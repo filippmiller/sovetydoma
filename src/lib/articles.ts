@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
+export { CATEGORIES } from './categories'
 
 const articlesDirectory = path.join(process.cwd(), 'src/content/articles')
 
@@ -18,78 +19,57 @@ export interface ArticleFrontmatter {
 export interface Article {
   frontmatter: ArticleFrontmatter
   content: string
+  wordCount: number
 }
 
-export const CATEGORIES: Record<string, { name: string; slug: string; description: string }> = {
-  kulinaria: {
-    name: 'Кулинария',
-    slug: 'kulinaria',
-    description: 'Рецепты, советы и секреты вкусной домашней кухни',
-  },
-  'dom-i-uborka': {
-    name: 'Дом и уборка',
-    slug: 'dom-i-uborka',
-    description: 'Лайфхаки для чистоты и порядка в доме',
-  },
-  'dacha-i-ogorod': {
-    name: 'Дача и огород',
-    slug: 'dacha-i-ogorod',
-    description: 'Советы для сада, огорода и загородной жизни',
-  },
-  layfkhaki: {
-    name: 'Лайфхаки',
-    slug: 'layfkhaki',
-    description: 'Полезные идеи и хитрости на каждый день',
-  },
-  ekonomiya: {
-    name: 'Экономия',
-    slug: 'ekonomiya',
-    description: 'Как жить хорошо и тратить меньше',
-  },
+function parseFile(fileName: string): { frontmatter: ArticleFrontmatter; content: string; wordCount: number } {
+  const fullPath = path.join(articlesDirectory, fileName)
+  const fileContents = fs.readFileSync(fullPath, 'utf8')
+  const { data, content } = matter(fileContents)
+  const wordCount = content.trim().split(/\s+/).length
+  return { frontmatter: data as ArticleFrontmatter, content, wordCount }
 }
 
-export function getAllArticles(): ArticleFrontmatter[] {
-  const fileNames = fs.readdirSync(articlesDirectory)
-  const articles = fileNames
-    .filter((f) => f.endsWith('.mdx'))
-    .map((fileName) => {
-      const fullPath = path.join(articlesDirectory, fileName)
-      const fileContents = fs.readFileSync(fullPath, 'utf8')
-      const { data } = matter(fileContents)
-      return data as ArticleFrontmatter
+export function getAllArticles(): (ArticleFrontmatter & { wordCount: number })[] {
+  const fileNames = fs.readdirSync(articlesDirectory).filter((f) => f.endsWith('.mdx'))
+  return fileNames
+    .map((f) => {
+      const { frontmatter, wordCount } = parseFile(f)
+      return { ...frontmatter, wordCount }
     })
     .sort((a, b) => (a.date < b.date ? 1 : -1))
-  return articles
 }
 
-export function getArticlesByCategory(category: string): ArticleFrontmatter[] {
+export function getArticlesByCategory(category: string): (ArticleFrontmatter & { wordCount: number })[] {
   return getAllArticles().filter((a) => a.category === category)
 }
 
 export function getArticle(category: string, slug: string): Article | null {
-  const fileNames = fs.readdirSync(articlesDirectory)
+  const fileNames = fs.readdirSync(articlesDirectory).filter((f) => f.endsWith('.mdx'))
   for (const fileName of fileNames) {
-    if (!fileName.endsWith('.mdx')) continue
-    const fullPath = path.join(articlesDirectory, fileName)
-    const fileContents = fs.readFileSync(fullPath, 'utf8')
-    const { data, content } = matter(fileContents)
-    const fm = data as ArticleFrontmatter
-    if (fm.slug === slug && fm.category === category) {
-      return { frontmatter: fm, content }
+    const { frontmatter, content, wordCount } = parseFile(fileName)
+    if (frontmatter.slug === slug && frontmatter.category === category) {
+      return { frontmatter, content, wordCount }
     }
   }
   return null
 }
 
 export function getAllSlugs(): { category: string; slug: string }[] {
-  const fileNames = fs.readdirSync(articlesDirectory)
-  return fileNames
+  return fs.readdirSync(articlesDirectory)
     .filter((f) => f.endsWith('.mdx'))
-    .map((fileName) => {
-      const fullPath = path.join(articlesDirectory, fileName)
-      const fileContents = fs.readFileSync(fullPath, 'utf8')
-      const { data } = matter(fileContents)
-      const fm = data as ArticleFrontmatter
-      return { category: fm.category, slug: fm.slug }
+    .map((f) => {
+      const { frontmatter } = parseFile(f)
+      return { category: frontmatter.category, slug: frontmatter.slug }
     })
+}
+
+export function getAllTags(): { tag: string; count: number }[] {
+  const tagCount: Record<string, number> = {}
+  getAllArticles().forEach((a) => {
+    a.tags.forEach((t) => { tagCount[t] = (tagCount[t] || 0) + 1 })
+  })
+  return Object.entries(tagCount)
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count)
 }

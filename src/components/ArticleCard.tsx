@@ -1,26 +1,17 @@
 import Link from 'next/link'
 import { ArticleFrontmatter, CATEGORIES } from '@/lib/articles'
+import { readingTime, relativeDate, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
 
 interface Props {
   article: ArticleFrontmatter
+  wordCount?: number
 }
 
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
-}
-
-const CATEGORY_COLORS: Record<string, string> = {
-  kulinaria: '#e67e22',
-  'dom-i-uborka': '#27ae60',
-  'dacha-i-ogorod': '#16a085',
-  layfkhaki: '#8e44ad',
-  ekonomiya: '#2980b9',
-}
-
-export default function ArticleCard({ article }: Props) {
+export default function ArticleCard({ article, wordCount }: Props) {
   const cat = CATEGORIES[article.category]
-  const color = CATEGORY_COLORS[article.category] || '#888'
+  const color = CATEGORY_COLOR[article.category] || '#888'
+  const emoji = CATEGORY_EMOJI[article.category] || '📄'
+  const time = wordCount ? readingTime('x '.repeat(wordCount)) : '~3 минуты'
 
   return (
     <Link
@@ -28,6 +19,7 @@ export default function ArticleCard({ article }: Props) {
       style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column' }}
     >
       <article
+        className="article-card"
         style={{
           backgroundColor: '#fff',
           borderRadius: '10px',
@@ -36,46 +28,47 @@ export default function ArticleCard({ article }: Props) {
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          transition: 'box-shadow 0.2s, transform 0.2s',
         }}
-        className="article-card"
       >
-        {/* Image placeholder */}
+        {/* Gradient hero */}
         <div style={{
-          backgroundColor: color,
-          height: '180px',
+          height: '160px',
+          background: `linear-gradient(135deg, ${color}dd 0%, ${color}88 100%)`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          fontSize: '3.5rem',
           position: 'relative',
+          overflow: 'hidden',
         }}>
-          <span style={{ fontSize: '3rem' }}>
-            {article.category === 'kulinaria' ? '🍲' :
-             article.category === 'dom-i-uborka' ? '🧹' :
-             article.category === 'dacha-i-ogorod' ? '🌱' :
-             article.category === 'layfkhaki' ? '💡' : '💰'}
-          </span>
+          <div style={{
+            position: 'absolute', inset: 0, opacity: 0.07,
+            backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }} />
+          {emoji}
         </div>
 
-        {/* Content */}
         <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
           {/* Category badge */}
           <span style={{
             display: 'inline-block',
             backgroundColor: color + '18',
-            color: color,
+            color,
             borderRadius: '4px',
             padding: '2px 8px',
-            fontSize: '0.75rem',
-            fontWeight: 600,
+            fontSize: '0.73rem',
+            fontWeight: 700,
             marginBottom: '0.6rem',
             width: 'fit-content',
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
           }}>
             {cat?.name || article.categoryName}
           </span>
 
           <h2 style={{
-            fontSize: '1.05rem',
+            fontSize: '1rem',
             fontWeight: 700,
             lineHeight: 1.4,
             marginBottom: '0.5rem',
@@ -85,30 +78,28 @@ export default function ArticleCard({ article }: Props) {
           </h2>
 
           <p style={{
-            fontSize: '0.88rem',
+            fontSize: '0.87rem',
             color: '#666',
             lineHeight: 1.6,
             flex: 1,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
           }}>
             {article.description}
           </p>
 
-          <time style={{ fontSize: '0.78rem', color: '#999', marginTop: '0.75rem', display: 'block' }}>
-            {formatDate(article.date)}
-          </time>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem' }}>
+            <time style={{ fontSize: '0.76rem', color: '#bbb' }}>
+              {relativeDate(article.date)}
+            </time>
+            <span style={{ fontSize: '0.76rem', color: '#bbb' }}>
+              ⏱ {time}
+            </span>
+          </div>
         </div>
       </article>
-
-      <style>{`
-        .article-card:hover {
-          box-shadow: 0 4px 16px rgba(0,0,0,0.13) !important;
-          transform: translateY(-2px);
-        }
-      `}</style>
     </Link>
   )
 }

@@ -3,8 +3,9 @@ import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import YandexMetrika from '@/components/YandexMetrika'
+import BackToTop from '@/components/BackToTop'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://sovetydoma.ru'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorim.vsedomatut.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -18,21 +19,33 @@ export const metadata: Metadata = {
     siteName: 'СоветыДома',
     locale: 'ru_RU',
     type: 'website',
+    images: [{ url: '/og-default.png', width: 1200, height: 630 }],
   },
-  robots: {
-    index: true,
-    follow: true,
+  twitter: {
+    card: 'summary_large_image',
+    site: '@sovetydoma',
+    creator: '@sovetydoma',
+  },
+  robots: { index: true, follow: true },
+  other: {
+    'yandex-verification': process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || '',
   },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru">
-      <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <head>
+        <link rel="alternate" hrefLang="ru" href={SITE_URL} />
+        <meta name="theme-color" content="#c0392b" />
+      </head>
+      <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', margin: 0 }}>
+        <a href="#main-content" className="skip-link">Перейти к содержимому</a>
         <YandexMetrika />
         <Header />
-        <main style={{ flex: 1 }}>{children}</main>
+        <main id="main-content" style={{ flex: 1 }}>{children}</main>
         <Footer />
+        <BackToTop />
       </body>
     </html>
   )
