@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: YandexImages
+Allow: /
+
+User-agent: YandexVideo
+Allow: /
+
+User-agent: YandexMedia
+Allow: /
+
+Sitemap: https://pogovorim.vsedomatut.com/sitemap.xml
+Host: https://pogovorim.vsedomatut.com
