@@ -4,6 +4,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import YandexMetrika from '@/components/YandexMetrika'
 import BackToTop from '@/components/BackToTop'
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorim.vsedomatut.com'
 
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="alternate" type="application/rss+xml" title="СоветыДома — Дача и огород" href={`${SITE_URL}/feed-dacha-i-ogorod.xml`} />
         <link rel="alternate" type="application/rss+xml" title="СоветыДома — Лайфхаки" href={`${SITE_URL}/feed-layfkhaki.xml`} />
         <link rel="alternate" type="application/rss+xml" title="СоветыДома — Экономия" href={`${SITE_URL}/feed-ekonomiya.xml`} />
+        <link rel="alternate" type="application/rss+xml" title="СоветыДома Turbo" href="https://pogovorim.vsedomatut.com/turbo.xml" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#c0392b" />
       </head>
@@ -60,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main-content" style={{ flex: 1 }}>{children}</main>
         <Footer />
         <BackToTop />
+        <ServiceWorkerRegistration />
       </body>
     </html>
   )

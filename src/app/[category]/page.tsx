@@ -1,3 +1,5 @@
+export const dynamicParams = false
+export const revalidate = false
 import { getArticlesByCategory, CATEGORIES } from '@/lib/articles'
 import ArticleCard from '@/components/ArticleCard'
 import Breadcrumb from '@/components/Breadcrumb'

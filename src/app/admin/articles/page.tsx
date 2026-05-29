@@ -1,4 +1,4 @@
-import { getAllArticles } from '@/lib/articles'
+﻿import { getAllArticles } from '@/lib/articles'
 import AdminArticlesList from '@/components/admin/AdminArticlesList'
 
 export default function AdminArticlesPage() {

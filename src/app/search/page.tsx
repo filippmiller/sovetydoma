@@ -1,4 +1,4 @@
-import { getAllArticles } from '@/lib/articles'
+﻿import { getAllArticles } from '@/lib/articles'
 import SearchClient from '@/components/SearchClient'
 import type { Metadata } from 'next'
 

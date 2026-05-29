@@ -1,4 +1,4 @@
-import { getAllTags } from '@/lib/articles'
+﻿import { getAllTags } from '@/lib/articles'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 

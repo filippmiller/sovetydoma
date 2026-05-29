@@ -12,23 +12,25 @@ export function relativeDate(dateStr: string): string {
   const now = new Date()
   const date = new Date(dateStr)
   const diffMs = now.getTime() - date.getTime()
+
+  // Future dates or same-day: show "сегодня"
+  if (diffMs < 0) return 'сегодня'
+
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
 
   if (diffDays === 0) return 'сегодня'
   if (diffDays === 1) return 'вчера'
   if (diffDays < 7) return `${diffDays} дн. назад`
-  if (diffDays < 30) {
+  if (diffDays < 28) {
     const weeks = Math.floor(diffDays / 7)
-    return weeks === 1 ? '1 неделю назад' : `${weeks} нед. назад`
+    return `${weeks} нед. назад`
   }
   if (diffDays < 365) {
     const months = Math.floor(diffDays / 30)
-    if (months === 1) return '1 месяц назад'
-    if (months < 5) return `${months} месяца назад`
-    return `${months} месяцев назад`
+    return `${months} мес. назад`
   }
   const years = Math.floor(diffDays / 365)
-  return years === 1 ? '1 год назад' : `${years} года назад`
+  return `${years} г. назад`
 }
 
 // Full date in Russian

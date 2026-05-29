@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import { getAllArticles, CATEGORIES } from '@/lib/articles'
 
 export const metadata: Metadata = {

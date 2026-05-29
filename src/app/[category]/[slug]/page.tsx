@@ -1,12 +1,25 @@
+export const dynamicParams = false
+export const revalidate = false
 import Link from 'next/link'
 import { getArticle, getAllSlugs, getAllArticles, CATEGORIES } from '@/lib/articles'
 import Breadcrumb from '@/components/Breadcrumb'
 import RelatedArticles from '@/components/RelatedArticles'
 import MoreArticles from '@/components/MoreArticles'
+import Comments from '@/components/Comments'
+import BookmarkButton from '@/components/BookmarkButton'
 import TableOfContents from '@/components/TableOfContents'
 import ReadingProgress from '@/components/ReadingProgress'
 import FontSizeControl from '@/components/FontSizeControl'
 import ViewTracker from '@/components/ViewTracker'
+import CostBadge from '@/components/CostBadge'
+import ArticleChecklist from '@/components/ArticleChecklist'
+import PrintRecipeButton from '@/components/PrintRecipeButton'
+import ArticleReactions from '@/components/ArticleReactions'
+import ViewedCategoryTracker from '@/components/ViewedCategoryTracker'
+import SponsoredBadge from '@/components/SponsoredBadge'
+import AffiliateLink from '@/components/AffiliateLink'
+import RecipeCard from '@/components/RecipeCard'
+import ArticleSeries from '@/components/ArticleSeries'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import type { Metadata } from 'next'
@@ -23,7 +36,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = getArticle(category, slug)
   if (!article) return {}
   const { frontmatter: fm } = article
+  const cat = CATEGORIES[category]
   const url = `${SITE_URL}/${category}/${slug}`
+  const ogUrl = `${SITE_URL}/api/og?title=${encodeURIComponent(fm.title)}&category=${category}&categoryName=${encodeURIComponent(cat?.name || fm.categoryName)}`
   return {
     title: fm.title,
     description: fm.description,
@@ -36,12 +51,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       publishedTime: fm.date,
       tags: fm.tags,
-      images: [{ url: '/og-default.png', width: 1200, height: 630 }],
+      images: [{ url: ogUrl, width: 1200, height: 630, alt: fm.title }],
     },
     twitter: {
       card: 'summary_large_image',
       title: fm.title,
       description: fm.description,
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
     },
   }
 }
@@ -167,6 +183,9 @@ export default async function ArticlePage({ params }: Props) {
       {/* F7: View tracker for popular articles */}
       <ViewTracker slug={slug} />
 
+      {/* Personalisation: track viewed category */}
+      <ViewedCategoryTracker category={category} />
+
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {additionalSchema && (
@@ -186,6 +205,17 @@ export default async function ArticlePage({ params }: Props) {
               { name: cat?.name || fm.categoryName, href: `/${category}` },
               { name: fm.title },
             ]} />
+
+            {/* Article series navigation */}
+            {fm.seriesName && (
+              <ArticleSeries
+                seriesName={fm.seriesName}
+                currentSlug={slug}
+                allArticles={allArticles}
+              />
+            )}
+
+            {fm.sponsored && <SponsoredBadge />}
 
             <header style={{ marginBottom: '1.75rem' }}>
               <span style={{
@@ -208,12 +238,17 @@ export default async function ArticlePage({ params }: Props) {
               </p>
 
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', fontSize: '0.83rem', color: '#767676', flexWrap: 'wrap' }}>
-                <time dateTime={fm.date} title={formatDate(fm.date)}>
-                  📅 {relativeDate(fm.date)}
+                <time dateTime={fm.date} title={formatDate(fm.date)} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span>📅 {formatDate(fm.date)} <span style={{ opacity: 0.7 }}>({relativeDate(fm.date)})</span></span>
+                  {fm.updated && (
+                    <span>🔄 Обновлено: {formatDate(fm.updated)}</span>
+                  )}
                 </time>
                 <span>⏱ {timeToRead}</span>
                 <span>📝 {wordCount} слов</span>
+                {fm.cost && <CostBadge cost={fm.cost} />}
                 <FontSizeControl />
+                <BookmarkButton slug={slug} title={fm.title} />
               </div>
             </header>
 
@@ -221,25 +256,41 @@ export default async function ArticlePage({ params }: Props) {
               <TableOfContents content={content} />
             </div>
 
+            {/* Visual recipe card — shown for Recipe articles with ingredients */}
+            {fm.schemaType === 'Recipe' && fm.recipeIngredient && (
+              <RecipeCard
+                prepTime={fm.prepTime}
+                cookTime={fm.cookTime}
+                recipeYield={fm.recipeYield}
+                recipeIngredient={fm.recipeIngredient}
+                recipeSteps={fm.recipeSteps}
+                difficulty={fm.difficulty}
+              />
+            )}
+
             <article className="prose">
-              <MDXRemote source={content} />
+              <MDXRemote source={content} components={{ ArticleChecklist, AffiliateLink }} />
             </article>
 
+            {/* Tags */}
             {fm.tags.length > 0 && (
               <div style={{ marginTop: '2rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {fm.tags.map((tag) => (
-                  <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}
-                    style={{
-                      padding: '4px 10px', borderRadius: '4px',
-                      backgroundColor: '#f0ede8', color: '#666',
-                      fontSize: '0.8rem', textDecoration: 'none',
-                    }}>
+                  <Link key={tag} href={`/tag/${encodeURIComponent(tag)}/`}
+                    style={{ padding: '4px 10px', borderRadius: '4px', backgroundColor: '#f0ede8', color: '#666', fontSize: '0.8rem', textDecoration: 'none' }}>
                     #{tag}
                   </Link>
                 ))}
               </div>
             )}
 
+            {/* Article reactions */}
+            <ArticleReactions slug={slug} />
+
+            {/* Print button for recipes */}
+            {fm.schemaType === 'Recipe' && <PrintRecipeButton />}
+
+            {/* Share buttons */}
             <div className="share-buttons" style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{ color: '#767676', fontSize: '0.88rem', fontWeight: 600 }}>Поделиться:</span>
               {[
@@ -249,26 +300,21 @@ export default async function ArticlePage({ params }: Props) {
               ].map(({ href, label, bg }) => (
                 <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                   aria-label={`Поделиться в ${label}`}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                    padding: '0.4rem 1rem', backgroundColor: bg, color: '#fff',
-                    borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500,
-                  }}>
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 1rem', backgroundColor: bg, color: '#fff', borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
                   {label}
                 </a>
               ))}
             </div>
 
-            {/* F9: Tag-based similarity recommendations across all categories */}
             <RelatedArticles articles={allArticles} currentSlug={slug} currentTags={fm.tags} />
-
-            {/* F5: Cross-category articles */}
-            <MoreArticles articles={otherArticles} />
+            <MoreArticles articles={allArticles.filter(a => a.category !== category && a.slug !== slug).slice(0, 6)} />
+            <Comments slug={slug} />
           </div>
 
-          <aside className="article-sidebar" aria-label="Содержание">
+          {/* Sidebar TOC (desktop only) */}
+          <div className="article-sidebar">
             <TableOfContents content={content} sidebar />
-          </aside>
+          </div>
         </div>
       </div>
     </>

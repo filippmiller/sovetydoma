@@ -15,12 +15,20 @@ export interface ArticleFrontmatter {
   updated?: string
   image: string
   tags: string[]
+  // Monetisation
+  sponsored?: boolean        // marks article as sponsored/partner content
   // Optional schema.org fields
   schemaType?: 'Recipe' | 'HowTo'
   prepTime?: string   // ISO 8601 e.g. PT20M
   cookTime?: string   // ISO 8601 e.g. PT90M
   recipeYield?: string
   recipeIngredient?: string[]
+  recipeSteps?: string[]
+  difficulty?: 'Легко' | 'Средне' | 'Сложно'
+  cost?: string  // e.g. "~300 ₽" or "бесплатно"
+  // Series navigation
+  seriesName?: string
+  seriesOrder?: number
 }
 
 export interface Article {

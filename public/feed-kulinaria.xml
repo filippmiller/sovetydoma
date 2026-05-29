@@ -6,13 +6,61 @@
     <description>Рецепты, советы и секреты вкусной домашней кухни</description>
     <language>ru</language>
     <atom:link href="https://pogovorim.vsedomatut.com/feed-kulinaria.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Fri, 29 May 2026 18:05:36 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 29 May 2026 19:42:16 GMT</lastBuildDate>
     <image>
       <url>https://pogovorim.vsedomatut.com/og-default.png</url>
       <title>СоветыДома</title>
       <link>https://pogovorim.vsedomatut.com/</link>
     </image>
     
+  <item>
+    <title>Зимние заготовки: варенье, соленья и маринады — с чего начать</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/zima-zagotovki/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/zima-zagotovki/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Руководство для начинающих по зимним заготовкам: варенье, соленья, маринады — базовые рецепты, необходимое оборудование и правила безопасного хранения.</description>
+  </item>
+  <item>
+    <title>Вареники с картошкой и луком: рецепт как у бабушки</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/vareniki-s-kartoshkoy/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/vareniki-s-kartoshkoy/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Пошаговый рецепт вареников с картошкой и луком — мягкое тесто, ароматная начинка и советы, которые передаются из поколения в поколение.</description>
+  </item>
+  <item>
+    <title>Как правильно варить куриный бульон: прозрачный и ароматный</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/kuriniy-bulon/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/kuriniy-bulon/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Секреты прозрачного и ароматного куриного бульона: выбор мяса, правильная температура варки, осветление и хранение.</description>
+  </item>
+  <item>
+    <title>Картошка в духовке с чесноком и зеленью: хрустящая корочка</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/kartoshka-v-duhovke/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/kartoshka-v-duhovke/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Как приготовить картошку в духовке с чесноком, зеленью и хрустящей корочкой — простой рецепт с советами по выбору сорта и температуре запекания.</description>
+  </item>
+  <item>
+    <title>Холодец из свиных ножек: классический рецепт с секретами прозрачности</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/holodets-retsept/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/holodets-retsept/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Классический рецепт холодца из свиных ножек с курицей: как добиться прозрачного бульона, правильная варка, специи и подача с хреном и горчицей.</description>
+  </item>
+  <item>
+    <title>Постный борщ без мяса: насыщенный вкус без животного белка</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/borsch-bez-myasa/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/borsch-bez-myasa/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Рецепт постного борща без мяса с насыщенным вкусом — свёкла, капуста, фасоль и секреты правильной кислинки без мясного бульона.</description>
+  </item>
   <item>
     <title>Как засолить грибы на зиму: холодный и горячий способ</title>
     <link>https://pogovorim.vsedomatut.com/kulinaria/griby-zasolka/</link>

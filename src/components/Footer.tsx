@@ -31,6 +31,16 @@ export default function Footer() {
             }}>
               📡 RSS-лента
             </Link>
+            {/* Telegram channel */}
+            <a href="https://t.me/sovetydoma" style={{
+              display: 'inline-flex', alignItems: 'center', gap: '5px',
+              color: '#229ED9', fontSize: '0.78rem', fontWeight: 700,
+              textDecoration: 'none', padding: '4px 10px', borderRadius: '5px',
+              border: '1.5px solid #229ED944', backgroundColor: '#229ED912',
+              marginTop: '6px',
+            }}>
+              📢 Telegram-канал
+            </a>
           </div>
 
           {/* Categories */}
@@ -51,7 +61,7 @@ export default function Footer() {
           <div>
             <div style={{ color: '#fff', fontWeight: 700, marginBottom: '0.85rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Новые советы на почту</div>
             <p style={{ fontSize: '0.85rem', color: '#c0bdb8', marginBottom: '0.85rem', lineHeight: 1.6 }}>
-              Раз в неделю — лучшие лайфхаки, рецепты и советы по дому. Без спама.
+              Раз в неделю — лучший совет недели. Уже 500+ читателей. Отписка в 1 клик.
             </p>
             <NewsletterForm />
           </div>

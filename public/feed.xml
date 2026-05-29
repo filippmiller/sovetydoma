@@ -6,7 +6,7 @@
     <description>Практические советы по кулинарии, уборке, огороду, лайфхаки и экономия для вашего дома.</description>
     <language>ru</language>
     <atom:link href="https://pogovorim.vsedomatut.com/feed.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Fri, 29 May 2026 18:05:36 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 29 May 2026 19:42:16 GMT</lastBuildDate>
     <image>
       <url>https://pogovorim.vsedomatut.com/og-default.png</url>
       <title>СоветыДома</title>
@@ -22,6 +22,102 @@
     <description>Бюджетное меню на неделю для двух человек с полным списком продуктов за 3000 рублей — вкусно, разнообразно и без жертв.</description>
   </item>
   <item>
+    <title>Зимние заготовки: варенье, соленья и маринады — с чего начать</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/zima-zagotovki/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/zima-zagotovki/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Руководство для начинающих по зимним заготовкам: варенье, соленья, маринады — базовые рецепты, необходимое оборудование и правила безопасного хранения.</description>
+  </item>
+  <item>
+    <title>Вареники с картошкой и луком: рецепт как у бабушки</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/vareniki-s-kartoshkoy/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/vareniki-s-kartoshkoy/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Пошаговый рецепт вареников с картошкой и луком — мягкое тесто, ароматная начинка и советы, которые передаются из поколения в поколение.</description>
+  </item>
+  <item>
+    <title>Как вывести пятна с одежды: кофе, трава, жир, кровь — конкретные методы</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/udalit-pyatna/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/udalit-pyatna/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Конкретные способы вывести пятна с одежды: кофе, трава, жир, кровь, вино, ржавчина — чем обработать, в каком порядке действовать и каких ошибок избегать.</description>
+  </item>
+  <item>
+    <title>Как быстро убрать ванную комнату до блеска за 20 минут</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/uborka-vannoy/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/uborka-vannoy/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Пошаговый план быстрой уборки ванной комнаты за 20 минут: правильная последовательность, эффективные средства и лайфхаки для блеска без усилий.</description>
+  </item>
+  <item>
+    <title>Как стирать белые вещи чтобы они оставались белыми</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/stirka-belih-veshchey/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/stirka-belih-veshchey/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Советы по стирке белых вещей: правильный режим, температура, отбеливатели и народные средства — чтобы белое оставалось белым надолго.</description>
+  </item>
+  <item>
+    <title>Бюджетный ремонт квартиры: как сделать красиво и недорого</title>
+    <link>https://pogovorim.vsedomatut.com/ekonomiya/remont-kvartiry-byudzhet/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/remont-kvartiry-byudzhet/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Как сделать ремонт квартиры красиво и недорого: планирование бюджета, выбор материалов, очерёдность работ и способы сэкономить без потери качества.</description>
+  </item>
+  <item>
+    <title>Когда и как посадить клубнику в открытый грунт</title>
+    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/posadit-klubniku/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/posadit-klubniku/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Полное руководство по посадке клубники в открытый грунт: оптимальные сроки, выбор места, подготовка почвы, схема посадки и первый уход.</description>
+  </item>
+  <item>
+    <title>Как делать покупки выгодно: скидки, акции и правила экономного шопинга</title>
+    <link>https://pogovorim.vsedomatut.com/ekonomiya/pokupki-bez-pereplat/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/pokupki-bez-pereplat/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Как покупать выгодно: кешбэк, агрегаторы скидок, правила планирования покупок, ловушки маркетинга и стратегии экономного шопинга в магазине и онлайн.</description>
+  </item>
+  <item>
+    <title>Как организовать кухню: места хранения и порядок без усилий</title>
+    <link>https://pogovorim.vsedomatut.com/layfkhaki/organizatsiya-kuhni/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/organizatsiya-kuhni/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Практические советы по организации кухни: зонирование, умное хранение, освобождение столешницы и лайфхаки для поддержания порядка каждый день.</description>
+  </item>
+  <item>
+    <title>Как вырастить морковь на даче: посев, уход и уборка</title>
+    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/morkov-vyraschivanie/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/morkov-vyraschivanie/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Подробное руководство по выращиванию моркови на даче: сроки посева, подготовка грядки, прореживание, полив и правильная уборка урожая.</description>
+  </item>
+  <item>
+    <title>Как правильно варить куриный бульон: прозрачный и ароматный</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/kuriniy-bulon/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/kuriniy-bulon/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Секреты прозрачного и ароматного куриного бульона: выбор мяса, правильная температура варки, осветление и хранение.</description>
+  </item>
+  <item>
+    <title>Как хранить овощи зимой в квартире: лук, картошка, морковь</title>
+    <link>https://pogovorim.vsedomatut.com/layfkhaki/khraneniye-ovoshchey-zimoy/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/khraneniye-ovoshchey-zimoy/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Практические советы по хранению овощей в квартире зимой: лук, картофель, морковь, чеснок, свёкла — условия, место, тара и сроки хранения.</description>
+  </item>
+  <item>
     <title>Кэшбэк карты в России 2026: как выбрать и не переплачивать</title>
     <link>https://pogovorim.vsedomatut.com/ekonomiya/kashbek-karty-2026/</link>
     <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/kashbek-karty-2026/</guid>
@@ -30,148 +126,52 @@
     <description>Как выбрать кэшбэк карту в 2026 году, чтобы реально экономить: категории кэшбэка, подводные камни, какие карты выгодны для разных расходов.</description>
   </item>
   <item>
-    <title>Чем подкормить грядки: органика vs минералка, когда и сколько</title>
-    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/udobreniya-gryadki/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/udobreniya-gryadki/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Сравнение органических и минеральных удобрений для огорода: состав, плюсы и минусы, NPK-соотношения, оптимальные сроки и нормы внесения по типу культур.</description>
-  </item>
-  <item>
-    <title>Болезни томатов: почему желтеют, скручиваются и чернеют листья</title>
-    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/tomaty-bolezni/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/tomaty-bolezni/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Разбираем все главные болезни томатов: фитофтора, вершинная гниль, мозаика, хлороз. Как определить причину пожелтения, скручивания и почернения листьев и что делать.</description>
-  </item>
-  <item>
-    <title>Вредители сада: как распознать и уничтожить тлю, клеща и белокрылку</title>
-    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/tli-nasekomye-sad/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/tli-nasekomye-sad/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Подробное руководство по борьбе с тлёй, паутинным клещом и белокрылкой: как распознать заражение, органические и химические методы борьбы, профилактика.</description>
-  </item>
-  <item>
-    <title>Болезни и паразиты овощей: мучнистая роса, фитофтора, нематода</title>
-    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/parazity-rastenii/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/parazity-rastenii/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Как распознать и победить мучнистую росу, фитофтору и нематоду на огороде. Органические и химические методы защиты растений.</description>
-  </item>
-  <item>
-    <title>Осы и пчёлы на даче: как не дать им устроить гнездо и что делать при укусе</title>
-    <link>https://pogovorim.vsedomatut.com/layfkhaki/osy-pchely-osam/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/osy-pchely-osam/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Практические советы по защите дачи от ос и пчёл: как предотвратить появление гнёзд, безопасно убрать уже устроившихся насекомых и оказать первую помощь при укусе.</description>
-  </item>
-  <item>
-    <title>Как вырастить огурцы в открытом грунте: от посадки до урожая</title>
-    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/ogurcy-v-otkrytom-grunte/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/ogurcy-v-otkrytom-grunte/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Пошаговое руководство по выращиванию огурцов в открытом грунте: подготовка почвы, сроки посадки, полив, подвязка, типичные ошибки и как получить богатый урожай.</description>
-  </item>
-  <item>
-    <title>Правила безопасности в лесу: как не заблудиться и что брать с собой</title>
-    <link>https://pogovorim.vsedomatut.com/layfkhaki/les-bezopasnost/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/les-bezopasnost/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Полное руководство по безопасности в лесу: что взять с собой, как ориентироваться без GPS, что делать если заблудились, как подать сигнал спасателям.</description>
-  </item>
-  <item>
-    <title>Как защититься от клещей: одежда, репелленты, осмотр после леса</title>
-    <link>https://pogovorim.vsedomatut.com/layfkhaki/kleshchi-zashchita/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/kleshchi-zashchita/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Практическое руководство по защите от клещей: правильная одежда, выбор репеллентов, осмотр тела после леса, что делать при укусе и как снять клеща.</description>
-  </item>
-  <item>
-    <title>Как засолить грибы на зиму: холодный и горячий способ</title>
-    <link>https://pogovorim.vsedomatut.com/kulinaria/griby-zasolka/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/griby-zasolka/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
+    <title>Картошка в духовке с чесноком и зеленью: хрустящая корочка</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/kartoshka-v-duhovke/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/kartoshka-v-duhovke/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
     <category>Кулинария</category>
-    <description>Подробные рецепты засолки грибов на зиму — горячий и холодный способы. Какие грибы выбрать, сколько соли нужно, как правильно хранить заготовки.</description>
+    <description>Как приготовить картошку в духовке с чесноком, зеленью и хрустящей корочкой — простой рецепт с советами по выбору сорта и температуре запекания.</description>
   </item>
   <item>
-    <title>Когда и как собирать грибы: сезон, правила, опасные виды</title>
-    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/griby-sezony-sbor/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/griby-sezony-sbor/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Полный гид по сбору грибов в России: когда начинается сезон, в каких лесах искать, как отличить съедобные от ядовитых и что делать при отравлении.</description>
+    <title>Как выбрать спелый арбуз: 7 признаков хорошего арбуза</title>
+    <link>https://pogovorim.vsedomatut.com/layfkhaki/kak-vybrat-arbuz/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/kak-vybrat-arbuz/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>7 верных признаков спелого арбуза: хвостик, пятно, звук, корочка, вес и другие способы выбрать сладкий арбуз на рынке или в магазине.</description>
   </item>
   <item>
-    <title>Как экономить на бензине: 10 реальных способов</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-benzin/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-benzin/</guid>
-    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
+    <title>Как избавиться от пыли в квартире надолго: причины и решения</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/izbavitsya-ot-pyli/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/izbavitsya-ot-pyli/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Почему пыль накапливается так быстро и как с ней бороться системно: источники пыли, правильные инструменты, антистатические средства и режим уборки.</description>
+  </item>
+  <item>
+    <title>Холодец из свиных ножек: классический рецепт с секретами прозрачности</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/holodets-retsept/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/holodets-retsept/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Классический рецепт холодца из свиных ножек с курицей: как добиться прозрачного бульона, правильная варка, специи и подача с хреном и горчицей.</description>
+  </item>
+  <item>
+    <title>Как сэкономить на электроэнергии дома: 10 рабочих способов</title>
+    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-elektroenergii/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-elektroenergii/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
-    <description>Как снизить расход топлива и расходы на бензин — стиль вождения, выбор АЗС, приложения для поиска дешёвого бензина и техническое обслуживание.</description>
+    <description>10 проверенных способов снизить расход электроэнергии дома без потери комфорта: от замены лампочек до умных режимов бытовой техники.</description>
   </item>
   <item>
-    <title>Как платить меньше за ЖКХ: 8 способов снизить коммунальные расходы</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-zhkh/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-zhkh/</guid>
-    <pubDate>Wed, 27 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Реальные способы сократить счета за ЖКХ — от счётчиков и субсидий до энергосберегающих лайфхаков. Сколько можно сэкономить каждым способом.</description>
-  </item>
-  <item>
-    <title>Как приготовить идеальные блины: тонкие, с дырочками, не рвутся</title>
-    <link>https://pogovorim.vsedomatut.com/kulinaria/domashnie-bliny/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/domashnie-bliny/</guid>
-    <pubDate>Wed, 27 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Проверенный рецепт тонких русских блинов с дырочками. Разбираем, почему блины рвутся, не переворачиваются и прилипают — и как это исправить.</description>
-  </item>
-  <item>
-    <title>Домашний майонез за 5 минут: рецепт без магазинной химии</title>
-    <link>https://pogovorim.vsedomatut.com/kulinaria/domashnie-mayonez/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/domashnie-mayonez/</guid>
-    <pubDate>Tue, 26 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Простой рецепт домашнего майонеза погружным блендером — густой, вкусный, без консервантов и загустителей. Хранится неделю.</description>
-  </item>
-  <item>
-    <title>Как убрать царапины с мебели: 7 способов без мастера</title>
-    <link>https://pogovorim.vsedomatut.com/layfkhaki/carapiny-na-mebeli/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/carapiny-na-mebeli/</guid>
-    <pubDate>Tue, 26 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Как замаскировать и устранить царапины на деревянной мебели, ДСП и лакированных поверхностях — народные методы и специальные средства.</description>
-  </item>
-  <item>
-    <title>Сборная мясная солянка: настоящий рецепт с каперсами и оливками</title>
-    <link>https://pogovorim.vsedomatut.com/kulinaria/solyanka-myasnaya/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/solyanka-myasnaya/</guid>
-    <pubDate>Mon, 25 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Классическая рецептура сборной мясной солянки с копчёностями, каперсами, оливками и лимоном — густой, ароматный суп ресторанного уровня.</description>
-  </item>
-  <item>
-    <title>Как хранить продукты чтобы дольше не портились: 12 правил</title>
-    <link>https://pogovorim.vsedomatut.com/layfkhaki/hranenie-produktov/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/hranenie-produktov/</guid>
-    <pubDate>Mon, 25 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Правила хранения продуктов в холодильнике и без него — что класть куда, как продлить свежесть овощей, фруктов, хлеба и мяса.</description>
-  </item>
-  <item>
-    <title>10 способов использовать пищевую соду дома: от кухни до ванной</title>
-    <link>https://pogovorim.vsedomatut.com/layfkhaki/soda-10-sposobov/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/soda-10-sposobov/</guid>
-    <pubDate>Sun, 24 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Пищевая сода — универсальное средство для уборки, устранения запахов и бытовых задач. 10 реальных способов применения соды дома.</description>
+    <title>Что посадить в тени на даче: растения которые растут без солнца</title>
+    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/chto-posadit-v-teni/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/chto-posadit-v-teni/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Какие овощи, зелень и цветы растут в тени: список теневыносливых растений для дачи, советы по посадке и уходу в затенённых местах.</description>
   </item>
   </channel>
 </rss>

@@ -1,0 +1,34 @@
+name: Notify Telegram on Deploy
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - 'src/content/articles/**.mdx'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Find new articles
+        id: articles
+        run: |
+          NEW=$(git diff --name-only HEAD~1 HEAD -- 'src/content/articles/*.mdx' | grep -v '^$' | head -3)
+          echo "files=$NEW" >> $GITHUB_OUTPUT
+      - name: Send to Telegram
+        if: steps.articles.outputs.files != ''
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          FILES="${{ steps.articles.outputs.files }}"
+          MSG="📝 Новые статьи на СоветыДома!%0A%0A"
+          while IFS= read -r file; do
+            SLUG=$(basename "$file" .mdx)
+            TITLE=$(grep '^title:' "$file" | head -1 | sed 's/title: *"\?\(.*\)"\?/\1/' | tr -d '"')
+            MSG="${MSG}• ${TITLE}%0A"
+          done <<< "$FILES"
+          MSG="${MSG}%0Ahttps://pogovorim.vsedomatut.com"
+          curl -s "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage?chat_id=${TG_CHAT_ID}&text=${MSG}&parse_mode=HTML"

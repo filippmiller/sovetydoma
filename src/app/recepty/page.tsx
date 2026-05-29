@@ -1,4 +1,4 @@
-import { getAllArticles } from '@/lib/articles'
+﻿import { getAllArticles } from '@/lib/articles'
 import RecipeFilter from '@/components/RecipeFilter'
 import Breadcrumb from '@/components/Breadcrumb'
 import type { Metadata } from 'next'

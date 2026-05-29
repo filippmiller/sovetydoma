@@ -6,13 +6,45 @@
     <description>Советы для сада, огорода и загородной жизни</description>
     <language>ru</language>
     <atom:link href="https://pogovorim.vsedomatut.com/feed-dacha-i-ogorod.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Fri, 29 May 2026 18:05:36 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 29 May 2026 19:42:16 GMT</lastBuildDate>
     <image>
       <url>https://pogovorim.vsedomatut.com/og-default.png</url>
       <title>СоветыДома</title>
       <link>https://pogovorim.vsedomatut.com/</link>
     </image>
     
+  <item>
+    <title>Когда и как посадить клубнику в открытый грунт</title>
+    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/posadit-klubniku/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/posadit-klubniku/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Полное руководство по посадке клубники в открытый грунт: оптимальные сроки, выбор места, подготовка почвы, схема посадки и первый уход.</description>
+  </item>
+  <item>
+    <title>Как вырастить морковь на даче: посев, уход и уборка</title>
+    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/morkov-vyraschivanie/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/morkov-vyraschivanie/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Подробное руководство по выращиванию моркови на даче: сроки посева, подготовка грядки, прореживание, полив и правильная уборка урожая.</description>
+  </item>
+  <item>
+    <title>Что посадить в тени на даче: растения которые растут без солнца</title>
+    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/chto-posadit-v-teni/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/chto-posadit-v-teni/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Какие овощи, зелень и цветы растут в тени: список теневыносливых растений для дачи, советы по посадке и уходу в затенённых местах.</description>
+  </item>
+  <item>
+    <title>Посадка чеснока под зиму: сроки, схема, сорта</title>
+    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/chesnok-osenyu/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/chesnok-osenyu/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Как посадить чеснок под зиму правильно: оптимальные сроки посадки, подготовка грядки, схема размещения зубков и выбор сортов для озимого выращивания.</description>
+  </item>
   <item>
     <title>Чем подкормить грядки: органика vs минералка, когда и сколько</title>
     <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/udobreniya-gryadki/</link>

@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { CATEGORIES } from '@/lib/categories'
 import DarkModeToggle from '@/components/DarkModeToggle'
+import HamburgerMenu from '@/components/HamburgerMenu'
+import AuthButton from '@/components/auth/AuthButton'
 
 export default function Header() {
   const pathname = usePathname()
@@ -30,7 +32,9 @@ export default function Header() {
           </Link>
           {/* Right side controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+            <AuthButton />
             <DarkModeToggle />
+            <HamburgerMenu />
             <Link
               href="/feed.xml"
               title="РСС-лента"
@@ -48,7 +52,7 @@ export default function Header() {
         </div>
 
         {/* Category nav */}
-        <nav aria-label="Основная навигация" style={{
+        <nav aria-label="Основная навигация" className="desktop-nav" style={{
           display: 'flex',
           gap: '0',
           overflowX: 'auto',
@@ -99,7 +103,7 @@ export default function Header() {
               minHeight: '44px',
             }}
           >
-            🍳 Рецепты
+            Рецепты
           </Link>
 
           {/* Search */}

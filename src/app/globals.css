@@ -291,3 +291,11 @@ footer a:hover { color: #fff !important; }
   color: #aaa;
   margin-bottom: 0.75rem;
 }
+
+/* Feature: Mobile hamburger menu responsive rules */
+.desktop-nav { display: flex; }
+.hamburger-btn { display: none; }
+@media (max-width: 768px) {
+  .desktop-nav { display: none !important; }
+  .hamburger-btn { display: flex !important; }
+}

@@ -1,7 +1,9 @@
-import { getAllArticles, CATEGORIES } from '@/lib/articles'
+﻿import { getAllArticles, CATEGORIES } from '@/lib/articles'
 import ArticleCard from '@/components/ArticleCard'
 import SeasonalBanner from '@/components/SeasonalBanner'
 import PopularArticles from '@/components/PopularArticles'
+import PersonalisedSection from '@/components/PersonalisedSection'
+import StartHereSection from '@/components/StartHereSection'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
@@ -43,8 +45,6 @@ const CATEGORY_COLOR: Record<string, string> = {
 
 export default function HomePage() {
   const articles = getAllArticles()
-  const featured = articles.slice(0, 3)
-  const rest = articles.slice(3)
   const catCounts = Object.fromEntries(
     Object.keys(CATEGORIES).map((cat) => [cat, articles.filter((a) => a.category === cat).length])
   )
@@ -55,6 +55,16 @@ export default function HomePage() {
     category: a.category,
     categoryName: a.categoryName,
     date: a.date,
+  }))
+
+  const articlesForClient = articles.map((a) => ({
+    slug: a.slug,
+    title: a.title,
+    category: a.category,
+    categoryName: a.categoryName,
+    date: a.date,
+    description: a.description,
+    tags: a.tags,
   }))
 
   return (
@@ -85,9 +95,9 @@ export default function HomePage() {
               Полезные советы<br />на каждый день
             </h1>
             <p style={{ fontSize: '1.05rem', opacity: 0.88, margin: '0 0 1.5rem', maxWidth: '520px', lineHeight: 1.6 }}>
-              Рецепты, лайфхаки, дача и экономия — всё проверено на практике. {articles.length} статей по {Object.keys(CATEGORIES).length} темам.
+              Рецепты, лайфхаки, дача и экономия — всё проверено на практике.
             </p>
-            <Link href="/kulinaria" style={{
+            <Link href="/search" style={{
               display: 'inline-block',
               backgroundColor: '#fff',
               color: '#c0392b',
@@ -135,38 +145,23 @@ export default function HomePage() {
         {/* F15: Seasonal content banner */}
         <SeasonalBanner />
 
-        {/* Featured row */}
-        {featured.length > 0 && (
-          <section style={{ marginBottom: '3rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-              <span style={{ fontSize: '1.2rem' }}>🔥</span>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>
-                Последние советы
-              </h2>
-              <span style={{ fontSize: '0.8rem', color: '#aaa', marginLeft: '0.3rem' }}>— самое свежее</span>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
-              {featured.map((article, i) => (
-                <ArticleCard key={article.slug} article={article} wordCount={article.wordCount} featured={i === 0} />
-              ))}
-            </div>
-          </section>
-        )}
+        {/* FIX 6: "С чего начать" for first-time visitors */}
+        <StartHereSection />
 
-        {/* Rest of articles */}
-        {rest.length > 0 && (
+        {/* All articles in one grid */}
+        {articles.length > 0 && (
           <section style={{ marginBottom: '2.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>
-                Ещё статьи
+                Все статьи
               </h2>
-              <Link href="/kulinaria" style={{ fontSize: '0.85rem', color: '#c0392b', textDecoration: 'none', fontWeight: 600 }}>
+              <Link href="/search" style={{ fontSize: '0.85rem', color: '#c0392b', textDecoration: 'none', fontWeight: 600 }}>
                 Все разделы →
               </Link>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
-              {rest.map((article) => (
-                <ArticleCard key={article.slug} article={article} wordCount={article.wordCount} />
+              {articles.map((article, i) => (
+                <ArticleCard key={article.slug} article={article} wordCount={article.wordCount} featured={i === 0} />
               ))}
             </div>
           </section>
@@ -175,20 +170,12 @@ export default function HomePage() {
         {/* F7: Popular articles (localStorage view tracking) */}
         <PopularArticles articles={popularArticleData} />
 
-        {/* RSS link */}
-        <div style={{ marginTop: '2.5rem', padding: '1rem 1.25rem', background: '#fff', borderRadius: '8px', border: '1px solid #e8e4df', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '1.1rem' }}>📡</span>
-          <div style={{ flex: 1 }}>
-            <span style={{ fontSize: '0.88rem', color: '#555', fontWeight: 600 }}>RSS-лента</span>
-            <span style={{ fontSize: '0.83rem', color: '#999', marginLeft: '0.5rem' }}>Подписывайтесь, чтобы не пропускать новые статьи</span>
-          </div>
-          <Link href="/feed.xml" style={{
-            fontSize: '0.83rem', color: '#c0392b', textDecoration: 'none',
-            fontWeight: 700, border: '1.5px solid #c0392b33',
-            padding: '0.35rem 0.85rem', borderRadius: '6px', backgroundColor: '#c0392b0a',
-          }}>
-            RSS ↗
-          </Link>
+        {/* Personalised "Для вас" section */}
+        <PersonalisedSection articles={articlesForClient} />
+
+        {/* RSS link — compact */}
+        <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.8rem', color: '#aaa' }}>
+          📡 <Link href="/feed.xml" style={{ color: '#aaa' }}>RSS-лента</Link>
         </div>
 
       </div>
