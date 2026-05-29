@@ -41,3 +41,12 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# Stray script deps
+argparse/
+gray-matter/
+is-extendable/
+js-yaml/
+kind-of/
+section-matter/
+strip-bom-string/

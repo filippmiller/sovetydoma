@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>СоветыДома — Экономия</title>
+    <link>https://pogovorim.vsedomatut.com/ekonomiya/</link>
+    <description>Как жить хорошо и тратить меньше</description>
+    <language>ru</language>
+    <atom:link href="https://pogovorim.vsedomatut.com/feed-ekonomiya.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 29 May 2026 18:05:36 GMT</lastBuildDate>
+    <image>
+      <url>https://pogovorim.vsedomatut.com/og-default.png</url>
+      <title>СоветыДома</title>
+      <link>https://pogovorim.vsedomatut.com/</link>
+    </image>
+    
+  <item>
+    <title>Меню на неделю за 3000 рублей на двоих: реальный план питания</title>
+    <link>https://pogovorim.vsedomatut.com/ekonomiya/menyu-na-nedelyu-3000/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/menyu-na-nedelyu-3000/</guid>
+    <pubDate>Sat, 30 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Бюджетное меню на неделю для двух человек с полным списком продуктов за 3000 рублей — вкусно, разнообразно и без жертв.</description>
+  </item>
+  <item>
+    <title>Кэшбэк карты в России 2026: как выбрать и не переплачивать</title>
+    <link>https://pogovorim.vsedomatut.com/ekonomiya/kashbek-karty-2026/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/kashbek-karty-2026/</guid>
+    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Как выбрать кэшбэк карту в 2026 году, чтобы реально экономить: категории кэшбэка, подводные камни, какие карты выгодны для разных расходов.</description>
+  </item>
+  <item>
+    <title>Как экономить на бензине: 10 реальных способов</title>
+    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-benzin/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-benzin/</guid>
+    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Как снизить расход топлива и расходы на бензин — стиль вождения, выбор АЗС, приложения для поиска дешёвого бензина и техническое обслуживание.</description>
+  </item>
+  <item>
+    <title>Как платить меньше за ЖКХ: 8 способов снизить коммунальные расходы</title>
+    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-zhkh/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-zhkh/</guid>
+    <pubDate>Wed, 27 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Реальные способы сократить счета за ЖКХ — от счётчиков и субсидий до энергосберегающих лайфхаков. Сколько можно сэкономить каждым способом.</description>
+  </item>
+  <item>
+    <title>Как сэкономить 5000 рублей в месяц на продуктах без ущерба для качества</title>
+    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-na-produktakh/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-na-produktakh/</guid>
+    <pubDate>Sat, 02 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Реальные стратегии экономии на продовольственных расходах: планирование меню, правильные магазины, заморозка и другие проверенные методы.</description>
+  </item>
+  </channel>
+</rss>

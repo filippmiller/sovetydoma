@@ -1,5 +1,6 @@
 interface Props {
   content: string
+  sidebar?: boolean
 }
 
 interface Heading {
@@ -25,12 +26,21 @@ function extractHeadings(content: string): Heading[] {
   return headings
 }
 
-export default function TableOfContents({ content }: Props) {
+export default function TableOfContents({ content, sidebar = false }: Props) {
   const headings = extractHeadings(content)
   if (headings.length < 2) return null
 
   return (
-    <nav className="toc" aria-label="Содержание статьи">
+    <nav
+      className={`toc${sidebar ? ' toc-sidebar' : ''}`}
+      aria-label="Содержание статьи"
+      style={sidebar ? {
+        position: 'sticky',
+        top: '80px',
+        maxHeight: 'calc(100vh - 100px)',
+        overflowY: 'auto',
+      } : undefined}
+    >
       <div className="toc-title">Содержание</div>
       {headings.map((h) => (
         <a key={h.id} href={`#${h.id}`}>

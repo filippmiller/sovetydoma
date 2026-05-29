@@ -12,8 +12,15 @@ export interface ArticleFrontmatter {
   categoryName: string
   description: string
   date: string
+  updated?: string
   image: string
   tags: string[]
+  // Optional schema.org fields
+  schemaType?: 'Recipe' | 'HowTo'
+  prepTime?: string   // ISO 8601 e.g. PT20M
+  cookTime?: string   // ISO 8601 e.g. PT90M
+  recipeYield?: string
+  recipeIngredient?: string[]
 }
 
 export interface Article {

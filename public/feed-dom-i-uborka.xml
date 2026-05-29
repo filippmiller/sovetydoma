@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>СоветыДома — Дом и уборка</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/</link>
+    <description>Лайфхаки для чистоты и порядка в доме</description>
+    <language>ru</language>
+    <atom:link href="https://pogovorim.vsedomatut.com/feed-dom-i-uborka.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 29 May 2026 18:05:36 GMT</lastBuildDate>
+    <image>
+      <url>https://pogovorim.vsedomatut.com/og-default.png</url>
+      <title>СоветыДома</title>
+      <link>https://pogovorim.vsedomatut.com/</link>
+    </image>
+    
+  <item>
+    <title>Как отмыть духовку от жира без химии за 30 минут</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/chistka-dukhovki/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/chistka-dukhovki/</guid>
+    <pubDate>Sat, 23 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Три способа очистить духовку от жира и нагара без агрессивной химии: сода с уксусом, паровой метод и лимонная кислота.</description>
+  </item>
+  <item>
+    <title>Как избавиться от запаха в холодильнике навсегда</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/zapakh-v-holodilnike/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/zapakh-v-holodilnike/</guid>
+    <pubDate>Fri, 22 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Причины неприятного запаха в холодильнике и способы избавиться от него — от мытья до народных поглотителей запахов.</description>
+  </item>
+  <item>
+    <title>Как отчистить белые кроссовки дома: 5 способов</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/krossovki-otmyt/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/krossovki-otmyt/</guid>
+    <pubDate>Thu, 21 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Как вернуть белизну кроссовкам из ткани, кожи и замши — зубная паста, сода, меламиновая губка и стирка в машинке.</description>
+  </item>
+  <item>
+    <title>Как стирать пуховик дома чтобы не испортить</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/stirka-pukhovika/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/stirka-pukhovika/</guid>
+    <pubDate>Wed, 20 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Правила стирки пуховика в машинке и вручную: температура, средства, сушка и как восстановить пух после стирки.</description>
+  </item>
+  <item>
+    <title>Как избавиться от накипи в чайнике за 10 минут</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/nakip-v-chaynike/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/nakip-v-chaynike/</guid>
+    <pubDate>Fri, 15 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Три проверенных способа удалить накипь из электрочайника подручными средствами — лимонная кислота, уксус и содовый раствор.</description>
+  </item>
+  <item>
+    <title>5 способов почистить сковороду от застарелого жира</title>
+    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/skovoroda-ot-zhira/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/skovoroda-ot-zhira/</guid>
+    <pubDate>Tue, 12 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Как отмыть сковороду от застарелого жира и нагара без дорогой химии: сода, соль, горчица и другие домашние средства.</description>
+  </item>
+  </channel>
+</rss>

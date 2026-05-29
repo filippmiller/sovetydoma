@@ -5,9 +5,10 @@ import { readingTime, relativeDate, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib
 interface Props {
   article: ArticleFrontmatter
   wordCount?: number
+  featured?: boolean
 }
 
-export default function ArticleCard({ article, wordCount }: Props) {
+export default function ArticleCard({ article, wordCount, featured = false }: Props) {
   const cat = CATEGORIES[article.category]
   const color = CATEGORY_COLOR[article.category] || '#888'
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
@@ -22,22 +23,23 @@ export default function ArticleCard({ article, wordCount }: Props) {
         className="article-card"
         style={{
           backgroundColor: '#fff',
-          borderRadius: '10px',
+          borderRadius: '12px',
           overflow: 'hidden',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+          boxShadow: featured ? '0 4px 16px rgba(0,0,0,0.12)' : '0 1px 4px rgba(0,0,0,0.08)',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
+          border: featured ? `2px solid ${color}44` : '1px solid #f0ece7',
         }}
       >
         {/* Gradient hero */}
         <div style={{
-          height: '160px',
+          height: featured ? '200px' : '160px',
           background: `linear-gradient(135deg, ${color}dd 0%, ${color}88 100%)`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '3.5rem',
+          fontSize: featured ? '4.5rem' : '3.5rem',
           position: 'relative',
           overflow: 'hidden',
         }}>
@@ -46,29 +48,42 @@ export default function ArticleCard({ article, wordCount }: Props) {
             backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }} />
-          {emoji}
+          {featured && (
+            <span style={{
+              position: 'absolute', top: '0.75rem', left: '0.75rem',
+              background: '#fff', color: color,
+              fontSize: '0.65rem', fontWeight: 800,
+              padding: '3px 8px', borderRadius: '4px',
+              textTransform: 'uppercase', letterSpacing: '0.06em',
+            }}>
+              Новое
+            </span>
+          )}
+          <span aria-hidden="true">{emoji}</span>
         </div>
 
-        <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: featured ? '1.25rem' : '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
           {/* Category badge */}
           <span style={{
-            display: 'inline-block',
-            backgroundColor: color + '18',
-            color,
-            borderRadius: '4px',
-            padding: '2px 8px',
-            fontSize: '0.73rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            backgroundColor: color,
+            color: '#fff',
+            borderRadius: '5px',
+            padding: '3px 9px',
+            fontSize: '0.7rem',
             fontWeight: 700,
-            marginBottom: '0.6rem',
+            marginBottom: '0.65rem',
             width: 'fit-content',
             textTransform: 'uppercase',
-            letterSpacing: '0.04em',
+            letterSpacing: '0.05em',
           }}>
-            {cat?.name || article.categoryName}
+            <span aria-hidden="true">{emoji}</span> {cat?.name || article.categoryName}
           </span>
 
           <h2 style={{
-            fontSize: '1rem',
+            fontSize: featured ? '1.15rem' : '1rem',
             fontWeight: 700,
             lineHeight: 1.4,
             marginBottom: '0.5rem',
@@ -77,20 +92,23 @@ export default function ArticleCard({ article, wordCount }: Props) {
             {article.title}
           </h2>
 
-          <p style={{
-            fontSize: '0.87rem',
-            color: '#666',
-            lineHeight: 1.6,
-            flex: 1,
-            overflow: 'hidden',
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-          }}>
-            {article.description}
-          </p>
+          {article.description && (
+            <p style={{
+              fontSize: '0.87rem',
+              color: '#666',
+              lineHeight: 1.65,
+              flex: 1,
+              overflow: 'hidden',
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              margin: 0,
+            }}>
+              {article.description}
+            </p>
+          )}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px solid #f0ece7' }}>
             <time style={{ fontSize: '0.76rem', color: '#bbb' }}>
               {relativeDate(article.date)}
             </time>

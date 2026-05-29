@@ -11,7 +11,7 @@ interface Props {
 
 export default function Breadcrumb({ items }: Props) {
   return (
-    <nav aria-label="Breadcrumb" style={{ marginBottom: '1.25rem' }}>
+    <nav aria-label="Путь к странице" style={{ marginBottom: '1.25rem' }}>
       <ol style={{
         display: 'flex',
         flexWrap: 'wrap',
@@ -25,18 +25,21 @@ export default function Breadcrumb({ items }: Props) {
         <li>
           <Link href="/" style={{ color: '#888', textDecoration: 'none' }}>Главная</Link>
         </li>
-        {items.map((item, i) => (
-          <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <span style={{ color: '#ccc' }}>›</span>
-            {item.href ? (
-              <Link href={item.href} style={{ color: '#888', textDecoration: 'none' }}>
-                {item.name}
-              </Link>
-            ) : (
-              <span style={{ color: '#444' }}>{item.name}</span>
-            )}
-          </li>
-        ))}
+        {items.map((item, i) => {
+          const isLast = i === items.length - 1
+          return (
+            <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <span style={{ color: '#ccc' }}>›</span>
+              {item.href ? (
+                <Link href={item.href} style={{ color: '#888', textDecoration: 'none' }}>
+                  {item.name}
+                </Link>
+              ) : (
+                <span style={{ color: '#444' }} aria-current={isLast ? 'page' : undefined}>{item.name}</span>
+              )}
+            </li>
+          )
+        })}
       </ol>
     </nav>
   )

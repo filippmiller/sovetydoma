@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -11,39 +10,102 @@
   --border: #e8e4df;
 }
 
+html:not(.dark) {
+  --warm-bg: #faf8f5;
+  --warm-card: #ffffff;
+  --accent: #c0392b;
+  --accent-light: #e74c3c;
+  --text-primary: #2c2c2c;
+  --text-secondary: #666666;
+  --border: #e8e4df;
+}
+
+html.dark {
+  --warm-bg: #1a1a1a;
+  --warm-card: #242424;
+  --text-primary: #f0ede8;
+  --text-secondary: #aaa;
+  --border: #333;
+}
+
+.dark body {
+  background: var(--warm-bg);
+  color: var(--text-primary);
+}
+
+.dark .prose p,
+.dark .prose li,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose strong {
+  color: var(--text-primary);
+}
+
 * { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+::selection { background: #c0392b; color: #fff; }
 
 body {
   background-color: var(--warm-bg);
   color: var(--text-primary);
   font-family: 'PT Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Focus visible — WCAG 2.1 AA */
+*:focus-visible {
+  outline: 2px solid #c0392b;
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 /* Skip to content */
 .skip-link {
   position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--accent);
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.skip-link:focus {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  z-index: 9999;
+  background: #c0392b;
   color: white;
   padding: 8px 16px;
-  z-index: 9999;
-  text-decoration: none;
-  border-radius: 0 0 4px 0;
+  border-radius: 4px;
   font-weight: 600;
-  transition: top 0.2s;
+  text-decoration: none;
 }
-.skip-link:focus { top: 0; }
 
 /* Prose (article body) */
 .prose h2 {
   font-size: 1.4rem;
   font-weight: 700;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
   margin-bottom: 0.75rem;
   color: #1a1a1a;
   scroll-margin-top: 80px;
+  border-left: 4px solid #c0392b;
+  padding-left: 0.75rem;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  margin: 1.5rem auto;
 }
 .prose h3 {
   font-size: 1.15rem;
@@ -130,6 +192,41 @@ body {
 .toc a { color: #444; text-decoration: none; font-size: 0.92rem; line-height: 1.8; display: block; }
 .toc a:hover { color: var(--accent); }
 
+/* Article 2-column layout (F3) */
+.article-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 740px;
+  margin: 0 auto;
+}
+
+.article-sidebar {
+  display: none;
+}
+
+/* On large screens: 2-column layout with sticky sidebar TOC */
+@media (min-width: 1024px) {
+  .article-layout {
+    grid-template-columns: 700px 260px;
+    max-width: none;
+  }
+
+  .article-sidebar {
+    display: block;
+  }
+
+  /* Hide inline TOC on desktop — sidebar TOC is shown instead */
+  .toc-inline {
+    display: none;
+  }
+}
+
+/* On mobile: show inline TOC, hide sidebar */
+.toc-inline {
+  display: block;
+}
+
 /* Print styles */
 @media print {
   header, footer, .back-to-top, .share-buttons, .related-articles { display: none !important; }
@@ -143,4 +240,54 @@ body {
 @media (max-width: 768px) {
   nav { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   nav::-webkit-scrollbar { display: none; }
+}
+
+/* Mobile: hide header tagline on very small screens */
+@media (max-width: 480px) {
+  header .site-tagline { display: none !important; }
+}
+
+/* Responsive grid: single column on narrow mobile */
+@media (max-width: 480px) {
+  .article-card { border-radius: 10px; }
+}
+
+/* Footer category links hover state */
+footer a:hover { color: #fff !important; }
+
+/* Tag cloud hover */
+.tag-cloud-link:hover { opacity: 0.65; }
+
+/* Prose code blocks */
+.prose code {
+  background: #f0ece7;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.9em;
+  color: #c0392b;
+  font-family: 'Courier New', monospace;
+}
+.prose pre {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border-radius: 8px;
+  padding: 1.25rem;
+  overflow-x: auto;
+  font-size: 0.88rem;
+  margin: 1.5rem 0;
+}
+.prose pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+/* Section headings on homepage */
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #aaa;
+  margin-bottom: 0.75rem;
 }

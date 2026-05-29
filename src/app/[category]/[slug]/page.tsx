@@ -1,8 +1,12 @@
 import Link from 'next/link'
-import { getArticle, getAllSlugs, getArticlesByCategory, CATEGORIES } from '@/lib/articles'
+import { getArticle, getAllSlugs, getAllArticles, CATEGORIES } from '@/lib/articles'
 import Breadcrumb from '@/components/Breadcrumb'
 import RelatedArticles from '@/components/RelatedArticles'
+import MoreArticles from '@/components/MoreArticles'
 import TableOfContents from '@/components/TableOfContents'
+import ReadingProgress from '@/components/ReadingProgress'
+import FontSizeControl from '@/components/FontSizeControl'
+import ViewTracker from '@/components/ViewTracker'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import type { Metadata } from 'next'
@@ -52,7 +56,12 @@ export default async function ArticlePage({ params }: Props) {
   const color = CATEGORY_COLOR[category] || '#888'
   const url = `${SITE_URL}/${category}/${slug}`
   const timeToRead = readingTime('x '.repeat(wordCount))
-  const categoryArticles = getArticlesByCategory(category)
+
+  // F7+F9: all articles needed for ViewTracker slug + tag-based similarity
+  const allArticles = getAllArticles()
+  const otherArticles = allArticles
+    .filter((a) => a.slug !== slug && a.category !== category)
+    .slice(0, 6)
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -80,104 +89,188 @@ export default async function ArticlePage({ params }: Props) {
     ],
   }
 
+  // FAQ schema — detect H2/H3 headings ending with "?"
+  const faqEntities: { '@type': string; name: string; acceptedAnswer: { '@type': string; text: string } }[] = []
+  const contentLines = content.split('\n')
+  for (let i = 0; i < contentLines.length; i++) {
+    const line = contentLines[i]
+    const headingMatch = line.match(/^#{2,3} (.+)$/)
+    if (headingMatch) {
+      const headingText = headingMatch[1].trim()
+      if (headingText.endsWith('?')) {
+        const bodyLines: string[] = []
+        for (let j = i + 1; j < contentLines.length; j++) {
+          if (/^#{1,6} /.test(contentLines[j])) break
+          bodyLines.push(contentLines[j])
+        }
+        const answerText = bodyLines
+          .join('\n').split('\n\n')
+          .map((p) => p.replace(/^#+\s/, '').replace(/[*_`]/g, '').trim())
+          .find((p) => p.length > 0) || ''
+        if (answerText) {
+          faqEntities.push({
+            '@type': 'Question',
+            name: headingText,
+            acceptedAnswer: { '@type': 'Answer', text: answerText },
+          })
+        }
+      }
+    }
+  }
+  const faqSchema = faqEntities.length >= 2
+    ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqEntities }
+    : null
+
+  // Additional structured data: Recipe or HowTo
+  let additionalSchema: object | null = null
+  if (fm.schemaType === 'Recipe') {
+    additionalSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Recipe',
+      name: fm.title,
+      description: fm.description,
+      author: { '@type': 'Organization', name: 'СоветыДома', url: SITE_URL },
+      datePublished: fm.date,
+      image: fm.image ? `${SITE_URL}${fm.image}` : undefined,
+      prepTime: fm.prepTime,
+      cookTime: fm.cookTime,
+      recipeYield: fm.recipeYield,
+      recipeIngredient: fm.recipeIngredient || [],
+      keywords: fm.tags.join(', '),
+      inLanguage: 'ru-RU',
+    }
+  } else if (fm.schemaType === 'HowTo') {
+    const steps = [...content.matchAll(/^## (.+)$/gm)].map((m, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: m[1].trim(),
+    }))
+    additionalSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'HowTo',
+      name: fm.title,
+      description: fm.description,
+      step: steps,
+      inLanguage: 'ru-RU',
+    }
+  }
+
   const vkUrl = `https://vk.com/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(fm.title)}`
   const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(fm.title)}`
   const waUrl = `https://wa.me/?text=${encodeURIComponent(fm.title + ' ' + url)}`
 
   return (
     <>
+      {/* F2: Reading progress bar */}
+      <ReadingProgress show />
+
+      {/* F7: View tracker for popular articles */}
+      <ViewTracker slug={slug} />
+
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {additionalSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(additionalSchema) }} />
+      )}
+      {faqSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      )}
 
       {/* Category color stripe */}
       <div style={{ height: '4px', background: `linear-gradient(90deg, ${color}, ${color}88)` }} />
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
-        <div style={{ maxWidth: '740px', margin: '0 auto' }}>
-          <Breadcrumb items={[
-            { name: cat?.name || fm.categoryName, href: `/${category}` },
-            { name: fm.title },
-          ]} />
+        <div className="article-layout">
+          <div className="article-main">
+            <Breadcrumb items={[
+              { name: cat?.name || fm.categoryName, href: `/${category}` },
+              { name: fm.title },
+            ]} />
 
-          {/* Header */}
-          <header style={{ marginBottom: '1.75rem' }}>
-            <span style={{
-              display: 'inline-block',
-              backgroundColor: color + '18', color,
-              borderRadius: '4px', padding: '3px 10px',
-              fontSize: '0.78rem', fontWeight: 700,
-              marginBottom: '0.9rem',
-              textTransform: 'uppercase', letterSpacing: '0.05em',
-            }}>
-              {cat?.name || fm.categoryName}
-            </span>
+            <header style={{ marginBottom: '1.75rem' }}>
+              <span style={{
+                display: 'inline-block',
+                backgroundColor: color + '18', color,
+                borderRadius: '4px', padding: '3px 10px',
+                fontSize: '0.78rem', fontWeight: 700,
+                marginBottom: '0.9rem',
+                textTransform: 'uppercase', letterSpacing: '0.05em',
+              }}>
+                {cat?.name || fm.categoryName}
+              </span>
 
-            <h1 style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1.3, color: '#1a1a1a', marginBottom: '0.75rem' }}>
-              {fm.title}
-            </h1>
+              <h1 style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1.3, color: '#1a1a1a', marginBottom: '0.75rem' }}>
+                {fm.title}
+              </h1>
 
-            <p style={{ fontSize: '1.05rem', color: '#666', lineHeight: 1.65, marginBottom: '0.9rem' }}>
-              {fm.description}
-            </p>
+              <p style={{ fontSize: '1.05rem', color: '#666', lineHeight: 1.65, marginBottom: '0.9rem' }}>
+                {fm.description}
+              </p>
 
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', fontSize: '0.83rem', color: '#aaa', flexWrap: 'wrap' }}>
-              <time dateTime={fm.date} title={formatDate(fm.date)}>
-                📅 {relativeDate(fm.date)}
-              </time>
-              <span>⏱ {timeToRead}</span>
-              <span>📝 {wordCount} слов</span>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', fontSize: '0.83rem', color: '#767676', flexWrap: 'wrap' }}>
+                <time dateTime={fm.date} title={formatDate(fm.date)}>
+                  📅 {relativeDate(fm.date)}
+                </time>
+                <span>⏱ {timeToRead}</span>
+                <span>📝 {wordCount} слов</span>
+                <FontSizeControl />
+              </div>
+            </header>
+
+            <div className="toc-inline">
+              <TableOfContents content={content} />
             </div>
-          </header>
 
-          {/* Table of Contents */}
-          <TableOfContents content={content} />
+            <article className="prose">
+              <MDXRemote source={content} />
+            </article>
 
-          {/* Article body */}
-          <article className="prose">
-            <MDXRemote source={content} />
-          </article>
+            {fm.tags.length > 0 && (
+              <div style={{ marginTop: '2rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {fm.tags.map((tag) => (
+                  <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}
+                    style={{
+                      padding: '4px 10px', borderRadius: '4px',
+                      backgroundColor: '#f0ede8', color: '#666',
+                      fontSize: '0.8rem', textDecoration: 'none',
+                    }}>
+                    #{tag}
+                  </Link>
+                ))}
+              </div>
+            )}
 
-          {/* Tags */}
-          {fm.tags.length > 0 && (
-            <div style={{ marginTop: '2rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {fm.tags.map((tag) => (
-                <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`}
+            <div className="share-buttons" style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <span style={{ color: '#767676', fontSize: '0.88rem', fontWeight: 600 }}>Поделиться:</span>
+              {[
+                { href: vkUrl, label: 'ВКонтакте', bg: '#4a76a8' },
+                { href: tgUrl, label: 'Telegram', bg: '#229ED9' },
+                { href: waUrl, label: 'WhatsApp', bg: '#25D366' },
+              ].map(({ href, label, bg }) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+                  aria-label={`Поделиться в ${label}`}
                   style={{
-                    padding: '4px 10px', borderRadius: '4px',
-                    backgroundColor: '#f0ede8', color: '#666',
-                    fontSize: '0.8rem', textDecoration: 'none',
+                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                    padding: '0.4rem 1rem', backgroundColor: bg, color: '#fff',
+                    borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500,
                   }}>
-                  #{tag}
-                </Link>
+                  {label}
+                </a>
               ))}
             </div>
-          )}
 
-          {/* Share buttons */}
-          <div className="share-buttons" style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <span style={{ color: '#888', fontSize: '0.88rem', fontWeight: 600 }}>Поделиться:</span>
-            {[
-              { href: vkUrl, label: 'ВКонтакте', bg: '#4a76a8' },
-              { href: tgUrl, label: 'Telegram', bg: '#229ED9' },
-              { href: waUrl, label: 'WhatsApp', bg: '#25D366' },
-            ].map(({ href, label, bg }) => (
-              <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-                aria-label={`Поделиться в ${label}`}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                  padding: '0.4rem 1rem', backgroundColor: bg, color: '#fff',
-                  borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500,
-                }}>
-                {label}
-              </a>
-            ))}
+            {/* F9: Tag-based similarity recommendations across all categories */}
+            <RelatedArticles articles={allArticles} currentSlug={slug} currentTags={fm.tags} />
+
+            {/* F5: Cross-category articles */}
+            <MoreArticles articles={otherArticles} />
           </div>
 
-          {/* Related articles */}
-          <RelatedArticles articles={categoryArticles} currentSlug={slug} />
+          <aside className="article-sidebar" aria-label="Содержание">
+            <TableOfContents content={content} sidebar />
+          </aside>
         </div>
       </div>
     </>
   )
 }
-

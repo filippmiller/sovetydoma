@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>СоветыДома — Кулинария</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/</link>
+    <description>Рецепты, советы и секреты вкусной домашней кухни</description>
+    <language>ru</language>
+    <atom:link href="https://pogovorim.vsedomatut.com/feed-kulinaria.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 29 May 2026 18:05:36 GMT</lastBuildDate>
+    <image>
+      <url>https://pogovorim.vsedomatut.com/og-default.png</url>
+      <title>СоветыДома</title>
+      <link>https://pogovorim.vsedomatut.com/</link>
+    </image>
+    
+  <item>
+    <title>Как засолить грибы на зиму: холодный и горячий способ</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/griby-zasolka/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/griby-zasolka/</guid>
+    <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Подробные рецепты засолки грибов на зиму — горячий и холодный способы. Какие грибы выбрать, сколько соли нужно, как правильно хранить заготовки.</description>
+  </item>
+  <item>
+    <title>Как приготовить идеальные блины: тонкие, с дырочками, не рвутся</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/domashnie-bliny/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/domashnie-bliny/</guid>
+    <pubDate>Wed, 27 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Проверенный рецепт тонких русских блинов с дырочками. Разбираем, почему блины рвутся, не переворачиваются и прилипают — и как это исправить.</description>
+  </item>
+  <item>
+    <title>Домашний майонез за 5 минут: рецепт без магазинной химии</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/domashnie-mayonez/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/domashnie-mayonez/</guid>
+    <pubDate>Tue, 26 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Простой рецепт домашнего майонеза погружным блендером — густой, вкусный, без консервантов и загустителей. Хранится неделю.</description>
+  </item>
+  <item>
+    <title>Сборная мясная солянка: настоящий рецепт с каперсами и оливками</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/solyanka-myasnaya/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/solyanka-myasnaya/</guid>
+    <pubDate>Mon, 25 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Классическая рецептура сборной мясной солянки с копчёностями, каперсами, оливками и лимоном — густой, ароматный суп ресторанного уровня.</description>
+  </item>
+  <item>
+    <title>Как варить пельмени правильно: чтобы не слипались и не рвались</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/kak-varit-pelmeni/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/kak-varit-pelmeni/</guid>
+    <pubDate>Sun, 24 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Правила варки пельменей — сколько воды, когда солить, как не дать слипнуться и сколько минут варить после всплытия.</description>
+  </item>
+  <item>
+    <title>Как сделать идеальный борщ: 7 секретов шеф-повара</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/idealnyy-borshch/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/idealnyy-borshch/</guid>
+    <pubDate>Wed, 20 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Раскрываем профессиональные секреты приготовления борща, который получается насыщенным, ароматным и с красивым ярким цветом.</description>
+  </item>
+  <item>
+    <title>Тесто для пельменей которое не рвётся: простой рецепт</title>
+    <link>https://pogovorim.vsedomatut.com/kulinaria/testo-dlya-pelmeney/</link>
+    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/testo-dlya-pelmeney/</guid>
+    <pubDate>Mon, 18 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Проверенный рецепт эластичного теста для пельменей, которое не рвётся при лепке и варке. Три варианта: на воде, на молоке и заварное.</description>
+  </item>
+  </channel>
+</rss>

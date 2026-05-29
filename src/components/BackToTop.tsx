@@ -17,8 +17,8 @@ export default function BackToTop() {
     <button
       className="back-to-top"
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      aria-label="Наверх"
-      title="Наверх"
+      aria-label="Вернуться наверх"
+      title="Вернуться наверх"
     >
       ↑
     </button>
