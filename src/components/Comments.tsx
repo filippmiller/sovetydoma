@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Comment } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
@@ -8,6 +8,8 @@ import AuthModal from '@/components/auth/AuthModal'
 interface Props {
   slug: string
 }
+
+// --- Helpers ---
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime()
@@ -26,11 +28,54 @@ function getInitials(name: string): string {
   return name
     .split(' ')
     .map((w) => w[0])
+    .filter(Boolean)
     .slice(0, 2)
     .join('')
     .toUpperCase()
 }
 
+// Deterministic color per user name
+const AVATAR_COLORS: [string, string][] = [
+  ['#fde8e8', '#c0392b'],
+  ['#e8f0fe', '#1a56db'],
+  ['#e8faf0', '#1e8449'],
+  ['#fef3e8', '#d35400'],
+  ['#f3e8fe', '#7d3c98'],
+  ['#e8f8fe', '#117a8b'],
+]
+function avatarColor(name: string): [string, string] {
+  let h = 0
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff
+  return AVATAR_COLORS[h % AVATAR_COLORS.length]
+}
+
+// --- Skeleton placeholder ---
+function SkeletonCard() {
+  return (
+    <div style={{ display: 'flex', gap: '0.75rem', padding: '1rem 0' }}>
+      <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#f0ede8', flexShrink: 0 }} />
+      <div style={{ flex: 1 }}>
+        <div style={{ width: '30%', height: 12, background: '#f0ede8', borderRadius: 4, marginBottom: 8 }} />
+        <div style={{ width: '85%', height: 10, background: '#f5f3f0', borderRadius: 4, marginBottom: 6 }} />
+        <div style={{ width: '70%', height: 10, background: '#f5f3f0', borderRadius: 4 }} />
+      </div>
+    </div>
+  )
+}
+
+// --- Auto-resize textarea hook ---
+function useAutoResize(value: string) {
+  const ref = useRef<HTMLTextAreaElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = Math.min(Math.max(el.scrollHeight, 100), 400) + 'px'
+  }, [value])
+  return ref
+}
+
+// --- Single comment card ---
 interface CommentItemProps {
   comment: Comment
   depth: number
@@ -40,36 +85,65 @@ interface CommentItemProps {
 function CommentItem({ comment, depth, onReply }: CommentItemProps) {
   const name = comment.profiles?.display_name || 'Пользователь'
   const initials = getInitials(name)
+  const [bg, fg] = avatarColor(name)
 
   return (
     <div style={{
-      display: 'flex', gap: '0.75rem',
-      marginLeft: depth > 0 ? '2rem' : 0,
+      display: 'flex',
+      gap: '0.75rem',
+      marginLeft: depth > 0 ? '1rem' : 0,
       paddingLeft: depth > 0 ? '1rem' : 0,
-      borderLeft: depth > 0 ? '2px solid #e8e4df' : 'none',
+      borderLeft: depth > 0 ? '3px solid #f0ede8' : 'none',
     }}>
+      {/* Avatar */}
       <div style={{
-        width: '36px', height: '36px', borderRadius: '50%',
-        backgroundColor: '#c0392b22', color: '#c0392b',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '0.78rem', fontWeight: 800, flexShrink: 0,
+        width: 38,
+        height: 38,
+        borderRadius: '50%',
+        backgroundColor: bg,
+        color: fg,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '0.8rem',
+        fontWeight: 800,
+        flexShrink: 0,
+        userSelect: 'none',
       }}>
         {initials}
       </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'baseline', flexWrap: 'wrap', marginBottom: '0.3rem' }}>
-          <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#222' }}>{name}</span>
-          <span style={{ fontSize: '0.78rem', color: '#aaa' }}>{timeAgo(comment.created_at)}</span>
+
+      {/* Body */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'baseline', flexWrap: 'wrap', marginBottom: '0.3rem' }}>
+          <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#1a1a1a' }}>{name}</span>
+          <span style={{ fontSize: '0.78rem', color: '#bbb' }}>{timeAgo(comment.created_at)}</span>
         </div>
-        <p style={{ margin: 0, fontSize: '0.93rem', lineHeight: 1.6, color: '#333', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+        <p style={{
+          margin: 0,
+          fontSize: '0.93rem',
+          lineHeight: 1.65,
+          color: '#333',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        }}>
           {comment.content}
         </p>
         <button
           onClick={() => onReply(comment.id)}
           style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            fontSize: '0.78rem', color: '#888', padding: '0.3rem 0', marginTop: '0.2rem',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '0.78rem',
+            color: '#aaa',
+            padding: '0.3rem 0',
+            marginTop: '0.15rem',
+            fontFamily: 'inherit',
+            transition: 'color 0.15s',
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = '#c0392b')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = '#aaa')}
         >
           Ответить
         </button>
@@ -78,6 +152,7 @@ function CommentItem({ comment, depth, onReply }: CommentItemProps) {
   )
 }
 
+// --- Main component ---
 export default function Comments({ slug }: Props) {
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
@@ -86,7 +161,10 @@ export default function Comments({ slug }: Props) {
   const [replyTo, setReplyTo] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [authOpen, setAuthOpen] = useState(false)
+  const [showAuth, setShowAuth] = useState(false)
+
+  const mainTextareaRef = useAutoResize(text)
+  const replyTextareaRef = useAutoResize(replyText)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -109,6 +187,7 @@ export default function Comments({ slug }: Props) {
   const submitComment = async (content: string, parentId: string | null) => {
     if (!content.trim() || !userId) return
     setSubmitting(true)
+
     const optimistic: Comment = {
       id: `opt-${Date.now()}`,
       article_slug: slug,
@@ -134,53 +213,113 @@ export default function Comments({ slug }: Props) {
   }
 
   const topLevel = comments.filter((c) => !c.parent_id)
-  const replies = (parentId: string) => comments.filter((c) => c.parent_id === parentId)
+  const getReplies = (parentId: string) => comments.filter((c) => c.parent_id === parentId)
+  const approvedCount = comments.length
 
   return (
     <section style={{ marginTop: '3rem', borderTop: '2px solid #f0ede8', paddingTop: '2rem' }}>
-      <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '1.5rem', color: '#1a1a1a' }}>
-        Комментарии ({comments.length})
-      </h2>
+      {/* Section heading */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.75rem' }}>
+        <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#1a1a1a' }}>
+          💬 Комментарии
+        </h2>
+        {!loading && (
+          <span style={{
+            background: '#f0ede8',
+            color: '#666',
+            borderRadius: '999px',
+            fontSize: '0.78rem',
+            fontWeight: 700,
+            padding: '0.15rem 0.6rem',
+            lineHeight: 1.5,
+          }}>
+            {approvedCount}
+          </span>
+        )}
+      </div>
 
+      {/* Comment list */}
       {loading ? (
-        <p style={{ color: '#aaa', fontSize: '0.88rem' }}>Загрузка…</p>
+        <div style={{ marginBottom: '2rem' }}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
       ) : comments.length === 0 ? (
-        <p style={{ color: '#aaa', fontSize: '0.88rem', marginBottom: '1.5rem' }}>Пока нет комментариев. Будьте первым!</p>
+        <div style={{
+          textAlign: 'center',
+          padding: '2rem 1rem',
+          marginBottom: '2rem',
+          background: '#faf9f7',
+          borderRadius: '12px',
+          border: '1.5px dashed #e8e4df',
+        }}>
+          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💭</div>
+          <p style={{ margin: 0, color: '#999', fontSize: '0.92rem' }}>
+            Будьте первым! Поделитесь своим мнением.
+          </p>
+        </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2rem' }}>
           {topLevel.map((c) => (
-            <div key={c.id}>
-              <CommentItem comment={c} depth={0} onReply={(id) => { setReplyTo(id); setReplyText('') }} />
-              {replies(c.id).map((r) => (
-                <div key={r.id} style={{ marginTop: '0.75rem' }}>
-                  <CommentItem comment={r} depth={1} onReply={(id) => { setReplyTo(id); setReplyText('') }} />
+            <div key={c.id} style={{ borderBottom: '1px solid #f5f3f0', paddingBottom: '1rem' }}>
+              <CommentItem
+                comment={c}
+                depth={0}
+                onReply={(id) => { setReplyTo(id); setReplyText('') }}
+              />
+
+              {/* Replies */}
+              {getReplies(c.id).length > 0 && (
+                <div style={{ marginTop: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                  {getReplies(c.id).map((r) => (
+                    <CommentItem
+                      key={r.id}
+                      comment={r}
+                      depth={1}
+                      onReply={(id) => { setReplyTo(id); setReplyText('') }}
+                    />
+                  ))}
                 </div>
-              ))}
+              )}
+
+              {/* Inline reply form */}
               {replyTo === c.id && (
-                <div style={{ marginLeft: '3rem', marginTop: '0.75rem', borderLeft: '2px solid #c0392b33', paddingLeft: '1rem' }}>
+                <div style={{
+                  marginLeft: '3rem',
+                  marginTop: '0.85rem',
+                  borderLeft: '3px solid #c0392b33',
+                  paddingLeft: '1rem',
+                }}>
                   <textarea
+                    ref={replyTextareaRef}
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     maxLength={2000}
-                    rows={3}
                     placeholder="Ваш ответ…"
-                    style={textareaStyle}
+                    style={{ ...textareaStyle, minHeight: '80px' }}
                     autoFocus
                   />
-                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                    <button
-                      onClick={() => submitComment(replyText, c.id)}
-                      disabled={submitting || !replyText.trim()}
-                      style={submitBtnStyle}
-                    >
-                      {submitting ? 'Отправляем…' : 'Ответить'}
-                    </button>
-                    <button
-                      onClick={() => { setReplyTo(null); setReplyText('') }}
-                      style={cancelBtnStyle}
-                    >
-                      Отмена
-                    </button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.4rem' }}>
+                    <span style={{ fontSize: '0.72rem', color: '#bbb' }}>{replyText.length}/2000</span>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button
+                        onClick={() => { setReplyTo(null); setReplyText('') }}
+                        style={cancelBtnStyle}
+                      >
+                        Отмена
+                      </button>
+                      <button
+                        onClick={() => submitComment(replyText, c.id)}
+                        disabled={submitting || !replyText.trim()}
+                        style={{
+                          ...submitBtnStyle,
+                          opacity: submitting || !replyText.trim() ? 0.6 : 1,
+                        }}
+                      >
+                        {submitting ? 'Отправляем…' : 'Ответить'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -189,38 +328,74 @@ export default function Comments({ slug }: Props) {
         </div>
       )}
 
-      {/* Comment form */}
-      <div style={{ background: '#faf8f6', borderRadius: '10px', padding: '1.25rem' }}>
-        <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.75rem', color: '#333' }}>
+      {/* Comment form box */}
+      <div style={{
+        background: '#faf8f6',
+        borderRadius: '12px',
+        padding: '1.5rem',
+        border: '1.5px solid #ede9e4',
+      }}>
+        <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', color: '#333', margin: '0 0 1rem 0' }}>
           Оставить комментарий
         </h3>
+
         {!userId ? (
-          <button
-            onClick={() => setAuthOpen(true)}
-            style={{
-              backgroundColor: '#c0392b', color: '#fff', border: 'none',
-              borderRadius: '7px', padding: '0.6rem 1.2rem',
-              fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer',
-            }}
-          >
-            Войдите, чтобы оставить комментарий
-          </button>
+          /* Not logged in */
+          <div style={{
+            textAlign: 'center',
+            padding: '1.5rem 1rem',
+            background: '#fff',
+            borderRadius: '10px',
+            border: '1.5px solid #ede9e4',
+          }}>
+            <p style={{ margin: '0 0 1rem 0', color: '#666', fontSize: '0.92rem' }}>
+              Войдите, чтобы оставить комментарий
+            </p>
+            <button
+              onClick={() => setShowAuth(true)}
+              style={{
+                backgroundColor: '#c0392b',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '0.65rem 1.8rem',
+                fontSize: '0.92rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}
+            >
+              Войти
+            </button>
+          </div>
         ) : (
+          /* Logged in */
           <>
             <textarea
+              ref={mainTextareaRef}
               value={text}
               onChange={(e) => setText(e.target.value)}
               maxLength={2000}
-              rows={4}
               placeholder="Напишите комментарий…"
-              style={textareaStyle}
+              style={{ ...textareaStyle, minHeight: '100px' }}
             />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
-              <span style={{ fontSize: '0.75rem', color: '#aaa' }}>{text.length}/2000</span>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: '0.6rem',
+              flexWrap: 'wrap',
+              gap: '0.5rem',
+            }}>
+              <span style={{ fontSize: '0.75rem', color: '#bbb' }}>{text.length}/2000</span>
               <button
                 onClick={() => submitComment(text, null)}
                 disabled={submitting || !text.trim()}
-                style={submitBtnStyle}
+                style={{
+                  ...submitBtnStyle,
+                  opacity: submitting || !text.trim() ? 0.6 : 1,
+                  // Full width on small screens handled via inline style below
+                }}
               >
                 {submitting ? 'Отправляем…' : 'Отправить'}
               </button>
@@ -229,25 +404,48 @@ export default function Comments({ slug }: Props) {
         )}
       </div>
 
-      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+      {showAuth && <AuthModal isOpen onClose={() => setShowAuth(false)} />}
     </section>
   )
 }
 
+// --- Shared styles ---
 const textareaStyle: React.CSSProperties = {
-  width: '100%', borderRadius: '7px', border: '1.5px solid #ddd',
-  padding: '0.6rem 0.8rem', fontSize: '0.93rem', resize: 'vertical',
-  fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
-  lineHeight: 1.6,
+  width: '100%',
+  borderRadius: '8px',
+  border: '1.5px solid #ddd',
+  padding: '0.75rem 0.9rem',
+  fontSize: '0.93rem',
+  resize: 'vertical',
+  fontFamily: 'inherit',
+  outline: 'none',
+  boxSizing: 'border-box',
+  lineHeight: 1.65,
+  maxHeight: '400px',
+  transition: 'border-color 0.2s',
+  background: '#fff',
 }
 
 const submitBtnStyle: React.CSSProperties = {
-  backgroundColor: '#c0392b', color: '#fff', border: 'none',
-  borderRadius: '7px', padding: '0.5rem 1.2rem',
-  fontSize: '0.88rem', fontWeight: 700, cursor: 'pointer',
+  backgroundColor: '#c0392b',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '8px',
+  padding: '0.6rem 1.5rem',
+  fontSize: '0.9rem',
+  fontWeight: 700,
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+  transition: 'background 0.2s, opacity 0.2s',
 }
 
 const cancelBtnStyle: React.CSSProperties = {
-  background: 'none', border: '1px solid #ddd', borderRadius: '7px',
-  padding: '0.5rem 1rem', fontSize: '0.88rem', cursor: 'pointer', color: '#666',
+  background: 'none',
+  border: '1.5px solid #ddd',
+  borderRadius: '8px',
+  padding: '0.6rem 1rem',
+  fontSize: '0.88rem',
+  cursor: 'pointer',
+  color: '#777',
+  fontFamily: 'inherit',
 }

@@ -1,12 +1,12 @@
-export const dynamicParams = false
-export const revalidate = false
 import Link from 'next/link'
 import { getArticle, getAllSlugs, getAllArticles, CATEGORIES } from '@/lib/articles'
 import Breadcrumb from '@/components/Breadcrumb'
 import RelatedArticles from '@/components/RelatedArticles'
 import MoreArticles from '@/components/MoreArticles'
 import Comments from '@/components/Comments'
-import BookmarkButton from '@/components/BookmarkButton'
+import FavoriteButton from '@/components/FavoriteButton'
+import SharePanel from '@/components/SharePanel'
+import StarRating from '@/components/StarRating'
 import TableOfContents from '@/components/TableOfContents'
 import ReadingProgress from '@/components/ReadingProgress'
 import FontSizeControl from '@/components/FontSizeControl'
@@ -248,7 +248,7 @@ export default async function ArticlePage({ params }: Props) {
                 <span>📝 {wordCount} слов</span>
                 {fm.cost && <CostBadge cost={fm.cost} />}
                 <FontSizeControl />
-                <BookmarkButton slug={slug} title={fm.title} />
+                <FavoriteButton slug={slug} title={fm.title} />
               </div>
             </header>
 
@@ -290,21 +290,13 @@ export default async function ArticlePage({ params }: Props) {
             {/* Print button for recipes */}
             {fm.schemaType === 'Recipe' && <PrintRecipeButton />}
 
-            {/* Share buttons */}
-            <div className="share-buttons" style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-              <span style={{ color: '#767676', fontSize: '0.88rem', fontWeight: 600 }}>Поделиться:</span>
-              {[
-                { href: vkUrl, label: 'ВКонтакте', bg: '#4a76a8' },
-                { href: tgUrl, label: 'Telegram', bg: '#229ED9' },
-                { href: waUrl, label: 'WhatsApp', bg: '#25D366' },
-              ].map(({ href, label, bg }) => (
-                <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-                  aria-label={`Поделиться в ${label}`}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 1rem', backgroundColor: bg, color: '#fff', borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
-                  {label}
-                </a>
-              ))}
+            {/* Star rating */}
+            <div style={{ marginTop: '2rem' }}>
+              <StarRating slug={slug} />
             </div>
+
+            {/* Share panel */}
+            <SharePanel url={url} title={fm.title} />
 
             <RelatedArticles articles={allArticles} currentSlug={slug} currentTags={fm.tags} />
             <MoreArticles articles={allArticles.filter(a => a.category !== category && a.slug !== slug).slice(0, 6)} />

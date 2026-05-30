@@ -15,11 +15,13 @@ export default function AuthModal({ isOpen, onClose }: Props) {
   const [displayName, setDisplayName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState<'welcome' | 'verify' | null>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!isOpen) return
     setError('')
+    setSuccess(null)
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
@@ -36,8 +38,11 @@ export default function AuthModal({ isOpen, onClose }: Props) {
     const { error: err } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (err) { setError(err.message); return }
-    onClose()
-    window.location.reload()
+    setSuccess('welcome')
+    setTimeout(() => {
+      onClose()
+      window.location.reload()
+    }, 1000)
   }
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -52,8 +57,13 @@ export default function AuthModal({ isOpen, onClose }: Props) {
     })
     setLoading(false)
     if (err) { setError(err.message); return }
-    onClose()
-    window.location.reload()
+    setSuccess('verify')
+  }
+
+  const switchTab = (t: 'login' | 'register') => {
+    setTab(t)
+    setError('')
+    setSuccess(null)
   }
 
   return (
@@ -61,132 +71,306 @@ export default function AuthModal({ isOpen, onClose }: Props) {
       ref={overlayRef}
       onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
       style={{
-        position: 'fixed', inset: 0, zIndex: 1000,
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1000,
         backgroundColor: 'rgba(0,0,0,0.5)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         padding: '1rem',
+        backdropFilter: 'blur(2px)',
       }}
     >
       <div style={{
-        background: '#fff', borderRadius: '12px', width: '100%', maxWidth: '400px',
-        boxShadow: '0 8px 40px rgba(0,0,0,0.18)', padding: '2rem', position: 'relative',
+        background: '#fff',
+        borderRadius: '16px',
+        width: '100%',
+        maxWidth: '420px',
+        boxShadow: '0 12px 48px rgba(0,0,0,0.2)',
+        padding: '2rem',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
+        {/* Top accent strip */}
+        <div style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0,
+          height: '4px',
+          background: 'linear-gradient(90deg, #c0392b, #e74c3c)',
+          borderRadius: '16px 16px 0 0',
+        }} />
+
         {/* Close button */}
         <button
           onClick={onClose}
           aria-label="Закрыть"
           style={{
-            position: 'absolute', top: '1rem', right: '1rem',
-            background: 'none', border: 'none', fontSize: '1.4rem', cursor: 'pointer',
-            color: '#888', lineHeight: 1,
+            position: 'absolute',
+            top: '1rem',
+            right: '1rem',
+            background: '#f5f3f0',
+            border: 'none',
+            width: '30px',
+            height: '30px',
+            borderRadius: '50%',
+            fontSize: '1.1rem',
+            cursor: 'pointer',
+            color: '#888',
+            lineHeight: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           ×
         </button>
 
-        {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '2px solid #f0ede8', marginBottom: '1.5rem' }}>
+        {/* Title */}
+        <div style={{ marginBottom: '0.35rem', marginTop: '0.5rem' }}>
+          <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a' }}>
+            {tab === 'login' ? 'Вход в СоветыДома' : 'Регистрация'}
+          </h2>
+        </div>
+
+        {/* Benefit subtitle */}
+        <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.85rem', color: '#888' }}>
+          {tab === 'login'
+            ? 'Сохраняйте статьи, оставляйте комментарии'
+            : 'Присоединяйтесь — это бесплатно'}
+        </p>
+
+        {/* Tab switcher — pill style */}
+        <div style={{
+          display: 'flex',
+          background: '#f5f3f0',
+          borderRadius: '10px',
+          padding: '4px',
+          marginBottom: '1.5rem',
+          gap: '4px',
+        }}>
           {(['login', 'register'] as const).map((t) => (
             <button
               key={t}
-              onClick={() => { setTab(t); setError('') }}
+              onClick={() => switchTab(t)}
               style={{
-                flex: 1, background: 'none', border: 'none', cursor: 'pointer',
-                padding: '0.6rem 0', fontSize: '0.95rem', fontWeight: 600,
+                flex: 1,
+                padding: '0.5rem 0',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                border: 'none',
+                borderRadius: '7px',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                transition: 'all 0.2s',
+                background: tab === t ? '#fff' : 'transparent',
                 color: tab === t ? '#c0392b' : '#888',
-                borderBottom: `2px solid ${tab === t ? '#c0392b' : 'transparent'}`,
-                marginBottom: '-2px', transition: 'color 0.2s',
+                boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
               }}
             >
-              {t === 'login' ? 'Войти' : 'Регистрация'}
+              {t === 'login' ? 'Войти' : 'Зарегистрироваться'}
             </button>
           ))}
         </div>
 
-        {tab === 'login' ? (
+        {/* Success states */}
+        {success === 'welcome' && (
+          <div style={{
+            textAlign: 'center',
+            padding: '2rem 1rem',
+            color: '#27ae60',
+            fontSize: '1rem',
+            fontWeight: 700,
+          }}>
+            🎉 Добро пожаловать!
+          </div>
+        )}
+
+        {success === 'verify' && (
+          <div style={{
+            background: '#f0fff4',
+            border: '1.5px solid #b2dfdb',
+            borderRadius: '10px',
+            padding: '1.25rem',
+            textAlign: 'center',
+            color: '#1e8449',
+          }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>📧</div>
+            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>
+              Проверьте почту для подтверждения
+            </p>
+            <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.82rem', color: '#555' }}>
+              Мы отправили письмо на {email}
+            </p>
+          </div>
+        )}
+
+        {/* Login form */}
+        {!success && tab === 'login' && (
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#444', marginBottom: '0.3rem' }}>
-                Email
-              </label>
-              <input
-                type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                required autoComplete="email"
-                style={inputStyle}
-                placeholder="you@example.com"
-              />
+              <label style={labelStyle}>Email</label>
+              <div style={inputWrapStyle}>
+                <span style={iconStyle}>📧</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  style={inputStyle}
+                />
+              </div>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#444', marginBottom: '0.3rem' }}>
-                Пароль
-              </label>
-              <input
-                type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                required autoComplete="current-password"
-                style={inputStyle}
-                placeholder="••••••••"
-              />
+              <label style={labelStyle}>Пароль</label>
+              <div style={inputWrapStyle}>
+                <span style={iconStyle}>🔒</span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  style={inputStyle}
+                />
+              </div>
             </div>
-            {error && <p style={{ color: '#c0392b', fontSize: '0.85rem', margin: 0 }}>{error}</p>}
+            {error && <p style={errorStyle}>{error}</p>}
             <button type="submit" disabled={loading} style={btnStyle}>
-              {loading ? 'Входим…' : 'Войти'}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#444', marginBottom: '0.3rem' }}>
-                Имя пользователя
-              </label>
-              <input
-                type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)}
-                required
-                style={inputStyle}
-                placeholder="Ваше имя"
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#444', marginBottom: '0.3rem' }}>
-                Email
-              </label>
-              <input
-                type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                required autoComplete="email"
-                style={inputStyle}
-                placeholder="you@example.com"
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#444', marginBottom: '0.3rem' }}>
-                Пароль
-              </label>
-              <input
-                type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                required autoComplete="new-password" minLength={6}
-                style={inputStyle}
-                placeholder="Минимум 6 символов"
-              />
-            </div>
-            {error && <p style={{ color: '#c0392b', fontSize: '0.85rem', margin: 0 }}>{error}</p>}
-            <button type="submit" disabled={loading} style={btnStyle}>
-              {loading ? 'Регистрируем…' : 'Зарегистрироваться'}
+              {loading ? 'Входим…' : 'Продолжить'}
             </button>
           </form>
         )}
+
+        {/* Register form */}
+        {!success && tab === 'register' && (
+          <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <label style={labelStyle}>Имя пользователя</label>
+              <div style={inputWrapStyle}>
+                <span style={iconStyle}>👤</span>
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  required
+                  placeholder="Ваше имя"
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+            <div>
+              <label style={labelStyle}>Email</label>
+              <div style={inputWrapStyle}>
+                <span style={iconStyle}>📧</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+            <div>
+              <label style={labelStyle}>Пароль</label>
+              <div style={inputWrapStyle}>
+                <span style={iconStyle}>🔒</span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  minLength={6}
+                  placeholder="Минимум 6 символов"
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+            {error && <p style={errorStyle}>{error}</p>}
+            <button type="submit" disabled={loading} style={btnStyle}>
+              {loading ? 'Регистрируем…' : 'Продолжить'}
+            </button>
+          </form>
+        )}
+
+        {/* Social proof footer */}
+        <p style={{
+          margin: '1.25rem 0 0 0',
+          textAlign: 'center',
+          fontSize: '0.8rem',
+          color: '#bbb',
+        }}>
+          🏠 Уже 500+ читателей СоветыДома
+        </p>
       </div>
     </div>
   )
 }
 
+// --- Shared styles ---
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '0.82rem',
+  fontWeight: 600,
+  color: '#555',
+  marginBottom: '0.35rem',
+}
+
+const inputWrapStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  border: '1.5px solid #e0dbd5',
+  borderRadius: '8px',
+  overflow: 'hidden',
+  background: '#faf9f7',
+  transition: 'border-color 0.2s',
+}
+
+const iconStyle: React.CSSProperties = {
+  padding: '0 0.5rem 0 0.75rem',
+  fontSize: '1rem',
+  userSelect: 'none',
+  flexShrink: 0,
+}
+
 const inputStyle: React.CSSProperties = {
-  width: '100%', padding: '0.6rem 0.8rem', borderRadius: '6px',
-  border: '1.5px solid #ddd', fontSize: '0.95rem', outline: 'none',
-  boxSizing: 'border-box', transition: 'border-color 0.2s',
+  flex: 1,
+  padding: '0.65rem 0.75rem 0.65rem 0.25rem',
+  border: 'none',
+  background: 'transparent',
+  fontSize: '0.95rem',
+  outline: 'none',
+  width: '100%',
+  fontFamily: 'inherit',
+}
+
+const errorStyle: React.CSSProperties = {
+  color: '#c0392b',
+  fontSize: '0.85rem',
+  margin: 0,
+  background: '#fff0f0',
+  border: '1px solid #f5c6cb',
+  borderRadius: '6px',
+  padding: '0.5rem 0.75rem',
 }
 
 const btnStyle: React.CSSProperties = {
-  backgroundColor: '#c0392b', color: '#fff', border: 'none',
-  borderRadius: '7px', padding: '0.7rem 1rem',
-  fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer',
-  transition: 'background 0.2s', marginTop: '0.25rem',
+  backgroundColor: '#c0392b',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '9px',
+  padding: '0.75rem 1rem',
+  fontSize: '0.95rem',
+  fontWeight: 700,
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+  transition: 'background 0.2s, opacity 0.2s',
+  marginTop: '0.25rem',
 }
