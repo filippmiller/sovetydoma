@@ -5,13 +5,11 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/lib/supabase'
+import { getArticleMeta } from '@/lib/article-index'
 
 interface SavedArticle {
-  id: string
   article_slug: string
-  article_title: string
   saved_at: string
-  category?: string
 }
 
 interface UserArticle {
@@ -65,7 +63,7 @@ export default function MoyKabinetPage() {
       const { data: a } = await supabase
         .from('user_articles')
         .select('*')
-        .eq('user_id', u.id)
+        .eq('author_id', u.id)
         .order('created_at', { ascending: false })
       setArticles((a as UserArticle[]) || [])
 
@@ -200,17 +198,20 @@ export default function MoyKabinetPage() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {saved.map((s) => (
-              <div key={s.id} style={{
+            {saved.map((s) => {
+              const meta = getArticleMeta(s.article_slug)
+              const href = meta?.category ? `/${meta.category}/${s.article_slug}/` : `/search/?q=${encodeURIComponent(s.article_slug)}`
+              return (
+              <div key={s.article_slug} style={{
                 background: '#fff', border: '1px solid #e8e4df', borderRadius: '8px',
                 padding: '0.9rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem',
               }}>
                 <span style={{ fontSize: '1.1rem' }}>🔖</span>
                 <Link
-                  href={`/${s.article_slug}`}
+                  href={href}
                   style={{ flex: 1, color: '#1a1a1a', textDecoration: 'none', fontWeight: 600, fontSize: '0.93rem' }}
                 >
-                  {s.article_title || s.article_slug}
+                  {meta?.title || s.article_slug}
                 </Link>
                 <button
                   onClick={() => removeSaved(s.article_slug)}
@@ -223,7 +224,8 @@ export default function MoyKabinetPage() {
                   ×
                 </button>
               </div>
-            ))}
+              )
+            })}
           </div>
         )
       )}

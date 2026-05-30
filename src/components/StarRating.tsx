@@ -39,14 +39,14 @@ export default function StarRating({ slug }: Props) {
         if (user.user) {
           const { data } = await sb
             .from('ratings')
-            .select('rating')
+            .select('stars')
             .eq('user_id', user.user.id)
-            .eq('slug', slug)
+            .eq('article_slug', slug)
             .maybeSingle()
-          if (data?.rating) {
-            setUserRating(data.rating)
+          if (data?.stars) {
+            setUserRating(data.stars)
             setRated(true)
-            localStorage.setItem(getStorageKey(slug), String(data.rating))
+            localStorage.setItem(getStorageKey(slug), String(data.stars))
           }
         }
       } catch {
@@ -73,8 +73,8 @@ export default function StarRating({ slug }: Props) {
         await sb
           .from('ratings')
           .upsert(
-            { user_id: user.user.id, slug, rating: n },
-            { onConflict: 'user_id,slug' }
+            { user_id: user.user.id, article_slug: slug, stars: n },
+            { onConflict: 'article_slug,user_id' }
           )
       }
     } catch {

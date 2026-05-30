@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { getSupabase } from '@/lib/supabase'
 
 interface Props {
   slug: string
@@ -22,6 +23,7 @@ export default function ArticleReactions({ slug }: Props) {
   const [counts, setCounts] = useState<number[]>([0, 0, 0, 0])
   const [active, setActive] = useState<boolean[]>([false, false, false, false])
   const [mounted, setMounted] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
     const newCounts = REACTIONS.map((r, i) => {
@@ -35,6 +37,32 @@ export default function ArticleReactions({ slug }: Props) {
     setCounts(newCounts)
     setActive(newActive)
     setMounted(true)
+
+    // Load auth + this user's persisted reactions (if logged in).
+    ;(async () => {
+      try {
+        const sb = getSupabase()
+        const { data: u } = await sb.auth.getUser()
+        const uid = u.user?.id ?? null
+        setUserId(uid)
+        if (uid) {
+          const { data: rows } = await sb
+            .from('reactions')
+            .select('emoji')
+            .eq('user_id', uid)
+            .eq('article_slug', slug)
+          if (rows && rows.length) {
+            const mine = new Set(rows.map((row: { emoji: string }) => row.emoji))
+            setActive(REACTIONS.map((r) => mine.has(r.emoji)))
+            REACTIONS.forEach((r) => {
+              localStorage.setItem(`reactions_${slug}_${r.emoji}_active`, mine.has(r.emoji) ? '1' : '0')
+            })
+          }
+        }
+      } catch {
+        // Not configured — localStorage-only mode.
+      }
+    })()
   }, [slug])
 
   function handleClick(index: number) {
@@ -58,6 +86,24 @@ export default function ArticleReactions({ slug }: Props) {
       updated[index] = !isActive
       return updated
     })
+
+    // Persist the user's own reaction to Supabase when logged in.
+    if (userId) {
+      ;(async () => {
+        try {
+          const sb = getSupabase()
+          if (isActive) {
+            await sb.from('reactions').delete()
+              .eq('user_id', userId).eq('article_slug', slug).eq('emoji', r.emoji)
+          } else {
+            await sb.from('reactions')
+              .upsert({ user_id: userId, article_slug: slug, emoji: r.emoji }, { onConflict: 'article_slug,user_id,emoji' })
+          }
+        } catch {
+          // localStorage already updated optimistically.
+        }
+      })()
+    }
   }
 
   if (!mounted) return null

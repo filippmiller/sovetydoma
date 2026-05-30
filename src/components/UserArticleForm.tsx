@@ -7,12 +7,13 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
+// Values MUST match the user_articles.category check constraint.
 const CATEGORIES = [
-  { value: 'dom-i-remont', label: 'Дом и ремонт' },
-  { value: 'sad-i-ogorod', label: 'Сад и огород' },
-  { value: 'kulinariya', label: 'Кулинария' },
-  { value: 'semya-i-byt', label: 'Семья и быт' },
-  { value: 'zdorove', label: 'Здоровье' },
+  { value: 'kulinaria', label: 'Кулинария' },
+  { value: 'dom-i-uborka', label: 'Дом и уборка' },
+  { value: 'dacha-i-ogorod', label: 'Дача и огород' },
+  { value: 'layfkhaki', label: 'Лайфхаки' },
+  { value: 'ekonomiya', label: 'Экономия' },
 ]
 
 interface Props {
@@ -22,7 +23,7 @@ interface Props {
 
 export default function UserArticleForm({ userId, onSuccess }: Props) {
   const [title, setTitle] = useState('')
-  const [category, setCategory] = useState('dom-i-remont')
+  const [category, setCategory] = useState('kulinaria')
   const [tags, setTags] = useState('')
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -37,7 +38,7 @@ export default function UserArticleForm({ userId, onSuccess }: Props) {
     const tagList = tags.split(',').map((t) => t.trim()).filter(Boolean)
 
     const { error: err } = await supabase.from('user_articles').insert({
-      user_id: userId,
+      author_id: userId,
       title: title.trim(),
       category,
       tags: tagList,

@@ -5,7 +5,8 @@ import { getSupabase } from '@/lib/supabase'
 
 interface Props {
   slug: string
-  title: string
+  // Accepted for call-site compatibility; saved_articles has no title column.
+  title?: string
 }
 
 const STORAGE_KEY = 'favorites'
@@ -22,7 +23,7 @@ function saveFavoritesToStorage(slugs: string[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(slugs))
 }
 
-export default function FavoriteButton({ slug, title }: Props) {
+export default function FavoriteButton({ slug }: Props) {
   const [saved, setSaved] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [showPlus, setShowPlus] = useState(false)
@@ -45,9 +46,9 @@ export default function FavoriteButton({ slug, title }: Props) {
         if (uid) {
           const { data: row } = await sb
             .from('saved_articles')
-            .select('id')
+            .select('article_slug')
             .eq('user_id', uid)
-            .eq('slug', slug)
+            .eq('article_slug', slug)
             .maybeSingle()
           if (row) setSaved(true)
         }
@@ -89,13 +90,13 @@ export default function FavoriteButton({ slug, title }: Props) {
         if (nextSaved) {
           await sb
             .from('saved_articles')
-            .upsert({ user_id: userId, slug, title }, { onConflict: 'user_id,slug' })
+            .upsert({ user_id: userId, article_slug: slug }, { onConflict: 'user_id,article_slug' })
         } else {
           await sb
             .from('saved_articles')
             .delete()
             .eq('user_id', userId)
-            .eq('slug', slug)
+            .eq('article_slug', slug)
         }
       } catch {
         // Table may not exist yet
