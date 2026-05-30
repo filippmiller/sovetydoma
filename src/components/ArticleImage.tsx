@@ -29,7 +29,12 @@ export default function ArticleImage({ src, alt, emoji, fallbackSize = '3.5rem' 
       alt={alt}
       loading="lazy"
       onError={() => setFailed(true)}
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+      style={{
+        position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover',
+        // If the image 404s before onError swaps to the emoji, never let the
+        // browser render the alt text at the hero's large inherited font size.
+        fontSize: 0, color: 'transparent',
+      }}
     />
   )
 }

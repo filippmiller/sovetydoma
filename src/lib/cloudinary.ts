@@ -31,9 +31,13 @@ export function resolveArticleImage(
 ): string | null {
   const v = (image || '').trim()
   if (!v) return null
-  // Treat the seeded placeholder as "no image" so the emoji fallback shows
-  // instead of a broken-image icon.
-  if (v.includes('placeholder')) return null
+  // Seeded placeholders ("/images/*.jpg", "placeholder") point at files that
+  // don't exist yet (there is no public/images dir). Render them as "no image"
+  // so cards fall back to the gradient + emoji instead of a broken <img> whose
+  // alt text (the article title) renders huge and overflows the hero.
+  // Real images added later should use an absolute http(s) URL or a bare
+  // Cloudinary public id, both of which still resolve below.
+  if (v.includes('placeholder') || v.startsWith('/images/')) return null
   if (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('/')) return v
   return cloudinaryUrl(v, { ...opts, format: 'auto', quality: 'auto' as unknown as number })
 }
