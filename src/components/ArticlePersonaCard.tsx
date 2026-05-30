@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { resolvePersona } from '@/lib/personas'
 
 interface Props {
@@ -41,7 +42,7 @@ export default function ArticlePersonaCard({ author, category, updated }: Props)
       </div>
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a1a1a' }}>
-          {p.name}{' '}
+          <Link href={`/author/${p.slug}/`} style={{ color: '#1a1a1a', textDecoration: 'none' }}>{p.name}</Link>{' '}
           <span style={{
             fontSize: '0.65rem', fontWeight: 700, verticalAlign: 'middle',
             background: '#eef2ff', color: '#3b5bdb', borderRadius: '4px', padding: '1px 6px', marginLeft: '0.25rem',
