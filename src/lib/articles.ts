@@ -29,6 +29,13 @@ export interface ArticleFrontmatter {
   // Series navigation
   seriesName?: string
   seriesOrder?: number
+  // Quick-answer block (all optional; block renders only when data/derivable)
+  quickAnswer?: string     // 1–3 sentence "краткий ответ"
+  time?: string            // human time, e.g. "2–3 часа"
+  needs?: string[]         // "что понадобится"
+  forWhom?: string         // "для кого подходит"
+  // Editorial attribution (persona slug from src/lib/personas.ts)
+  author?: string
 }
 
 export interface Article {
