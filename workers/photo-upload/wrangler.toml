@@ -1,0 +1,11 @@
+name = "sovetydoma-photo-upload"
+main = "src/index.ts"
+compatibility_date = "2026-05-01"
+
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "sovetydoma-photos"
+
+[vars]
+SUPABASE_URL = "https://plwkjdpuxjkmpkqiqzkk.supabase.co"
+ALLOWED_ORIGIN = "*"

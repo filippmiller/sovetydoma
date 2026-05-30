@@ -3,7 +3,7 @@ import { getSupabase } from '@/lib/supabase'
 export interface PhotoRow {
   id: string
   article_slug: string
-  storage_path: string
+  storage_path: string   // R2 object key (served via the upload Worker)
   caption: string
   user_id: string | null
   author_name: string
@@ -15,15 +15,17 @@ export interface PhotoRow {
 }
 
 const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/\/+$/, '')
+// Cloudflare Worker that stores/serves photos in R2.
+const PHOTO_WORKER = (process.env.NEXT_PUBLIC_PHOTO_WORKER_URL || 'https://sovetydoma-photo-upload.filippmiller.workers.dev').replace(/\/+$/, '')
 
-/** Public URL for a photo stored in the 'photos' bucket. */
+/** Public URL for a photo stored in R2 (served by the upload Worker). */
 export function photoPublicUrl(storagePath: string): string {
-  return `${SUPABASE_URL}/storage/v1/object/public/photos/${storagePath}`
+  return `${PHOTO_WORKER}/file/${storagePath.split('/').map(encodeURIComponent).join('/')}`
 }
 
 /**
- * Upload a file to the 'photos' bucket, create the metadata row (pending),
- * then trigger AI moderation. Returns the created row (with post-AI status).
+ * Upload a file to R2 via the Worker, create the metadata row (pending), then
+ * trigger AI moderation. Returns the resulting moderation status.
  */
 export async function uploadPhoto(opts: {
   file: File
@@ -34,17 +36,36 @@ export async function uploadPhoto(opts: {
   const { data: u } = await sb.auth.getUser()
   if (!u.user) return { ok: false, error: 'not_authenticated' }
 
+  const { data: sess } = await sb.auth.getSession()
+  const token = sess.session?.access_token
+  if (!token) return { ok: false, error: 'not_authenticated' }
+
   const ext = (opts.file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
-  const path = `${opts.articleSlug}/${u.user.id}-${Date.now()}.${ext}`
 
-  const up = await sb.storage.from('photos').upload(path, opts.file, {
-    contentType: opts.file.type, upsert: false,
-  })
-  if (up.error) return { ok: false, error: up.error.message }
+  // 1) Upload bytes to R2 through the Worker (validates the JWT, returns key).
+  let key: string
+  try {
+    const up = await fetch(`${PHOTO_WORKER}/upload`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': opts.file.type || 'image/jpeg',
+        'x-article-slug': opts.articleSlug,
+        'x-file-ext': ext,
+      },
+      body: opts.file,
+    })
+    const j = await up.json()
+    if (!up.ok || !j?.key) return { ok: false, error: j?.error || 'upload_failed' }
+    key = j.key
+  } catch {
+    return { ok: false, error: 'upload_failed' }
+  }
 
+  // 2) Record metadata (pending) in Supabase.
   const { data: row, error: insErr } = await sb.from('photos').insert({
     article_slug: opts.articleSlug,
-    storage_path: path,
+    storage_path: key,
     caption: opts.caption.trim(),
     user_id: u.user.id,
     author_name: u.user.email?.split('@')[0] || 'Пользователь',
@@ -52,11 +73,9 @@ export async function uploadPhoto(opts: {
   }).select().single()
   if (insErr || !row) return { ok: false, error: insErr?.message || 'insert_failed' }
 
-  // Fire AI moderation (best-effort; if it fails the photo stays pending).
+  // 3) Fire AI moderation (best-effort; on failure the photo stays pending).
   let status = 'pending'
   try {
-    const { data: sess } = await sb.auth.getSession()
-    const token = sess.session?.access_token
     const res = await fetch(`${SUPABASE_URL}/functions/v1/moderate-photo`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
