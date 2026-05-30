@@ -55,3 +55,4 @@ strip-bom-string/
 *.log
 
 .claude/scheduled_tasks.lock
+/knowledge-export.json
