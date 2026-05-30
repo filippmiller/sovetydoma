@@ -17,9 +17,32 @@ export default function StarRating({ slug }: Props) {
   const [hovered, setHovered] = useState(0)
   const [animating, setAnimating] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [avg, setAvg] = useState<number | null>(null)
+  const [voteCount, setVoteCount] = useState(0)
+
+  // Pull the public aggregate (everyone can read ratings) so we can show
+  // "★ 4.6 · 12 оценок" as social proof regardless of login state.
+  const loadAggregate = async () => {
+    try {
+      const sb = getSupabase()
+      const { data } = await sb.from('ratings').select('stars').eq('article_slug', slug)
+      if (data && data.length) {
+        const sum = data.reduce((acc: number, r: { stars: number }) => acc + r.stars, 0)
+        setAvg(Math.round((sum / data.length) * 10) / 10)
+        setVoteCount(data.length)
+      } else {
+        setAvg(null)
+        setVoteCount(0)
+      }
+    } catch {
+      // ratings unreadable — hide aggregate
+    }
+  }
 
   useEffect(() => {
-    // Load from localStorage
+    loadAggregate()
+
+    // Load the user's own prior rating (localStorage first, then Supabase)
     const stored = localStorage.getItem(getStorageKey(slug))
     if (stored) {
       const n = parseInt(stored, 10)
@@ -31,7 +54,6 @@ export default function StarRating({ slug }: Props) {
       }
     }
 
-    // Try Supabase
     ;(async () => {
       try {
         const sb = getSupabase()
@@ -76,11 +98,21 @@ export default function StarRating({ slug }: Props) {
             { user_id: user.user.id, article_slug: slug, stars: n },
             { onConflict: 'article_slug,user_id' }
           )
+        // Refresh the public average so the user immediately sees their vote counted.
+        loadAggregate()
       }
     } catch {
       // Table not ready — localStorage fallback already saved
     }
   }
+
+  const AvgBadge = () =>
+    avg !== null ? (
+      <span style={{ fontSize: '0.82rem', color: '#888', whiteSpace: 'nowrap' }}>
+        <span style={{ color: '#f39c12' }}>★</span> {avg.toFixed(1)} · {voteCount}{' '}
+        {voteCount % 10 === 1 && voteCount % 100 !== 11 ? 'оценка' : voteCount % 10 >= 2 && voteCount % 10 <= 4 && (voteCount % 100 < 10 || voteCount % 100 >= 20) ? 'оценки' : 'оценок'}
+      </span>
+    ) : null
 
   if (loading) {
     return (
@@ -120,6 +152,7 @@ export default function StarRating({ slug }: Props) {
         <span style={{ fontSize: '0.85rem', color: '#888', fontStyle: 'italic' }}>
           Ваша оценка: {userRating}/5 · Спасибо!
         </span>
+        <AvgBadge />
       </div>
     )
   }
@@ -171,6 +204,7 @@ export default function StarRating({ slug }: Props) {
             </button>
           ))}
         </div>
+        <AvgBadge />
       </div>
     </div>
   )

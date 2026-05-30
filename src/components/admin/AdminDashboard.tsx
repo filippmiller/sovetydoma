@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import AdminShell from './AdminShell'
+import { useAdminAuth } from '@/lib/admin-auth'
 
 interface Props {
   articles: (ArticleFrontmatter & { wordCount: number })[]
@@ -27,22 +27,9 @@ function StatCard({ icon, value, label, color }: { icon: string; value: string |
 }
 
 export default function AdminDashboard({ articles, categories }: Props) {
-  const [authed, setAuthed] = useState(false)
+  const authState = useAdminAuth()
 
-  useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem('admin_auth')
-      if (!raw) {
-        window.location.href = '/admin/login/'
-        return
-      }
-      setAuthed(true)
-    } catch {
-      window.location.href = '/admin/login/'
-    }
-  }, [])
-
-  if (!authed) return null
+  if (authState !== 'authed') return null
 
   // Compute stats
   const totalArticles = articles.length

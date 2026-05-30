@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { getSupabase } from '@/lib/supabase'
 
 const ACCENT = '#c0392b'
 const ACCENT_DARK = '#a93226'
@@ -14,28 +15,48 @@ export default function AdminLoginForm() {
   const emailRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem('admin_auth')
-      if (raw) { window.location.href = '/admin/'; return }
-    } catch {}
-    emailRef.current?.focus()
+    // If already signed in as an admin, skip the form.
+    ;(async () => {
+      try {
+        const sb = getSupabase()
+        const { data } = await sb.auth.getUser()
+        if (data.user) {
+          const { data: p } = await sb.from('profiles').select('role').eq('id', data.user.id).maybeSingle()
+          if (p?.role === 'admin') { window.location.href = '/admin/'; return }
+        }
+      } catch {}
+      emailRef.current?.focus()
+    })()
   }, [])
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
     setLoading(true)
-    setTimeout(() => {
-      if (email.trim().toLowerCase() === 'admin@sovetydoma.ru' && password === 'sovetydoma2026!') {
-        sessionStorage.setItem('admin_auth', JSON.stringify({
-          email: email.trim().toLowerCase(), name: 'Филипп М.', role: 'Главный редактор', loginAt: Date.now(),
-        }))
-        window.location.href = '/admin/'
-      } else {
+    try {
+      const sb = getSupabase()
+      const { data, error: signInErr } = await sb.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      })
+      if (signInErr || !data.user) {
         setError('Неверный email или пароль')
         setLoading(false)
+        return
       }
-    }, 350)
+      // Authenticated — now require the admin role.
+      const { data: profile } = await sb.from('profiles').select('role').eq('id', data.user.id).maybeSingle()
+      if (profile?.role === 'admin') {
+        window.location.href = '/admin/'
+      } else {
+        await sb.auth.signOut()
+        setError('У этого аккаунта нет прав администратора')
+        setLoading(false)
+      }
+    } catch {
+      setError('Сервис временно недоступен')
+      setLoading(false)
+    }
   }
 
   return (

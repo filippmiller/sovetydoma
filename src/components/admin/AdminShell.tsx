@@ -29,14 +29,29 @@ export default function AdminShell({ activeNav, children }: Props) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem('admin_auth')
-      if (raw) setUser(JSON.parse(raw))
-    } catch {}
+    ;(async () => {
+      try {
+        const { getSupabase } = await import('@/lib/supabase')
+        const sb = getSupabase()
+        const { data } = await sb.auth.getUser()
+        if (data.user) {
+          const { data: p } = await sb.from('profiles').select('display_name, role').eq('id', data.user.id).maybeSingle()
+          setUser({
+            email: data.user.email || '',
+            name: p?.display_name || data.user.email?.split('@')[0] || 'Админ',
+            role: p?.role === 'admin' ? 'Администратор' : (p?.role || ''),
+            loginAt: Date.now(),
+          })
+        }
+      } catch {}
+    })()
   }, [])
 
-  function handleLogout() {
-    try { sessionStorage.removeItem('admin_auth') } catch {}
+  async function handleLogout() {
+    try {
+      const { getSupabase } = await import('@/lib/supabase')
+      await getSupabase().auth.signOut()
+    } catch {}
     window.location.href = '/admin/login/'
   }
 

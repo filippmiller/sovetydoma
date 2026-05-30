@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { ArticleFrontmatter, CATEGORIES } from '@/lib/articles'
 import { readingTime, relativeDate, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
+import { resolveArticleImage } from '@/lib/cloudinary'
 import CardFavoriteButton from '@/components/CardFavoriteButton'
+import ArticleImage from '@/components/ArticleImage'
 
 interface Props {
   article: ArticleFrontmatter
@@ -14,6 +16,7 @@ export default function ArticleCard({ article, wordCount, featured = false }: Pr
   const color = CATEGORY_COLOR[article.category] || '#888'
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
   const time = wordCount ? readingTime('x '.repeat(wordCount)) : '~3 минуты'
+  const imageSrc = resolveArticleImage(article.image, { width: 600, height: 400 })
 
   return (
     <Link
@@ -61,7 +64,11 @@ export default function ArticleCard({ article, wordCount, featured = false }: Pr
             </span>
           )}
           <CardFavoriteButton slug={article.slug} />
-          <span aria-hidden="true">{emoji}</span>
+          {imageSrc ? (
+            <ArticleImage src={imageSrc} alt={article.title} emoji={emoji} fallbackSize={featured ? '4.5rem' : '3.5rem'} />
+          ) : (
+            <span aria-hidden="true">{emoji}</span>
+          )}
         </div>
 
         <div style={{ padding: featured ? '1.25rem' : '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>

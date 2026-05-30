@@ -32,6 +32,14 @@ export default function Header() {
           </Link>
           {/* Right side controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+            <Link
+              href="/izbrannoe/"
+              aria-label="Избранное"
+              title="Избранное"
+              style={{ fontSize: '1.15rem', textDecoration: 'none', lineHeight: 1, display: 'inline-flex', alignItems: 'center' }}
+            >
+              ❤️
+            </Link>
             <AuthButton />
             <DarkModeToggle />
             <HamburgerMenu />

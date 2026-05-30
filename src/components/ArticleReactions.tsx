@@ -13,32 +13,32 @@ const REACTIONS = [
   { emoji: '🤔', label: 'Интересно' },
 ]
 
-const MULTIPLIERS = [7, 11, 5, 9]
-
-function seedCount(slug: string, index: number): number {
-  return (slug.length * MULTIPLIERS[index]) % 30 + 3
-}
-
 export default function ArticleReactions({ slug }: Props) {
   const [counts, setCounts] = useState<number[]>([0, 0, 0, 0])
   const [active, setActive] = useState<boolean[]>([false, false, false, false])
   const [mounted, setMounted] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
 
-  useEffect(() => {
-    const newCounts = REACTIONS.map((r, i) => {
-      const stored = localStorage.getItem(`reactions_${slug}_${r.emoji}`)
-      const seed = seedCount(slug, i)
-      return stored !== null ? parseInt(stored, 10) : seed
-    })
-    const newActive = REACTIONS.map((r) => {
-      return localStorage.getItem(`reactions_${slug}_${r.emoji}_active`) === '1'
-    })
-    setCounts(newCounts)
-    setActive(newActive)
-    setMounted(true)
+  // Real aggregate counts per emoji, straight from the reactions table
+  // (readable by everyone via RLS). No fabricated seed numbers.
+  const loadCounts = async () => {
+    try {
+      const sb = getSupabase()
+      const { data } = await sb.from('reactions').select('emoji').eq('article_slug', slug)
+      if (data) {
+        setCounts(REACTIONS.map((r) => data.filter((row: { emoji: string }) => row.emoji === r.emoji).length))
+      }
+    } catch {
+      // unreadable — leave counts at zero
+    }
+  }
 
-    // Load auth + this user's persisted reactions (if logged in).
+  useEffect(() => {
+    setMounted(true)
+    // Anonymous highlight state lives in localStorage so it survives reloads.
+    setActive(REACTIONS.map((r) => localStorage.getItem(`reactions_${slug}_${r.emoji}_active`) === '1'))
+    loadCounts()
+
     ;(async () => {
       try {
         const sb = getSupabase()
@@ -51,96 +51,90 @@ export default function ArticleReactions({ slug }: Props) {
             .select('emoji')
             .eq('user_id', uid)
             .eq('article_slug', slug)
-          if (rows && rows.length) {
-            const mine = new Set(rows.map((row: { emoji: string }) => row.emoji))
-            setActive(REACTIONS.map((r) => mine.has(r.emoji)))
-            REACTIONS.forEach((r) => {
-              localStorage.setItem(`reactions_${slug}_${r.emoji}_active`, mine.has(r.emoji) ? '1' : '0')
-            })
-          }
+          const mine = new Set((rows || []).map((row: { emoji: string }) => row.emoji))
+          setActive(REACTIONS.map((r) => mine.has(r.emoji)))
         }
       } catch {
-        // Not configured — localStorage-only mode.
+        // Not configured — localStorage-only highlight.
       }
     })()
   }, [slug])
 
-  function handleClick(index: number) {
+  async function handleClick(index: number) {
     const r = REACTIONS[index]
     const isActive = active[index]
-    const seed = seedCount(slug, index)
-    const storedRaw = localStorage.getItem(`reactions_${slug}_${r.emoji}`)
-    const current = storedRaw !== null ? parseInt(storedRaw, 10) : seed
-    const next = isActive ? Math.max(0, current - 1) : current + 1
+    const next = !isActive
 
-    localStorage.setItem(`reactions_${slug}_${r.emoji}`, String(next))
-    localStorage.setItem(`reactions_${slug}_${r.emoji}_active`, isActive ? '0' : '1')
+    // Optimistic highlight toggle (works for everyone).
+    setActive((prev) => prev.map((v, i) => (i === index ? next : v)))
+    localStorage.setItem(`reactions_${slug}_${r.emoji}_active`, next ? '1' : '0')
 
-    setCounts((prev) => {
-      const updated = [...prev]
-      updated[index] = next
-      return updated
-    })
-    setActive((prev) => {
-      const updated = [...prev]
-      updated[index] = !isActive
-      return updated
-    })
+    if (!userId) {
+      // Anonymous: cannot persist (RLS requires auth). Keep counts truthful —
+      // only the user's own highlight changes, the real count is untouched.
+      return
+    }
 
-    // Persist the user's own reaction to Supabase when logged in.
-    if (userId) {
-      ;(async () => {
-        try {
-          const sb = getSupabase()
-          if (isActive) {
-            await sb.from('reactions').delete()
-              .eq('user_id', userId).eq('article_slug', slug).eq('emoji', r.emoji)
-          } else {
-            await sb.from('reactions')
-              .upsert({ user_id: userId, article_slug: slug, emoji: r.emoji }, { onConflict: 'article_slug,user_id,emoji' })
-          }
-        } catch {
-          // localStorage already updated optimistically.
-        }
-      })()
+    // Optimistic count nudge, then write to DB and reconcile with the truth.
+    setCounts((prev) => prev.map((c, i) => (i === index ? Math.max(0, c + (next ? 1 : -1)) : c)))
+    try {
+      const sb = getSupabase()
+      if (next) {
+        await sb.from('reactions').upsert(
+          { user_id: userId, article_slug: slug, emoji: r.emoji },
+          { onConflict: 'article_slug,user_id,emoji' },
+        )
+      } else {
+        await sb.from('reactions').delete()
+          .eq('user_id', userId).eq('article_slug', slug).eq('emoji', r.emoji)
+      }
+      loadCounts()
+    } catch {
+      // Revert optimistic count if the write failed.
+      loadCounts()
     }
   }
 
   if (!mounted) return null
 
   return (
-    <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
-      {REACTIONS.map((r, i) => (
-        <button
-          key={r.emoji}
-          onClick={() => handleClick(i)}
-          aria-pressed={active[i]}
-          aria-label={`${r.label}: ${counts[i]}`}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            padding: '0.45rem 1rem',
-            borderRadius: '999px',
-            border: active[i] ? '2px solid #c0392b' : '2px solid #e0dbd5',
-            backgroundColor: active[i] ? '#c0392b0f' : '#faf9f7',
-            cursor: 'pointer',
-            fontSize: '0.9rem',
-            fontWeight: 600,
-            color: active[i] ? '#c0392b' : '#555',
-            transition: 'border-color 0.15s, color 0.15s, background-color 0.15s',
-            minHeight: '40px',
-          }}
-        >
-          <span style={{ fontSize: '1.1rem' }}>{r.emoji}</span>
-          <span>{r.label}</span>
-          <span style={{
-            fontSize: '0.8rem',
-            fontWeight: 700,
-            color: active[i] ? '#c0392b' : '#999',
-          }}>{counts[i]}</span>
-        </button>
-      ))}
+    <div style={{ marginTop: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+        {REACTIONS.map((r, i) => (
+          <button
+            key={r.emoji}
+            onClick={() => handleClick(i)}
+            aria-pressed={active[i]}
+            aria-label={`${r.label}: ${counts[i]}`}
+            title={!userId ? 'Войдите, чтобы ваш голос учли' : undefined}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              padding: '0.45rem 1rem',
+              borderRadius: '999px',
+              border: active[i] ? '2px solid #c0392b' : '2px solid #e0dbd5',
+              backgroundColor: active[i] ? '#c0392b0f' : '#faf9f7',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              color: active[i] ? '#c0392b' : '#555',
+              transition: 'border-color 0.15s, color 0.15s, background-color 0.15s',
+              minHeight: '40px',
+            }}
+          >
+            <span style={{ fontSize: '1.1rem' }}>{r.emoji}</span>
+            <span>{r.label}</span>
+            {counts[i] > 0 && (
+              <span style={{
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                color: active[i] ? '#c0392b' : '#999',
+              }}>{counts[i]}</span>
+            )}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
