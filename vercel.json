@@ -1,6 +1,6 @@
 {
   "installCommand": "pnpm install",
-  "buildCommand": "node scripts/generate-article-index.mjs && node scripts/generate-sitemap.mjs && node scripts/generate-rss.mjs && node scripts/generate-turbo.mjs && node scripts/generate-zen.mjs && npx next build",
+  "buildCommand": "node scripts/generate-article-index.mjs && node scripts/generate-questions-index.mjs && node scripts/generate-sitemap.mjs && node scripts/generate-rss.mjs && node scripts/generate-turbo.mjs && node scripts/generate-zen.mjs && npx next build",
   "outputDirectory": "out",
   "framework": null,
   "headers": [

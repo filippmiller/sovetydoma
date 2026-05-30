@@ -322,8 +322,8 @@ export default async function ArticlePage({ params }: Props) {
             {/* Derived topic cluster (shared-tag / same-category) */}
             <ArticleTopicCluster allArticles={allArticles} currentSlug={slug} category={category} tags={fm.tags} />
 
-            {/* Questions — coming-soon empty state */}
-            <ArticleQuestionsBlock />
+            {/* Questions — live Q&A for this article */}
+            <ArticleQuestionsBlock articleSlug={slug} />
 
             <Comments slug={slug} />
           </div>
