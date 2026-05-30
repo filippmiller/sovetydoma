@@ -40,12 +40,21 @@ async function rest(table, query) {
   return res.json()
 }
 
+// Preserve the already-committed index when we can't fetch fresh data, so a
+// build without Supabase env (e.g. on Vercel) never wipes real questions to [].
+function keepExisting(reason) {
+  let existing = '[]\n'
+  let n = 0
+  try {
+    existing = fs.readFileSync(OUT, 'utf8')
+    n = JSON.parse(existing).length
+  } catch { /* no committed index yet */ }
+  if (!fs.existsSync(OUT)) fs.writeFileSync(OUT, existing)
+  console.warn(`[questions-index] ${reason} — keeping committed index (${n} questions)`)
+}
+
 async function main() {
-  if (!URL || !KEY) {
-    console.warn('[questions-index] Supabase env not set — writing empty index')
-    fs.writeFileSync(OUT, '[]\n')
-    return
-  }
+  if (!URL || !KEY) { keepExisting('Supabase env not set'); return }
   try {
     const questions = await rest('questions', 'status=eq.approved&select=*&order=created_at.desc')
     const out = []
@@ -59,8 +68,7 @@ async function main() {
     fs.writeFileSync(OUT, JSON.stringify(out, null, 2) + '\n')
     console.log(`[questions-index] wrote ${out.length} approved questions`)
   } catch (e) {
-    console.warn('[questions-index] failed, writing empty index:', e.message)
-    fs.writeFileSync(OUT, '[]\n')
+    keepExisting('fetch failed: ' + e.message)
   }
 }
 
