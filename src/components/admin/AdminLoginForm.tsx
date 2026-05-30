@@ -15,18 +15,12 @@ export default function AdminLoginForm() {
   const emailRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    // If already signed in as an admin, skip the form.
-    ;(async () => {
-      try {
-        const sb = getSupabase()
-        const { data } = await sb.auth.getUser()
-        if (data.user) {
-          const { data: p } = await sb.from('profiles').select('role').eq('id', data.user.id).maybeSingle()
-          if (p?.role === 'admin') { window.location.href = '/admin/'; return }
-        }
-      } catch {}
-      emailRef.current?.focus()
-    })()
+    // Only focus the email field. We deliberately do NOT auto-redirect an
+    // already-signed-in admin to /admin/ here: combined with the gate on
+    // /admin/, that created a /admin/ ⟷ /admin/login/ redirect loop (the page
+    // "shook back and forth") whenever the session/role check was momentarily
+    // flaky. Submitting the form still lets a valid session straight in.
+    emailRef.current?.focus()
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
