@@ -56,3 +56,4 @@ strip-bom-string/
 
 .claude/scheduled_tasks.lock
 /knowledge-export.json
+incoming-articles/*.mdx
