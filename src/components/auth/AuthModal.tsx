@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '@/lib/supabase'
 
 interface Props {
@@ -34,7 +35,9 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     return () => window.removeEventListener('keydown', handleKey)
   }, [isOpen, onClose, initialTab])
 
-  if (!isOpen) return null
+  // Portal target — only available in the browser. Combined with the
+  // `if (!isOpen) return null` guard below, this never runs during SSR.
+  if (!isOpen || typeof document === 'undefined') return null
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,7 +74,9 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setSuccess(null)
   }
 
-  return (
+  // Render through a portal to <body> so the fixed overlay is never trapped
+  // by an ancestor's containing block (e.g. a card's transform/overflow).
+  return createPortal(
     <div
       ref={overlayRef}
       onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
@@ -317,7 +322,8 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
           🏠 Уже 500+ читателей СоветыДома
         </p>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
