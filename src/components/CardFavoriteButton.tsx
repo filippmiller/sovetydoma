@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
+import AuthModal from '@/components/auth/AuthModal'
 
 interface Props {
   slug: string
@@ -26,6 +27,7 @@ export default function CardFavoriteButton({ slug }: Props) {
   const [saved, setSaved] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [showAuth, setShowAuth] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -62,6 +64,8 @@ export default function CardFavoriteButton({ slug }: Props) {
     const favs = readFavorites()
     if (next) {
       if (!favs.includes(slug)) localStorage.setItem(STORAGE_KEY, JSON.stringify([...favs, slug]))
+      // Politely invite anonymous users to register so favorites sync.
+      if (!userId) setShowAuth(true)
     } else {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(favs.filter((s) => s !== slug)))
     }
@@ -86,34 +90,45 @@ export default function CardFavoriteButton({ slug }: Props) {
   const label = saved ? 'Убрать из избранного' : 'В избранное'
 
   return (
-    <button
-      onClick={toggle}
-      aria-label={label}
-      title={label}
-      style={{
-        position: 'absolute',
-        top: '0.75rem',
-        right: '0.75rem',
-        width: '36px',
-        height: '36px',
-        borderRadius: '50%',
-        border: 'none',
-        background: 'rgba(255,255,255,0.9)',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '1.05rem',
-        lineHeight: 1,
-        padding: 0,
-        zIndex: 2,
-        transition: 'transform 0.15s ease, background 0.15s ease',
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.12)' }}
-      onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
-    >
-      <span aria-hidden="true">{mounted && saved ? '❤️' : '🤍'}</span>
-    </button>
+    <>
+      <button
+        onClick={toggle}
+        aria-label={label}
+        title={label}
+        style={{
+          position: 'absolute',
+          top: '0.75rem',
+          right: '0.75rem',
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          border: 'none',
+          background: 'rgba(255,255,255,0.9)',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.05rem',
+          lineHeight: 1,
+          padding: 0,
+          zIndex: 2,
+          transition: 'transform 0.15s ease, background 0.15s ease',
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.12)' }}
+        onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
+      >
+        <span aria-hidden="true">{mounted && saved ? '❤️' : '🤍'}</span>
+      </button>
+
+      {showAuth && (
+        <AuthModal
+          isOpen
+          onClose={() => setShowAuth(false)}
+          initialTab="register"
+          reason="❤️ Сохранили статью! Зарегистрируйтесь, чтобы избранное было на всех устройствах."
+        />
+      )}
+    </>
   )
 }

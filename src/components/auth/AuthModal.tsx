@@ -6,10 +6,14 @@ import { supabase } from '@/lib/supabase'
 interface Props {
   isOpen: boolean
   onClose: () => void
+  /** Which tab to show first (default 'login'). */
+  initialTab?: 'login' | 'register'
+  /** Optional context line shown under the title, e.g. why the modal opened. */
+  reason?: string
 }
 
-export default function AuthModal({ isOpen, onClose }: Props) {
-  const [tab, setTab] = useState<'login' | 'register'>('login')
+export default function AuthModal({ isOpen, onClose, initialTab = 'login', reason }: Props) {
+  const [tab, setTab] = useState<'login' | 'register'>(initialTab)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
@@ -22,12 +26,13 @@ export default function AuthModal({ isOpen, onClose }: Props) {
     if (!isOpen) return
     setError('')
     setSuccess(null)
+    setTab(initialTab)
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [isOpen, onClose])
+  }, [isOpen, onClose, initialTab])
 
   if (!isOpen) return null
 
@@ -133,11 +138,13 @@ export default function AuthModal({ isOpen, onClose }: Props) {
           </h2>
         </div>
 
-        {/* Benefit subtitle */}
-        <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.85rem', color: '#888' }}>
-          {tab === 'login'
-            ? 'Сохраняйте статьи, оставляйте комментарии'
-            : 'Присоединяйтесь — это бесплатно'}
+        {/* Benefit subtitle (or contextual reason if the modal was invoked from an action) */}
+        <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.85rem', color: reason ? '#c0392b' : '#888', fontWeight: reason ? 600 : 400 }}>
+          {reason
+            ? reason
+            : tab === 'login'
+              ? 'Сохраняйте статьи, оставляйте комментарии'
+              : 'Присоединяйтесь — это бесплатно'}
         </p>
 
         {/* Tab switcher — pill style */}

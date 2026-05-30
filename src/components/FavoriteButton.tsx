@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
+import AuthModal from '@/components/auth/AuthModal'
 
 interface Props {
   slug: string
@@ -27,8 +28,7 @@ export default function FavoriteButton({ slug }: Props) {
   const [saved, setSaved] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [showPlus, setShowPlus] = useState(false)
-  const [toast, setToast] = useState(false)
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [showAuth, setShowAuth] = useState(false)
 
   useEffect(() => {
     // Check localStorage
@@ -57,16 +57,7 @@ export default function FavoriteButton({ slug }: Props) {
       }
     })()
 
-    return () => {
-      if (toastTimer.current) clearTimeout(toastTimer.current)
-    }
   }, [slug])
-
-  const showToast = () => {
-    setToast(true)
-    if (toastTimer.current) clearTimeout(toastTimer.current)
-    toastTimer.current = setTimeout(() => setToast(false), 3000)
-  }
 
   const toggle = async () => {
     const nextSaved = !saved
@@ -78,7 +69,10 @@ export default function FavoriteButton({ slug }: Props) {
       if (!favs.includes(slug)) saveFavoritesToStorage([...favs, slug])
       setShowPlus(true)
       setTimeout(() => setShowPlus(false), 600)
-      if (!userId) showToast()
+      // Anonymous user just saved their first favorite — politely invite them
+      // to register/login so it syncs across devices. The favorite is already
+      // kept in localStorage, so nothing is lost if they dismiss.
+      if (!userId) setShowAuth(true)
     } else {
       saveFavoritesToStorage(favs.filter((s) => s !== slug))
     }
@@ -169,25 +163,14 @@ export default function FavoriteButton({ slug }: Props) {
         {saved ? 'В избранном' : 'Сохранить'}
       </span>
 
-      {/* Toast for anonymous saves */}
-      {toast && (
-        <div style={{
-          position: 'absolute',
-          bottom: '110%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: '#333',
-          color: '#fff',
-          fontSize: '0.78rem',
-          padding: '0.45rem 0.8rem',
-          borderRadius: '8px',
-          whiteSpace: 'nowrap',
-          zIndex: 100,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-          pointerEvents: 'none',
-        }}>
-          Войдите, чтобы синхронизировать на всех устройствах
-        </div>
+      {/* Invite anonymous users to register/login so favorites sync */}
+      {showAuth && (
+        <AuthModal
+          isOpen
+          onClose={() => setShowAuth(false)}
+          initialTab="register"
+          reason="❤️ Сохранили статью! Зарегистрируйтесь, чтобы избранное было на всех устройствах."
+        />
       )}
     </div>
   )
