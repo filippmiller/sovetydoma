@@ -20,6 +20,12 @@ import SponsoredBadge from '@/components/SponsoredBadge'
 import AffiliateLink from '@/components/AffiliateLink'
 import RecipeCard from '@/components/RecipeCard'
 import ArticleSeries from '@/components/ArticleSeries'
+import ArticleQuickAnswer from '@/components/ArticleQuickAnswer'
+import ArticlePersonaCard from '@/components/ArticlePersonaCard'
+import ArticleFeedback from '@/components/ArticleFeedback'
+import ArticlePhotoSubmissionCTA from '@/components/ArticlePhotoSubmissionCTA'
+import ArticleQuestionsBlock from '@/components/ArticleQuestionsBlock'
+import ArticleTopicCluster from '@/components/ArticleTopicCluster'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import type { Metadata } from 'next'
@@ -252,6 +258,12 @@ export default async function ArticlePage({ params }: Props) {
               </div>
             </header>
 
+            {/* Editorial attribution (AI-assisted persona, with disclosure) */}
+            <ArticlePersonaCard author={fm.author} category={category} updated={fm.updated || fm.date} />
+
+            {/* Fast-answer block — renders only when an answer is available/derivable */}
+            <ArticleQuickAnswer fm={fm} />
+
             <div className="toc-inline">
               <TableOfContents content={content} />
             </div>
@@ -295,11 +307,24 @@ export default async function ArticlePage({ params }: Props) {
               <StarRating slug={slug} />
             </div>
 
+            {/* Helped? + practical result signals + improve textarea (local-safe) */}
+            <ArticleFeedback slug={slug} />
+
+            {/* "Покажите, что получилось" — coming-soon, no broken controls */}
+            <ArticlePhotoSubmissionCTA fm={fm} />
+
             {/* Share panel */}
             <SharePanel url={url} title={fm.title} />
 
             <RelatedArticles articles={allArticles} currentSlug={slug} currentTags={fm.tags} />
             <MoreArticles articles={allArticles.filter(a => a.category !== category && a.slug !== slug).slice(0, 6)} />
+
+            {/* Derived topic cluster (shared-tag / same-category) */}
+            <ArticleTopicCluster allArticles={allArticles} currentSlug={slug} category={category} tags={fm.tags} />
+
+            {/* Questions — coming-soon empty state */}
+            <ArticleQuestionsBlock />
+
             <Comments slug={slug} />
           </div>
 
