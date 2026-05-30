@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArticleFrontmatter, CATEGORIES } from '@/lib/articles'
 import { readingTime, relativeDate, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
+import CardFavoriteButton from '@/components/CardFavoriteButton'
 
 interface Props {
   article: ArticleFrontmatter
@@ -59,6 +60,7 @@ export default function ArticleCard({ article, wordCount, featured = false }: Pr
               Новое
             </span>
           )}
+          <CardFavoriteButton slug={article.slug} />
           <span aria-hidden="true">{emoji}</span>
         </div>
 
