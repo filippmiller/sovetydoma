@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { getSupabase } from '@/lib/supabase'
 
 interface Props {
   slug: string
 }
 
-// Practical result signals (Problem C). Stored locally for now; a backend
-// table can read these later for product/SEO analysis without UI changes.
+// Practical result signals (Problem C). Persisted to Supabase feedback_events;
+// public aggregate tallies read from feedback_counters.
 const SIGNALS = [
   { key: 'helped', label: '👍 Помогло' },
   { key: 'not_helped', label: '👎 Не помогло' },
@@ -15,7 +16,9 @@ const SIGNALS = [
   { key: 'worked', label: '✅ Сработало' },
   { key: 'not_worked', label: '❌ Не сработало' },
   { key: 'want_try', label: '🔖 Хочу попробовать' },
-]
+] as const
+
+type Counts = Record<string, number>
 
 export default function ArticleFeedback({ slug }: Props) {
   const [signal, setSignal] = useState<string | null>(null)
@@ -23,6 +26,20 @@ export default function ArticleFeedback({ slug }: Props) {
   const [comment, setComment] = useState('')
   const [sent, setSent] = useState(false)
   const [showComment, setShowComment] = useState(false)
+  const [counts, setCounts] = useState<Counts>({})
+
+  // Load aggregate counters (public) + restore this visitor's prior choices.
+  const loadCounts = async () => {
+    try {
+      const sb = getSupabase()
+      const { data } = await sb.from('feedback_counters').select('kind, count').eq('article_slug', slug)
+      if (data) {
+        const c: Counts = {}
+        for (const row of data as { kind: string; count: number }[]) c[row.kind] = row.count
+        setCounts(c)
+      }
+    } catch { /* offline */ }
+  }
 
   useEffect(() => {
     try {
@@ -30,35 +47,43 @@ export default function ArticleFeedback({ slug }: Props) {
       const v = localStorage.getItem(`fb_verdict_${slug}`)
       if (v === 'yes' || v === 'no') { setVerdict(v); setShowComment(true) }
       if (localStorage.getItem(`fb_sent_${slug}`) === '1') setSent(true)
-    } catch { /* localStorage unavailable */ }
+    } catch {}
+    loadCounts()
   }, [slug])
 
-  const pickSignal = (key: string) => {
-    const next = signal === key ? null : key
-    setSignal(next)
+  // Record an event to Supabase (anon allowed); optimistic local count bump.
+  const record = async (kind: string, extra: { comment?: string } = {}) => {
+    setCounts((prev) => ({ ...prev, [kind]: (prev[kind] || 0) + 1 }))
     try {
-      if (next) localStorage.setItem(`fb_signal_${slug}`, next)
-      else localStorage.removeItem(`fb_signal_${slug}`)
-    } catch {}
+      const sb = getSupabase()
+      let userId: string | null = null
+      try { const { data } = await sb.auth.getUser(); userId = data.user?.id ?? null } catch {}
+      await sb.from('feedback_events').insert({ article_slug: slug, kind, comment: extra.comment || '', user_id: userId })
+    } catch { /* best-effort; optimistic count already shown */ }
+  }
+
+  const pickSignal = (key: string) => {
+    if (signal === key) return // one signal per visitor; don't double-count
+    setSignal(key)
+    try { localStorage.setItem(`fb_signal_${slug}`, key) } catch {}
+    record(key)
   }
 
   const pickVerdict = (v: 'yes' | 'no') => {
     setVerdict(v); setShowComment(true)
     try { localStorage.setItem(`fb_verdict_${slug}`, v) } catch {}
+    record(v === 'yes' ? 'verdict_yes' : 'verdict_no')
   }
 
   const submit = () => {
-    // No backend yet — persist locally so nothing is lost and nothing crashes.
-    try {
-      if (comment.trim()) localStorage.setItem(`fb_comment_${slug}`, comment.trim())
-      localStorage.setItem(`fb_sent_${slug}`, '1')
-    } catch {}
+    if (comment.trim()) record('verdict_' + (verdict || 'no'), { comment: comment.trim() })
+    try { localStorage.setItem(`fb_sent_${slug}`, '1') } catch {}
     setSent(true)
   }
 
   return (
     <section style={{ marginTop: '2.5rem', borderTop: '1px solid #f0ece7', paddingTop: '1.75rem' }}>
-      {/* Practical signals */}
+      {/* Practical signals with live aggregate counts */}
       <div style={{ marginBottom: '1.5rem' }}>
         <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '0.6rem' }}>
           Что у вас получилось?
@@ -66,6 +91,7 @@ export default function ArticleFeedback({ slug }: Props) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
           {SIGNALS.map((s) => {
             const active = signal === s.key
+            const n = counts[s.key] || 0
             return (
               <button
                 key={s.key}
@@ -79,7 +105,7 @@ export default function ArticleFeedback({ slug }: Props) {
                   fontSize: '0.85rem', fontWeight: 600, fontFamily: 'inherit',
                 }}
               >
-                {s.label}
+                {s.label}{n > 0 && <span style={{ marginLeft: '0.4rem', fontWeight: 700, color: active ? '#c0392b' : '#999' }}>{n}</span>}
               </button>
             )
           })}
@@ -96,8 +122,12 @@ export default function ArticleFeedback({ slug }: Props) {
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a1a1a' }}>Помогла ли статья?</span>
-              <button onClick={() => pickVerdict('yes')} style={verdictBtn(verdict === 'yes', '#27ae60')}>Да</button>
-              <button onClick={() => pickVerdict('no')} style={verdictBtn(verdict === 'no', '#c0392b')}>Нет</button>
+              <button onClick={() => pickVerdict('yes')} style={verdictBtn(verdict === 'yes', '#27ae60')}>
+                Да{counts.verdict_yes ? ` · ${counts.verdict_yes}` : ''}
+              </button>
+              <button onClick={() => pickVerdict('no')} style={verdictBtn(verdict === 'no', '#c0392b')}>
+                Нет{counts.verdict_no ? ` · ${counts.verdict_no}` : ''}
+              </button>
             </div>
 
             {showComment && (
