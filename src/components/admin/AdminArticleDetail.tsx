@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { Article } from '@/lib/articles'
 import AdminShell from './AdminShell'
+import { useAdminAuth } from '@/lib/admin-auth'
 
 interface Props {
   article: Article
@@ -48,16 +49,8 @@ function MetaRow({ label, value }: { label: string; value: React.ReactNode }) {
 }
 
 export default function AdminArticleDetail({ article }: Props) {
-  const [authed, setAuthed] = useState(false)
+  const authState = useAdminAuth()
   const [copied, setCopied] = useState(false)
-
-  useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem('admin_auth')
-      if (!raw) { window.location.href = '/admin/login/'; return }
-      setAuthed(true)
-    } catch { window.location.href = '/admin/login/' }
-  }, [])
 
   function handleCopy() {
     navigator.clipboard.writeText(article.content).then(() => {
@@ -68,7 +61,7 @@ export default function AdminArticleDetail({ article }: Props) {
     })
   }
 
-  if (!authed) return null
+  if (authState !== 'authed') return null
 
   const { frontmatter: fm, content, wordCount } = article
   const catColor = CATEGORY_COLORS[fm.category] || '#888'

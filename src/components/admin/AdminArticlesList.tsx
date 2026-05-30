@@ -34,19 +34,11 @@ const CATEGORY_COLORS: Record<string, string> = {
 }
 
 export default function AdminArticlesList({ articles }: Props) {
-  const [authed, setAuthed] = useState(false)
+  const authState = useAdminAuth()
   const [query, setQuery] = useState('')
   const [sortKey, setSortKey] = useState<SortKey>('date')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [filterCategory, setFilterCategory] = useState('')
-
-  useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem('admin_auth')
-      if (!raw) { window.location.href = '/admin/login/'; return }
-      setAuthed(true)
-    } catch { window.location.href = '/admin/login/' }
-  }, [])
 
   const filtered = useMemo(() => {
     let list = [...articles]
@@ -92,7 +84,7 @@ export default function AdminArticlesList({ articles }: Props) {
 
   const categories = [...new Set(articles.map(a => a.category))].sort()
 
-  if (!authed) return null
+  if (authState !== 'authed') return null
 
   return (
     <AdminShell activeNav="articles">
