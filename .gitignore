@@ -53,3 +53,5 @@ strip-bom-string/
 
 # build/test logs
 *.log
+
+.claude/scheduled_tasks.lock

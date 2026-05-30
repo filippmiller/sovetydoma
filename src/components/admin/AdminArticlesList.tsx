@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import AdminShell from './AdminShell'
+import { useAdminAuth } from '@/lib/admin-auth'
 
 interface Props {
   articles: (ArticleFrontmatter & { wordCount: number })[]
