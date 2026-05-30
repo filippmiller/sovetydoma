@@ -74,7 +74,7 @@ MDX-файлом. Подтверди, что понял формат.
 12. Запечённая курица с хрустящей корочкой | zapechennaya-kuritsa | kulinaria
 13. Оладьи на кефире пышные | oladi-na-kefire | kulinaria
 14. Домашние пельмени: тесто и лепка | domashnie-pelmeni-testo | kulinaria
-15. Солянка мясная сборная | solyanka-myasnaya | kulinaria
+15. Солянка мясная сборная классическая | solyanka-sbornaya-myasnaya | kulinaria
 16. Картофельное пюре без комочков | kartofelnoe-pyure | kulinaria
 17. Шарлотка с яблоками простая | sharlotka-s-yablokami | kulinaria
 18. Как сварить вкусный компот из сухофруктов | kompot-iz-suhofruktov | kulinaria
@@ -89,7 +89,7 @@ MDX-файлом. Подтверди, что понял формат.
 ### Дом и уборка — dom-i-uborka (25)
 26. Как отмыть духовку от жира без химии | otmyt-duhovku-ot-zhira | dom-i-uborka
 27. Чистка стиральной машины от запаха | chistka-stiralnoy-mashiny | dom-i-uborka
-28. Как избавиться от накипи в чайнике | nakip-v-chaynike | dom-i-uborka
+28. Как удалить накипь в чайнике лимонной кислотой | udalit-nakip-limonkoy | dom-i-uborka
 29. Уборка холодильника и устранение запаха | uborka-holodilnika | dom-i-uborka
 30. Как отмыть пригоревшую кастрюлю | prigorevshaya-kastryulya | dom-i-uborka
 31. Чистка ковра в домашних условиях | chistka-kovra-doma | dom-i-uborka
@@ -99,7 +99,7 @@ MDX-файлом. Подтверди, что понял формат.
 35. Чистка микроволновки паром | chistka-mikrovolnovki | dom-i-uborka
 36. Как отмыть жалюзи быстро | otmyt-zhalyuzi | dom-i-uborka
 37. Уход за деревянной мебелью | uhod-za-mebelyu | dom-i-uborka
-38. Как избавиться от пыли надолго | izbavitsya-ot-pyli | dom-i-uborka
+38. Как уменьшить количество пыли в квартире | menshe-pyli-v-kvartire | dom-i-uborka
 39. Чистка швов между плиткой | shvy-mezhdu-plitkoy | dom-i-uborka
 40. Как вывести запах из обуви | zapah-iz-obuvi | dom-i-uborka
 41. Стирка пуховика в стиральной машине | stirka-puhovika | dom-i-uborka
