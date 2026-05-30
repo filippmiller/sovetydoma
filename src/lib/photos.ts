@@ -24,6 +24,39 @@ export function photoPublicUrl(storagePath: string): string {
 }
 
 /**
+ * Upload raw bytes to R2 via the Worker and return the object key. Lower-level
+ * than uploadPhoto() — used where the caller stores the key in its own table
+ * (e.g. an optional photo attached to a comment).
+ */
+export async function uploadToR2(opts: {
+  file: File
+  articleSlug: string
+}): Promise<{ ok: true; key: string } | { ok: false; error: string }> {
+  const sb = getSupabase()
+  const { data: sess } = await sb.auth.getSession()
+  const token = sess.session?.access_token
+  if (!token) return { ok: false, error: 'not_authenticated' }
+  const ext = (opts.file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
+  try {
+    const up = await fetch(`${PHOTO_WORKER}/upload`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': opts.file.type || 'image/jpeg',
+        'x-article-slug': opts.articleSlug,
+        'x-file-ext': ext,
+      },
+      body: opts.file,
+    })
+    const j = await up.json()
+    if (!up.ok || !j?.key) return { ok: false, error: j?.error || 'upload_failed' }
+    return { ok: true, key: j.key }
+  } catch {
+    return { ok: false, error: 'upload_failed' }
+  }
+}
+
+/**
  * Upload a file to R2 via the Worker, create the metadata row (pending), then
  * trigger AI moderation. Returns the resulting moderation status.
  */

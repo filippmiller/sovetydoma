@@ -38,6 +38,7 @@ export interface Comment {
   content: string
   parent_id: string | null
   is_approved: boolean
+  photo_path?: string | null
   created_at: string
   profiles?: Profile
 }

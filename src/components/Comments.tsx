@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Comment } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
+import { uploadToR2, photoPublicUrl } from '@/lib/photos'
+
+const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/\/+$/, '')
 
 interface Props {
   slug: string
@@ -129,6 +132,15 @@ function CommentItem({ comment, depth, onReply }: CommentItemProps) {
         }}>
           {comment.content}
         </p>
+        {comment.photo_path && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={photoPublicUrl(comment.photo_path)}
+            alt="Фото к комментарию"
+            loading="lazy"
+            style={{ marginTop: '0.5rem', maxWidth: '240px', width: '100%', borderRadius: '8px', display: 'block' }}
+          />
+        )}
         <button
           onClick={() => onReply(comment.id)}
           style={{
@@ -162,6 +174,8 @@ export default function Comments({ slug }: Props) {
   const [replyText, setReplyText] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
+  const [photo, setPhoto] = useState<File | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
 
   const mainTextareaRef = useAutoResize(text)
   const replyTextareaRef = useAutoResize(replyText)
@@ -184,31 +198,49 @@ export default function Comments({ slug }: Props) {
       })
   }, [slug])
 
-  const submitComment = async (content: string, parentId: string | null) => {
+  const submitComment = async (content: string, parentId: string | null, attach?: File | null) => {
     if (!content.trim() || !userId) return
     setSubmitting(true)
+    setNotice(null)
 
-    const optimistic: Comment = {
-      id: `opt-${Date.now()}`,
-      article_slug: slug,
-      user_id: userId,
-      content: content.trim(),
-      parent_id: parentId,
-      is_approved: true,
-      created_at: new Date().toISOString(),
+    // 1) Optional photo → upload to R2 first, keep the key.
+    let photoKey: string | null = null
+    if (attach) {
+      const up = await uploadToR2({ file: attach, articleSlug: slug })
+      if (!up.ok) { setSubmitting(false); setNotice('Не удалось загрузить фото. Комментарий не отправлен.'); return }
+      photoKey = up.key
     }
-    setComments((prev) => [...prev, optimistic])
-    if (parentId) { setReplyText(''); setReplyTo(null) } else setText('')
 
+    // 2) Insert as pending (is_approved defaults false now → moderation).
     const { data, error } = await supabase
       .from('comments')
-      .insert({ article_slug: slug, user_id: userId, content: content.trim(), parent_id: parentId })
+      .insert({ article_slug: slug, user_id: userId, content: content.trim(), parent_id: parentId, photo_path: photoKey })
       .select('*, profiles(display_name, avatar_url)')
       .single()
 
+    if (error || !data) { setSubmitting(false); setNotice('Не удалось отправить комментарий.'); return }
+
+    // 3) Fire AI moderation; if it approves, show the comment immediately.
+    let approved = false
+    try {
+      const { data: sess } = await supabase.auth.getSession()
+      const token = sess.session?.access_token
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/moderate-comment`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ commentId: (data as Comment).id }),
+      })
+      const j = await res.json()
+      approved = !!j?.is_approved
+    } catch { /* stays pending for a human */ }
+
+    if (parentId) { setReplyText(''); setReplyTo(null) } else { setText(''); setPhoto(null) }
     setSubmitting(false)
-    if (!error && data) {
-      setComments((prev) => prev.map((c) => (c.id === optimistic.id ? (data as Comment) : c)))
+
+    if (approved) {
+      setComments((prev) => [...prev, { ...(data as Comment), is_approved: true }])
+    } else {
+      setNotice('🕓 Спасибо! Комментарий отправлен на модерацию и появится после проверки.')
     }
   }
 
@@ -379,6 +411,19 @@ export default function Comments({ slug }: Props) {
               placeholder="Напишите комментарий…"
               style={{ ...textareaStyle, minHeight: '100px' }}
             />
+            {/* Optional photo attachment */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+              <label style={{ fontSize: '0.82rem', color: '#777', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                📷 Прикрепить фото
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setPhoto(e.target.files?.[0] || null)}
+                  style={{ display: 'none' }}
+                />
+              </label>
+              {photo && <span style={{ fontSize: '0.8rem', color: '#1e8449' }}>✓ {photo.name.slice(0, 28)}</span>}
+            </div>
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
@@ -389,17 +434,19 @@ export default function Comments({ slug }: Props) {
             }}>
               <span style={{ fontSize: '0.75rem', color: '#bbb' }}>{text.length}/2000</span>
               <button
-                onClick={() => submitComment(text, null)}
+                onClick={() => submitComment(text, null, photo)}
                 disabled={submitting || !text.trim()}
                 style={{
                   ...submitBtnStyle,
                   opacity: submitting || !text.trim() ? 0.6 : 1,
-                  // Full width on small screens handled via inline style below
                 }}
               >
                 {submitting ? 'Отправляем…' : 'Отправить'}
               </button>
             </div>
+            {notice && (
+              <p style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: notice.startsWith('🕓') ? '#1e8449' : '#c0392b' }}>{notice}</p>
+            )}
           </>
         )}
       </div>
