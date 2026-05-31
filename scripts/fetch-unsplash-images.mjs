@@ -1,89 +1,105 @@
 import fs from 'fs'
 import path from 'path'
-import https from 'https'
 
-const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY || ''
+// Resumable, rate-limit-aware Unsplash image fetcher for SovetyDoma articles.
+//
+//   UNSPLASH_ACCESS_KEY=xxx node scripts/fetch-unsplash-images.mjs
+//
+// - Reads every src/content/articles/*.mdx, fetches a relevant landscape photo,
+//   saves it to public/images/<slug>.jpg (served as /images/<slug>.jpg).
+// - SKIPS slugs that already have a file → safe to re-run across hourly batches.
+// - Demo Unsplash apps allow 50 requests/hour. The script watches the
+//   X-Ratelimit-Remaining header and STOPS cleanly when the budget is gone,
+//   so you just re-run it next hour to continue where it left off.
+// - Query priority: explicit QUERY_MAP entry → category English query → a
+//   transliteration-ish fallback from the slug.
+
+const KEY = process.env.UNSPLASH_ACCESS_KEY || ''
+if (!KEY) { console.error('Missing UNSPLASH_ACCESS_KEY'); process.exit(1) }
+
 const ARTICLES_DIR = path.join(process.cwd(), 'src/content/articles')
 const IMAGES_DIR = path.join(process.cwd(), 'public/images')
-
-// Keyword map: article slug → Unsplash search query
-const QUERY_MAP = {
-  'idealnyy-borshch': 'borscht soup russian',
-  'domashnie-bliny': 'russian pancakes blini',
-  'domashnie-mayonez': 'homemade mayonnaise',
-  'solyanka-myasnaya': 'russian meat soup',
-  'nakip-v-chaynike': 'electric kettle kitchen',
-  'skovoroda-ot-zhira': 'cast iron pan cleaning',
-  'griby-sezony-sbor': 'forest mushrooms picking',
-  'griby-zasolka': 'pickled mushrooms jar',
-  'ogurcy-v-otkrytom-grunte': 'garden cucumbers growing',
-  'ogurcy-sorta-teplica': 'greenhouse cucumbers',
-  'tomaty-bolezni': 'tomato plants garden',
-  'kleshchi-zashchita': 'forest walk safety',
-  'les-bezopasnost': 'forest hiking russia',
-  'udobreniya-gryadki': 'garden fertilizer soil',
-  'osy-pchely-osam': 'wasp nest garden',
-  'tli-nasekomye-sad': 'aphids garden plants',
-  'parazity-rastenii': 'plant disease fungus',
-  'kompost-bystro': 'compost garden organic',
-  'podkormka-pomidorov': 'tomatoes fertilizing',
-  'klubnika-na-podokonnike': 'strawberries windowsill',
-  'kogda-sazhat-pomidory-2026': 'tomato seedlings spring',
-  'ogurcy-ot-tli': 'cucumber plant aphids',
-  'zapakh-v-holodilnike': 'refrigerator clean kitchen',
-  'chistka-dukhovki': 'oven cleaning',
-  'krossovki-otmyt': 'white sneakers clean',
-  'stirka-pukhovika': 'washing down jacket',
-  'ekonomiya-benzin': 'gas station car fuel',
-  'ekonomiya-zhkh': 'utility bills home',
-  'kashbek-karty-2026': 'credit cards cashback',
-  'menyu-na-nedelyu-3000': 'weekly meal planning',
-  'ekonomiya-na-produktakh': 'grocery shopping budget',
-  'carapiny-na-mebeli': 'wood furniture scratch repair',
-  'hranenie-produktov': 'food storage containers',
-  'soda-10-sposobov': 'baking soda cleaning',
-  'poryadok-za-15-minut': 'clean apartment room',
-  'starye-dzhinsy': 'denim jeans diy craft',
-}
-
 if (!fs.existsSync(IMAGES_DIR)) fs.mkdirSync(IMAGES_DIR, { recursive: true })
 
-async function downloadImage(url, dest) {
-  return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(dest)
-    https.get(url, res => {
-      if (res.statusCode === 302 || res.statusCode === 301) {
-        https.get(res.headers.location, res2 => res2.pipe(file))
-      } else {
-        res.pipe(file)
-      }
-      file.on('finish', () => { file.close(); resolve() })
-    }).on('error', reject)
-  })
+// Good English search queries by category (reliable Unsplash results).
+const CATEGORY_QUERY = {
+  kulinaria: 'russian food cooking dish',
+  'dom-i-uborka': 'home cleaning tidy interior',
+  'dacha-i-ogorod': 'vegetable garden gardening',
+  layfkhaki: 'home life hack organization',
+  ekonomiya: 'money saving budget home',
+  rybalka: 'fishing river lake rod',
 }
 
-async function fetchPhoto(query, slug) {
-  if (!UNSPLASH_ACCESS_KEY) { console.log(`Skip ${slug} — no UNSPLASH_ACCESS_KEY`); return null }
-  const url = `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`
+// Hand-tuned overrides for specific slugs (best relevance).
+const QUERY_MAP = {
+  'idealnyy-borshch': 'borscht soup', 'domashnie-bliny': 'russian pancakes blini',
+  'domashnie-mayonez': 'homemade mayonnaise', 'solyanka-myasnaya': 'meat soup bowl',
+  'nakip-v-chaynike': 'electric kettle', 'skovoroda-ot-zhira': 'cast iron pan',
+  'griby-sezony-sbor': 'forest mushrooms', 'griby-zasolka': 'pickled mushrooms jar',
+  'ogurcy-v-otkrytom-grunte': 'cucumber garden', 'tomaty-bolezni': 'tomato plants',
+  'kleshchi-zashchita': 'forest path walk', 'les-bezopasnost': 'forest hiking',
+  'udobreniya-gryadki': 'garden soil fertilizer', 'kompost-bystro': 'compost heap garden',
+  'podkormka-pomidorov': 'tomato plant care', 'klubnika-na-podokonnike': 'strawberry plant',
+  'zapakh-v-holodilnike': 'open refrigerator', 'chistka-dukhovki': 'oven cleaning',
+  'krossovki-otmyt': 'white sneakers', 'stirka-pukhovika': 'down jacket laundry',
+  'ekonomiya-benzin': 'fuel pump car', 'menyu-na-nedelyu-3000': 'meal prep containers',
+  'soda-10-sposobov': 'baking soda', 'poryadok-za-15-minut': 'tidy clean room',
+}
+
+function readCategory(file) {
+  try {
+    const txt = fs.readFileSync(path.join(ARTICLES_DIR, file), 'utf8')
+    const m = txt.match(/^category:\s*["']?([a-z-]+)["']?/m)
+    return m ? m[1] : null
+  } catch { return null }
+}
+
+async function fetchPhotoUrl(query) {
+  const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&orientation=landscape&per_page=1&content_filter=high&client_id=${KEY}`
   const res = await fetch(url)
-  if (!res.ok) return null
+  const remaining = res.headers.get('x-ratelimit-remaining')
+  if (res.status === 403) return { url: null, remaining: 0, blocked: true }
+  if (!res.ok) return { url: null, remaining }
   const data = await res.json()
-  return data.urls?.regular || null
+  return { url: data.results?.[0]?.urls?.regular || null, remaining }
+}
+
+async function download(url, dest) {
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`download ${res.status}`)
+  const buf = Buffer.from(await res.arrayBuffer())
+  fs.writeFileSync(dest, buf)
 }
 
 const files = fs.readdirSync(ARTICLES_DIR).filter(f => f.endsWith('.mdx'))
+let fetched = 0, skipped = 0, failed = 0
+console.log(`${files.length} articles total`)
+
 for (const file of files) {
   const slug = file.replace('.mdx', '')
-  const imgPath = path.join(IMAGES_DIR, `${slug}.jpg`)
-  if (fs.existsSync(imgPath)) { console.log(`✓ ${slug} — already exists`); continue }
-  const query = QUERY_MAP[slug] || slug.replace(/-/g, ' ')
-  const photoUrl = await fetchPhoto(query, slug)
-  if (photoUrl) {
-    await downloadImage(photoUrl, imgPath)
-    console.log(`✓ Downloaded image for ${slug}`)
-  } else {
-    console.log(`- No image for ${slug}`)
+  const dest = path.join(IMAGES_DIR, `${slug}.jpg`)
+  if (fs.existsSync(dest)) { skipped++; continue }
+
+  const cat = readCategory(file)
+  const query = QUERY_MAP[slug] || CATEGORY_QUERY[cat] || slug.replace(/-/g, ' ')
+
+  const { url, remaining, blocked } = await fetchPhotoUrl(query)
+  if (blocked) {
+    console.log(`\n⏸  Rate limit hit. Fetched ${fetched} this run. Re-run next hour to continue.`)
+    break
   }
-  await new Promise(r => setTimeout(r, 200)) // rate limit
+  if (url) {
+    try { await download(url, dest); fetched++; console.log(`✓ ${slug}  (${query})  [rl:${remaining}]`) }
+    catch (e) { failed++; console.log(`✗ ${slug} download failed: ${e.message}`) }
+  } else {
+    failed++; console.log(`- ${slug}: no result for "${query}"`)
+  }
+  if (remaining !== null && Number(remaining) <= 0) {
+    console.log(`\n⏸  Rate budget exhausted. Re-run next hour to continue.`); break
+  }
+  await new Promise(r => setTimeout(r, 250))
 }
-console.log('Done fetching images.')
+
+const have = fs.readdirSync(IMAGES_DIR).filter(f => f.endsWith('.jpg')).length
+console.log(`\nDone. fetched=${fetched} skipped=${skipped} failed=${failed}. Total images on disk: ${have}/${files.length}`)

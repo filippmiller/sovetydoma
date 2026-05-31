@@ -31,13 +31,11 @@ export function resolveArticleImage(
 ): string | null {
   const v = (image || '').trim()
   if (!v) return null
-  // Seeded placeholders ("/images/*.jpg", "placeholder") point at files that
-  // don't exist yet (there is no public/images dir). Render them as "no image"
-  // so cards fall back to the gradient + emoji instead of a broken <img> whose
-  // alt text (the article title) renders huge and overflows the hero.
-  // Real images added later should use an absolute http(s) URL or a bare
-  // Cloudinary public id, both of which still resolve below.
-  if (v.includes('placeholder') || v.startsWith('/images/')) return null
+  // Generic seeded placeholder → no image (cards fall back to gradient + emoji).
+  // Real per-article files under /images/<slug>.jpg ARE served; if the file is
+  // still missing, <ArticleImage> transparently 404-falls-back to the emoji,
+  // so this is safe even before every image has been fetched.
+  if (v.includes('placeholder')) return null
   if (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('/')) return v
   return cloudinaryUrl(v, { ...opts, format: 'auto', quality: 'auto' as unknown as number })
 }

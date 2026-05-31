@@ -64,3 +64,6 @@ DEPLOY-*.md
 *.secrets.md
 .secrets/
 
+
+# transient resume note (references keys)
+HANDOFF-RESUME.md
