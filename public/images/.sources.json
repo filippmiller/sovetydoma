@@ -877,5 +877,1445 @@
     "provider": "generated-card",
     "style": "muted-topic-thumbnail",
     "generatedAt": "2026-05-31T13:24:57.465993+00:00"
+  },
+  "previews/baklazhany-v-teplitse": {
+    "provider": "local-preview",
+    "source": "baklazhany-v-teplitse.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.514303+00:00"
+  },
+  "previews/bliny-na-moloke": {
+    "provider": "local-preview",
+    "source": "bliny-na-moloke.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.533673+00:00"
+  },
+  "previews/bolezni-ogurtsov": {
+    "provider": "local-preview",
+    "source": "bolezni-ogurtsov.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.549652+00:00"
+  },
+  "previews/borba-s-medvedkoy": {
+    "provider": "local-preview",
+    "source": "borba-s-medvedkoy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.562625+00:00"
+  },
+  "previews/borba-s-oduvanchikami": {
+    "provider": "local-preview",
+    "source": "borba-s-oduvanchikami.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.580104+00:00"
+  },
+  "previews/borba-s-tley": {
+    "provider": "local-preview",
+    "source": "borba-s-tley.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.600600+00:00"
+  },
+  "previews/borba-so-slizniami": {
+    "provider": "local-preview",
+    "source": "borba-so-slizniami.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.615951+00:00"
+  },
+  "previews/borsch-bez-myasa": {
+    "provider": "local-preview",
+    "source": "borsch-bez-myasa.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.626048+00:00"
+  },
+  "previews/bystraya-uborka-15-minut": {
+    "provider": "local-preview",
+    "source": "bystraya-uborka-15-minut.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.636986+00:00"
+  },
+  "previews/chesnok-osenyu": {
+    "provider": "local-preview",
+    "source": "chesnok-osenyu.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.663085+00:00"
+  },
+  "previews/chistka-kovra-doma": {
+    "provider": "local-preview",
+    "source": "chistka-kovra-doma.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.691636+00:00"
+  },
+  "previews/chistka-mikrovolnovki": {
+    "provider": "local-preview",
+    "source": "chistka-mikrovolnovki.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.703655+00:00"
+  },
+  "previews/chistka-stiralnoy-mashiny": {
+    "provider": "local-preview",
+    "source": "chistka-stiralnoy-mashiny.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.716219+00:00"
+  },
+  "previews/chto-posadit-v-teni": {
+    "provider": "local-preview",
+    "source": "chto-posadit-v-teni.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.731073+00:00"
+  },
+  "previews/deshevye-produkty": {
+    "provider": "local-preview",
+    "source": "deshevye-produkty.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.740143+00:00"
+  },
+  "previews/domashnie-pelmeni-testo": {
+    "provider": "local-preview",
+    "source": "domashnie-pelmeni-testo.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.783470+00:00"
+  },
+  "previews/domashniy-mayonez-bystro": {
+    "provider": "local-preview",
+    "source": "domashniy-mayonez-bystro.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.795749+00:00"
+  },
+  "previews/drenazh-na-uchastke": {
+    "provider": "local-preview",
+    "source": "drenazh-na-uchastke.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.813329+00:00"
+  },
+  "previews/dyni-vyrashchivanie": {
+    "provider": "local-preview",
+    "source": "dyni-vyrashchivanie.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.823048+00:00"
+  },
+  "previews/ekonomiya-benzina": {
+    "provider": "local-preview",
+    "source": "ekonomiya-benzina.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.847700+00:00"
+  },
+  "previews/ekonomiya-elektrichestva": {
+    "provider": "local-preview",
+    "source": "ekonomiya-elektrichestva.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.861854+00:00"
+  },
+  "previews/ekonomiya-elektroenergii": {
+    "provider": "local-preview",
+    "source": "ekonomiya-elektroenergii.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.877861+00:00"
+  },
+  "previews/ekonomiya-na-himii": {
+    "provider": "local-preview",
+    "source": "ekonomiya-na-himii.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.891931+00:00"
+  },
+  "previews/ekonomiya-na-odezhde": {
+    "provider": "local-preview",
+    "source": "ekonomiya-na-odezhde.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.906637+00:00"
+  },
+  "previews/ekonomiya-na-otoplenii": {
+    "provider": "local-preview",
+    "source": "ekonomiya-na-otoplenii.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.918172+00:00"
+  },
+  "previews/ekonomiya-na-produktah": {
+    "provider": "local-preview",
+    "source": "ekonomiya-na-produktah.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.928778+00:00"
+  },
+  "previews/ekonomiya-vody": {
+    "provider": "local-preview",
+    "source": "ekonomiya-vody.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.993138+00:00"
+  },
+  "previews/ekonomnyy-otpusk": {
+    "provider": "local-preview",
+    "source": "ekonomnyy-otpusk.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.033346+00:00"
+  },
+  "previews/grechka-po-kupecheski": {
+    "provider": "local-preview",
+    "source": "grechka-po-kupecheski.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.047251+00:00"
+  },
+  "previews/griby-sezony-sbor": {
+    "provider": "local-preview",
+    "source": "griby-sezony-sbor.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.060079+00:00"
+  },
+  "previews/griby-zasolka": {
+    "provider": "local-preview",
+    "source": "griby-zasolka.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.072921+00:00"
+  },
+  "previews/gryadki-iz-dosok": {
+    "provider": "local-preview",
+    "source": "gryadki-iz-dosok.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.085935+00:00"
+  },
+  "previews/gryadki-k-zime": {
+    "provider": "local-preview",
+    "source": "gryadki-k-zime.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.102258+00:00"
+  },
+  "previews/gulyash-iz-govyadiny": {
+    "provider": "local-preview",
+    "source": "gulyash-iz-govyadiny.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.117536+00:00"
+  },
+  "previews/hleb-v-duhovke": {
+    "provider": "local-preview",
+    "source": "hleb-v-duhovke.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.133513+00:00"
+  },
+  "previews/holodets-retsept": {
+    "provider": "local-preview",
+    "source": "holodets-retsept.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.146766+00:00"
+  },
+  "previews/hranenie-morkovi": {
+    "provider": "local-preview",
+    "source": "hranenie-morkovi.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.159316+00:00"
+  },
+  "previews/hranenie-na-kuhne": {
+    "provider": "local-preview",
+    "source": "hranenie-na-kuhne.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.171657+00:00"
+  },
+  "previews/hranenie-provodov": {
+    "provider": "local-preview",
+    "source": "hranenie-provodov.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.210875+00:00"
+  },
+  "previews/izbavit-ot-pyireya": {
+    "provider": "local-preview",
+    "source": "izbavit-ot-pyireya.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.239828+00:00"
+  },
+  "previews/izbavitsya-ot-pyli": {
+    "provider": "local-preview",
+    "source": "izbavitsya-ot-pyli.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.249816+00:00"
+  },
+  "previews/kak-varit-makarony": {
+    "provider": "local-preview",
+    "source": "kak-varit-makarony.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.262330+00:00"
+  },
+  "previews/kak-vybrat-arbuz": {
+    "provider": "local-preview",
+    "source": "kak-vybrat-arbuz.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.301060+00:00"
+  },
+  "previews/kartofelnoe-pyure": {
+    "provider": "local-preview",
+    "source": "kartofelnoe-pyure.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.313760+00:00"
+  },
+  "previews/kartoshka-v-duhovke": {
+    "provider": "local-preview",
+    "source": "kartoshka-v-duhovke.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.326179+00:00"
+  },
+  "previews/keshbek-bonusy": {
+    "provider": "local-preview",
+    "source": "keshbek-bonusy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.363004+00:00"
+  },
+  "previews/khraneniye-ovoshchey-zimoy": {
+    "provider": "local-preview",
+    "source": "khraneniye-ovoshchey-zimoy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.375957+00:00"
+  },
+  "previews/kleshchi-zashchita": {
+    "provider": "local-preview",
+    "source": "kleshchi-zashchita.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.395425+00:00"
+  },
+  "previews/klubnika-v-grunte": {
+    "provider": "local-preview",
+    "source": "klubnika-v-grunte.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.420607+00:00"
+  },
+  "previews/koloradskiy-zhuk": {
+    "provider": "local-preview",
+    "source": "koloradskiy-zhuk.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.459060+00:00"
+  },
+  "previews/kompost-svoimi-rukami": {
+    "provider": "local-preview",
+    "source": "kompost-svoimi-rukami.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.496850+00:00"
+  },
+  "previews/kompot-iz-suhofruktov": {
+    "provider": "local-preview",
+    "source": "kompot-iz-suhofruktov.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.582340+00:00"
+  },
+  "previews/kuriniy-bulon": {
+    "provider": "local-preview",
+    "source": "kuriniy-bulon.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.635582+00:00"
+  },
+  "previews/les-bezopasnost": {
+    "provider": "local-preview",
+    "source": "les-bezopasnost.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.658988+00:00"
+  },
+  "previews/lovlya-karasya": {
+    "provider": "local-preview",
+    "source": "lovlya-karasya.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.672435+00:00"
+  },
+  "previews/marinad-dlya-shashlyka": {
+    "provider": "local-preview",
+    "source": "marinad-dlya-shashlyka.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.685786+00:00"
+  },
+  "previews/marinovannyy-luk": {
+    "provider": "local-preview",
+    "source": "marinovannyy-luk.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.698559+00:00"
+  },
+  "previews/menshe-pyli-v-kvartire": {
+    "provider": "local-preview",
+    "source": "menshe-pyli-v-kvartire.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.712791+00:00"
+  },
+  "previews/morkov-vyraschivanie": {
+    "provider": "local-preview",
+    "source": "morkov-vyraschivanie.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.746922+00:00"
+  },
+  "previews/muravi-na-uchastke": {
+    "provider": "local-preview",
+    "source": "muravi-na-uchastke.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.759720+00:00"
+  },
+  "previews/obrezka-smorodiny": {
+    "provider": "local-preview",
+    "source": "obrezka-smorodiny.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.783672+00:00"
+  },
+  "previews/obrezka-yabloni": {
+    "provider": "local-preview",
+    "source": "obrezka-yabloni.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.795928+00:00"
+  },
+  "previews/ogurcy-v-otkrytom-grunte": {
+    "provider": "local-preview",
+    "source": "ogurcy-v-otkrytom-grunte.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.867135+00:00"
+  },
+  "previews/ohladit-napitok-bystro": {
+    "provider": "local-preview",
+    "source": "ohladit-napitok-bystro.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.880137+00:00"
+  },
+  "previews/oladi-na-kefire": {
+    "provider": "local-preview",
+    "source": "oladi-na-kefire.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.892957+00:00"
+  },
+  "previews/organizatsiya-kuhni": {
+    "provider": "local-preview",
+    "source": "organizatsiya-kuhni.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.906176+00:00"
+  },
+  "previews/osy-pchely-osam": {
+    "provider": "local-preview",
+    "source": "osy-pchely-osam.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.919535+00:00"
+  },
+  "previews/otkryt-tuguyu-kryshku": {
+    "provider": "local-preview",
+    "source": "otkryt-tuguyu-kryshku.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.932614+00:00"
+  },
+  "previews/otmyt-duhovku-ot-zhira": {
+    "provider": "local-preview",
+    "source": "otmyt-duhovku-ot-zhira.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.945636+00:00"
+  },
+  "previews/otmyt-zerkalo": {
+    "provider": "local-preview",
+    "source": "otmyt-zerkalo.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.958179+00:00"
+  },
+  "previews/otmyt-zhalyuzi": {
+    "provider": "local-preview",
+    "source": "otmyt-zhalyuzi.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.970405+00:00"
+  },
+  "previews/otstirat-polotentsa": {
+    "provider": "local-preview",
+    "source": "otstirat-polotentsa.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.983054+00:00"
+  },
+  "previews/ovsyanoe-pechenie": {
+    "provider": "local-preview",
+    "source": "ovsyanoe-pechenie.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.996283+00:00"
+  },
+  "previews/parazity-rastenii": {
+    "provider": "local-preview",
+    "source": "parazity-rastenii.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.010514+00:00"
+  },
+  "previews/pautinnyy-kleshch": {
+    "provider": "local-preview",
+    "source": "pautinnyy-kleshch.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.023284+00:00"
+  },
+  "previews/plesen-v-vannoy": {
+    "provider": "local-preview",
+    "source": "plesen-v-vannoy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.035924+00:00"
+  },
+  "previews/plov-iz-svininy": {
+    "provider": "local-preview",
+    "source": "plov-iz-svininy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.048626+00:00"
+  },
+  "previews/pochinit-molniyu": {
+    "provider": "local-preview",
+    "source": "pochinit-molniyu.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.061057+00:00"
+  },
+  "previews/pochistit-divan": {
+    "provider": "local-preview",
+    "source": "pochistit-divan.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.073299+00:00"
+  },
+  "previews/pochistit-serebro": {
+    "provider": "local-preview",
+    "source": "pochistit-serebro.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.086762+00:00"
+  },
+  "previews/pochistit-utyug": {
+    "provider": "local-preview",
+    "source": "pochistit-utyug.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.099292+00:00"
+  },
+  "previews/pochva-vesennie-posadki": {
+    "provider": "local-preview",
+    "source": "pochva-vesennie-posadki.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.111569+00:00"
+  },
+  "previews/podkormka-ogurtsov": {
+    "provider": "local-preview",
+    "source": "podkormka-ogurtsov.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.123949+00:00"
+  },
+  "previews/podkormka-pomidorov-teplitsa": {
+    "provider": "local-preview",
+    "source": "podkormka-pomidorov-teplitsa.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.136622+00:00"
+  },
+  "previews/pokupki-bez-pereplat": {
+    "provider": "local-preview",
+    "source": "pokupki-bez-pereplat.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.163978+00:00"
+  },
+  "previews/poliv-ogoroda": {
+    "provider": "local-preview",
+    "source": "poliv-ogoroda.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.177063+00:00"
+  },
+  "previews/pomyt-okna-bez-razvodov": {
+    "provider": "local-preview",
+    "source": "pomyt-okna-bez-razvodov.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.190336+00:00"
+  },
+  "previews/poryadok-v-shkafu": {
+    "provider": "local-preview",
+    "source": "poryadok-v-shkafu.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.202944+00:00"
+  },
+  "previews/posadit-klubniku": {
+    "provider": "local-preview",
+    "source": "posadit-klubniku.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.228308+00:00"
+  },
+  "previews/posadka-chesnoka-pod-zimu": {
+    "provider": "local-preview",
+    "source": "posadka-chesnoka-pod-zimu.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.241054+00:00"
+  },
+  "previews/posadka-kartofelya": {
+    "provider": "local-preview",
+    "source": "posadka-kartofelya.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.253882+00:00"
+  },
+  "previews/posadka-luka": {
+    "provider": "local-preview",
+    "source": "posadka-luka.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.267384+00:00"
+  },
+  "previews/posadka-redisa": {
+    "provider": "local-preview",
+    "source": "posadka-redisa.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.280286+00:00"
+  },
+  "previews/posadka-vishni": {
+    "provider": "local-preview",
+    "source": "posadka-vishni.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.293495+00:00"
+  },
+  "previews/posadka-zemlyaniki": {
+    "provider": "local-preview",
+    "source": "posadka-zemlyaniki.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.306132+00:00"
+  },
+  "previews/prigorevshaya-kastryulya": {
+    "provider": "local-preview",
+    "source": "prigorevshaya-kastryulya.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.318986+00:00"
+  },
+  "previews/privivka-derevev": {
+    "provider": "local-preview",
+    "source": "privivka-derevev.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.332405+00:00"
+  },
+  "previews/rassada-tomatov": {
+    "provider": "local-preview",
+    "source": "rassada-tomatov.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.344873+00:00"
+  },
+  "previews/rassypchatyy-ris": {
+    "provider": "local-preview",
+    "source": "rassypchatyy-ris.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.358870+00:00"
+  },
+  "previews/rasteniya-dlya-teni": {
+    "provider": "local-preview",
+    "source": "rasteniya-dlya-teni.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.372098+00:00"
+  },
+  "previews/razvyazat-uzel": {
+    "provider": "local-preview",
+    "source": "razvyazat-uzel.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.384564+00:00"
+  },
+  "previews/remont-kvartiry-byudzhet": {
+    "provider": "local-preview",
+    "source": "remont-kvartiry-byudzhet.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.397157+00:00"
+  },
+  "previews/sel-telefon": {
+    "provider": "local-preview",
+    "source": "sel-telefon.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.409564+00:00"
+  },
+  "previews/semeynyy-byudzhet": {
+    "provider": "local-preview",
+    "source": "semeynyy-byudzhet.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.420567+00:00"
+  },
+  "previews/sharlotka-s-yablokami": {
+    "provider": "local-preview",
+    "source": "sharlotka-s-yablokami.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.433753+00:00"
+  },
+  "previews/shvy-mezhdu-plitkoy": {
+    "provider": "local-preview",
+    "source": "shvy-mezhdu-plitkoy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.447417+00:00"
+  },
+  "previews/sideraty": {
+    "provider": "local-preview",
+    "source": "sideraty.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.460080+00:00"
+  },
+  "previews/sladkiy-perec": {
+    "provider": "local-preview",
+    "source": "sladkiy-perec.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.483894+00:00"
+  },
+  "previews/sochnye-kotlety": {
+    "provider": "local-preview",
+    "source": "sochnye-kotlety.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.496538+00:00"
+  },
+  "previews/soda-v-bytu": {
+    "provider": "local-preview",
+    "source": "soda-v-bytu.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.521637+00:00"
+  },
+  "previews/solyanka-sbornaya-myasnaya": {
+    "provider": "local-preview",
+    "source": "solyanka-sbornaya-myasnaya.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.547191+00:00"
+  },
+  "previews/sornyaki-na-gazone": {
+    "provider": "local-preview",
+    "source": "sornyaki-na-gazone.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.560330+00:00"
+  },
+  "previews/sousy-k-myasu": {
+    "provider": "local-preview",
+    "source": "sousy-k-myasu.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.574707+00:00"
+  },
+  "previews/spisok-pokupok": {
+    "provider": "local-preview",
+    "source": "spisok-pokupok.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.586755+00:00"
+  },
+  "previews/staticheskoe-elektrichestvo": {
+    "provider": "local-preview",
+    "source": "staticheskoe-elektrichestvo.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.630427+00:00"
+  },
+  "previews/stirka-belih-veshchey": {
+    "provider": "local-preview",
+    "source": "stirka-belih-veshchey.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.642701+00:00"
+  },
+  "previews/stirka-puhovika": {
+    "provider": "local-preview",
+    "source": "stirka-puhovika.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.655561+00:00"
+  },
+  "previews/syrniki-iz-tvoroga": {
+    "provider": "local-preview",
+    "source": "syrniki-iz-tvoroga.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.682180+00:00"
+  },
+  "previews/teplaya-gryadka": {
+    "provider": "local-preview",
+    "source": "teplaya-gryadka.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.694351+00:00"
+  },
+  "previews/teplitsa-iz-polikarbonata": {
+    "provider": "local-preview",
+    "source": "teplitsa-iz-polikarbonata.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.707646+00:00"
+  },
+  "previews/testo-dlya-pitstsy": {
+    "provider": "local-preview",
+    "source": "testo-dlya-pitstsy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.745954+00:00"
+  },
+  "previews/tli-nasekomye-sad": {
+    "provider": "local-preview",
+    "source": "tli-nasekomye-sad.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.758054+00:00"
+  },
+  "previews/tomaty-bolezni": {
+    "provider": "local-preview",
+    "source": "tomaty-bolezni.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.768611+00:00"
+  },
+  "previews/tsarapiny-na-mebeli": {
+    "provider": "local-preview",
+    "source": "tsarapiny-na-mebeli.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.780879+00:00"
+  },
+  "previews/tushenaya-kapusta": {
+    "provider": "local-preview",
+    "source": "tushenaya-kapusta.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.793063+00:00"
+  },
+  "previews/tvorozhnaya-zapekanka": {
+    "provider": "local-preview",
+    "source": "tvorozhnaya-zapekanka.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.805537+00:00"
+  },
+  "previews/uborka-holodilnika": {
+    "provider": "local-preview",
+    "source": "uborka-holodilnika.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.817998+00:00"
+  },
+  "previews/uborka-posle-remonta": {
+    "provider": "local-preview",
+    "source": "uborka-posle-remonta.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.830397+00:00"
+  },
+  "previews/uborka-vannoy": {
+    "provider": "local-preview",
+    "source": "uborka-vannoy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.843620+00:00"
+  },
+  "previews/udalit-nakip-limonkoy": {
+    "provider": "local-preview",
+    "source": "udalit-nakip-limonkoy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.855908+00:00"
+  },
+  "previews/udalit-pyatna": {
+    "provider": "local-preview",
+    "source": "udalit-pyatna.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.867764+00:00"
+  },
+  "previews/udalit-zhvachku": {
+    "provider": "local-preview",
+    "source": "udalit-zhvachku.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.880029+00:00"
+  },
+  "previews/udobreniya-gryadki": {
+    "provider": "local-preview",
+    "source": "udobreniya-gryadki.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.893950+00:00"
+  },
+  "previews/uhod-za-gazonom": {
+    "provider": "local-preview",
+    "source": "uhod-za-gazonom.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.906559+00:00"
+  },
+  "previews/uhod-za-grushey": {
+    "provider": "local-preview",
+    "source": "uhod-za-grushey.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.918398+00:00"
+  },
+  "previews/uhod-za-malinoy": {
+    "provider": "local-preview",
+    "source": "uhod-za-malinoy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.930812+00:00"
+  },
+  "previews/uhod-za-mebelyu": {
+    "provider": "local-preview",
+    "source": "uhod-za-mebelyu.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.943577+00:00"
+  },
+  "previews/uhod-za-smorodinoy": {
+    "provider": "local-preview",
+    "source": "uhod-za-smorodinoy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.955605+00:00"
+  },
+  "previews/ukryt-gortenziyu": {
+    "provider": "local-preview",
+    "source": "ukryt-gortenziyu.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.968194+00:00"
+  },
+  "previews/ukryt-rozy-na-zimu": {
+    "provider": "local-preview",
+    "source": "ukryt-rozy-na-zimu.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.980662+00:00"
+  },
+  "previews/vareniki-s-kartoshkoy": {
+    "provider": "local-preview",
+    "source": "vareniki-s-kartoshkoy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.993612+00:00"
+  },
+  "previews/vyrashchivanie-kabachkov": {
+    "provider": "local-preview",
+    "source": "vyrashchivanie-kabachkov.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.005876+00:00"
+  },
+  "previews/vyrastit-arbuzy": {
+    "provider": "local-preview",
+    "source": "vyrastit-arbuzy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.018239+00:00"
+  },
+  "previews/vysushit-obuv": {
+    "provider": "local-preview",
+    "source": "vysushit-obuv.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.030124+00:00"
+  },
+  "previews/yaichnitsa-omlet": {
+    "provider": "local-preview",
+    "source": "yaichnitsa-omlet.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.046716+00:00"
+  },
+  "previews/zapah-iz-obuvi": {
+    "provider": "local-preview",
+    "source": "zapah-iz-obuvi.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.059585+00:00"
+  },
+  "previews/zapah-v-posudomoyke": {
+    "provider": "local-preview",
+    "source": "zapah-v-posudomoyke.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.072571+00:00"
+  },
+  "previews/zapechennaya-kuritsa": {
+    "provider": "local-preview",
+    "source": "zapechennaya-kuritsa.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.102724+00:00"
+  },
+  "previews/zaryadka-telefona-layfhaki": {
+    "provider": "local-preview",
+    "source": "zaryadka-telefona-layfhaki.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.116963+00:00"
+  },
+  "previews/zatochit-nozh": {
+    "provider": "local-preview",
+    "source": "zatochit-nozh.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.129582+00:00"
+  },
+  "previews/zelen-na-podokonnike": {
+    "provider": "local-preview",
+    "source": "zelen-na-podokonnike.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.142474+00:00"
+  },
+  "previews/zima-zagotovki": {
+    "provider": "local-preview",
+    "source": "zima-zagotovki.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.155084+00:00"
+  },
+  "previews/carapiny-na-mebeli": {
+    "provider": "local-preview",
+    "source": "carapiny-na-mebeli.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.647589+00:00"
+  },
+  "previews/chistka-dukhovki": {
+    "provider": "local-preview",
+    "source": "chistka-dukhovki.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.677072+00:00"
+  },
+  "previews/domashnie-bliny": {
+    "provider": "local-preview",
+    "source": "domashnie-bliny.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.756691+00:00"
+  },
+  "previews/domashnie-mayonez": {
+    "provider": "local-preview",
+    "source": "domashnie-mayonez.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.768996+00:00"
+  },
+  "previews/ekonomiya-benzin": {
+    "provider": "local-preview",
+    "source": "ekonomiya-benzin.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.835831+00:00"
+  },
+  "previews/ekonomiya-na-produktakh": {
+    "provider": "local-preview",
+    "source": "ekonomiya-na-produktakh.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:21.960013+00:00"
+  },
+  "previews/ekonomiya-zhkh": {
+    "provider": "local-preview",
+    "source": "ekonomiya-zhkh.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.019403+00:00"
+  },
+  "previews/hranenie-produktov": {
+    "provider": "local-preview",
+    "source": "hranenie-produktov.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.197426+00:00"
+  },
+  "previews/idealnyy-borshch": {
+    "provider": "local-preview",
+    "source": "idealnyy-borshch.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.227597+00:00"
+  },
+  "previews/kak-varit-pelmeni": {
+    "provider": "local-preview",
+    "source": "kak-varit-pelmeni.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.288163+00:00"
+  },
+  "previews/kashbek-karty-2026": {
+    "provider": "local-preview",
+    "source": "kashbek-karty-2026.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.350385+00:00"
+  },
+  "previews/klubnika-na-podokonnike": {
+    "provider": "local-preview",
+    "source": "klubnika-na-podokonnike.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.407377+00:00"
+  },
+  "previews/kogda-sazhat-pomidory-2026": {
+    "provider": "local-preview",
+    "source": "kogda-sazhat-pomidory-2026.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.446348+00:00"
+  },
+  "previews/kompost-bystro": {
+    "provider": "local-preview",
+    "source": "kompost-bystro.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.483472+00:00"
+  },
+  "previews/krossovki-otmyt": {
+    "provider": "local-preview",
+    "source": "krossovki-otmyt.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.613471+00:00"
+  },
+  "previews/menyu-na-nedelyu-3000": {
+    "provider": "local-preview",
+    "source": "menyu-na-nedelyu-3000.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.733991+00:00"
+  },
+  "previews/nakip-v-chaynike": {
+    "provider": "local-preview",
+    "source": "nakip-v-chaynike.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.770649+00:00"
+  },
+  "previews/ogurcy-ot-tli": {
+    "provider": "local-preview",
+    "source": "ogurcy-ot-tli.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.817070+00:00"
+  },
+  "previews/ogurcy-sorta-teplica": {
+    "provider": "local-preview",
+    "source": "ogurcy-sorta-teplica.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:22.844745+00:00"
+  },
+  "previews/podkormka-pomidorov": {
+    "provider": "local-preview",
+    "source": "podkormka-pomidorov.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.150273+00:00"
+  },
+  "previews/poryadok-za-15-minut": {
+    "provider": "local-preview",
+    "source": "poryadok-za-15-minut.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.215468+00:00"
+  },
+  "previews/skovoroda-ot-zhira": {
+    "provider": "local-preview",
+    "source": "skovoroda-ot-zhira.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.471067+00:00"
+  },
+  "previews/soda-10-sposobov": {
+    "provider": "local-preview",
+    "source": "soda-10-sposobov.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.509233+00:00"
+  },
+  "previews/solyanka-myasnaya": {
+    "provider": "local-preview",
+    "source": "solyanka-myasnaya.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.534449+00:00"
+  },
+  "previews/starye-dzhinsy": {
+    "provider": "local-preview",
+    "source": "starye-dzhinsy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.617493+00:00"
+  },
+  "previews/stirka-pukhovika": {
+    "provider": "local-preview",
+    "source": "stirka-pukhovika.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.669851+00:00"
+  },
+  "previews/testo-dlya-pelmeney": {
+    "provider": "local-preview",
+    "source": "testo-dlya-pelmeney.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:23.733583+00:00"
+  },
+  "previews/zapakh-v-holodilnike": {
+    "provider": "local-preview",
+    "source": "zapakh-v-holodilnike.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-05-31T13:35:24.089848+00:00"
   }
 }

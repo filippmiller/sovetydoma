@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ArticleFrontmatter, CATEGORIES } from '@/lib/articles'
 import { readingTime, relativeDate, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
-import { resolveArticleImage } from '@/lib/cloudinary'
+import { resolveArticlePreviewImage } from '@/lib/cloudinary'
 import CardFavoriteButton from '@/components/CardFavoriteButton'
 import ArticleImage from '@/components/ArticleImage'
 
@@ -17,8 +17,8 @@ export default function ArticleCard({ article, wordCount, featured = false, view
   const color = CATEGORY_COLOR[article.category] || '#888'
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
   const time = wordCount ? readingTime('x '.repeat(wordCount)) : '~3 минуты'
-  const imageSrc = resolveArticleImage(article.image, { width: 600, height: 400 })
-  const cardImageSrc = imageSrc?.startsWith('/images/') ? `${imageSrc}?v=20260531-thumbs` : imageSrc
+  const imageSrc = resolveArticlePreviewImage(article.image, article.slug, { width: 240, height: 240 })
+  const cardImageSrc = imageSrc?.startsWith('/images/') ? `${imageSrc}?v=20260531-previews` : imageSrc
 
   return (
     <Link

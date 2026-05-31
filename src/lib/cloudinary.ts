@@ -39,3 +39,21 @@ export function resolveArticleImage(
   if (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('/')) return v
   return cloudinaryUrl(v, { ...opts, format: 'auto', quality: 'auto' as unknown as number })
 }
+
+export function resolveArticlePreviewImage(
+  image: string | undefined,
+  slug: string,
+  opts: { width?: number; height?: number } = {},
+): string | null {
+  const v = (image || '').trim()
+  const width = opts.width || 240
+  const height = opts.height || 240
+
+  if (!v || v.includes('placeholder')) return `/images/previews/${slug}.jpg`
+  if (v.startsWith('/images/')) {
+    const file = v.split('/').pop()
+    return file ? `/images/previews/${file}` : `/images/previews/${slug}.jpg`
+  }
+  if (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('/')) return v
+  return cloudinaryUrl(v, { width, height, format: 'auto', quality: 70 })
+}
