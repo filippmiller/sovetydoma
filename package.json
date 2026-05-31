@@ -10,6 +10,10 @@
     "test": "node --test scripts/__tests__/*.test.mjs src/lib/*.test.mjs",
     "audit:images": "node scripts/audit-article-images.mjs --fail-on-duplicates",
     "generate:card-images": "python scripts/generate-card-images.py",
+    "generate:photo-like-images": "node scripts/generate-photo-like-images.mjs",
+    "generate:procedural-photo-images": "python scripts/generate-procedural-photo-images.py",
+    "fetch:openverse-images": "node scripts/fetch-openverse-images.mjs",
+    "normalize:images": "python scripts/normalize-article-images.py",
     "generate:previews": "python scripts/generate-image-previews.py"
   },
   "dependencies": {

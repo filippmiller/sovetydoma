@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { ArticleFrontmatter, CATEGORIES } from '@/lib/articles'
+import type { ArticleFrontmatter } from '@/lib/articles'
+import { CATEGORIES } from '@/lib/categories'
 import { readingTime, relativeDate, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
 import { resolveArticlePreviewImage } from '@/lib/cloudinary'
 import CardFavoriteButton from '@/components/CardFavoriteButton'
@@ -10,9 +11,11 @@ interface Props {
   wordCount?: number
   featured?: boolean
   viewCount?: number
+  ratingAverage?: number | null
+  likeCount?: number
 }
 
-export default function ArticleCard({ article, wordCount, featured = false, viewCount }: Props) {
+export default function ArticleCard({ article, wordCount, featured = false, viewCount = 0, ratingAverage = null, likeCount = 0 }: Props) {
   const cat = CATEGORIES[article.category]
   const color = CATEGORY_COLOR[article.category] || '#888'
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
@@ -131,12 +134,21 @@ export default function ArticleCard({ article, wordCount, featured = false, view
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', marginTop: '0.85rem', paddingTop: '0.7rem', borderTop: '1px solid #f0ece7' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexWrap: 'wrap', marginTop: '0.85rem', paddingTop: '0.7rem', borderTop: '1px solid #f0ece7', fontSize: '0.74rem', color: '#999' }}>
           <time style={{ fontSize: '0.74rem', color: '#aaa' }}>
             {relativeDate(article.date)}
           </time>
-          <span style={{ fontSize: '0.74rem', color: '#aaa', whiteSpace: 'nowrap' }}>
-            {typeof viewCount === 'number' && viewCount > 0 ? `👁 ${viewCount} · ` : ''}⏱ {time}
+          <span aria-label="Просмотры" title="Просмотры" style={{ whiteSpace: 'nowrap' }}>
+            👁 {viewCount}
+          </span>
+          <span aria-label="Оценка" title="Оценка" style={{ whiteSpace: 'nowrap' }}>
+            ★ {ratingAverage ? ratingAverage.toFixed(1) : '0.0'}
+          </span>
+          <span aria-label="Нравится" title="Нравится" style={{ whiteSpace: 'nowrap' }}>
+            ❤ {likeCount}
+          </span>
+          <span title="Время чтения" style={{ whiteSpace: 'nowrap', marginLeft: 'auto' }}>
+            ⏱ {time}
           </span>
         </div>
       </article>

@@ -14,6 +14,7 @@ import {
 //
 //   UNSPLASH_ACCESS_KEY=xxx node scripts/fetch-unsplash-images.mjs
 //   UNSPLASH_ACCESS_KEY=xxx node scripts/fetch-unsplash-images.mjs --replace-duplicates
+//   UNSPLASH_ACCESS_KEY=xxx node scripts/fetch-unsplash-images.mjs --replace-generated
 //
 // The fetcher now avoids the old per-category duplicate failure mode:
 // - builds article-specific queries from title/tags/slug/category;
@@ -30,6 +31,7 @@ if (!KEY) {
 
 const args = new Set(process.argv.slice(2))
 const replaceDuplicates = args.has('--replace-duplicates')
+const replaceGenerated = args.has('--replace-generated')
 const maxFetches = Number(process.env.MAX_FETCHES || '9999')
 
 const ARTICLES_DIR = path.join(process.cwd(), 'src/content/articles')
@@ -101,6 +103,7 @@ async function fetchUniqueImage(article, dest, usedIds, usedHashes, sources) {
           continue
         }
 
+        if (fs.existsSync(dest)) fs.unlinkSync(dest)
         fs.renameSync(temp, dest)
         usedIds.add(picked.id)
         usedHashes.add(hash)
@@ -146,16 +149,11 @@ for (const article of articles) {
   const dest = path.join(IMAGES_DIR, `${article.slug}.jpg`)
   const exists = fs.existsSync(dest)
   const shouldReplace = replaceDuplicates && duplicateSet.has(article.slug)
+  const shouldReplaceGenerated = replaceGenerated && sources[article.slug]?.provider === 'generated-card'
 
-  if (exists && !shouldReplace) {
+  if (exists && !shouldReplace && !shouldReplaceGenerated) {
     skipped++
     continue
-  }
-
-  if (exists && shouldReplace) {
-    const currentHash = sha256File(dest)
-    usedHashes.delete(currentHash)
-    fs.unlinkSync(dest)
   }
 
   const result = await fetchUniqueImage(article, dest, usedIds, usedHashes, sources)

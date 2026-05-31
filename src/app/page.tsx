@@ -1,5 +1,5 @@
 ﻿import { getAllArticles, CATEGORIES } from '@/lib/articles'
-import ArticleCard from '@/components/ArticleCard'
+import ArticleCatalogGrid from '@/components/ArticleCatalogGrid'
 import SeasonalBanner from '@/components/SeasonalBanner'
 import PopularArticles from '@/components/PopularArticles'
 import PersonalisedSection from '@/components/PersonalisedSection'
@@ -159,11 +159,7 @@ export default function HomePage() {
                 Все разделы →
               </Link>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
-              {articles.map((article, i) => (
-                <ArticleCard key={article.slug} article={article} wordCount={article.wordCount} featured={i === 0} />
-              ))}
-            </div>
+            <ArticleCatalogGrid articles={articles} />
           </section>
         )}
 
