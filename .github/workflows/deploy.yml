@@ -72,8 +72,8 @@ jobs:
 
       - name: Smoke test (live host)
         run: |
-          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
-            -H "Host: 1001sovet.ru" http://${{ secrets.VPS_HOST }}/)
+          # Hit the real HTTPS site; -L follows the HTTP->HTTPS 301.
+          code=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 25 https://1001sovet.ru/)
           echo "Homepage returned $code"
           [ "$code" = "200" ] || { echo "::error::Smoke test failed ($code)"; exit 1; }
 
