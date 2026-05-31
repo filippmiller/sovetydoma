@@ -7,7 +7,7 @@ import StartHereSection from '@/components/StartHereSection'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorimdoma.ru'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://1001sovet.ru'
 
 export const metadata: Metadata = {
   title: 'СоветыДома — полезные советы для дома, кухни и дачи',

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const articlesDir = path.join(__dirname, '../src/content/articles')
-const SITE_URL = 'https://pogovorimdoma.ru'
+const SITE_URL = 'https://1001sovet.ru'
 
 function escapeXml(str) {
   return String(str || '')
