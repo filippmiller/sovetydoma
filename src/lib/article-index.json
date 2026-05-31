@@ -1,11 +1,31 @@
 {
+  "bliny-na-moloke": {
+    "category": "kulinaria",
+    "title": "Тонкие блины на молоке без комочков: проверенный рецепт"
+  },
+  "bolezni-ogurtsov": {
+    "category": "dacha-i-ogorod",
+    "title": "Болезни огурцов и их лечение: распознаём и спасаем урожай"
+  },
   "borba-s-oduvanchikami": {
     "category": "dacha-i-ogorod",
     "title": "Как навсегда избавиться от одуванчиков на дачном участке"
   },
+  "borba-s-tley": {
+    "category": "dacha-i-ogorod",
+    "title": "Как навсегда избавиться от тли на садовых растениях"
+  },
+  "borba-so-slizniami": {
+    "category": "dacha-i-ogorod",
+    "title": "Как избавиться от слизней на огороде: проверенные методы"
+  },
   "borsch-bez-myasa": {
     "category": "kulinaria",
     "title": "Постный борщ без мяса: насыщенный вкус без животного белка"
+  },
+  "bystraya-uborka-15-minut": {
+    "category": "layfkhaki",
+    "title": "Уборка за 15 минут: порядок без нервов и усталости"
   },
   "carapiny-na-mebeli": {
     "category": "layfkhaki",
@@ -19,9 +39,25 @@
     "category": "dom-i-uborka",
     "title": "Как отмыть духовку от жира без химии за 30 минут"
   },
+  "chistka-kovra-doma": {
+    "category": "dom-i-uborka",
+    "title": "Как почистить ковёр в домашних условиях без стиральной машины"
+  },
+  "chistka-mikrovolnovki": {
+    "category": "dom-i-uborka",
+    "title": "Как почистить микроволновку паром без усилий за 10 минут"
+  },
+  "chistka-stiralnoy-mashiny": {
+    "category": "dom-i-uborka",
+    "title": "Как избавиться от запаха в стиральной машине за 30 минут"
+  },
   "chto-posadit-v-teni": {
     "category": "dacha-i-ogorod",
     "title": "Что посадить в тени на даче: растения которые растут без солнца"
+  },
+  "deshevye-produkty": {
+    "category": "ekonomiya",
+    "title": "Дешёвые и полезные продукты: как питаться полноценно на скромный бюджет"
   },
   "domashnie-bliny": {
     "category": "kulinaria",
@@ -31,21 +67,65 @@
     "category": "kulinaria",
     "title": "Домашний майонез за 5 минут: рецепт без магазинной химии"
   },
+  "domashnie-pelmeni-testo": {
+    "category": "kulinaria",
+    "title": "Домашние пельмени: рецепт теста и техника лепки"
+  },
+  "domashniy-mayonez-bystro": {
+    "category": "kulinaria",
+    "title": "Домашний майонез за 2 минуты без взбивания венчиком"
+  },
   "ekonomiya-benzin": {
     "category": "ekonomiya",
     "title": "Как экономить на бензине: 10 реальных способов"
+  },
+  "ekonomiya-benzina": {
+    "category": "ekonomiya",
+    "title": "Как сократить расходы на бензин на 20–30% без продажи машины"
+  },
+  "ekonomiya-elektrichestva": {
+    "category": "ekonomiya",
+    "title": "Как снизить счета за электричество на 20–40% без вреда для комфорта"
   },
   "ekonomiya-elektroenergii": {
     "category": "ekonomiya",
     "title": "Как сэкономить на электроэнергии дома: 10 рабочих способов"
   },
+  "ekonomiya-na-himii": {
+    "category": "ekonomiya",
+    "title": "Как экономить на бытовой химии в 3 раза без вреда для чистоты"
+  },
+  "ekonomiya-na-odezhde": {
+    "category": "ekonomiya",
+    "title": "Как покупать качественную одежду и экономить до 50% на гардеробе"
+  },
+  "ekonomiya-na-otoplenii": {
+    "category": "ekonomiya",
+    "title": "Как сократить расходы на отопление зимой без замерзания"
+  },
+  "ekonomiya-na-produktah": {
+    "category": "ekonomiya",
+    "title": "Как экономить на продуктах до 30% без потери качества питания"
+  },
   "ekonomiya-na-produktakh": {
     "category": "ekonomiya",
     "title": "Как сэкономить 5000 рублей в месяц на продуктах без ущерба для качества"
   },
+  "ekonomiya-vody": {
+    "category": "ekonomiya",
+    "title": "Как сократить расход воды в квартире вдвое без дискомфорта"
+  },
   "ekonomiya-zhkh": {
     "category": "ekonomiya",
     "title": "Как платить меньше за ЖКХ: 8 способов снизить коммунальные расходы"
+  },
+  "ekonomnyy-otpusk": {
+    "category": "ekonomiya",
+    "title": "Как подготовиться к отпуску без лишних трат и финансовых сюрпризов"
+  },
+  "grechka-po-kupecheski": {
+    "category": "kulinaria",
+    "title": "Гречка с мясом по-купечески: сытная классика"
   },
   "griby-sezony-sbor": {
     "category": "dacha-i-ogorod",
@@ -55,13 +135,37 @@
     "category": "kulinaria",
     "title": "Как засолить грибы на зиму: холодный и горячий способ"
   },
+  "gryadki-k-zime": {
+    "category": "dacha-i-ogorod",
+    "title": "Подготовка грядок к зиме: пошаговая инструкция для дачника"
+  },
+  "gulyash-iz-govyadiny": {
+    "category": "kulinaria",
+    "title": "Гуляш из говядины с густой подливкой: рецепт как в садике"
+  },
+  "hleb-v-duhovke": {
+    "category": "kulinaria",
+    "title": "Домашний хлеб в духовке: простой рецепт для новичков"
+  },
   "holodets-retsept": {
     "category": "kulinaria",
     "title": "Холодец из свиных ножек: классический рецепт с секретами прозрачности"
   },
+  "hranenie-morkovi": {
+    "category": "dacha-i-ogorod",
+    "title": "Как сохранить морковь свежей до нового урожая"
+  },
+  "hranenie-na-kuhne": {
+    "category": "dom-i-uborka",
+    "title": "Как организовать хранение на маленькой кухне: 10 идей"
+  },
   "hranenie-produktov": {
     "category": "layfkhaki",
     "title": "Как хранить продукты чтобы дольше не портились: 12 правил"
+  },
+  "hranenie-provodov": {
+    "category": "layfkhaki",
+    "title": "Как навести порядок с проводами и зарядками: 7 лайфхаков"
   },
   "idealnyy-borshch": {
     "category": "kulinaria",
@@ -71,6 +175,10 @@
     "category": "dom-i-uborka",
     "title": "Как избавиться от пыли в квартире надолго: причины и решения"
   },
+  "kak-varit-makarony": {
+    "category": "kulinaria",
+    "title": "Как правильно варить макароны аль денте: секреты идеальной текстуры"
+  },
   "kak-varit-pelmeni": {
     "category": "kulinaria",
     "title": "Как варить пельмени правильно: чтобы не слипались и не рвались"
@@ -79,6 +187,10 @@
     "category": "layfkhaki",
     "title": "Как выбрать спелый арбуз: 7 признаков хорошего арбуза"
   },
+  "kartofelnoe-pyure": {
+    "category": "kulinaria",
+    "title": "Идеальное картофельное пюре без комочков: все нюансы"
+  },
   "kartoshka-v-duhovke": {
     "category": "kulinaria",
     "title": "Картошка в духовке с чесноком и зеленью: хрустящая корочка"
@@ -86,6 +198,10 @@
   "kashbek-karty-2026": {
     "category": "ekonomiya",
     "title": "Кэшбэк карты в России 2026: как выбрать и не переплачивать"
+  },
+  "keshbek-bonusy": {
+    "category": "ekonomiya",
+    "title": "Кэшбэк и бонусные программы: как выжать максимум из каждой покупки"
   },
   "khraneniye-ovoshchey-zimoy": {
     "category": "layfkhaki",
@@ -99,13 +215,29 @@
     "category": "dacha-i-ogorod",
     "title": "Клубника на подоконнике круглый год: как вырастить дома"
   },
+  "klubnika-v-grunte": {
+    "category": "dacha-i-ogorod",
+    "title": "Клубника в открытом грунте: секреты сладкой ягоды"
+  },
   "kogda-sazhat-pomidory-2026": {
     "category": "dacha-i-ogorod",
     "title": "Когда сажать помидоры на рассаду в 2026 году по регионам"
   },
+  "koloradskiy-zhuk": {
+    "category": "dacha-i-ogorod",
+    "title": "Как уничтожить колорадского жука без химии и с ней"
+  },
   "kompost-bystro": {
     "category": "dacha-i-ogorod",
     "title": "Как сделать компост быстро: горячее компостирование за 2 недели"
+  },
+  "kompost-svoimi-rukami": {
+    "category": "dacha-i-ogorod",
+    "title": "Компост за 2 месяца: быстрый способ без запаха"
+  },
+  "kompot-iz-suhofruktov": {
+    "category": "kulinaria",
+    "title": "Вкусный компот из сухофруктов: пропорции и время варки"
   },
   "krossovki-otmyt": {
     "category": "dom-i-uborka",
@@ -119,6 +251,18 @@
     "category": "layfkhaki",
     "title": "Правила безопасности в лесу: как не заблудиться и что брать с собой"
   },
+  "marinad-dlya-shashlyka": {
+    "category": "kulinaria",
+    "title": "Маринад для шашлыка, который делает мясо мягким и сочным"
+  },
+  "marinovannyy-luk": {
+    "category": "kulinaria",
+    "title": "Маринованный лук к шашлыку: быстрый рецепт за 30 минут"
+  },
+  "menshe-pyli-v-kvartire": {
+    "category": "dom-i-uborka",
+    "title": "12 способов сократить количество пыли в квартире вдвое"
+  },
   "menyu-na-nedelyu-3000": {
     "category": "ekonomiya",
     "title": "Меню на неделю за 3000 рублей на двоих: реальный план питания"
@@ -127,9 +271,17 @@
     "category": "dacha-i-ogorod",
     "title": "Как вырастить морковь на даче: посев, уход и уборка"
   },
+  "muravi-na-uchastke": {
+    "category": "dacha-i-ogorod",
+    "title": "Как избавиться от муравьёв на дачном участке"
+  },
   "nakip-v-chaynike": {
     "category": "dom-i-uborka",
     "title": "Как избавиться от накипи в чайнике за 10 минут"
+  },
+  "obrezka-yabloni": {
+    "category": "dacha-i-ogorod",
+    "title": "Обрезка яблони весной: как не навредить дереву"
   },
   "ogurcy-ot-tli": {
     "category": "dacha-i-ogorod",
@@ -143,6 +295,14 @@
     "category": "dacha-i-ogorod",
     "title": "Как вырастить огурцы в открытом грунте: от посадки до урожая"
   },
+  "ohladit-napitok-bystro": {
+    "category": "layfkhaki",
+    "title": "Как за 5 минут охладить любой напиток без льда"
+  },
+  "oladi-na-kefire": {
+    "category": "kulinaria",
+    "title": "Пышные оладьи на кефире: секрет воздушного теста"
+  },
   "organizatsiya-kuhni": {
     "category": "layfkhaki",
     "title": "Как организовать кухню: места хранения и порядок без усилий"
@@ -151,9 +311,65 @@
     "category": "layfkhaki",
     "title": "Осы и пчёлы на даче: как не дать им устроить гнездо и что делать при укусе"
   },
+  "otkryt-tuguyu-kryshku": {
+    "category": "layfkhaki",
+    "title": "Как открыть банку с тугой крышкой: 8 проверенных методов"
+  },
+  "otmyt-duhovku-ot-zhira": {
+    "category": "dom-i-uborka",
+    "title": "Как отмыть духовку от жира без химии за 1 час"
+  },
+  "otmyt-zerkalo": {
+    "category": "dom-i-uborka",
+    "title": "Как отмыть зеркало до идеального блеска без разводов"
+  },
+  "otmyt-zhalyuzi": {
+    "category": "dom-i-uborka",
+    "title": "Как быстро отмыть жалюзи от пыли и грязи за 30 минут"
+  },
+  "otstirat-polotentsa": {
+    "category": "dom-i-uborka",
+    "title": "Как отстирать кухонные полотенца от жира и запаха"
+  },
+  "ovsyanoe-pechenie": {
+    "category": "kulinaria",
+    "title": "Домашнее овсяное печенье: рассыпчатое и ароматное"
+  },
   "parazity-rastenii": {
     "category": "dacha-i-ogorod",
     "title": "Болезни и паразиты овощей: мучнистая роса, фитофтора, нематода"
+  },
+  "plesen-v-vannoy": {
+    "category": "dom-i-uborka",
+    "title": "Как удалить плесень в ванной комнате навсегда за 1 день"
+  },
+  "plov-iz-svininy": {
+    "category": "kulinaria",
+    "title": "Плов из свинины в казане: пряный и рассыпчатый"
+  },
+  "pochinit-molniyu": {
+    "category": "layfkhaki",
+    "title": "Как починить застёжку-молнию на куртке и сумке за 10 минут"
+  },
+  "pochistit-divan": {
+    "category": "dom-i-uborka",
+    "title": "Как почистить диван от пятен в домашних условиях"
+  },
+  "pochistit-serebro": {
+    "category": "dom-i-uborka",
+    "title": "Как почистить серебро и золото в домашних условиях"
+  },
+  "pochistit-utyug": {
+    "category": "dom-i-uborka",
+    "title": "Как почистить утюг от нагара и пригара на подошве за 20 минут"
+  },
+  "podkormka-ogurtsov": {
+    "category": "dacha-i-ogorod",
+    "title": "Подкормка огурцов: схема для рекордного урожая"
+  },
+  "podkormka-pomidorov-teplitsa": {
+    "category": "dacha-i-ogorod",
+    "title": "Подкормка помидоров в теплице: схема по фазам роста"
   },
   "podkormka-pomidorov": {
     "category": "dacha-i-ogorod",
@@ -163,6 +379,18 @@
     "category": "ekonomiya",
     "title": "Как делать покупки выгодно: скидки, акции и правила экономного шопинга"
   },
+  "poliv-ogoroda": {
+    "category": "dacha-i-ogorod",
+    "title": "Полив огорода: сколько воды нужно и как часто поливать"
+  },
+  "pomyt-okna-bez-razvodov": {
+    "category": "dom-i-uborka",
+    "title": "Как помыть окна без разводов: секреты идеальной чистоты"
+  },
+  "poryadok-v-shkafu": {
+    "category": "dom-i-uborka",
+    "title": "Система складывания вещей: как навести порядок в шкафу"
+  },
   "poryadok-za-15-minut": {
     "category": "layfkhaki",
     "title": "Как навести порядок в квартире за 15 минут: система быстрой уборки"
@@ -171,37 +399,133 @@
     "category": "dacha-i-ogorod",
     "title": "Когда и как посадить клубнику в открытый грунт"
   },
+  "posadka-chesnoka-pod-zimu": {
+    "category": "dacha-i-ogorod",
+    "title": "Когда сажать чеснок под зиму: сроки и правила"
+  },
+  "posadka-kartofelya": {
+    "category": "dacha-i-ogorod",
+    "title": "Посадка картофеля: точные сроки и схемы высадки"
+  },
+  "posadka-luka": {
+    "category": "dacha-i-ogorod",
+    "title": "Посадка лука на репку: сроки, подготовка и уход за урожаем"
+  },
+  "prigorevshaya-kastryulya": {
+    "category": "dom-i-uborka",
+    "title": "Как отмыть пригоревшую кастрюлю без усилий за 30 минут"
+  },
+  "privivka-derevev": {
+    "category": "dacha-i-ogorod",
+    "title": "Прививка плодовых деревьев для новичков: простые способы"
+  },
+  "rassada-tomatov": {
+    "category": "dacha-i-ogorod",
+    "title": "Выращивание рассады томатов дома: пошаговое руководство"
+  },
+  "rassypchatyy-ris": {
+    "category": "kulinaria",
+    "title": "Как сварить рассыпчатый рис без единого комочка"
+  },
+  "rasteniya-dlya-teni": {
+    "category": "dacha-i-ogorod",
+    "title": "Что посадить в тени на даче: лучшие овощи и зелень для затенённых участков"
+  },
+  "razvyazat-uzel": {
+    "category": "layfkhaki",
+    "title": "10 способов развязать тугой узел и запаянный пакет за секунды"
+  },
   "remont-kvartiry-byudzhet": {
     "category": "ekonomiya",
     "title": "Бюджетный ремонт квартиры: как сделать красиво и недорого"
+  },
+  "sel-telefon": {
+    "category": "layfkhaki",
+    "title": "Телефон сел в дороге: что делать и как остаться на связи"
+  },
+  "semeynyy-byudzhet": {
+    "category": "ekonomiya",
+    "title": "Планирование семейного бюджета: система, которая работает"
+  },
+  "sharlotka-s-yablokami": {
+    "category": "kulinaria",
+    "title": "Простая шарлотка с яблоками: рецепт высокого бисквита"
+  },
+  "shvy-mezhdu-plitkoy": {
+    "category": "dom-i-uborka",
+    "title": "Как отбелить и очистить швы между плиткой без химии"
+  },
+  "sideraty": {
+    "category": "dacha-i-ogorod",
+    "title": "Сидераты для улучшения почвы: какие сеять и когда заделывать"
   },
   "skovoroda-ot-zhira": {
     "category": "dom-i-uborka",
     "title": "5 способов почистить сковороду от застарелого жира"
   },
+  "sochnye-kotlety": {
+    "category": "kulinaria",
+    "title": "Сочные котлеты: секреты фарша и правильной обжарки"
+  },
   "soda-10-sposobov": {
     "category": "layfkhaki",
     "title": "10 способов использовать пищевую соду дома: от кухни до ванной"
+  },
+  "soda-v-bytu": {
+    "category": "layfkhaki",
+    "title": "15 способов применения пищевой соды в быту, о которых мало кто знает"
   },
   "solyanka-myasnaya": {
     "category": "kulinaria",
     "title": "Сборная мясная солянка: настоящий рецепт с каперсами и оливками"
   },
+  "solyanka-sbornaya-myasnaya": {
+    "category": "kulinaria",
+    "title": "Сборная мясная солянка: классический рецепт навара"
+  },
+  "sousy-k-myasu": {
+    "category": "kulinaria",
+    "title": "5 простых соусов к мясу: рецепты на каждый день"
+  },
+  "spisok-pokupok": {
+    "category": "ekonomiya",
+    "title": "Как составить список покупок, который реально экономит деньги"
+  },
   "starye-dzhinsy": {
     "category": "layfkhaki",
     "title": "10 вещей которые можно сделать из старых джинсов"
+  },
+  "staticheskoe-elektrichestvo": {
+    "category": "layfkhaki",
+    "title": "Как избавиться от статического электричества на одежде и в квартире"
   },
   "stirka-belih-veshchey": {
     "category": "dom-i-uborka",
     "title": "Как стирать белые вещи чтобы они оставались белыми"
   },
+  "stirka-puhovika": {
+    "category": "dom-i-uborka",
+    "title": "Как правильно постирать пуховик в стиральной машине"
+  },
   "stirka-pukhovika": {
     "category": "dom-i-uborka",
     "title": "Как стирать пуховик дома чтобы не испортить"
   },
+  "syrniki-iz-tvoroga": {
+    "category": "kulinaria",
+    "title": "Пышные сырники из творога, которые не разваливаются"
+  },
+  "teplaya-gryadka": {
+    "category": "dacha-i-ogorod",
+    "title": "Как сделать тёплую грядку своими руками для раннего урожая"
+  },
   "testo-dlya-pelmeney": {
     "category": "kulinaria",
     "title": "Тесто для пельменей которое не рвётся: простой рецепт"
+  },
+  "testo-dlya-pitstsy": {
+    "category": "kulinaria",
+    "title": "Тонкое хрустящее тесто для пиццы: рецепт итальянской основы"
   },
   "tli-nasekomye-sad": {
     "category": "dacha-i-ogorod",
@@ -211,25 +535,101 @@
     "category": "dacha-i-ogorod",
     "title": "Болезни томатов: почему желтеют, скручиваются и чернеют листья"
   },
+  "tsarapiny-na-mebeli": {
+    "category": "layfkhaki",
+    "title": "Как убрать царапины с мебели из дерева и ламината"
+  },
+  "tushenaya-kapusta": {
+    "category": "kulinaria",
+    "title": "Тушёная капуста как в столовой: секрет мягкости и цвета"
+  },
+  "tvorozhnaya-zapekanka": {
+    "category": "kulinaria",
+    "title": "Творожная запеканка как в детском саду: классический рецепт"
+  },
+  "uborka-holodilnika": {
+    "category": "dom-i-uborka",
+    "title": "Как быстро убрать запах из холодильника и помыть его за 45 минут"
+  },
+  "uborka-posle-remonta": {
+    "category": "dom-i-uborka",
+    "title": "Уборка после ремонта: пошаговый план с чего начать"
+  },
   "uborka-vannoy": {
     "category": "dom-i-uborka",
     "title": "Как быстро убрать ванную комнату до блеска за 20 минут"
+  },
+  "udalit-nakip-limonkoy": {
+    "category": "dom-i-uborka",
+    "title": "Как удалить накипь в чайнике лимонной кислотой за 15 минут"
   },
   "udalit-pyatna": {
     "category": "dom-i-uborka",
     "title": "Как вывести пятна с одежды: кофе, трава, жир, кровь — конкретные методы"
   },
+  "udalit-zhvachku": {
+    "category": "dom-i-uborka",
+    "title": "Как удалить жвачку с одежды, ковра и мебели без следа"
+  },
   "udobreniya-gryadki": {
     "category": "dacha-i-ogorod",
     "title": "Чем подкормить грядки: органика vs минералка, когда и сколько"
+  },
+  "uhod-za-mebelyu": {
+    "category": "dom-i-uborka",
+    "title": "Как ухаживать за деревянной мебелью: секреты долговечности"
+  },
+  "uhod-za-smorodinoy": {
+    "category": "dacha-i-ogorod",
+    "title": "Уход за смородиной для большого урожая: обрезка, полив и подкормка"
+  },
+  "ukryt-rozy-na-zimu": {
+    "category": "dacha-i-ogorod",
+    "title": "Как укрыть розы на зиму: правила утепления для разных сортов"
   },
   "vareniki-s-kartoshkoy": {
     "category": "kulinaria",
     "title": "Вареники с картошкой и луком: рецепт как у бабушки"
   },
+  "vyrashchivanie-kabachkov": {
+    "category": "dacha-i-ogorod",
+    "title": "Выращивание кабачков в открытом грунте: секреты большого урожая"
+  },
+  "vysushit-obuv": {
+    "category": "layfkhaki",
+    "title": "Как быстро высушить мокрую обувь и убрать запах за час"
+  },
+  "yaichnitsa-omlet": {
+    "category": "kulinaria",
+    "title": "Идеальная яичница и пышный омлет: техника за 15 минут"
+  },
+  "zapah-iz-obuvi": {
+    "category": "dom-i-uborka",
+    "title": "7 надёжных способов вывести неприятный запах из обуви"
+  },
+  "zapah-v-posudomoyke": {
+    "category": "dom-i-uborka",
+    "title": "Как избавиться от неприятного запаха в посудомоечной машине"
+  },
   "zapakh-v-holodilnike": {
     "category": "dom-i-uborka",
     "title": "Как избавиться от запаха в холодильнике навсегда"
+  },
+  "zapechennaya-kuritsa": {
+    "category": "kulinaria",
+    "title": "Запечённая курица с хрустящей корочкой: секреты хруста"
+  },
+  "zaryadka-telefona-layfhaki": {
+    "category": "layfkhaki",
+    "title": "12 лайфхаков для быстрой и безопасной зарядки телефона"
+  },
+  "zatochit-nozh": {
+    "category": "layfkhaki",
+    "title": "Как заточить нож без точилки: 6 рабочих способов"
+  },
+  "zelen-na-podokonnike": {
+    "category": "dacha-i-ogorod",
+    "title": "Выращивание зелени на подоконнике круглый год в домашних условиях"
   },
   "zima-zagotovki": {
     "category": "kulinaria",
