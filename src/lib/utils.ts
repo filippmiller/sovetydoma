@@ -55,6 +55,7 @@ export const CATEGORY_EMOJI: Record<string, string> = {
   'dacha-i-ogorod': '🌱',
   layfkhaki: '💡',
   ekonomiya: '💰',
+  rybalka: '🎣',
 }
 
 // Category color map
@@ -64,4 +65,5 @@ export const CATEGORY_COLOR: Record<string, string> = {
   'dacha-i-ogorod': '#16a085',
   layfkhaki: '#8e44ad',
   ekonomiya: '#2980b9',
+  rybalka: '#2c7da0',
 }

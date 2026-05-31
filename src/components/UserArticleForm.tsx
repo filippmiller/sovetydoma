@@ -14,6 +14,7 @@ const CATEGORIES = [
   { value: 'dacha-i-ogorod', label: 'Дача и огород' },
   { value: 'layfkhaki', label: 'Лайфхаки' },
   { value: 'ekonomiya', label: 'Экономия' },
+  { value: 'rybalka', label: 'Рыбалка' },
 ]
 
 interface Props {

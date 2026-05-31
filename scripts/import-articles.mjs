@@ -25,6 +25,7 @@ const CATEGORIES = {
   'dacha-i-ogorod': 'Дача и огород',
   layfkhaki: 'Лайфхаки',
   ekonomiya: 'Экономия',
+  rybalka: 'Рыбалка',
 }
 
 function validate(fm, content, existingSlugs, batchSlugs) {

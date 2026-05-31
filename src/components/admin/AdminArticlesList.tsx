@@ -23,6 +23,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   'dacha-i-ogorod': 'Дача и огород',
   layfkhaki: 'Лайфхаки',
   ekonomiya: 'Экономия',
+  rybalka: 'Рыбалка',
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -31,6 +32,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   'dacha-i-ogorod': '#16a085',
   layfkhaki: '#8e44ad',
   ekonomiya: '#2980b9',
+  rybalka: '#2c7da0',
 }
 
 export default function AdminArticlesList({ articles }: Props) {

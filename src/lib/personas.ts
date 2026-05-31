@@ -46,6 +46,16 @@ export const PERSONAS: Persona[] = [
     contact: 'petr.ivanov@sovetydoma.ru',
     disclosure: DISCLOSURE,
   },
+  {
+    slug: 'andrey-rybak',
+    name: 'Андрей Рыбаков',
+    role: 'Виртуальный редактор раздела «Рыбалка»',
+    bio: 'Разбирается в снастях, наживках и сезонах клёва. Любит тихие зори на берегу и делится проверенными приёмами ловли.',
+    icon: '🎣',
+    categories: ['rybalka'],
+    contact: 'andrey.rybak@sovetydoma.ru',
+    disclosure: DISCLOSURE,
+  },
 ]
 
 const BY_SLUG = new Map(PERSONAS.map((p) => [p.slug, p]))

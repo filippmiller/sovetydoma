@@ -58,6 +58,7 @@ export default function AdminDashboard({ articles, categories }: Props) {
     'dacha-i-ogorod': '#16a085',
     layfkhaki: '#8e44ad',
     ekonomiya: '#2980b9',
+    rybalka: '#2c7da0',
   }
 
   return (

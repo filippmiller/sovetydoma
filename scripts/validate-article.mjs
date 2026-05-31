@@ -14,6 +14,7 @@ const CATEGORIES = {
   'dacha-i-ogorod': 'Дача и огород',
   layfkhaki: 'Лайфхаки',
   ekonomiya: 'Экономия',
+  rybalka: 'Рыбалка',
 }
 
 const file = process.argv[2]
