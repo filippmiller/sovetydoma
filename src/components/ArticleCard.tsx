@@ -18,6 +18,7 @@ export default function ArticleCard({ article, wordCount, featured = false, view
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
   const time = wordCount ? readingTime('x '.repeat(wordCount)) : '~3 минуты'
   const imageSrc = resolveArticleImage(article.image, { width: 600, height: 400 })
+  const cardImageSrc = imageSrc?.startsWith('/images/') ? `${imageSrc}?v=20260531-cards` : imageSrc
 
   return (
     <Link
@@ -65,8 +66,8 @@ export default function ArticleCard({ article, wordCount, featured = false, view
             </span>
           )}
           <CardFavoriteButton slug={article.slug} />
-          {imageSrc ? (
-            <ArticleImage src={imageSrc} alt={article.title} emoji={emoji} fallbackSize={featured ? '4.5rem' : '3.5rem'} />
+          {cardImageSrc ? (
+            <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={featured ? '4.5rem' : '3.5rem'} />
           ) : (
             <span aria-hidden="true">{emoji}</span>
           )}

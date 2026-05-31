@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "node --test scripts/__tests__/*.test.mjs src/lib/*.test.mjs",
-    "audit:images": "node scripts/audit-article-images.mjs --fail-on-duplicates"
+    "audit:images": "node scripts/audit-article-images.mjs --fail-on-duplicates",
+    "generate:card-images": "python scripts/generate-card-images.py"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

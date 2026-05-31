@@ -277,5 +277,605 @@
     "userName": "Karyna Panchenko",
     "userUrl": "https://unsplash.com/@karyna_panchenko",
     "fetchedAt": "2026-05-31T11:12:04.402Z"
+  },
+  "gryadki-iz-dosok": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.055850+00:00"
+  },
+  "gulyash-iz-govyadiny": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.073211+00:00"
+  },
+  "holodets-retsept": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.091290+00:00"
+  },
+  "hranenie-morkovi": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.107808+00:00"
+  },
+  "hranenie-na-kuhne": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.125960+00:00"
+  },
+  "hranenie-produktov": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.143429+00:00"
+  },
+  "hranenie-provodov": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.160203+00:00"
+  },
+  "izbavit-ot-pyireya": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.177990+00:00"
+  },
+  "kak-varit-makarony": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.195154+00:00"
+  },
+  "kak-varit-pelmeni": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.211781+00:00"
+  },
+  "kak-vybrat-arbuz": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.227931+00:00"
+  },
+  "kartofelnoe-pyure": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.245050+00:00"
+  },
+  "kartoshka-v-duhovke": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.261487+00:00"
+  },
+  "kashbek-karty-2026": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.277906+00:00"
+  },
+  "keshbek-bonusy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.294837+00:00"
+  },
+  "khraneniye-ovoshchey-zimoy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.311424+00:00"
+  },
+  "klubnika-v-grunte": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.332179+00:00"
+  },
+  "kogda-sazhat-pomidory-2026": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.350972+00:00"
+  },
+  "koloradskiy-zhuk": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.370710+00:00"
+  },
+  "kompost-bystro": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.390759+00:00"
+  },
+  "kompost-svoimi-rukami": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.410566+00:00"
+  },
+  "kompot-iz-suhofruktov": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.427280+00:00"
+  },
+  "kuriniy-bulon": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.444255+00:00"
+  },
+  "marinad-dlya-shashlyka": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.462284+00:00"
+  },
+  "marinovannyy-luk": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.479026+00:00"
+  },
+  "menshe-pyli-v-kvartire": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.495593+00:00"
+  },
+  "morkov-vyraschivanie": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.512545+00:00"
+  },
+  "muravi-na-uchastke": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.529480+00:00"
+  },
+  "obrezka-smorodiny": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.547477+00:00"
+  },
+  "obrezka-yabloni": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.565645+00:00"
+  },
+  "ogurcy-ot-tli": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.584201+00:00"
+  },
+  "ogurcy-sorta-teplica": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.604208+00:00"
+  },
+  "ohladit-napitok-bystro": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.624215+00:00"
+  },
+  "oladi-na-kefire": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.646385+00:00"
+  },
+  "organizatsiya-kuhni": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.666630+00:00"
+  },
+  "osy-pchely-osam": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.688878+00:00"
+  },
+  "otkryt-tuguyu-kryshku": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.711932+00:00"
+  },
+  "otmyt-duhovku-ot-zhira": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.733133+00:00"
+  },
+  "otmyt-zerkalo": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.751506+00:00"
+  },
+  "otmyt-zhalyuzi": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.768523+00:00"
+  },
+  "otstirat-polotentsa": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.787456+00:00"
+  },
+  "ovsyanoe-pechenie": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.807226+00:00"
+  },
+  "parazity-rastenii": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.824989+00:00"
+  },
+  "pautinnyy-kleshch": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.842727+00:00"
+  },
+  "plesen-v-vannoy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.860558+00:00"
+  },
+  "plov-iz-svininy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.878405+00:00"
+  },
+  "pochinit-molniyu": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.900332+00:00"
+  },
+  "pochistit-divan": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.921661+00:00"
+  },
+  "pochistit-serebro": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.945097+00:00"
+  },
+  "pochistit-utyug": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.963185+00:00"
+  },
+  "pochva-vesennie-posadki": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:21.981760+00:00"
+  },
+  "podkormka-ogurtsov": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.000873+00:00"
+  },
+  "podkormka-pomidorov-teplitsa": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.024878+00:00"
+  },
+  "pokupki-bez-pereplat": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.044025+00:00"
+  },
+  "poliv-ogoroda": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.060760+00:00"
+  },
+  "pomyt-okna-bez-razvodov": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.085131+00:00"
+  },
+  "poryadok-v-shkafu": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.104862+00:00"
+  },
+  "posadit-klubniku": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.122315+00:00"
+  },
+  "posadka-chesnoka-pod-zimu": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.139415+00:00"
+  },
+  "posadka-kartofelya": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.157397+00:00"
+  },
+  "posadka-luka": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.177283+00:00"
+  },
+  "posadka-redisa": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.196146+00:00"
+  },
+  "posadka-vishni": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.214991+00:00"
+  },
+  "posadka-zemlyaniki": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.235274+00:00"
+  },
+  "prigorevshaya-kastryulya": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.253035+00:00"
+  },
+  "privivka-derevev": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.270222+00:00"
+  },
+  "rassada-tomatov": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.287932+00:00"
+  },
+  "rassypchatyy-ris": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.307685+00:00"
+  },
+  "rasteniya-dlya-teni": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.332251+00:00"
+  },
+  "razvyazat-uzel": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.351185+00:00"
+  },
+  "remont-kvartiry-byudzhet": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.371310+00:00"
+  },
+  "sel-telefon": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.391215+00:00"
+  },
+  "sharlotka-s-yablokami": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.409684+00:00"
+  },
+  "shvy-mezhdu-plitkoy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.426515+00:00"
+  },
+  "sideraty": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.444931+00:00"
+  },
+  "sladkiy-perec": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.462984+00:00"
+  },
+  "sochnye-kotlety": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.480360+00:00"
+  },
+  "soda-v-bytu": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.498801+00:00"
+  },
+  "solyanka-sbornaya-myasnaya": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.516981+00:00"
+  },
+  "sornyaki-na-gazone": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.535131+00:00"
+  },
+  "sousy-k-myasu": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.552704+00:00"
+  },
+  "spisok-pokupok": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.569994+00:00"
+  },
+  "starye-dzhinsy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.586986+00:00"
+  },
+  "staticheskoe-elektrichestvo": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.605054+00:00"
+  },
+  "stirka-belih-veshchey": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.622712+00:00"
+  },
+  "stirka-puhovika": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.639447+00:00"
+  },
+  "syrniki-iz-tvoroga": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.656258+00:00"
+  },
+  "teplaya-gryadka": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.674670+00:00"
+  },
+  "teplitsa-iz-polikarbonata": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.692007+00:00"
+  },
+  "testo-dlya-pelmeney": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.708630+00:00"
+  },
+  "testo-dlya-pitstsy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.725881+00:00"
+  },
+  "tli-nasekomye-sad": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.743806+00:00"
+  },
+  "tsarapiny-na-mebeli": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.762153+00:00"
+  },
+  "tushenaya-kapusta": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.778870+00:00"
+  },
+  "tvorozhnaya-zapekanka": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.797369+00:00"
+  },
+  "uborka-holodilnika": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.816782+00:00"
+  },
+  "uborka-posle-remonta": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.834316+00:00"
+  },
+  "uborka-vannoy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.851437+00:00"
+  },
+  "udalit-nakip-limonkoy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.868433+00:00"
+  },
+  "udalit-pyatna": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.885604+00:00"
+  },
+  "udalit-zhvachku": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.902699+00:00"
+  },
+  "uhod-za-gazonom": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.919061+00:00"
+  },
+  "uhod-za-grushey": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.938830+00:00"
+  },
+  "uhod-za-malinoy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.956740+00:00"
+  },
+  "uhod-za-mebelyu": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.973061+00:00"
+  },
+  "uhod-za-smorodinoy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:22.990709+00:00"
+  },
+  "ukryt-gortenziyu": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.011677+00:00"
+  },
+  "ukryt-rozy-na-zimu": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.030933+00:00"
+  },
+  "vareniki-s-kartoshkoy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.050373+00:00"
+  },
+  "vyrashchivanie-kabachkov": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.070408+00:00"
+  },
+  "vyrastit-arbuzy": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.088481+00:00"
+  },
+  "vysushit-obuv": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.107665+00:00"
+  },
+  "yaichnitsa-omlet": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.126294+00:00"
+  },
+  "zapah-iz-obuvi": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.144370+00:00"
+  },
+  "zapah-v-posudomoyke": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.163548+00:00"
+  },
+  "zapechennaya-kuritsa": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.182771+00:00"
+  },
+  "zaryadka-telefona-layfhaki": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.200971+00:00"
+  },
+  "zatochit-nozh": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.218314+00:00"
+  },
+  "zelen-na-podokonnike": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.236276+00:00"
+  },
+  "zima-zagotovki": {
+    "provider": "generated-card",
+    "style": "branded-topic-cover",
+    "generatedAt": "2026-05-31T13:12:23.253686+00:00"
   }
 }
