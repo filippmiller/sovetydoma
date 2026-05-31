@@ -1,0 +1,82 @@
+name: Deploy to Timeweb VPS
+
+# Build the static export and ship it to the Timeweb VPS over SSH.
+# Atomic release: upload to a timestamped dir, then symlink-swap via activate.sh.
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch: {}   # allow manual "Run workflow" from the Actions tab
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false   # never interrupt an in-flight deploy
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SITE_URL: https://1001sovet.ru
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_PHOTO_WORKER_URL: ${{ secrets.NEXT_PUBLIC_PHOTO_WORKER_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
+      - name: Build static export
+        run: pnpm run build
+
+      - name: Sanity check output
+        run: |
+          test -f out/index.html || { echo "::error::out/index.html missing — build did not export"; exit 1; }
+          echo "Exported $(find out -type f | wc -l) files"
+
+      - name: Add VPS to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Install SSH deploy key
+        run: |
+          install -m 600 /dev/stdin ~/.ssh/deploy_key <<< "${{ secrets.VPS_SSH_KEY }}"
+
+      - name: Upload release (rsync)
+        run: |
+          REL="gha-${GITHUB_SHA::8}-$(date +%Y%m%d%H%M%S)"
+          echo "REL=$REL" >> $GITHUB_ENV
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes" \
+            out/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/1001sovet-releases/$REL/
+
+      - name: Activate release (atomic symlink swap)
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "/opt/deploy/activate.sh '$REL'"
+
+      - name: Smoke test (live host)
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
+            -H "Host: 1001sovet.ru" http://${{ secrets.VPS_HOST }}/)
+          echo "Homepage returned $code"
+          [ "$code" = "200" ] || { echo "::error::Smoke test failed ($code)"; exit 1; }
+
+      - name: Cleanup key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

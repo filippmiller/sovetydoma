@@ -57,3 +57,10 @@ strip-bom-string/
 .claude/scheduled_tasks.lock
 /knowledge-export.json
 incoming-articles/*.mdx
+
+# deploy / infra docs that reference secret-file locations (keep out of git)
+DEPLOY-TIMEWEB.md
+DEPLOY-*.md
+*.secrets.md
+.secrets/
+

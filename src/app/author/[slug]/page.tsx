@@ -10,7 +10,7 @@ import { getAllArticles, CATEGORIES } from '@/lib/articles'
 import type { AnswerRow, QuestionRow } from '@/lib/questions'
 import questionsIndex from '@/lib/questions-index.json'
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorimdoma.ru').replace(/\/+$/, '')
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
 
 type QWithAnswers = QuestionRow & { answers: AnswerRow[] }
 const QUESTIONS = questionsIndex as unknown as QWithAnswers[]
