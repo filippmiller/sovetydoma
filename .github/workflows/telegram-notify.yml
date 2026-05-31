@@ -4,6 +4,7 @@ on:
     branches: [master, main]
     paths:
       - 'src/content/articles/**.mdx'
+  workflow_dispatch: {}
 
 jobs:
   notify:
@@ -16,7 +17,11 @@ jobs:
         id: articles
         run: |
           NEW=$(git diff --name-only HEAD~1 HEAD -- 'src/content/articles/*.mdx' | grep -v '^$' | head -3)
-          echo "files=$NEW" >> $GITHUB_OUTPUT
+          {
+            echo 'files<<EOF'
+            echo "$NEW"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
       - name: Send to Telegram
         if: steps.articles.outputs.files != ''
         env:
