@@ -6,7 +6,7 @@ import Breadcrumb from '@/components/Breadcrumb'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorim.vsedomatut.com'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorimdoma.ru'
 const CATEGORY_EMOJI: Record<string, string> = {
   kulinaria: '🍲', 'dom-i-uborka': '🧹', 'dacha-i-ogorod': '🌱', layfkhaki: '💡', ekonomiya: '💰', rybalka: '🎣',
 }

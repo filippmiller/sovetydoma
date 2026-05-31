@@ -31,7 +31,7 @@ import { MDXRemote } from 'next-mdx-remote/rsc'
 import type { Metadata } from 'next'
 import { readingTime, formatDate, relativeDate, CATEGORY_COLOR } from '@/lib/utils'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorim.vsedomatut.com'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorimdoma.ru'
 
 interface Props { params: Promise<{ category: string; slug: string }> }
 

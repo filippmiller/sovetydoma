@@ -6,7 +6,7 @@ import YandexMetrika from '@/components/YandexMetrika'
 import BackToTop from '@/components/BackToTop'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorim.vsedomatut.com'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorimdoma.ru'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="alternate" type="application/rss+xml" title="СоветыДома — Дача и огород" href={`${SITE_URL}/feed-dacha-i-ogorod.xml`} />
         <link rel="alternate" type="application/rss+xml" title="СоветыДома — Лайфхаки" href={`${SITE_URL}/feed-layfkhaki.xml`} />
         <link rel="alternate" type="application/rss+xml" title="СоветыДома — Экономия" href={`${SITE_URL}/feed-ekonomiya.xml`} />
-        <link rel="alternate" type="application/rss+xml" title="СоветыДома Turbo" href="https://pogovorim.vsedomatut.com/turbo.xml" />
+        <link rel="alternate" type="application/rss+xml" title="СоветыДома Turbo" href="https://pogovorimdoma.ru/turbo.xml" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#c0392b" />
       </head>

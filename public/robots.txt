@@ -13,5 +13,5 @@ Allow: /
 User-agent: YandexMedia
 Allow: /
 
-Sitemap: https://pogovorim.vsedomatut.com/sitemap.xml
-Host: https://pogovorim.vsedomatut.com
+Sitemap: https://pogovorimdoma.ru/sitemap.xml
+Host: https://pogovorimdoma.ru

@@ -2,77 +2,173 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>СоветыДома — Экономия</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/</link>
+    <link>https://pogovorimdoma.ru/ekonomiya/</link>
     <description>Как жить хорошо и тратить меньше</description>
     <language>ru</language>
-    <atom:link href="https://pogovorim.vsedomatut.com/feed-ekonomiya.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Sat, 30 May 2026 10:08:41 GMT</lastBuildDate>
+    <atom:link href="https://pogovorimdoma.ru/feed-ekonomiya.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 31 May 2026 07:00:49 GMT</lastBuildDate>
     <image>
-      <url>https://pogovorim.vsedomatut.com/og-default.png</url>
+      <url>https://pogovorimdoma.ru/og-default.png</url>
       <title>СоветыДома</title>
-      <link>https://pogovorim.vsedomatut.com/</link>
+      <link>https://pogovorimdoma.ru/</link>
     </image>
     
   <item>
+    <title>Как составить список покупок, который реально экономит деньги</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/spisok-pokupok/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/spisok-pokupok/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Методика составления умного списка покупок, которая сокращает импульсивные траты и пищевые отходы.</description>
+  </item>
+  <item>
+    <title>Планирование семейного бюджета: система, которая работает</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/semeynyy-byudzhet/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/semeynyy-byudzhet/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Пошаговая методика учёта доходов и расходов семьи с распределением по категориям и накоплениями.</description>
+  </item>
+  <item>
+    <title>Кэшбэк и бонусные программы: как выжать максимум из каждой покупки</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/keshbek-bonusy/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/keshbek-bonusy/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Руководство по использованию кэшбэка, бонусов и карт лояльности для реальной экономии на покупках.</description>
+  </item>
+  <item>
+    <title>Как подготовиться к отпуску без лишних трат и финансовых сюрпризов</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomnyy-otpusk/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomnyy-otpusk/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Планирование отпуска с экономией на билетах, жилье, питании и развлечениях без потери качества отдыха.</description>
+  </item>
+  <item>
+    <title>Как сократить расход воды в квартире вдвое без дискомфорта</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-vody/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-vody/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Практические способы экономии холодной и горячей воды с помощью приборов, привычек и простых доработок.</description>
+  </item>
+  <item>
+    <title>Как экономить на продуктах до 30% без потери качества питания</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-na-produktah/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-na-produktah/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Практические стратегии снижения расходов на продукты питания с сохранением полноценного и вкусного рациона.</description>
+  </item>
+  <item>
+    <title>Как сократить расходы на отопление зимой без замерзания</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-na-otoplenii/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-na-otoplenii/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Практические меры по утеплению квартиры и снижению трат на отопление без капитального ремонта.</description>
+  </item>
+  <item>
+    <title>Как покупать качественную одежду и экономить до 50% на гардеробе</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-na-odezhde/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-na-odezhde/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Стратегии выгодных покупок одежды: сезонные распродажи, вторичный рынок и правильный подбор базового гардероба.</description>
+  </item>
+  <item>
+    <title>Как экономить на бытовой химии в 3 раза без вреда для чистоты</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-na-himii/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-na-himii/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Способы сократить расходы на моющие средства с помощью концентратов, универсальных средств и домашних рецептов.</description>
+  </item>
+  <item>
+    <title>Как снизить счета за электричество на 20–40% без вреда для комфорта</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-elektrichestva/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-elektrichestva/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Проверенные способы уменьшить потребление электроэнергии в квартире и доме с помощью техники и привычек.</description>
+  </item>
+  <item>
+    <title>Как сократить расходы на бензин на 20–30% без продажи машины</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-benzina/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-benzina/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Практические советы по экономии топлива: стиль вождения, техническое состояние и планирование поездок.</description>
+  </item>
+  <item>
+    <title>Дешёвые и полезные продукты: как питаться полноценно на скромный бюджет</title>
+    <link>https://pogovorimdoma.ru/ekonomiya/deshevye-produkty/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/deshevye-produkty/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Список доступных по цене продуктов с высокой питательной ценностью для сбалансированного рациона.</description>
+  </item>
+  <item>
     <title>Меню на неделю за 3000 рублей на двоих: реальный план питания</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/menyu-na-nedelyu-3000/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/menyu-na-nedelyu-3000/</guid>
+    <link>https://pogovorimdoma.ru/ekonomiya/menyu-na-nedelyu-3000/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/menyu-na-nedelyu-3000/</guid>
     <pubDate>Sat, 30 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Бюджетное меню на неделю для двух человек с полным списком продуктов за 3000 рублей — вкусно, разнообразно и без жертв.</description>
   </item>
   <item>
     <title>Бюджетный ремонт квартиры: как сделать красиво и недорого</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/remont-kvartiry-byudzhet/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/remont-kvartiry-byudzhet/</guid>
+    <link>https://pogovorimdoma.ru/ekonomiya/remont-kvartiry-byudzhet/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/remont-kvartiry-byudzhet/</guid>
     <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Как сделать ремонт квартиры красиво и недорого: планирование бюджета, выбор материалов, очерёдность работ и способы сэкономить без потери качества.</description>
   </item>
   <item>
     <title>Как делать покупки выгодно: скидки, акции и правила экономного шопинга</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/pokupki-bez-pereplat/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/pokupki-bez-pereplat/</guid>
+    <link>https://pogovorimdoma.ru/ekonomiya/pokupki-bez-pereplat/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/pokupki-bez-pereplat/</guid>
     <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Как покупать выгодно: кешбэк, агрегаторы скидок, правила планирования покупок, ловушки маркетинга и стратегии экономного шопинга в магазине и онлайн.</description>
   </item>
   <item>
     <title>Кэшбэк карты в России 2026: как выбрать и не переплачивать</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/kashbek-karty-2026/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/kashbek-karty-2026/</guid>
+    <link>https://pogovorimdoma.ru/ekonomiya/kashbek-karty-2026/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/kashbek-karty-2026/</guid>
     <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Как выбрать кэшбэк карту в 2026 году, чтобы реально экономить: категории кэшбэка, подводные камни, какие карты выгодны для разных расходов.</description>
   </item>
   <item>
     <title>Как сэкономить на электроэнергии дома: 10 рабочих способов</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-elektroenergii/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-elektroenergii/</guid>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-elektroenergii/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-elektroenergii/</guid>
     <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>10 проверенных способов снизить расход электроэнергии дома без потери комфорта: от замены лампочек до умных режимов бытовой техники.</description>
   </item>
   <item>
     <title>Как экономить на бензине: 10 реальных способов</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-benzin/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-benzin/</guid>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-benzin/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-benzin/</guid>
     <pubDate>Thu, 28 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Как снизить расход топлива и расходы на бензин — стиль вождения, выбор АЗС, приложения для поиска дешёвого бензина и техническое обслуживание.</description>
   </item>
   <item>
     <title>Как платить меньше за ЖКХ: 8 способов снизить коммунальные расходы</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-zhkh/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-zhkh/</guid>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-zhkh/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-zhkh/</guid>
     <pubDate>Wed, 27 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Реальные способы сократить счета за ЖКХ — от счётчиков и субсидий до энергосберегающих лайфхаков. Сколько можно сэкономить каждым способом.</description>
   </item>
   <item>
     <title>Как сэкономить 5000 рублей в месяц на продуктах без ущерба для качества</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-na-produktakh/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-na-produktakh/</guid>
+    <link>https://pogovorimdoma.ru/ekonomiya/ekonomiya-na-produktakh/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/ekonomiya/ekonomiya-na-produktakh/</guid>
     <pubDate>Sat, 02 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Реальные стратегии экономии на продовольственных расходах: планирование меню, правильные магазины, заморозка и другие проверенные методы.</description>

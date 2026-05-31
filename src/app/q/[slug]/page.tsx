@@ -10,7 +10,7 @@ import { getArticleMeta } from '@/lib/article-index'
 import type { AnswerRow, QuestionRow } from '@/lib/questions'
 import questionsIndex from '@/lib/questions-index.json'
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://sovetydoma.vercel.app').replace(/\/+$/, '')
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://pogovorimdoma.ru').replace(/\/+$/, '')
 
 type QWithAnswers = QuestionRow & { answers: AnswerRow[] }
 const ALL = questionsIndex as unknown as QWithAnswers[]

@@ -2,176 +2,176 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>СоветыДома — советы для дома и дачи</title>
-    <link>https://pogovorim.vsedomatut.com/</link>
+    <link>https://pogovorimdoma.ru/</link>
     <description>Практические советы по кулинарии, уборке, огороду, лайфхаки и экономия для вашего дома.</description>
     <language>ru</language>
-    <atom:link href="https://pogovorim.vsedomatut.com/feed.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Sat, 30 May 2026 10:08:41 GMT</lastBuildDate>
+    <atom:link href="https://pogovorimdoma.ru/feed.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 31 May 2026 07:00:49 GMT</lastBuildDate>
     <image>
-      <url>https://pogovorim.vsedomatut.com/og-default.png</url>
+      <url>https://pogovorimdoma.ru/og-default.png</url>
       <title>СоветыДома</title>
-      <link>https://pogovorim.vsedomatut.com/</link>
+      <link>https://pogovorimdoma.ru/</link>
     </image>
     
   <item>
-    <title>Меню на неделю за 3000 рублей на двоих: реальный план питания</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/menyu-na-nedelyu-3000/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/menyu-na-nedelyu-3000/</guid>
-    <pubDate>Sat, 30 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Бюджетное меню на неделю для двух человек с полным списком продуктов за 3000 рублей — вкусно, разнообразно и без жертв.</description>
-  </item>
-  <item>
-    <title>Зимние заготовки: варенье, соленья и маринады — с чего начать</title>
-    <link>https://pogovorim.vsedomatut.com/kulinaria/zima-zagotovki/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/zima-zagotovki/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Руководство для начинающих по зимним заготовкам: варенье, соленья, маринады — базовые рецепты, необходимое оборудование и правила безопасного хранения.</description>
-  </item>
-  <item>
-    <title>Вареники с картошкой и луком: рецепт как у бабушки</title>
-    <link>https://pogovorim.vsedomatut.com/kulinaria/vareniki-s-kartoshkoy/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/vareniki-s-kartoshkoy/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Пошаговый рецепт вареников с картошкой и луком — мягкое тесто, ароматная начинка и советы, которые передаются из поколения в поколение.</description>
-  </item>
-  <item>
-    <title>Как вывести пятна с одежды: кофе, трава, жир, кровь — конкретные методы</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/udalit-pyatna/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/udalit-pyatna/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Конкретные способы вывести пятна с одежды: кофе, трава, жир, кровь, вино, ржавчина — чем обработать, в каком порядке действовать и каких ошибок избегать.</description>
-  </item>
-  <item>
-    <title>Как быстро убрать ванную комнату до блеска за 20 минут</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/uborka-vannoy/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/uborka-vannoy/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Пошаговый план быстрой уборки ванной комнаты за 20 минут: правильная последовательность, эффективные средства и лайфхаки для блеска без усилий.</description>
-  </item>
-  <item>
-    <title>Как стирать белые вещи чтобы они оставались белыми</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/stirka-belih-veshchey/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/stirka-belih-veshchey/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Советы по стирке белых вещей: правильный режим, температура, отбеливатели и народные средства — чтобы белое оставалось белым надолго.</description>
-  </item>
-  <item>
-    <title>Бюджетный ремонт квартиры: как сделать красиво и недорого</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/remont-kvartiry-byudzhet/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/remont-kvartiry-byudzhet/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Как сделать ремонт квартиры красиво и недорого: планирование бюджета, выбор материалов, очерёдность работ и способы сэкономить без потери качества.</description>
-  </item>
-  <item>
-    <title>Когда и как посадить клубнику в открытый грунт</title>
-    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/posadit-klubniku/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/posadit-klubniku/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <title>Выращивание зелени на подоконнике круглый год в домашних условиях</title>
+    <link>https://pogovorimdoma.ru/dacha-i-ogorod/zelen-na-podokonnike/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dacha-i-ogorod/zelen-na-podokonnike/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дача и огород</category>
-    <description>Полное руководство по посадке клубники в открытый грунт: оптимальные сроки, выбор места, подготовка почвы, схема посадки и первый уход.</description>
+    <description>Научитесь выращивать свежую зелень на подоконнике зимой и летом — петрушку, укроп, базилик и шпинат.</description>
   </item>
   <item>
-    <title>Как делать покупки выгодно: скидки, акции и правила экономного шопинга</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/pokupki-bez-pereplat/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/pokupki-bez-pereplat/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Как покупать выгодно: кешбэк, агрегаторы скидок, правила планирования покупок, ловушки маркетинга и стратегии экономного шопинга в магазине и онлайн.</description>
-  </item>
-  <item>
-    <title>Как организовать кухню: места хранения и порядок без усилий</title>
-    <link>https://pogovorim.vsedomatut.com/layfkhaki/organizatsiya-kuhni/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/organizatsiya-kuhni/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <title>Как заточить нож без точилки: 6 рабочих способов</title>
+    <link>https://pogovorimdoma.ru/layfkhaki/zatochit-nozh/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/layfkhaki/zatochit-nozh/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Лайфхаки</category>
-    <description>Практические советы по организации кухни: зонирование, умное хранение, освобождение столешницы и лайфхаки для поддержания порядка каждый день.</description>
+    <description>Экстренная заточка кухонного ножа подручными средствами: керамика, камень, стекло и другие методы.</description>
   </item>
   <item>
-    <title>Как вырастить морковь на даче: посев, уход и уборка</title>
-    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/morkov-vyraschivanie/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/morkov-vyraschivanie/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Подробное руководство по выращиванию моркови на даче: сроки посева, подготовка грядки, прореживание, полив и правильная уборка урожая.</description>
+    <title>12 лайфхаков для быстрой и безопасной зарядки телефона</title>
+    <link>https://pogovorimdoma.ru/layfkhaki/zaryadka-telefona-layfhaki/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/layfkhaki/zaryadka-telefona-layfhaki/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Практические советы, как ускорить зарядку смартфона и продлить срок службы аккумулятора.</description>
   </item>
   <item>
-    <title>Как правильно варить куриный бульон: прозрачный и ароматный</title>
-    <link>https://pogovorim.vsedomatut.com/kulinaria/kuriniy-bulon/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/kuriniy-bulon/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <title>Запечённая курица с хрустящей корочкой: секреты хруста</title>
+    <link>https://pogovorimdoma.ru/kulinaria/zapechennaya-kuritsa/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/kulinaria/zapechennaya-kuritsa/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Кулинария</category>
-    <description>Секреты прозрачного и ароматного куриного бульона: выбор мяса, правильная температура варки, осветление и хранение.</description>
+    <description>Как запечь курицу в духовке с хрустящей золотистой корочкой: сухая корочка, правильная температура и время запекания.</description>
   </item>
   <item>
-    <title>Как хранить овощи зимой в квартире: лук, картошка, морковь</title>
-    <link>https://pogovorim.vsedomatut.com/layfkhaki/khraneniye-ovoshchey-zimoy/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/khraneniye-ovoshchey-zimoy/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Практические советы по хранению овощей в квартире зимой: лук, картофель, морковь, чеснок, свёкла — условия, место, тара и сроки хранения.</description>
-  </item>
-  <item>
-    <title>Кэшбэк карты в России 2026: как выбрать и не переплачивать</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/kashbek-karty-2026/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/kashbek-karty-2026/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Как выбрать кэшбэк карту в 2026 году, чтобы реально экономить: категории кэшбэка, подводные камни, какие карты выгодны для разных расходов.</description>
-  </item>
-  <item>
-    <title>Картошка в духовке с чесноком и зеленью: хрустящая корочка</title>
-    <link>https://pogovorim.vsedomatut.com/kulinaria/kartoshka-v-duhovke/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/kartoshka-v-duhovke/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Как приготовить картошку в духовке с чесноком, зеленью и хрустящей корочкой — простой рецепт с советами по выбору сорта и температуре запекания.</description>
-  </item>
-  <item>
-    <title>Как выбрать спелый арбуз: 7 признаков хорошего арбуза</title>
-    <link>https://pogovorim.vsedomatut.com/layfkhaki/kak-vybrat-arbuz/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/layfkhaki/kak-vybrat-arbuz/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>7 верных признаков спелого арбуза: хвостик, пятно, звук, корочка, вес и другие способы выбрать сладкий арбуз на рынке или в магазине.</description>
-  </item>
-  <item>
-    <title>Как избавиться от пыли в квартире надолго: причины и решения</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/izbavitsya-ot-pyli/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/izbavitsya-ot-pyli/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <title>Как избавиться от неприятного запаха в посудомоечной машине</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/zapah-v-posudomoyke/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/zapah-v-posudomoyke/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Почему пыль накапливается так быстро и как с ней бороться системно: источники пыли, правильные инструменты, антистатические средства и режим уборки.</description>
+    <description>Причины запаха из посудомойки и эффективные способы его устранения: чистка фильтров, уксус и профилактика.</description>
   </item>
   <item>
-    <title>Холодец из свиных ножек: классический рецепт с секретами прозрачности</title>
-    <link>https://pogovorim.vsedomatut.com/kulinaria/holodets-retsept/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/kulinaria/holodets-retsept/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <title>7 надёжных способов вывести неприятный запах из обуви</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/zapah-iz-obuvi/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/zapah-iz-obuvi/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Эффективные домашние методы удаления запаха из обуви с помощью соды, уксуса, чая и других подручных средств.</description>
+  </item>
+  <item>
+    <title>Идеальная яичница и пышный омлет: техника за 15 минут</title>
+    <link>https://pogovorimdoma.ru/kulinaria/yaichnitsa-omlet/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/kulinaria/yaichnitsa-omlet/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Кулинария</category>
-    <description>Классический рецепт холодца из свиных ножек с курицей: как добиться прозрачного бульона, правильная варка, специи и подача с хреном и горчицей.</description>
+    <description>Как пожарить яичницу с жидким желтком и приготовить пышный омлет без духовки: температурные хитрости.</description>
   </item>
   <item>
-    <title>Как сэкономить на электроэнергии дома: 10 рабочих способов</title>
-    <link>https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-elektroenergii/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/ekonomiya/ekonomiya-elektroenergii/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>10 проверенных способов снизить расход электроэнергии дома без потери комфорта: от замены лампочек до умных режимов бытовой техники.</description>
+    <title>Как быстро высушить мокрую обувь и убрать запах за час</title>
+    <link>https://pogovorimdoma.ru/layfkhaki/vysushit-obuv/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/layfkhaki/vysushit-obuv/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Безопасные методы сушки обуви из кожи, замши и текстиля без деформации и неприятного запаха.</description>
   </item>
   <item>
-    <title>Что посадить в тени на даче: растения которые растут без солнца</title>
-    <link>https://pogovorim.vsedomatut.com/dacha-i-ogorod/chto-posadit-v-teni/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dacha-i-ogorod/chto-posadit-v-teni/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <title>Выращивание кабачков в открытом грунте: секреты большого урожая</title>
+    <link>https://pogovorimdoma.ru/dacha-i-ogorod/vyrashchivanie-kabachkov/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dacha-i-ogorod/vyrashchivanie-kabachkov/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дача и огород</category>
-    <description>Какие овощи, зелень и цветы растут в тени: список теневыносливых растений для дачи, советы по посадке и уходу в затенённых местах.</description>
+    <description>Пошаговая инструкция по выращиванию кабачков в открытом грунте — от посева семян до сбора урожая.</description>
+  </item>
+  <item>
+    <title>Как укрыть розы на зиму: правила утепления для разных сортов</title>
+    <link>https://pogovorimdoma.ru/dacha-i-ogorod/ukryt-rozy-na-zimu/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dacha-i-ogorod/ukryt-rozy-na-zimu/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Узнайте, как правильно укрыть розы на зиму, чтобы кусты не вымерзли и весну встретили здоровыми.</description>
+  </item>
+  <item>
+    <title>Уход за смородиной для большого урожая: обрезка, полив и подкормка</title>
+    <link>https://pogovorimdoma.ru/dacha-i-ogorod/uhod-za-smorodinoy/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dacha-i-ogorod/uhod-za-smorodinoy/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Правильный уход за смородиной — обрезка, подкормки и полив — гарантирует обильный урожай крупных ягод.</description>
+  </item>
+  <item>
+    <title>Как ухаживать за деревянной мебелью: секреты долговечности</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/uhod-za-mebelyu/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/uhod-za-mebelyu/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Практические советы по уходу за деревянной мебелью для сохранения её вида и продления срока службы.</description>
+  </item>
+  <item>
+    <title>Как удалить жвачку с одежды, ковра и мебели без следа</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/udalit-zhvachku/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/udalit-zhvachku/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Проверенные способы удаления жевательной резинки с разных поверхностей: заморозка, уксус, утюг и спирт.</description>
+  </item>
+  <item>
+    <title>Как удалить накипь в чайнике лимонной кислотой за 15 минут</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/udalit-nakip-limonkoy/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/udalit-nakip-limonkoy/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Быстрый и безопасный способ очистить электрический чайник от накипи с помощью лимонной кислоты.</description>
+  </item>
+  <item>
+    <title>Уборка после ремонта: пошаговый план с чего начать</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/uborka-posle-remonta/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/uborka-posle-remonta/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Подробный план уборки квартиры после ремонта: последовательность действий, средства и полезные лайфхаки.</description>
+  </item>
+  <item>
+    <title>Как быстро убрать запах из холодильника и помыть его за 45 минут</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/uborka-holodilnika/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/uborka-holodilnika/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Пошаговая инструкция по уборке холодильника и устранению неприятных запахов без химии.</description>
+  </item>
+  <item>
+    <title>Творожная запеканка как в детском саду: классический рецепт</title>
+    <link>https://pogovorimdoma.ru/kulinaria/tvorozhnaya-zapekanka/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/kulinaria/tvorozhnaya-zapekanka/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Рецепт пышной творожной запеканки с манкой — воздушная, нежная и с румяной корочкой, точно как в детском саду.</description>
+  </item>
+  <item>
+    <title>Тушёная капуста как в столовой: секрет мягкости и цвета</title>
+    <link>https://pogovorimdoma.ru/kulinaria/tushenaya-kapusta/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/kulinaria/tushenaya-kapusta/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Рецепт тушёной капусты с мягким вкусом и аппетитным цветом: правильная нарезка, специи и время тушения.</description>
+  </item>
+  <item>
+    <title>Как убрать царапины с мебели из дерева и ламината</title>
+    <link>https://pogovorimdoma.ru/layfkhaki/tsarapiny-na-mebeli/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/layfkhaki/tsarapiny-na-mebeli/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Домашние средства для удаления мелких и глубоких царапин с деревянной и ламинированной мебели.</description>
+  </item>
+  <item>
+    <title>Тонкое хрустящее тесто для пиццы: рецепт итальянской основы</title>
+    <link>https://pogovorimdoma.ru/kulinaria/testo-dlya-pitstsy/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/kulinaria/testo-dlya-pitstsy/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Как приготовить тонкое хрустящее тесто для пиццы в домашних условиях — пропорции, время расстойки и температура выпечки.</description>
   </item>
   </channel>
 </rss>

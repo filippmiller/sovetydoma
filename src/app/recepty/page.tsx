@@ -6,7 +6,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Рецепты — пошаговые рецепты на СоветыДома',
   description: 'Домашние рецепты с фильтрами по времени приготовления и теме. Быстрые блюда, супы, выпечка и многое другое.',
-  alternates: { canonical: 'https://pogovorim.vsedomatut.com/recepty' },
+  alternates: { canonical: 'https://pogovorimdoma.ru/recepty' },
 }
 
 export default function ReceptyPage() {

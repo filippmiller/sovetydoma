@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const articlesDir = path.join(__dirname, '../src/content/articles')
-const SITE_URL = 'https://pogovorim.vsedomatut.com'
+const SITE_URL = 'https://pogovorimdoma.ru'
 const METRIKA_ID = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID || 'XXXXXXXX'
 
 function escapeXml(str) {

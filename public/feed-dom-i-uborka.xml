@@ -2,96 +2,176 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>СоветыДома — Дом и уборка</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/</link>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/</link>
     <description>Лайфхаки для чистоты и порядка в доме</description>
     <language>ru</language>
-    <atom:link href="https://pogovorim.vsedomatut.com/feed-dom-i-uborka.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Sat, 30 May 2026 10:08:41 GMT</lastBuildDate>
+    <atom:link href="https://pogovorimdoma.ru/feed-dom-i-uborka.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 31 May 2026 07:00:49 GMT</lastBuildDate>
     <image>
-      <url>https://pogovorim.vsedomatut.com/og-default.png</url>
+      <url>https://pogovorimdoma.ru/og-default.png</url>
       <title>СоветыДома</title>
-      <link>https://pogovorim.vsedomatut.com/</link>
+      <link>https://pogovorimdoma.ru/</link>
     </image>
     
   <item>
-    <title>Как вывести пятна с одежды: кофе, трава, жир, кровь — конкретные методы</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/udalit-pyatna/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/udalit-pyatna/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <title>Как избавиться от неприятного запаха в посудомоечной машине</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/zapah-v-posudomoyke/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/zapah-v-posudomoyke/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Конкретные способы вывести пятна с одежды: кофе, трава, жир, кровь, вино, ржавчина — чем обработать, в каком порядке действовать и каких ошибок избегать.</description>
+    <description>Причины запаха из посудомойки и эффективные способы его устранения: чистка фильтров, уксус и профилактика.</description>
   </item>
   <item>
-    <title>Как быстро убрать ванную комнату до блеска за 20 минут</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/uborka-vannoy/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/uborka-vannoy/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <title>7 надёжных способов вывести неприятный запах из обуви</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/zapah-iz-obuvi/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/zapah-iz-obuvi/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Пошаговый план быстрой уборки ванной комнаты за 20 минут: правильная последовательность, эффективные средства и лайфхаки для блеска без усилий.</description>
+    <description>Эффективные домашние методы удаления запаха из обуви с помощью соды, уксуса, чая и других подручных средств.</description>
   </item>
   <item>
-    <title>Как стирать белые вещи чтобы они оставались белыми</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/stirka-belih-veshchey/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/stirka-belih-veshchey/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <title>Как ухаживать за деревянной мебелью: секреты долговечности</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/uhod-za-mebelyu/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/uhod-za-mebelyu/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Советы по стирке белых вещей: правильный режим, температура, отбеливатели и народные средства — чтобы белое оставалось белым надолго.</description>
+    <description>Практические советы по уходу за деревянной мебелью для сохранения её вида и продления срока службы.</description>
   </item>
   <item>
-    <title>Как избавиться от пыли в квартире надолго: причины и решения</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/izbavitsya-ot-pyli/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/izbavitsya-ot-pyli/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
+    <title>Как удалить жвачку с одежды, ковра и мебели без следа</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/udalit-zhvachku/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/udalit-zhvachku/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Почему пыль накапливается так быстро и как с ней бороться системно: источники пыли, правильные инструменты, антистатические средства и режим уборки.</description>
+    <description>Проверенные способы удаления жевательной резинки с разных поверхностей: заморозка, уксус, утюг и спирт.</description>
   </item>
   <item>
-    <title>Как отмыть духовку от жира без химии за 30 минут</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/chistka-dukhovki/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/chistka-dukhovki/</guid>
-    <pubDate>Sat, 23 May 2026 00:00:00 GMT</pubDate>
+    <title>Как удалить накипь в чайнике лимонной кислотой за 15 минут</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/udalit-nakip-limonkoy/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/udalit-nakip-limonkoy/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Три способа очистить духовку от жира и нагара без агрессивной химии: сода с уксусом, паровой метод и лимонная кислота.</description>
+    <description>Быстрый и безопасный способ очистить электрический чайник от накипи с помощью лимонной кислоты.</description>
   </item>
   <item>
-    <title>Как избавиться от запаха в холодильнике навсегда</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/zapakh-v-holodilnike/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/zapakh-v-holodilnike/</guid>
-    <pubDate>Fri, 22 May 2026 00:00:00 GMT</pubDate>
+    <title>Уборка после ремонта: пошаговый план с чего начать</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/uborka-posle-remonta/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/uborka-posle-remonta/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Причины неприятного запаха в холодильнике и способы избавиться от него — от мытья до народных поглотителей запахов.</description>
+    <description>Подробный план уборки квартиры после ремонта: последовательность действий, средства и полезные лайфхаки.</description>
   </item>
   <item>
-    <title>Как отчистить белые кроссовки дома: 5 способов</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/krossovki-otmyt/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/krossovki-otmyt/</guid>
-    <pubDate>Thu, 21 May 2026 00:00:00 GMT</pubDate>
+    <title>Как быстро убрать запах из холодильника и помыть его за 45 минут</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/uborka-holodilnika/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/uborka-holodilnika/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Как вернуть белизну кроссовкам из ткани, кожи и замши — зубная паста, сода, меламиновая губка и стирка в машинке.</description>
+    <description>Пошаговая инструкция по уборке холодильника и устранению неприятных запахов без химии.</description>
   </item>
   <item>
-    <title>Как стирать пуховик дома чтобы не испортить</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/stirka-pukhovika/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/stirka-pukhovika/</guid>
-    <pubDate>Wed, 20 May 2026 00:00:00 GMT</pubDate>
+    <title>Как правильно постирать пуховик в стиральной машине</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/stirka-puhovika/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/stirka-puhovika/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Правила стирки пуховика в машинке и вручную: температура, средства, сушка и как восстановить пух после стирки.</description>
+    <description>Пошаговая инструкция по стирке пуховика в машинке: режимы, средства, сушка и восстановление пуха.</description>
   </item>
   <item>
-    <title>Как избавиться от накипи в чайнике за 10 минут</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/nakip-v-chaynike/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/nakip-v-chaynike/</guid>
-    <pubDate>Fri, 15 May 2026 00:00:00 GMT</pubDate>
+    <title>Как отбелить и очистить швы между плиткой без химии</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/shvy-mezhdu-plitkoy/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/shvy-mezhdu-plitkoy/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Три проверенных способа удалить накипь из электрочайника подручными средствами — лимонная кислота, уксус и содовый раствор.</description>
+    <description>Простые и безопасные способы очистки межплиточных швов в ванной и на кухне подручными средствами.</description>
   </item>
   <item>
-    <title>5 способов почистить сковороду от застарелого жира</title>
-    <link>https://pogovorim.vsedomatut.com/dom-i-uborka/skovoroda-ot-zhira/</link>
-    <guid isPermaLink="true">https://pogovorim.vsedomatut.com/dom-i-uborka/skovoroda-ot-zhira/</guid>
-    <pubDate>Tue, 12 May 2026 00:00:00 GMT</pubDate>
+    <title>Как отмыть пригоревшую кастрюлю без усилий за 30 минут</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/prigorevshaya-kastryulya/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/prigorevshaya-kastryulya/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Как отмыть сковороду от застарелого жира и нагара без дорогой химии: сода, соль, горчица и другие домашние средства.</description>
+    <description>Проверенные методы очистки пригоревших кастрюль из нержавейки и эмали в домашних условиях.</description>
+  </item>
+  <item>
+    <title>Система складывания вещей: как навести порядок в шкафу</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/poryadok-v-shkafu/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/poryadok-v-shkafu/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Методы организации шкафа: вертикальное хранение, раскладка по цветам и правила отбора ненужного.</description>
+  </item>
+  <item>
+    <title>Как помыть окна без разводов: секреты идеальной чистоты</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/pomyt-okna-bez-razvodov/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/pomyt-okna-bez-razvodov/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Проверенные методы мытья окон, которые оставляют стекла кристально чистыми без разводов и разводов.</description>
+  </item>
+  <item>
+    <title>Как почистить утюг от нагара и пригара на подошве за 20 минут</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/pochistit-utyug/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/pochistit-utyug/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Простые способы очистить подошву утюга от пригара, нагара и пятен без повреждения покрытия.</description>
+  </item>
+  <item>
+    <title>Как почистить серебро и золото в домашних условиях</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/pochistit-serebro/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/pochistit-serebro/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Безопасные домашние методы чистки серебряных и золотых украшений от потускнения, налёта и окисления.</description>
+  </item>
+  <item>
+    <title>Как почистить диван от пятен в домашних условиях</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/pochistit-divan/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/pochistit-divan/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Эффективные методы удаления пятен с обивки дивана: от кофе и вина до жира и чернил.</description>
+  </item>
+  <item>
+    <title>Как удалить плесень в ванной комнате навсегда за 1 день</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/plesen-v-vannoy/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/plesen-v-vannoy/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Надёжные способы избавиться от чёрной плесени в ванной и предотвратить её повторное появление.</description>
+  </item>
+  <item>
+    <title>Как отстирать кухонные полотенца от жира и запаха</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/otstirat-polotentsa/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/otstirat-polotentsa/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Проверенные рецепты отстирывания кухонных полотенец: замачивание, сода, уксус и правильная стирка.</description>
+  </item>
+  <item>
+    <title>Как быстро отмыть жалюзи от пыли и грязи за 30 минут</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/otmyt-zhalyuzi/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/otmyt-zhalyuzi/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Быстрые методы очистки горизонтальных и вертикальных жалюзи от пыли без снятия с окна.</description>
+  </item>
+  <item>
+    <title>Как отмыть зеркало до идеального блеска без разводов</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/otmyt-zerkalo/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/otmyt-zerkalo/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Проверенные способы мытья зеркал без разводов с помощью уксуса, нашатыря и правильной техники протирки.</description>
+  </item>
+  <item>
+    <title>Как отмыть духовку от жира без химии за 1 час</title>
+    <link>https://pogovorimdoma.ru/dom-i-uborka/otmyt-duhovku-ot-zhira/</link>
+    <guid isPermaLink="true">https://pogovorimdoma.ru/dom-i-uborka/otmyt-duhovku-ot-zhira/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Простые способы очистить духовку от застарелого жира народными средствами без агрессивной химии.</description>
   </item>
   </channel>
 </rss>
