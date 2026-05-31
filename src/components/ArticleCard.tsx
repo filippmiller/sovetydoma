@@ -9,9 +9,10 @@ interface Props {
   article: ArticleFrontmatter
   wordCount?: number
   featured?: boolean
+  viewCount?: number
 }
 
-export default function ArticleCard({ article, wordCount, featured = false }: Props) {
+export default function ArticleCard({ article, wordCount, featured = false, viewCount }: Props) {
   const cat = CATEGORIES[article.category]
   const color = CATEGORY_COLOR[article.category] || '#888'
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
@@ -122,7 +123,7 @@ export default function ArticleCard({ article, wordCount, featured = false }: Pr
               {relativeDate(article.date)}
             </time>
             <span style={{ fontSize: '0.76rem', color: '#bbb' }}>
-              ⏱ {time}
+              {typeof viewCount === 'number' && viewCount > 0 ? `👁 ${viewCount} · ` : ''}⏱ {time}
             </span>
           </div>
         </div>

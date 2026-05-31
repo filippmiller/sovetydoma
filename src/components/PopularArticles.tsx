@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { CATEGORY_COLOR, CATEGORY_EMOJI } from '@/lib/utils'
 import { CATEGORIES } from '@/lib/categories'
+import { getSupabase } from '@/lib/supabase'
+import { sortArticlesByViews } from '@/lib/view-counts.mjs'
 
 interface ArticleData {
   title: string
@@ -13,33 +15,41 @@ interface ArticleData {
   date: string
 }
 
+type ArticleWithViews = ArticleData & { viewCount?: number }
+
 interface Props {
   articles: ArticleData[]
 }
 
 export default function PopularArticles({ articles }: Props) {
-  const [topArticles, setTopArticles] = useState<ArticleData[]>([])
-  const [fromStorage, setFromStorage] = useState(false)
+  const [topArticles, setTopArticles] = useState<ArticleWithViews[]>([])
+  const [fromViews, setFromViews] = useState(false)
 
   useEffect(() => {
-    try {
-      const withViews = articles.map((a) => ({
-        ...a,
-        views: parseInt(localStorage.getItem(`views_${a.slug}`) || '0', 10),
-      }))
-      const hasAnyViews = withViews.some((a) => a.views > 0)
-      if (hasAnyViews) {
-        setFromStorage(true)
-        setTopArticles(
-          withViews.sort((a, b) => b.views - a.views).slice(0, 5)
-        )
-      } else {
-        // Fallback: newest articles
-        setTopArticles([...articles].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 5))
+    let active = true
+
+    async function load() {
+      try {
+        const sb = getSupabase()
+        const { data } = await sb
+          .from('feedback_counters')
+          .select('article_slug, kind, count')
+          .eq('kind', 'view')
+
+        const sorted = sortArticlesByViews(articles, data || [])
+        const hasViews = sorted.some((article) => article.viewCount > 0)
+        if (!active) return
+        setFromViews(hasViews)
+        setTopArticles((hasViews ? sorted : newest(articles)).slice(0, 5))
+      } catch {
+        if (!active) return
+        setFromViews(false)
+        setTopArticles(newest(articles).slice(0, 5))
       }
-    } catch {
-      setTopArticles([...articles].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 5))
     }
+
+    load()
+    return () => { active = false }
   }, [articles])
 
   if (topArticles.length === 0) return null
@@ -58,12 +68,13 @@ export default function PopularArticles({ articles }: Props) {
         <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>
           Популярное
         </h2>
-        {fromStorage && (
-          <span style={{ fontSize: '0.75rem', color: '#aaa', marginLeft: '0.25rem' }}>— по вашим просмотрам</span>
+        {fromViews && (
+          <span style={{ fontSize: '0.75rem', color: '#aaa', marginLeft: '0.25rem' }}>— по просмотрам</span>
         )}
       </div>
       <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
         {topArticles.map((article, i) => {
+          const views = Number(article.viewCount || 0)
           const color = CATEGORY_COLOR[article.category] || '#888'
           const emoji = CATEGORY_EMOJI[article.category] || '📄'
           const cat = CATEGORIES[article.category]
@@ -92,7 +103,7 @@ export default function PopularArticles({ articles }: Props) {
                     {article.title}
                   </div>
                   <div style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '1px' }}>
-                    {cat?.name || article.categoryName}
+                    {cat?.name || article.categoryName}{views > 0 ? ` · 👁 ${views}` : ''}
                   </div>
                 </div>
               </Link>
@@ -102,4 +113,8 @@ export default function PopularArticles({ articles }: Props) {
       </ol>
     </section>
   )
+}
+
+function newest<T extends { date: string }>(articles: T[]): T[] {
+  return [...articles].sort((a, b) => (a.date < b.date ? 1 : -1))
 }

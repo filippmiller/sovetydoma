@@ -26,6 +26,7 @@ import ArticleFeedback from '@/components/ArticleFeedback'
 import ArticlePhotoSubmissionCTA from '@/components/ArticlePhotoSubmissionCTA'
 import ArticleQuestionsBlock from '@/components/ArticleQuestionsBlock'
 import ArticleTopicCluster from '@/components/ArticleTopicCluster'
+import ArticleViewCount from '@/components/ArticleViewCount'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import type { Metadata } from 'next'
@@ -251,6 +252,7 @@ export default async function ArticlePage({ params }: Props) {
                   )}
                 </time>
                 <span>⏱ {timeToRead}</span>
+                <ArticleViewCount slug={slug} />
                 <span>📝 {wordCount} слов</span>
                 {fm.cost && <CostBadge cost={fm.cost} />}
                 <FontSizeControl />

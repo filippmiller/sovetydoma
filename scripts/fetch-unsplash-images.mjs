@@ -1,68 +1,76 @@
-import fs from 'fs'
-import path from 'path'
+#!/usr/bin/env node
+import fs from 'node:fs'
+import path from 'node:path'
+import {
+  buildImageAudit,
+  buildUnsplashQueries,
+  chooseUniqueUnsplashResult,
+  readArticleFiles,
+  readImageFiles,
+  sha256File,
+} from './image-audit-utils.mjs'
 
 // Resumable, rate-limit-aware Unsplash image fetcher for SovetyDoma articles.
 //
 //   UNSPLASH_ACCESS_KEY=xxx node scripts/fetch-unsplash-images.mjs
+//   UNSPLASH_ACCESS_KEY=xxx node scripts/fetch-unsplash-images.mjs --replace-duplicates
 //
-// - Reads every src/content/articles/*.mdx, fetches a relevant landscape photo,
-//   saves it to public/images/<slug>.jpg (served as /images/<slug>.jpg).
-// - SKIPS slugs that already have a file → safe to re-run across hourly batches.
-// - Demo Unsplash apps allow 50 requests/hour. The script watches the
-//   X-Ratelimit-Remaining header and STOPS cleanly when the budget is gone,
-//   so you just re-run it next hour to continue where it left off.
-// - Query priority: explicit QUERY_MAP entry → category English query → a
-//   transliteration-ish fallback from the slug.
+// The fetcher now avoids the old per-category duplicate failure mode:
+// - builds article-specific queries from title/tags/slug/category;
+// - requests several Unsplash results, not only the first result;
+// - rejects photo IDs already assigned in public/images/.sources.json;
+// - rejects downloaded files whose hash already exists locally;
+// - optionally replaces exact duplicate local images.
 
 const KEY = process.env.UNSPLASH_ACCESS_KEY || ''
-if (!KEY) { console.error('Missing UNSPLASH_ACCESS_KEY'); process.exit(1) }
+if (!KEY) {
+  console.error('Missing UNSPLASH_ACCESS_KEY')
+  process.exit(1)
+}
+
+const args = new Set(process.argv.slice(2))
+const replaceDuplicates = args.has('--replace-duplicates')
+const maxFetches = Number(process.env.MAX_FETCHES || '9999')
 
 const ARTICLES_DIR = path.join(process.cwd(), 'src/content/articles')
 const IMAGES_DIR = path.join(process.cwd(), 'public/images')
+const SOURCES_FILE = path.join(IMAGES_DIR, '.sources.json')
 if (!fs.existsSync(IMAGES_DIR)) fs.mkdirSync(IMAGES_DIR, { recursive: true })
 
-// Good English search queries by category (reliable Unsplash results).
-const CATEGORY_QUERY = {
-  kulinaria: 'russian food cooking dish',
-  'dom-i-uborka': 'home cleaning tidy interior',
-  'dacha-i-ogorod': 'vegetable garden gardening',
-  layfkhaki: 'home life hack organization',
-  ekonomiya: 'money saving budget home',
-  rybalka: 'fishing river lake rod',
-}
-
-// Hand-tuned overrides for specific slugs (best relevance).
-const QUERY_MAP = {
-  'idealnyy-borshch': 'borscht soup', 'domashnie-bliny': 'russian pancakes blini',
-  'domashnie-mayonez': 'homemade mayonnaise', 'solyanka-myasnaya': 'meat soup bowl',
-  'nakip-v-chaynike': 'electric kettle', 'skovoroda-ot-zhira': 'cast iron pan',
-  'griby-sezony-sbor': 'forest mushrooms', 'griby-zasolka': 'pickled mushrooms jar',
-  'ogurcy-v-otkrytom-grunte': 'cucumber garden', 'tomaty-bolezni': 'tomato plants',
-  'kleshchi-zashchita': 'forest path walk', 'les-bezopasnost': 'forest hiking',
-  'udobreniya-gryadki': 'garden soil fertilizer', 'kompost-bystro': 'compost heap garden',
-  'podkormka-pomidorov': 'tomato plant care', 'klubnika-na-podokonnike': 'strawberry plant',
-  'zapakh-v-holodilnike': 'open refrigerator', 'chistka-dukhovki': 'oven cleaning',
-  'krossovki-otmyt': 'white sneakers', 'stirka-pukhovika': 'down jacket laundry',
-  'ekonomiya-benzin': 'fuel pump car', 'menyu-na-nedelyu-3000': 'meal prep containers',
-  'soda-10-sposobov': 'baking soda', 'poryadok-za-15-minut': 'tidy clean room',
-}
-
-function readCategory(file) {
+function readSources() {
   try {
-    const txt = fs.readFileSync(path.join(ARTICLES_DIR, file), 'utf8')
-    const m = txt.match(/^category:\s*["']?([a-z-]+)["']?/m)
-    return m ? m[1] : null
-  } catch { return null }
+    return JSON.parse(fs.readFileSync(SOURCES_FILE, 'utf8'))
+  } catch {
+    return {}
+  }
 }
 
-async function fetchPhotoUrl(query) {
-  const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&orientation=landscape&per_page=1&content_filter=high&client_id=${KEY}`
+function writeSources(sources) {
+  fs.writeFileSync(SOURCES_FILE, `${JSON.stringify(sources, null, 2)}\n`, 'utf8')
+}
+
+function duplicateSlugs(audit) {
+  const slugs = new Set()
+  for (const group of audit.exactDuplicateGroups) {
+    for (const slug of group) slugs.add(slug)
+  }
+  return slugs
+}
+
+async function searchPhotos(query) {
+  const url = new URL('https://api.unsplash.com/search/photos')
+  url.searchParams.set('query', query)
+  url.searchParams.set('orientation', 'landscape')
+  url.searchParams.set('per_page', '30')
+  url.searchParams.set('content_filter', 'high')
+  url.searchParams.set('client_id', KEY)
+
   const res = await fetch(url)
   const remaining = res.headers.get('x-ratelimit-remaining')
-  if (res.status === 403) return { url: null, remaining: 0, blocked: true }
-  if (!res.ok) return { url: null, remaining }
+  if (res.status === 403) return { results: [], remaining: 0, blocked: true }
+  if (!res.ok) return { results: [], remaining }
   const data = await res.json()
-  return { url: data.results?.[0]?.urls?.regular || null, remaining }
+  return { results: data.results || [], remaining }
 }
 
 async function download(url, dest) {
@@ -72,34 +80,101 @@ async function download(url, dest) {
   fs.writeFileSync(dest, buf)
 }
 
-const files = fs.readdirSync(ARTICLES_DIR).filter(f => f.endsWith('.mdx'))
-let fetched = 0, skipped = 0, failed = 0
-console.log(`${files.length} articles total`)
+async function fetchUniqueImage(article, dest, usedIds, usedHashes, sources) {
+  for (const query of buildUnsplashQueries(article)) {
+    const { results, remaining, blocked } = await searchPhotos(query)
+    if (blocked) return { fetched: false, blocked: true, remaining }
 
-for (const file of files) {
-  const slug = file.replace('.mdx', '')
-  const dest = path.join(IMAGES_DIR, `${slug}.jpg`)
-  if (fs.existsSync(dest)) { skipped++; continue }
+    let candidates = results
+    while (candidates.length) {
+      const picked = chooseUniqueUnsplashResult(candidates, usedIds)
+      if (!picked) break
 
-  const cat = readCategory(file)
-  const query = QUERY_MAP[slug] || CATEGORY_QUERY[cat] || slug.replace(/-/g, ' ')
+      const temp = `${dest}.tmp`
+      try {
+        await download(picked.url, temp)
+        const hash = sha256File(temp)
+        if (usedHashes.has(hash)) {
+          fs.unlinkSync(temp)
+          usedIds.add(picked.id)
+          candidates = candidates.filter((item) => item.id !== picked.id)
+          continue
+        }
 
-  const { url, remaining, blocked } = await fetchPhotoUrl(query)
-  if (blocked) {
-    console.log(`\n⏸  Rate limit hit. Fetched ${fetched} this run. Re-run next hour to continue.`)
-    break
+        fs.renameSync(temp, dest)
+        usedIds.add(picked.id)
+        usedHashes.add(hash)
+        sources[article.slug] = {
+          provider: 'unsplash',
+          id: picked.id,
+          query,
+          alt: picked.alt,
+          userName: picked.userName,
+          userUrl: picked.userUrl,
+          fetchedAt: new Date().toISOString(),
+        }
+        return { fetched: true, remaining, query, id: picked.id }
+      } catch (error) {
+        try { if (fs.existsSync(temp)) fs.unlinkSync(temp) } catch {}
+        candidates = candidates.filter((item) => item.id !== picked.id)
+      }
+    }
+
+    if (remaining !== null && Number(remaining) <= 0) return { fetched: false, blocked: true, remaining }
+    await new Promise((resolve) => setTimeout(resolve, 250))
   }
-  if (url) {
-    try { await download(url, dest); fetched++; console.log(`✓ ${slug}  (${query})  [rl:${remaining}]`) }
-    catch (e) { failed++; console.log(`✗ ${slug} download failed: ${e.message}`) }
-  } else {
-    failed++; console.log(`- ${slug}: no result for "${query}"`)
-  }
-  if (remaining !== null && Number(remaining) <= 0) {
-    console.log(`\n⏸  Rate budget exhausted. Re-run next hour to continue.`); break
-  }
-  await new Promise(r => setTimeout(r, 250))
+
+  return { fetched: false, blocked: false, remaining: null }
 }
 
-const have = fs.readdirSync(IMAGES_DIR).filter(f => f.endsWith('.jpg')).length
-console.log(`\nDone. fetched=${fetched} skipped=${skipped} failed=${failed}. Total images on disk: ${have}/${files.length}`)
+const articles = readArticleFiles(ARTICLES_DIR)
+let images = readImageFiles(IMAGES_DIR)
+let audit = buildImageAudit({ articles, images })
+const duplicateSet = duplicateSlugs(audit)
+const sources = readSources()
+const usedIds = new Set(Object.values(sources).map((source) => source?.id).filter(Boolean))
+const usedHashes = new Set(images.map((image) => image.sha256).filter(Boolean))
+
+let fetched = 0
+let skipped = 0
+let failed = 0
+console.log(`${articles.length} articles total`)
+
+for (const article of articles) {
+  if (fetched >= maxFetches) break
+
+  const dest = path.join(IMAGES_DIR, `${article.slug}.jpg`)
+  const exists = fs.existsSync(dest)
+  const shouldReplace = replaceDuplicates && duplicateSet.has(article.slug)
+
+  if (exists && !shouldReplace) {
+    skipped++
+    continue
+  }
+
+  if (exists && shouldReplace) {
+    const currentHash = sha256File(dest)
+    usedHashes.delete(currentHash)
+    fs.unlinkSync(dest)
+  }
+
+  const result = await fetchUniqueImage(article, dest, usedIds, usedHashes, sources)
+  if (result.blocked) {
+    console.log(`\nPaused: rate limit exhausted. fetched=${fetched} skipped=${skipped} failed=${failed}`)
+    break
+  }
+
+  if (result.fetched) {
+    fetched++
+    console.log(`ok ${article.slug} (${result.query}) [rl:${result.remaining}]`)
+    writeSources(sources)
+  } else {
+    failed++
+    console.log(`miss ${article.slug}`)
+  }
+}
+
+images = readImageFiles(IMAGES_DIR)
+audit = buildImageAudit({ articles, images })
+writeSources(sources)
+console.log(`\nDone. fetched=${fetched} skipped=${skipped} failed=${failed}. images=${audit.imageCount}/${audit.articleCount}. duplicateGroups=${audit.exactDuplicateGroups.length}. missing=${audit.missingImages.length}`)

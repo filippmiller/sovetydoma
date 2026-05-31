@@ -1,4 +1,8 @@
 {
+  "baklazhany-v-teplitse": {
+    "category": "dacha-i-ogorod",
+    "title": "Баклажаны в теплице: от рассады до сбора урожая за один сезон"
+  },
   "bliny-na-moloke": {
     "category": "kulinaria",
     "title": "Тонкие блины на молоке без комочков: проверенный рецепт"
@@ -6,6 +10,10 @@
   "bolezni-ogurtsov": {
     "category": "dacha-i-ogorod",
     "title": "Болезни огурцов и их лечение: распознаём и спасаем урожай"
+  },
+  "borba-s-medvedkoy": {
+    "category": "dacha-i-ogorod",
+    "title": "Эффективная борьба с медведкой: проверенные способы защиты огорода"
   },
   "borba-s-oduvanchikami": {
     "category": "dacha-i-ogorod",
@@ -75,6 +83,14 @@
     "category": "kulinaria",
     "title": "Домашний майонез за 2 минуты без взбивания венчиком"
   },
+  "drenazh-na-uchastke": {
+    "category": "dacha-i-ogorod",
+    "title": "Сухая дача больше не проблема: как правильно сделать дренаж участка"
+  },
+  "dyni-vyrashchivanie": {
+    "category": "dacha-i-ogorod",
+    "title": "Выращивание дынь на подоконнике и в теплице: от семечка до аромата"
+  },
   "ekonomiya-benzin": {
     "category": "ekonomiya",
     "title": "Как экономить на бензине: 10 реальных способов"
@@ -135,6 +151,10 @@
     "category": "kulinaria",
     "title": "Как засолить грибы на зиму: холодный и горячий способ"
   },
+  "gryadki-iz-dosok": {
+    "category": "dacha-i-ogorod",
+    "title": "Грядки из досок своими руками: пошаговая инструкция для начинающих"
+  },
   "gryadki-k-zime": {
     "category": "dacha-i-ogorod",
     "title": "Подготовка грядок к зиме: пошаговая инструкция для дачника"
@@ -170,6 +190,10 @@
   "idealnyy-borshch": {
     "category": "kulinaria",
     "title": "Как сделать идеальный борщ: 7 секретов шеф-повара"
+  },
+  "izbavit-ot-pyireya": {
+    "category": "dacha-i-ogorod",
+    "title": "Пырей на участке: беспощадные методы уничтожения сорняка навсегда"
   },
   "izbavitsya-ot-pyli": {
     "category": "dom-i-uborka",
@@ -283,6 +307,10 @@
     "category": "dom-i-uborka",
     "title": "Как избавиться от накипи в чайнике за 10 минут"
   },
+  "obrezka-smorodiny": {
+    "category": "dacha-i-ogorod",
+    "title": "Обрезка смородины после ягод: как подготовить кусты к следующему году"
+  },
   "obrezka-yabloni": {
     "category": "dacha-i-ogorod",
     "title": "Обрезка яблони весной: как не навредить дереву"
@@ -343,6 +371,10 @@
     "category": "dacha-i-ogorod",
     "title": "Болезни и паразиты овощей: мучнистая роса, фитофтора, нематода"
   },
+  "pautinnyy-kleshch": {
+    "category": "dacha-i-ogorod",
+    "title": "Как избавиться от паутинного клеща на огурцах: экстренные меры"
+  },
   "plesen-v-vannoy": {
     "category": "dom-i-uborka",
     "title": "Как удалить плесень в ванной комнате навсегда за 1 день"
@@ -366,6 +398,10 @@
   "pochistit-utyug": {
     "category": "dom-i-uborka",
     "title": "Как почистить утюг от нагара и пригара на подошве за 20 минут"
+  },
+  "pochva-vesennie-posadki": {
+    "category": "dacha-i-ogorod",
+    "title": "Как подготовить почву для весенних посадок: пошаговый план"
   },
   "podkormka-ogurtsov": {
     "category": "dacha-i-ogorod",
@@ -414,6 +450,18 @@
   "posadka-luka": {
     "category": "dacha-i-ogorod",
     "title": "Посадка лука на репку: сроки, подготовка и уход за урожаем"
+  },
+  "posadka-redisa": {
+    "category": "dacha-i-ogorod",
+    "title": "Ранний редис к майским праздникам: пошаговая инструкция посадки"
+  },
+  "posadka-vishni": {
+    "category": "dacha-i-ogorod",
+    "title": "Вишня саженцем: как посадить дерево, чтобы оно прижилось и плодоносило"
+  },
+  "posadka-zemlyaniki": {
+    "category": "dacha-i-ogorod",
+    "title": "Посадка земляники из усиков: получите 50 новых кустов бесплатно"
   },
   "prigorevshaya-kastryulya": {
     "category": "dom-i-uborka",
@@ -467,6 +515,10 @@
     "category": "dom-i-uborka",
     "title": "5 способов почистить сковороду от застарелого жира"
   },
+  "sladkiy-perec": {
+    "category": "dacha-i-ogorod",
+    "title": "Выращивание сладкого перца в открытом грунте: секреты урожая"
+  },
   "sochnye-kotlety": {
     "category": "kulinaria",
     "title": "Сочные котлеты: секреты фарша и правильной обжарки"
@@ -486,6 +538,10 @@
   "solyanka-sbornaya-myasnaya": {
     "category": "kulinaria",
     "title": "Сборная мясная солянка: классический рецепт навара"
+  },
+  "sornyaki-na-gazone": {
+    "category": "dacha-i-ogorod",
+    "title": "Как избавиться от сорняков на газоне без химии: 7 проверенных способов"
   },
   "sousy-k-myasu": {
     "category": "kulinaria",
@@ -522,6 +578,10 @@
   "teplaya-gryadka": {
     "category": "dacha-i-ogorod",
     "title": "Как сделать тёплую грядку своими руками для раннего урожая"
+  },
+  "teplitsa-iz-polikarbonata": {
+    "category": "dacha-i-ogorod",
+    "title": "Теплица из поликарбоната своими руками: проект на выходные"
   },
   "testo-dlya-pelmeney": {
     "category": "kulinaria",
@@ -579,6 +639,18 @@
     "category": "dacha-i-ogorod",
     "title": "Чем подкормить грядки: органика vs минералка, когда и сколько"
   },
+  "uhod-za-gazonom": {
+    "category": "dacha-i-ogorod",
+    "title": "Зелёный газон в июльскую жару: правила полива и стрижки"
+  },
+  "uhod-za-grushey": {
+    "category": "dacha-i-ogorod",
+    "title": "Уход за грушей летом и осенью: инструкция для сочного урожая"
+  },
+  "uhod-za-malinoy": {
+    "category": "dacha-i-ogorod",
+    "title": "Малина без хаоса: правильная подвязка и обрезка для щедрого урожая"
+  },
   "uhod-za-mebelyu": {
     "category": "dom-i-uborka",
     "title": "Как ухаживать за деревянной мебелью: секреты долговечности"
@@ -586,6 +658,10 @@
   "uhod-za-smorodinoy": {
     "category": "dacha-i-ogorod",
     "title": "Уход за смородиной для большого урожая: обрезка, полив и подкормка"
+  },
+  "ukryt-gortenziyu": {
+    "category": "dacha-i-ogorod",
+    "title": "Как правильно укрыть гортензию на зиму: инструкция для каждого вида"
   },
   "ukryt-rozy-na-zimu": {
     "category": "dacha-i-ogorod",
@@ -598,6 +674,10 @@
   "vyrashchivanie-kabachkov": {
     "category": "dacha-i-ogorod",
     "title": "Выращивание кабачков в открытом грунте: секреты большого урожая"
+  },
+  "vyrastit-arbuzy": {
+    "category": "dacha-i-ogorod",
+    "title": "Сладкий урожай арбузов: секреты выращивания в открытом грунте"
   },
   "vysushit-obuv": {
     "category": "layfkhaki",
