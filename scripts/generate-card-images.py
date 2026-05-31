@@ -3,12 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-import re
-import textwrap
 from datetime import datetime, timezone
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,34 +19,28 @@ HEIGHT = 800
 
 CATEGORY = {
     "kulinaria": {
-        "name": "Кулинария",
-        "emoji": "🍲",
-        "colors": ("#f08a24", "#ffcf70", "#8f3b00"),
+        "colors": ("#c99052", "#ead9bf", "#70451f"),
+        "kind": "kitchen",
     },
     "dom-i-uborka": {
-        "name": "Дом и уборка",
-        "emoji": "🧹",
-        "colors": ("#28a86b", "#b9f0cf", "#0f5f3f"),
+        "colors": ("#6f9b87", "#d7e3da", "#315748"),
+        "kind": "home",
     },
     "dacha-i-ogorod": {
-        "name": "Дача и огород",
-        "emoji": "🌱",
-        "colors": ("#14967d", "#bdebd7", "#075849"),
+        "colors": ("#759764", "#dbe4cf", "#3d5734"),
+        "kind": "garden",
     },
     "layfkhaki": {
-        "name": "Лайфхаки",
-        "emoji": "💡",
-        "colors": ("#8e44ad", "#e6c4f3", "#4b1765"),
+        "colors": ("#8d8072", "#e4ded4", "#50483f"),
+        "kind": "lifehack",
     },
     "ekonomiya": {
-        "name": "Экономия",
-        "emoji": "💰",
-        "colors": ("#2878b9", "#bcdaf5", "#123d69"),
+        "colors": ("#6689a3", "#d9e2e7", "#304b60"),
+        "kind": "savings",
     },
     "rybalka": {
-        "name": "Рыбалка",
-        "emoji": "🎣",
-        "colors": ("#2e86ab", "#bde8f6", "#17475c"),
+        "colors": ("#5f8fa2", "#d3e4e8", "#315867"),
+        "kind": "fishing",
     },
 }
 
@@ -85,25 +77,10 @@ def load_articles() -> list[dict[str, object]]:
         articles.append(
             {
                 "slug": slug,
-                "title": str(data.get("title") or slug.replace("-", " ")),
                 "category": str(data.get("category") or ""),
-                "tags": data.get("tags") if isinstance(data.get("tags"), list) else [],
             }
         )
     return articles
-
-
-def font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
-    candidates = [
-        "C:/Windows/Fonts/arialbd.ttf" if bold else "C:/Windows/Fonts/arial.ttf",
-        "C:/Windows/Fonts/segoeuib.ttf" if bold else "C:/Windows/Fonts/segoeui.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-    ]
-    for candidate in candidates:
-        path = Path(candidate)
-        if path.exists():
-            return ImageFont.truetype(str(path), size)
-    return ImageFont.load_default()
 
 
 def hex_to_rgb(value: str) -> tuple[int, int, int]:
@@ -115,84 +92,127 @@ def blend(a: tuple[int, int, int], b: tuple[int, int, int], t: float) -> tuple[i
     return tuple(round(a[i] * (1 - t) + b[i] * t) for i in range(3))
 
 
-def draw_gradient(draw: ImageDraw.ImageDraw, primary: str, secondary: str) -> None:
-    a = hex_to_rgb(primary)
-    b = hex_to_rgb(secondary)
-    for y in range(HEIGHT):
-        t = y / HEIGHT
-        color = blend(a, b, t)
-        draw.line([(0, y), (WIDTH, y)], fill=color)
-
-
 def seeded(slug: str) -> int:
     return int(hashlib.sha256(slug.encode("utf-8")).hexdigest()[:12], 16)
 
 
-def draw_pattern(draw: ImageDraw.ImageDraw, slug: str, ink: tuple[int, int, int]) -> None:
-    seed = seeded(slug)
-    step = 86 + seed % 34
-    radius = 22 + seed % 28
-    for y in range(-step, HEIGHT + step, step):
-        for x in range(-step, WIDTH + step, step):
-            wobble = ((x * 17 + y * 31 + seed) % 52) - 26
-            bbox = [x + wobble, y - wobble, x + wobble + radius, y - wobble + radius]
-            draw.ellipse(bbox, outline=(*ink, 42), width=3)
+def random_unit(seed: int, index: int) -> float:
+    value = hashlib.sha256(f"{seed}:{index}".encode("utf-8")).hexdigest()[:8]
+    return int(value, 16) / 0xFFFFFFFF
 
-    for i in range(11):
+
+def draw_gradient(draw: ImageDraw.ImageDraw, primary: tuple[int, int, int], secondary: tuple[int, int, int]) -> None:
+    for y in range(HEIGHT):
+        t = y / HEIGHT
+        draw.line([(0, y), (WIDTH, y)], fill=blend(secondary, primary, t * 0.35))
+
+
+def draw_background_texture(layer: Image.Image, slug: str, palette: tuple[tuple[int, int, int], ...]) -> None:
+    draw = ImageDraw.Draw(layer, "RGBA")
+    seed = seeded(slug)
+
+    for i in range(22):
+        x = int(random_unit(seed, i * 5) * WIDTH)
+        y = int(random_unit(seed, i * 5 + 1) * HEIGHT)
+        w = int(140 + random_unit(seed, i * 5 + 2) * 420)
+        h = int(90 + random_unit(seed, i * 5 + 3) * 260)
+        color = palette[i % len(palette)]
+        alpha = int(18 + random_unit(seed, i * 5 + 4) * 38)
+        draw.ellipse([x - w // 2, y - h // 2, x + w // 2, y + h // 2], fill=(*color, alpha))
+
+    for i in range(9):
         x = (seed * (i + 3) * 37) % WIDTH
         y = (seed * (i + 5) * 53) % HEIGHT
         length = 110 + ((seed >> i) % 130)
         angle = ((seed >> (i + 4)) % 628) / 100
         x2 = x + int(math.cos(angle) * length)
         y2 = y + int(math.sin(angle) * length)
-        draw.line([(x, y), (x2, y2)], fill=(*ink, 34), width=5)
+        draw.line([(x, y), (x2, y2)], fill=(*palette[-1], 22), width=5)
 
 
-def draw_text_box(draw: ImageDraw.ImageDraw, article: dict[str, object], info: dict[str, object]) -> None:
-    title = str(article["title"])
-    tags = [str(tag) for tag in article.get("tags", [])][:3]
-    dark = hex_to_rgb(str(info["colors"][2]))
+def draw_kitchen(draw: ImageDraw.ImageDraw, primary: tuple[int, int, int], dark: tuple[int, int, int]) -> None:
+    draw.rounded_rectangle([190, 430, 970, 555], radius=48, fill=(*primary, 120))
+    draw.ellipse([300, 220, 900, 650], fill=(255, 255, 255, 112), outline=(*dark, 55), width=10)
+    for x in (445, 545, 645):
+        draw.ellipse([x, 325, x + 115, 440], fill=(*dark, 86))
+        draw.ellipse([x + 18, 342, x + 97, 420], fill=(245, 238, 225, 150))
+
+
+def draw_home(draw: ImageDraw.ImageDraw, primary: tuple[int, int, int], dark: tuple[int, int, int]) -> None:
+    draw.rounded_rectangle([245, 300, 900, 590], radius=42, fill=(255, 255, 255, 118))
+    for i, x in enumerate((310, 470, 630, 790)):
+        draw.rounded_rectangle([x, 235, x + 92, 585], radius=42, fill=(*primary, 108 - i * 10))
+    draw.line([(235, 600), (930, 600)], fill=(*dark, 66), width=14)
+
+
+def draw_garden(draw: ImageDraw.ImageDraw, primary: tuple[int, int, int], dark: tuple[int, int, int]) -> None:
+    draw.rounded_rectangle([130, 515, 1065, 680], radius=52, fill=(*dark, 58))
+    for x in range(210, 1000, 115):
+        draw.line([(x, 560), (x + 28, 330)], fill=(*dark, 100), width=12)
+        draw.ellipse([x - 70, 295, x + 45, 410], fill=(*primary, 112))
+        draw.ellipse([x + 5, 270, x + 130, 400], fill=(*primary, 82))
+
+
+def draw_lifehack(draw: ImageDraw.ImageDraw, primary: tuple[int, int, int], dark: tuple[int, int, int]) -> None:
+    draw.rounded_rectangle([245, 360, 945, 520], radius=58, fill=(255, 255, 255, 112))
+    for i, x in enumerate((335, 455, 575, 695)):
+        draw.rounded_rectangle([x, 250 + i * 16, x + 260, 330 + i * 16], radius=38, fill=(*primary, 96 - i * 9))
+    draw.ellipse([500, 275, 760, 535], outline=(*dark, 86), width=18)
+
+
+def draw_savings(draw: ImageDraw.ImageDraw, primary: tuple[int, int, int], dark: tuple[int, int, int]) -> None:
+    draw.rounded_rectangle([285, 265, 895, 560], radius=50, fill=(255, 255, 255, 116))
+    for i, x in enumerate((370, 500, 630, 760)):
+        h = 120 + i * 55
+        draw.rounded_rectangle([x, 610 - h, x + 76, 610], radius=30, fill=(*primary, 105))
+    draw.arc([300, 225, 920, 725], start=205, end=330, fill=(*dark, 80), width=18)
+
+
+def draw_fishing(draw: ImageDraw.ImageDraw, primary: tuple[int, int, int], dark: tuple[int, int, int]) -> None:
+    for y in (410, 485, 560):
+        draw.arc([120, y - 80, 1080, y + 95], start=8, end=172, fill=(*primary, 82), width=16)
+    draw.ellipse([435, 300, 785, 500], fill=(255, 255, 255, 110), outline=(*dark, 62), width=9)
+    draw.polygon([(785, 400), (920, 310), (920, 490)], fill=(*dark, 76))
+
+
+def draw_topic_image(image: Image.Image, article: dict[str, object], info: dict[str, object]) -> None:
     primary = hex_to_rgb(str(info["colors"][0]))
+    secondary = hex_to_rgb(str(info["colors"][1]))
+    dark = hex_to_rgb(str(info["colors"][2]))
 
-    box = [86, 116, WIDTH - 86, HEIGHT - 96]
-    draw.rounded_rectangle(box, radius=32, fill=(255, 255, 255, 236), outline=(*dark, 55), width=2)
+    layer = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw_background_texture(layer, str(article["slug"]), (primary, secondary, dark))
+    draw = ImageDraw.Draw(layer, "RGBA")
 
-    draw.rounded_rectangle([122, 154, 422, 206], radius=18, fill=(*primary, 235))
-    draw.text((146, 163), str(info["name"]).upper(), fill=(255, 255, 255), font=font(24, True))
+    kind = str(info["kind"])
+    if kind == "kitchen":
+        draw_kitchen(draw, primary, dark)
+    elif kind == "home":
+        draw_home(draw, primary, dark)
+    elif kind == "garden":
+        draw_garden(draw, primary, dark)
+    elif kind == "savings":
+        draw_savings(draw, primary, dark)
+    elif kind == "fishing":
+        draw_fishing(draw, primary, dark)
+    else:
+        draw_lifehack(draw, primary, dark)
 
-    draw.rounded_rectangle([WIDTH - 310, 146, WIDTH - 126, 206], radius=18, outline=(*dark, 95), width=3)
-    draw.text((WIDTH - 282, 160), "СОВЕТ", fill=dark, font=font(26, True))
-
-    title_font = font(58, True)
-    lines = textwrap.wrap(title, width=28)
-    if len(lines) > 4:
-        title_font = font(50, True)
-        lines = textwrap.wrap(title, width=32)[:4]
-
-    y = 254
-    for line in lines:
-        draw.text((126, y), line, fill=dark, font=title_font)
-        y += title_font.size + 11
-
-    draw.line([(126, HEIGHT - 188), (WIDTH - 126, HEIGHT - 188)], fill=(*primary, 115), width=4)
-    if tags:
-        tag_text = "  ".join(f"#{tag}" for tag in tags)
-        draw.text((126, HEIGHT - 154), tag_text, fill=(*dark, 210), font=font(28, False))
-    draw.text((126, HEIGHT - 124), "СоветыДома", fill=(*dark, 165), font=font(24, True))
+    image.alpha_composite(layer.filter(ImageFilter.GaussianBlur(radius=1.2)))
 
 
 def save_cover(article: dict[str, object]) -> None:
     info = CATEGORY.get(str(article["category"]), CATEGORY["layfkhaki"])
-    primary, secondary, dark = info["colors"]
+    primary = hex_to_rgb(str(info["colors"][0]))
+    secondary = hex_to_rgb(str(info["colors"][1]))
 
-    image = Image.new("RGB", (WIDTH, HEIGHT), "#ffffff")
+    image = Image.new("RGBA", (WIDTH, HEIGHT), (*secondary, 255))
     draw = ImageDraw.Draw(image, "RGBA")
     draw_gradient(draw, primary, secondary)
-    draw_pattern(draw, str(article["slug"]), hex_to_rgb(dark))
-    draw_text_box(draw, article, info)
+    draw_topic_image(image, article, info)
 
     out = IMAGES_DIR / f"{article['slug']}.jpg"
-    image.save(out, "JPEG", quality=88, optimize=True, progressive=True)
+    image.convert("RGB").save(out, "JPEG", quality=86, optimize=True, progressive=True)
 
 
 def read_sources() -> dict[str, object]:
@@ -219,7 +239,7 @@ def main() -> None:
         save_cover(article)
         sources[slug] = {
             "provider": "generated-card",
-            "style": "branded-topic-cover",
+            "style": "muted-topic-thumbnail",
             "generatedAt": datetime.now(timezone.utc).isoformat(),
         }
         generated += 1

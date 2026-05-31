@@ -27,7 +27,8 @@ export default function ArticleImage({ src, alt, emoji, fallbackSize = '3.5rem' 
     <img
       src={src}
       alt={alt}
-      loading="lazy"
+      loading="eager"
+      decoding="async"
       onError={() => setFailed(true)}
       style={{
         position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover',

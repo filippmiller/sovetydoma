@@ -18,7 +18,7 @@ export default function ArticleCard({ article, wordCount, featured = false, view
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
   const time = wordCount ? readingTime('x '.repeat(wordCount)) : '~3 минуты'
   const imageSrc = resolveArticleImage(article.image, { width: 600, height: 400 })
-  const cardImageSrc = imageSrc?.startsWith('/images/') ? `${imageSrc}?v=20260531-cards` : imageSrc
+  const cardImageSrc = imageSrc?.startsWith('/images/') ? `${imageSrc}?v=20260531-thumbs` : imageSrc
 
   return (
     <Link
@@ -36,97 +36,108 @@ export default function ArticleCard({ article, wordCount, featured = false, view
           display: 'flex',
           flexDirection: 'column',
           border: featured ? `2px solid ${color}44` : '1px solid #f0ece7',
+          padding: featured ? '1rem' : '0.9rem',
         }}
       >
-        {/* Gradient hero */}
         <div style={{
-          height: featured ? '200px' : '160px',
-          background: `linear-gradient(135deg, ${color}dd 0%, ${color}88 100%)`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: featured ? '4.5rem' : '3.5rem',
-          position: 'relative',
-          overflow: 'hidden',
+          display: 'grid',
+          gridTemplateColumns: `minmax(0, 1fr) ${featured ? 'clamp(100px, 28%, 124px)' : 'clamp(88px, 27%, 108px)'}`,
+          gap: featured ? '0.95rem' : '0.8rem',
+          alignItems: 'start',
+          flex: 1,
         }}>
-          <div style={{
-            position: 'absolute', inset: 0, opacity: 0.07,
-            backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }} />
-          {featured && (
-            <span style={{
-              position: 'absolute', top: '0.75rem', left: '0.75rem',
-              background: '#fff', color: color,
-              fontSize: '0.65rem', fontWeight: 800,
-              padding: '3px 8px', borderRadius: '4px',
-              textTransform: 'uppercase', letterSpacing: '0.06em',
+          <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.55rem', flexWrap: 'wrap' }}>
+              {featured && (
+                <span style={{
+                  background: `${color}14`, color,
+                  fontSize: '0.62rem', fontWeight: 800,
+                  padding: '3px 7px', borderRadius: '4px',
+                  textTransform: 'uppercase', letterSpacing: '0.05em',
+                }}>
+                  Новое
+                </span>
+              )}
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                backgroundColor: `${color}12`,
+                color,
+                borderRadius: '5px',
+                padding: '3px 8px',
+                fontSize: '0.68rem',
+                fontWeight: 750,
+                width: 'fit-content',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+              }}>
+                <span aria-hidden="true">{emoji}</span> {cat?.name || article.categoryName}
+              </span>
+            </div>
+
+            <h2 style={{
+              fontSize: featured ? '1.12rem' : '0.98rem',
+              fontWeight: 750,
+              lineHeight: 1.35,
+              margin: '0 0 0.45rem',
+              color: '#1a1a1a',
+              overflowWrap: 'anywhere',
             }}>
-              Новое
-            </span>
-          )}
-          <CardFavoriteButton slug={article.slug} />
-          {cardImageSrc ? (
-            <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={featured ? '4.5rem' : '3.5rem'} />
-          ) : (
-            <span aria-hidden="true">{emoji}</span>
-          )}
+              {article.title}
+            </h2>
+
+            {article.description && (
+              <p style={{
+                fontSize: '0.85rem',
+                color: '#666',
+                lineHeight: 1.55,
+                flex: 1,
+                overflow: 'hidden',
+                display: '-webkit-box',
+                WebkitLineClamp: featured ? 4 : 3,
+                WebkitBoxOrient: 'vertical',
+                margin: 0,
+              }}>
+                {article.description}
+              </p>
+            )}
+          </div>
+
+          <div style={{
+            position: 'relative',
+            aspectRatio: '1 / 1',
+            width: '100%',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            background: '#f4f0ea',
+            boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
+          }}>
+            <CardFavoriteButton slug={article.slug} />
+            {cardImageSrc ? (
+              <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={featured ? '2rem' : '1.65rem'} />
+            ) : (
+              <span aria-hidden="true" style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: featured ? '2rem' : '1.65rem',
+              }}>
+                {emoji}
+              </span>
+            )}
+          </div>
         </div>
 
-        <div style={{ padding: featured ? '1.25rem' : '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Category badge */}
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            backgroundColor: color,
-            color: '#fff',
-            borderRadius: '5px',
-            padding: '3px 9px',
-            fontSize: '0.7rem',
-            fontWeight: 700,
-            marginBottom: '0.65rem',
-            width: 'fit-content',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-          }}>
-            <span aria-hidden="true">{emoji}</span> {cat?.name || article.categoryName}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', marginTop: '0.85rem', paddingTop: '0.7rem', borderTop: '1px solid #f0ece7' }}>
+          <time style={{ fontSize: '0.74rem', color: '#aaa' }}>
+            {relativeDate(article.date)}
+          </time>
+          <span style={{ fontSize: '0.74rem', color: '#aaa', whiteSpace: 'nowrap' }}>
+            {typeof viewCount === 'number' && viewCount > 0 ? `👁 ${viewCount} · ` : ''}⏱ {time}
           </span>
-
-          <h2 style={{
-            fontSize: featured ? '1.15rem' : '1rem',
-            fontWeight: 700,
-            lineHeight: 1.4,
-            marginBottom: '0.5rem',
-            color: '#1a1a1a',
-          }}>
-            {article.title}
-          </h2>
-
-          {article.description && (
-            <p style={{
-              fontSize: '0.87rem',
-              color: '#666',
-              lineHeight: 1.65,
-              flex: 1,
-              overflow: 'hidden',
-              display: '-webkit-box',
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: 'vertical',
-              margin: 0,
-            }}>
-              {article.description}
-            </p>
-          )}
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.85rem', paddingTop: '0.75rem', borderTop: '1px solid #f0ece7' }}>
-            <time style={{ fontSize: '0.76rem', color: '#bbb' }}>
-              {relativeDate(article.date)}
-            </time>
-            <span style={{ fontSize: '0.76rem', color: '#bbb' }}>
-              {typeof viewCount === 'number' && viewCount > 0 ? `👁 ${viewCount} · ` : ''}⏱ {time}
-            </span>
-          </div>
         </div>
       </article>
     </Link>
