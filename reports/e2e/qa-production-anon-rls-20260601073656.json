@@ -1,0 +1,44 @@
+{
+  "marker": "QA_E2E_20260601073656",
+  "userId": "d6eb17b9-01d7-42df-950a-d74a66a2d592",
+  "steps": [
+    {
+      "name": "anon.profiles.upsert",
+      "ok": false,
+      "id": null,
+      "error": "new row violates row-level security policy for table \"profiles\""
+    },
+    {
+      "name": "anon.ratings.insert",
+      "ok": false,
+      "id": null,
+      "error": "new row violates row-level security policy for table \"ratings\""
+    },
+    {
+      "name": "anon.reactions.insert",
+      "ok": false,
+      "id": null,
+      "error": "new row violates row-level security policy for table \"reactions\""
+    },
+    {
+      "name": "anon.comments.insert.approved",
+      "ok": false,
+      "id": null,
+      "error": "new row violates row-level security policy for table \"comments\""
+    },
+    {
+      "name": "anon.saved_articles.insert",
+      "ok": false,
+      "id": null,
+      "error": "Could not find the 'article_title' column of 'saved_articles' in the schema cache"
+    }
+  ],
+  "created": {},
+  "errors": [
+    "anon.profiles.upsert: new row violates row-level security policy for table \"profiles\"",
+    "anon.ratings.insert: new row violates row-level security policy for table \"ratings\"",
+    "anon.reactions.insert: new row violates row-level security policy for table \"reactions\"",
+    "anon.comments.insert.approved: new row violates row-level security policy for table \"comments\"",
+    "anon.saved_articles.insert: Could not find the 'article_title' column of 'saved_articles' in the schema cache"
+  ]
+}

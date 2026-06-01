@@ -1,0 +1,10 @@
+{
+  "email": "filippmiller@gmail.com",
+  "marker": "REAL_EMAIL_TEST_20260601075847",
+  "userId": null,
+  "hasSession": false,
+  "emailConfirmedAt": null,
+  "confirmationSentLikely": false,
+  "error": "email rate limit exceeded",
+  "createdAt": "2026-06-01T07:58:47.988Z"
+}

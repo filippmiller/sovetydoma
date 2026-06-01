@@ -8,6 +8,7 @@ interface Props {
   emoji: string
   /** font-size for the emoji fallback */
   fallbackSize?: string
+  loading?: 'eager' | 'lazy'
 }
 
 /**
@@ -15,11 +16,25 @@ interface Props {
  * emoji if the file 404s or fails to load. This keeps cards/heroes looking
  * intentional while real photos are still being added.
  */
-export default function ArticleImage({ src, alt, emoji, fallbackSize = '3.5rem' }: Props) {
+export default function ArticleImage({ src, alt, emoji, fallbackSize = '3.5rem', loading = 'lazy' }: Props) {
   const [failed, setFailed] = useState(false)
 
   if (failed) {
-    return <span aria-hidden="true" style={{ fontSize: fallbackSize }}>{emoji}</span>
+    return (
+      <span
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: fallbackSize,
+        }}
+      >
+        {emoji}
+      </span>
+    )
   }
 
   return (
@@ -27,7 +42,7 @@ export default function ArticleImage({ src, alt, emoji, fallbackSize = '3.5rem' 
     <img
       src={src}
       alt={alt}
-      loading="eager"
+      loading={loading}
       decoding="async"
       onError={() => setFailed(true)}
       style={{

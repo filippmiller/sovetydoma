@@ -1,0 +1,27 @@
+{
+  "stamp": "20260601073609",
+  "marker": "QA_E2E_20260601073609",
+  "articleSlug": "borba-s-oduvanchikami",
+  "email": "qa+user-20260601073609@example.test",
+  "password": "[redacted]",
+  "steps": [
+    {
+      "name": "auth.signUp",
+      "userId": null,
+      "hasSession": false,
+      "error": "Email address \"qa+user-20260601073609@example.test\" is invalid"
+    },
+    {
+      "name": "auth.signInWithPassword",
+      "userId": null,
+      "hasSession": false,
+      "error": "Invalid login credentials"
+    }
+  ],
+  "created": {},
+  "errors": [
+    "signUp: Email address \"qa+user-20260601073609@example.test\" is invalid",
+    "signIn: Invalid login credentials"
+  ],
+  "blocked": "Auth user was created or attempted, but no usable session was returned. Email confirmation may be required."
+}

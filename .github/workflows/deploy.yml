@@ -39,6 +39,11 @@ jobs:
       - name: Typecheck
         run: pnpm exec tsc --noEmit
 
+      - name: Tests and content audits
+        run: |
+          pnpm test
+          pnpm run audit:images
+
       - name: Build static export
         run: pnpm run build
 
@@ -73,10 +78,26 @@ jobs:
 
       - name: Smoke test (live host)
         run: |
+          set -euo pipefail
           # Hit the real HTTPS site; -L follows the HTTP->HTTPS 301.
-          code=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 25 https://1001sovet.ru/)
+          code=$(curl -sL -o /tmp/home.html -w "%{http_code}" --max-time 25 https://1001sovet.ru/)
           echo "Homepage returned $code"
-          [ "$code" = "200" ] || { echo "::error::Smoke test failed ($code)"; exit 1; }
+          [ "$code" = "200" ] || { echo "::error::Homepage smoke failed ($code)"; exit 1; }
+          grep -q "СоветыДома" /tmp/home.html || { echo "::error::Homepage content marker missing"; exit 1; }
+
+          redirect=$(curl -sI --max-time 25 http://1001sovet.ru/ | tr -d '\r' | awk 'tolower($1)=="location:" {print $2}' | tail -1)
+          [ "$redirect" = "https://1001sovet.ru/" ] || { echo "::error::HTTP redirect mismatch: $redirect"; exit 1; }
+
+          curl -fsSL --max-time 25 https://1001sovet.ru/dacha-i-ogorod/borba-s-oduvanchikami/ | grep -q "одуванчиков" \
+            || { echo "::error::Article page smoke failed"; exit 1; }
+          curl -fsSI --max-time 25 https://1001sovet.ru/images/previews/borba-s-oduvanchikami.jpg >/dev/null \
+            || { echo "::error::Article preview image smoke failed"; exit 1; }
+          curl -fsSL --max-time 25 https://1001sovet.ru/sitemap.xml | grep -q "borba-s-oduvanchikami" \
+            || { echo "::error::Sitemap smoke failed"; exit 1; }
+          curl -fsSL --max-time 25 https://1001sovet.ru/feed.xml | grep -q "СоветыДома" \
+            || { echo "::error::RSS smoke failed"; exit 1; }
+          curl -fsSL --max-time 25 https://1001sovet.ru/build.json | grep -q "$GITHUB_SHA" \
+            || { echo "::error::Live build metadata does not match $GITHUB_SHA"; exit 1; }
 
       - name: Cleanup key
         if: always()

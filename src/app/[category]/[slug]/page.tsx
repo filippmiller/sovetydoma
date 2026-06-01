@@ -27,10 +27,12 @@ import ArticlePhotoSubmissionCTA from '@/components/ArticlePhotoSubmissionCTA'
 import ArticleQuestionsBlock from '@/components/ArticleQuestionsBlock'
 import ArticleTopicCluster from '@/components/ArticleTopicCluster'
 import ArticleViewCount from '@/components/ArticleViewCount'
+import ArticleImage from '@/components/ArticleImage'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import type { Metadata } from 'next'
-import { readingTime, formatDate, relativeDate, CATEGORY_COLOR } from '@/lib/utils'
+import { readingTime, formatDate, relativeDate, CATEGORY_COLOR, CATEGORY_EMOJI } from '@/lib/utils'
+import { resolveArticleImage } from '@/lib/cloudinary'
 import { SITE_NAME, SITE_URL, articleCanonicalUrl, articleImageUrl, absoluteUrl, truncateForMeta } from '@/lib/seo'
 
 interface Props { params: Promise<{ category: string; slug: string }> }
@@ -92,15 +94,14 @@ export default async function ArticlePage({ params }: Props) {
   const { frontmatter: fm, content, wordCount } = article
   const cat = CATEGORIES[category]
   const color = CATEGORY_COLOR[category] || '#888'
+  const emoji = CATEGORY_EMOJI[category] || '📄'
   const url = articleCanonicalUrl(fm)
   const imageUrl = articleImageUrl(fm)
+  const visibleImageUrl = resolveArticleImage(fm.image, { width: 900, height: 520 })
   const timeToRead = readingTime('x '.repeat(wordCount))
 
   // F7+F9: all articles needed for ViewTracker slug + tag-based similarity
   const allArticles = getAllArticles()
-  const otherArticles = allArticles
-    .filter((a) => a.slug !== slug && a.category !== category)
-    .slice(0, 6)
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -204,10 +205,6 @@ export default async function ArticlePage({ params }: Props) {
     }
   }
 
-  const vkUrl = `https://vk.com/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(fm.title)}`
-  const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(fm.title)}`
-  const waUrl = `https://wa.me/?text=${encodeURIComponent(fm.title + ' ' + url)}`
-
   return (
     <>
       {/* F2: Reading progress bar */}
@@ -285,6 +282,21 @@ export default async function ArticlePage({ params }: Props) {
                 <FavoriteButton slug={slug} title={fm.title} />
               </div>
             </header>
+
+            {visibleImageUrl && (
+              <figure style={{
+                position: 'relative',
+                aspectRatio: '16 / 9',
+                maxHeight: '320px',
+                margin: '0 0 1.5rem',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                background: '#f4f0ea',
+                boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
+              }}>
+                <ArticleImage src={visibleImageUrl} alt={fm.title} emoji={emoji} fallbackSize="2.4rem" loading="eager" />
+              </figure>
+            )}
 
             {/* Editorial attribution (AI-assisted persona, with disclosure) */}
             <ArticlePersonaCard author={fm.author} category={category} updated={fm.updated || fm.date} />

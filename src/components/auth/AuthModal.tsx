@@ -19,20 +19,28 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [error, setError] = useState('')
+  const [info, setInfo] = useState('')
   const [loading, setLoading] = useState(false)
+  const [resending, setResending] = useState(false)
   const [success, setSuccess] = useState<'welcome' | 'verify' | null>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!isOpen) return
-    setError('')
-    setSuccess(null)
-    setTab(initialTab)
+    const resetId = window.setTimeout(() => {
+      setError('')
+      setInfo('')
+      setSuccess(null)
+      setTab(initialTab)
+    }, 0)
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
+    return () => {
+      window.clearTimeout(resetId)
+      window.removeEventListener('keydown', handleKey)
+    }
   }, [isOpen, onClose, initialTab])
 
   // Portal target — only available in the browser. Combined with the
@@ -42,10 +50,16 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setInfo('')
     setLoading(true)
     const { error: err } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
-    if (err) { setError(err.message); return }
+    if (err) {
+      setError(err.message === 'Email not confirmed'
+        ? 'Email ещё не подтверждён. Проверьте письмо с подтверждением или запросите его повторно.'
+        : err.message)
+      return
+    }
     setSuccess('welcome')
     setTimeout(() => {
       onClose()
@@ -56,6 +70,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setInfo('')
     if (!displayName.trim()) { setError('Введите имя пользователя'); return }
     setLoading(true)
     const { error: err } = await supabase.auth.signUp({
@@ -68,9 +83,26 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setSuccess('verify')
   }
 
+  const resendConfirmation = async () => {
+    if (!email.trim()) { setError('Введите email, чтобы отправить письмо повторно'); return }
+    setError('')
+    setInfo('')
+    setResending(true)
+    const { error: err } = await supabase.auth.resend({ type: 'signup', email: email.trim() })
+    setResending(false)
+    if (err) {
+      setError(err.message === 'email rate limit exceeded'
+        ? 'Лимит писем временно исчерпан. Попробуйте позже или напишите разработчику.'
+        : err.message)
+      return
+    }
+    setInfo('Письмо подтверждения отправлено повторно. Проверьте входящие и спам.')
+  }
+
   const switchTab = (t: 'login' | 'register') => {
     setTab(t)
     setError('')
+    setInfo('')
     setSuccess(null)
   }
 
@@ -214,6 +246,11 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.82rem', color: '#555' }}>
               Мы отправили письмо на {email}
             </p>
+            <button type="button" onClick={resendConfirmation} disabled={resending} style={{ ...btnStyle, marginTop: '1rem', width: '100%' }}>
+              {resending ? 'Отправляем...' : 'Отправить письмо ещё раз'}
+            </button>
+            {info && <p style={{ ...successTextStyle, marginTop: '0.7rem' }}>{info}</p>}
+            {error && <p style={{ ...errorStyle, marginTop: '0.7rem' }}>{error}</p>}
           </div>
         )}
 
@@ -251,9 +288,15 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
               </div>
             </div>
             {error && <p style={errorStyle}>{error}</p>}
+            {info && <p style={successTextStyle}>{info}</p>}
             <button type="submit" disabled={loading} style={btnStyle}>
               {loading ? 'Входим…' : 'Продолжить'}
             </button>
+            {error.includes('Email ещё не подтверждён') && (
+              <button type="button" onClick={resendConfirmation} disabled={resending} style={{ ...secondaryBtnStyle }}>
+                {resending ? 'Отправляем...' : 'Отправить письмо подтверждения ещё раз'}
+              </button>
+            )}
           </form>
         )}
 
@@ -306,6 +349,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
               </div>
             </div>
             {error && <p style={errorStyle}>{error}</p>}
+            {info && <p style={successTextStyle}>{info}</p>}
             <button type="submit" disabled={loading} style={btnStyle}>
               {loading ? 'Регистрируем…' : 'Продолжить'}
             </button>
@@ -374,6 +418,16 @@ const errorStyle: React.CSSProperties = {
   padding: '0.5rem 0.75rem',
 }
 
+const successTextStyle: React.CSSProperties = {
+  color: '#1e8449',
+  fontSize: '0.85rem',
+  margin: 0,
+  background: '#f0fff4',
+  border: '1px solid #b2dfdb',
+  borderRadius: '6px',
+  padding: '0.5rem 0.75rem',
+}
+
 const btnStyle: React.CSSProperties = {
   backgroundColor: '#c0392b',
   color: '#fff',
@@ -386,4 +440,16 @@ const btnStyle: React.CSSProperties = {
   fontFamily: 'inherit',
   transition: 'background 0.2s, opacity 0.2s',
   marginTop: '0.25rem',
+}
+
+const secondaryBtnStyle: React.CSSProperties = {
+  backgroundColor: '#fff',
+  color: '#c0392b',
+  border: '1.5px solid #c0392b',
+  borderRadius: '9px',
+  padding: '0.7rem 1rem',
+  fontSize: '0.9rem',
+  fontWeight: 700,
+  cursor: 'pointer',
+  fontFamily: 'inherit',
 }

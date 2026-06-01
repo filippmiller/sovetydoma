@@ -10,8 +10,10 @@ interface Env {
   PHOTOS: R2Bucket
   SUPABASE_URL: string
   SUPABASE_ANON_KEY: string // secret via `wrangler secret put`
+  SUPABASE_SERVICE_ROLE_KEY?: string // secret via `wrangler secret put`; used only for narrow anonymous view ingestion
   ALLOWED_ORIGIN: string
   CONTACT_ALLOWED_ORIGINS?: string
+  VIEW_ALLOWED_ORIGINS?: string
   CONTACT_FORM_SECRET: string
   CONTACT_TO_EMAIL?: string
   CONTACT_FROM_EMAIL?: string
@@ -28,6 +30,7 @@ const CONTACT_FROM_EMAIL = 'noreply@vsedomatut.com'
 const CONTACT_MIN_SECONDS = 3
 const CONTACT_MAX_SECONDS = 30 * 60
 const contactHits = new Map<string, number[]>()
+const viewHits = new Map<string, number[]>()
 
 function cors(env: Env): Record<string, string> {
   return {
@@ -47,6 +50,21 @@ function contactCors(req: Request, env: Env): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'content-type',
+    'Vary': 'Origin',
+  }
+}
+
+function restrictedCors(req: Request, allowedValue: string | undefined, fallback: string): Record<string, string> {
+  const origin = req.headers.get('Origin') || ''
+  const allowed = (allowedValue || fallback)
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+  const allowOrigin = allowed.includes('*') || allowed.includes(origin) ? origin || allowed[0] : allowed[0]
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'content-type',
     'Vary': 'Origin',
   }
@@ -140,6 +158,24 @@ function rateLimitContact(ip: string): boolean {
   recent.push(now)
   contactHits.set(ip, recent)
   return true
+}
+
+function rateLimitView(ip: string, articleSlug: string): boolean {
+  const now = Date.now()
+  const key = `${ip}:${articleSlug}`
+  const recent = (viewHits.get(key) || []).filter((time) => now - time < 60 * 60 * 1000)
+  const perMinute = recent.filter((time) => now - time < 60 * 1000).length
+  if (perMinute >= 3 || recent.length >= 12) {
+    viewHits.set(key, recent)
+    return false
+  }
+  recent.push(now)
+  viewHits.set(key, recent)
+  return true
+}
+
+function cleanArticleSlug(value: unknown): string {
+  return String(value || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 120)
 }
 
 function escapeHtml(value: string): string {
@@ -237,6 +273,9 @@ const worker = {
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url)
     const h = cors(env)
+    if (req.method === 'OPTIONS' && url.pathname === '/view') {
+      return new Response('ok', { headers: restrictedCors(req, env.VIEW_ALLOWED_ORIGINS || env.CONTACT_ALLOWED_ORIGINS, env.ALLOWED_ORIGIN || 'https://1001sovet.ru') })
+    }
     if (req.method === 'OPTIONS' && url.pathname.startsWith('/contact')) {
       return new Response('ok', { headers: contactCors(req, env) })
     }
@@ -281,6 +320,38 @@ const worker = {
         return json({ error: 'email_delivery_failed' }, 502, contactHeaders)
       }
       return json({ ok: true }, 200, contactHeaders)
+    }
+
+    if (url.pathname === '/view') {
+      const viewHeaders = restrictedCors(req, env.VIEW_ALLOWED_ORIGINS || env.CONTACT_ALLOWED_ORIGINS, env.ALLOWED_ORIGIN || 'https://1001sovet.ru')
+      if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, viewHeaders)
+      if (!env.SUPABASE_SERVICE_ROLE_KEY) return json({ error: 'view_ingestion_not_configured' }, 503, viewHeaders)
+
+      const payload = await req.json().catch(() => null) as null | { article_slug?: string; articleSlug?: string }
+      const articleSlug = cleanArticleSlug(payload?.article_slug || payload?.articleSlug)
+      if (!articleSlug || articleSlug.length < 3) return json({ error: 'bad_article_slug' }, 400, viewHeaders)
+
+      const ip = getClientIp(req)
+      if (!rateLimitView(ip, articleSlug)) return json({ error: 'rate_limited' }, 429, viewHeaders)
+
+      const res = await fetch(`${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/feedback_events`, {
+        method: 'POST',
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({
+          article_slug: articleSlug,
+          kind: 'view',
+          comment: '',
+          user_id: null,
+        }),
+      })
+
+      if (!res.ok) return json({ error: 'view_insert_failed' }, 502, viewHeaders)
+      return json({ ok: true }, 200, viewHeaders)
     }
 
     if (req.method === 'GET' && url.pathname.startsWith('/file/')) {

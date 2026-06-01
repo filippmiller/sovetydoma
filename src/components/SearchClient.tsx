@@ -21,10 +21,16 @@ interface Props {
   articles: ArticleData[]
 }
 
+function getUrlQuery(): string {
+  if (typeof window === 'undefined') return ''
+  return new URLSearchParams(window.location.search).get('q') || ''
+}
+
 export default function SearchClient({ articles }: Props) {
-  const [query, setQuery] = useState('')
-  const [debouncedQuery, setDebouncedQuery] = useState('')
+  const [query, setQuery] = useState(getUrlQuery)
+  const [debouncedQuery, setDebouncedQuery] = useState(getUrlQuery)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const articleJson = JSON.stringify(articles).replace(/</g, '\\u003c')
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current)
@@ -34,16 +40,6 @@ export default function SearchClient({ articles }: Props) {
     return () => { if (timerRef.current) clearTimeout(timerRef.current) }
   }, [query])
 
-  useEffect(() => {
-    const urlQuery = new URLSearchParams(window.location.search).get('q') || ''
-    if (!urlQuery) return
-    const id = window.setTimeout(() => {
-      setQuery(urlQuery)
-      setDebouncedQuery(urlQuery)
-    }, 0)
-    return () => window.clearTimeout(id)
-  }, [])
-
   const results = useMemo(() => {
     if (!debouncedQuery.trim()) return []
     return searchArticles(articles, debouncedQuery)
@@ -52,7 +48,7 @@ export default function SearchClient({ articles }: Props) {
   const hasQuery = debouncedQuery.trim().length > 0
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
+    <div data-search-page style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
       <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.4rem', color: '#1a1a1a' }}>
         Поиск
       </h1>
@@ -61,7 +57,7 @@ export default function SearchClient({ articles }: Props) {
       </p>
 
       {/* Search input */}
-      <div style={{ position: 'relative', marginBottom: '2rem' }}>
+      <form action="/search/" method="get" role="search" style={{ position: 'relative', marginBottom: '2rem' }}>
         <span style={{
           position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)',
           fontSize: '1.1rem', pointerEvents: 'none', color: '#aaa',
@@ -72,6 +68,7 @@ export default function SearchClient({ articles }: Props) {
           type="search"
           name="q"
           autoFocus
+          suppressHydrationWarning
           placeholder="Введите запрос — например: борщ, уборка, огород..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -92,6 +89,7 @@ export default function SearchClient({ articles }: Props) {
         />
         {query && (
           <button
+            type="button"
             onClick={() => setQuery('')}
             style={{
               position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
@@ -103,7 +101,11 @@ export default function SearchClient({ articles }: Props) {
             ×
           </button>
         )}
-      </div>
+      </form>
+      <style dangerouslySetInnerHTML={{ __html: '[data-search-page][data-has-static-results="1"] [data-search-browse]{display:none!important}' }} />
+      <div data-search-fallback-results style={{ display: 'none' }} />
+      <script id="search-page-data" type="application/json" dangerouslySetInnerHTML={{ __html: articleJson }} />
+      <script dangerouslySetInnerHTML={{ __html: searchPageBootstrap }} />
 
       {/* Results */}
       {hasQuery ? (
@@ -203,7 +205,7 @@ export default function SearchClient({ articles }: Props) {
         )
       ) : (
         /* Browse state — show categories and tag hints */
-        <div>
+        <div data-search-browse>
           <div style={{ marginBottom: '2.5rem' }}>
             <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#555', marginBottom: '0.9rem' }}>По разделу</h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
@@ -231,3 +233,102 @@ export default function SearchClient({ articles }: Props) {
     </div>
   )
 }
+
+const searchPageBootstrap = String.raw`
+(() => {
+  const root = document.querySelector('[data-search-page]');
+  if (!root || root.dataset.staticReady === '1') return;
+  root.dataset.staticReady = '1';
+
+  const input = root.querySelector('input[name="q"]');
+  const box = root.querySelector('[data-search-fallback-results]');
+  const browse = root.querySelector('[data-search-browse]');
+  const dataNode = root.querySelector('#search-page-data');
+  const query = new URLSearchParams(window.location.search).get('q') || '';
+  if (!input || !box || !dataNode || query.trim().length < 1) return;
+
+  input.value = query;
+  const articles = JSON.parse(dataNode.textContent || '[]');
+  const stops = new Set(['а','без','бы','в','во','для','до','за','и','из','или','как','ко','на','над','не','о','об','от','по','под','при','про','с','со','у','что','это']);
+  const suffixes = ['ться','тся','ся','иями','ями','ами','ого','его','ому','ему','ыми','ими','иях','ах','ях','ов','ев','ей','ой','ый','ий','ая','яя','ое','ее','ые','ие','ую','юю','ом','ем','ам','ям','а','я','ы','и','у','ю','е','о'];
+  const colors = { kulinaria: '#e67e22', 'dom-i-uborka': '#27ae60', 'dacha-i-ogorod': '#16a085', layfkhaki: '#8e44ad', ekonomiya: '#2980b9', rybalka: '#555' };
+
+  function norm(value) {
+    return String(value || '').toLowerCase().replaceAll('ё', 'е').replace(/[^a-zа-я0-9\s-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function stem(token) {
+    const clean = norm(token).replace(/[-ьъ]/g, '');
+    if (clean.length <= 4) return clean;
+    for (const suffix of suffixes) {
+      if (clean.endsWith(suffix) && clean.length - suffix.length >= 4) return clean.slice(0, -suffix.length);
+    }
+    return clean;
+  }
+
+  function tokens(value) {
+    return [...new Set(norm(value).split(/\s+/).map(stem).filter((token) => token.length >= 3 && !stops.has(token)))];
+  }
+
+  function score(article, value) {
+    const queryTokens = tokens(value);
+    if (!queryTokens.length) return 0;
+    const title = norm(article.title);
+    const description = norm(article.description);
+    const tags = norm((article.tags || []).join(' '));
+    const category = norm(article.categoryName + ' ' + article.category);
+    const all = title + ' ' + description + ' ' + tags + ' ' + category;
+    const stems = [...new Set(all.split(/\s+/).map(stem).filter((token) => token.length >= 3))];
+    let total = 0;
+    for (const token of queryTokens) {
+      if (title.includes(token)) total += 24;
+      if (tags.includes(token)) total += 20;
+      if (description.includes(token)) total += 12;
+      if (category.includes(token)) total += 5;
+      if (stems.includes(token)) total += 12;
+      else if (stems.some((s) => s.includes(token) || token.includes(s))) total += 7;
+    }
+    const matched = queryTokens.filter((token) => all.includes(token) || stems.some((s) => s.includes(token) || token.includes(s)));
+    if (matched.length === queryTokens.length) total += 15;
+    if (title.includes(norm(value))) total += 30;
+    return total;
+  }
+
+  function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+  }
+
+  const results = articles
+    .map((article) => ({ ...article, score: score(article, query) }))
+    .filter((article) => article.score > 0)
+    .sort((a, b) => b.score - a.score || Date.parse(b.date) - Date.parse(a.date));
+
+  if (browse) browse.style.display = 'none';
+  root.dataset.hasStaticResults = '1';
+  box.style.display = 'block';
+  if (!results.length) {
+    box.innerHTML = '<div style="text-align:center;padding:3rem 1rem"><div style="font-size:2.5rem;margin-bottom:.75rem">🔍</div><p style="font-size:1.1rem;font-weight:600;color:#444;margin:0 0 .5rem">Ничего не найдено</p><p style="color:#888;font-size:.9rem;margin:0">Попробуйте другой запрос.</p></div>';
+    return;
+  }
+
+  box.innerHTML = [
+    '<p style="font-size:.85rem;color:#888;margin:0 0 1rem">Найдено: ' + results.length + ' статей</p>',
+    '<div style="display:flex;flex-direction:column;gap:.75rem">',
+    results.map((article) => {
+      const color = colors[article.category] || '#888';
+      const href = '/' + article.category + '/' + article.slug + '/';
+      return [
+        '<a href="' + href + '" style="text-decoration:none;color:inherit">',
+        '<div style="background:#fff;border-radius:10px;border:1.5px solid #e8e4df;padding:1rem 1.25rem;display:flex;gap:1rem;align-items:flex-start;box-shadow:0 1px 4px rgba(0,0,0,.05)">',
+        '<div style="width:48px;height:48px;flex-shrink:0;border-radius:8px;background:' + color + '18;display:flex;align-items:center;justify-content:center;color:' + color + ';font-weight:800">#</div>',
+        '<div style="flex:1;min-width:0">',
+        '<div style="margin-bottom:.3rem"><span style="font-size:.7rem;font-weight:700;text-transform:uppercase;background:' + color + '18;color:' + color + ';border-radius:4px;padding:2px 7px">' + escapeHtml(article.categoryName) + '</span></div>',
+        '<h3 style="font-size:.97rem;font-weight:700;color:#1a1a1a;margin:0 0 .3rem;line-height:1.4">' + escapeHtml(article.title) + '</h3>',
+        '<p style="font-size:.83rem;color:#666;margin:0;line-height:1.5">' + escapeHtml(article.description) + '</p>',
+        '</div></div></a>',
+      ].join('');
+    }).join(''),
+    '</div>',
+  ].join('');
+})();
+`

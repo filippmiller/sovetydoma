@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/generate-article-index.mjs && node scripts/generate-questions-index.mjs && node scripts/generate-sitemap.mjs && node scripts/generate-rss.mjs && next build",
+    "build": "node scripts/generate-build-metadata.mjs && node scripts/generate-article-index.mjs && node scripts/generate-questions-index.mjs && node scripts/generate-sitemap.mjs && node scripts/generate-rss.mjs && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "node --test scripts/__tests__/*.test.mjs src/lib/*.test.mjs && node scripts/audit-seo.mjs",
