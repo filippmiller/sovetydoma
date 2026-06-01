@@ -25,7 +25,6 @@ import ArticlePersonaCard from '@/components/ArticlePersonaCard'
 import ArticleFeedback from '@/components/ArticleFeedback'
 import ArticlePhotoSubmissionCTA from '@/components/ArticlePhotoSubmissionCTA'
 import ArticleQuestionsBlock from '@/components/ArticleQuestionsBlock'
-import ArticleTopicCluster from '@/components/ArticleTopicCluster'
 import ArticleViewCount from '@/components/ArticleViewCount'
 import ArticleImage from '@/components/ArticleImage'
 import { notFound } from 'next/navigation'
@@ -34,6 +33,7 @@ import type { Metadata } from 'next'
 import { readingTime, formatDate, relativeDate, CATEGORY_COLOR, CATEGORY_EMOJI } from '@/lib/utils'
 import { resolveArticleImage } from '@/lib/cloudinary'
 import { SITE_NAME, SITE_URL, articleCanonicalUrl, articleImageUrl, absoluteUrl, truncateForMeta } from '@/lib/seo'
+import { getMoreInterestingArticles, getSimilarArticles } from '@/lib/article-recommendations'
 
 interface Props { params: Promise<{ category: string; slug: string }> }
 
@@ -102,6 +102,14 @@ export default async function ArticlePage({ params }: Props) {
 
   // F7+F9: all articles needed for ViewTracker slug + tag-based similarity
   const allArticles = getAllArticles()
+  const currentArticle = { ...fm, wordCount }
+  const similarArticles = getSimilarArticles(allArticles, currentArticle, 4)
+  const moreInterestingArticles = getMoreInterestingArticles(
+    allArticles,
+    currentArticle,
+    similarArticles.map((article) => article.slug),
+    6,
+  )
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -356,11 +364,8 @@ export default async function ArticlePage({ params }: Props) {
             {/* Share panel */}
             <SharePanel url={url} title={fm.title} />
 
-            <RelatedArticles articles={allArticles} currentSlug={slug} currentTags={fm.tags} />
-            <MoreArticles articles={allArticles.filter(a => a.category !== category && a.slug !== slug).slice(0, 6)} />
-
-            {/* Derived topic cluster (shared-tag / same-category) */}
-            <ArticleTopicCluster allArticles={allArticles} currentSlug={slug} category={category} tags={fm.tags} />
+            <RelatedArticles articles={similarArticles} />
+            <MoreArticles articles={moreInterestingArticles} />
 
             {/* Questions — live Q&A for this article */}
             <ArticleQuestionsBlock articleSlug={slug} />
