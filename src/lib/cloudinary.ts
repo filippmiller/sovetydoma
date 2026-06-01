@@ -50,10 +50,8 @@ export function resolveArticlePreviewImage(
   const height = opts.height || 240
 
   if (!v || v.includes('placeholder')) return `/images/previews/${slug}.jpg`
-  if (v.startsWith('/images/')) {
-    const file = v.split('/').pop()
-    return file ? `/images/previews/${file}` : `/images/previews/${slug}.jpg`
-  }
+  if (v.startsWith('/images/')) return `/images/previews/${slug}.jpg`
   if (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('/')) return v
+  if (!CLOUD_NAME) return `/images/previews/${slug}.jpg`
   return cloudinaryUrl(v, { width, height, format: 'auto', quality: 70 })
 }
