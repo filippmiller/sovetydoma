@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 
 interface Props {
@@ -16,12 +16,11 @@ const REACTIONS = [
 export default function ArticleReactions({ slug }: Props) {
   const [counts, setCounts] = useState<number[]>([0, 0, 0, 0])
   const [active, setActive] = useState<boolean[]>([false, false, false, false])
-  const [mounted, setMounted] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
 
   // Real aggregate counts per emoji, straight from the reactions table
   // (readable by everyone via RLS). No fabricated seed numbers.
-  const loadCounts = async () => {
+  const loadCounts = useCallback(async () => {
     try {
       const sb = getSupabase()
       const { data } = await sb.from('reactions').select('emoji').eq('article_slug', slug)
@@ -31,19 +30,21 @@ export default function ArticleReactions({ slug }: Props) {
     } catch {
       // unreadable — leave counts at zero
     }
-  }
+  }, [slug])
 
   useEffect(() => {
-    setMounted(true)
-    // Anonymous highlight state lives in localStorage so it survives reloads.
-    setActive(REACTIONS.map((r) => localStorage.getItem(`reactions_${slug}_${r.emoji}_active`) === '1'))
-    loadCounts()
-
+    let cancelled = false
     ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+      // Anonymous highlight state lives in localStorage so it survives reloads.
+      setActive(REACTIONS.map((r) => localStorage.getItem(`reactions_${slug}_${r.emoji}_active`) === '1'))
+      await loadCounts()
       try {
         const sb = getSupabase()
         const { data: u } = await sb.auth.getUser()
         const uid = u.user?.id ?? null
+        if (cancelled) return
         setUserId(uid)
         if (uid) {
           const { data: rows } = await sb
@@ -52,13 +53,15 @@ export default function ArticleReactions({ slug }: Props) {
             .eq('user_id', uid)
             .eq('article_slug', slug)
           const mine = new Set((rows || []).map((row: { emoji: string }) => row.emoji))
+          if (cancelled) return
           setActive(REACTIONS.map((r) => mine.has(r.emoji)))
         }
       } catch {
         // Not configured — localStorage-only highlight.
       }
     })()
-  }, [slug])
+    return () => { cancelled = true }
+  }, [slug, loadCounts])
 
   async function handleClick(index: number) {
     const r = REACTIONS[index]
@@ -80,10 +83,9 @@ export default function ArticleReactions({ slug }: Props) {
     try {
       const sb = getSupabase()
       if (next) {
-        await sb.from('reactions').upsert(
-          { user_id: userId, article_slug: slug, emoji: r.emoji },
-          { onConflict: 'article_slug,user_id,emoji' },
-        )
+        await sb.from('reactions').delete()
+          .eq('user_id', userId).eq('article_slug', slug).eq('emoji', r.emoji)
+        await sb.from('reactions').insert({ user_id: userId, article_slug: slug, emoji: r.emoji })
       } else {
         await sb.from('reactions').delete()
           .eq('user_id', userId).eq('article_slug', slug).eq('emoji', r.emoji)
@@ -94,8 +96,6 @@ export default function ArticleReactions({ slug }: Props) {
       loadCounts()
     }
   }
-
-  if (!mounted) return null
 
   return (
     <div style={{ marginTop: '1.5rem' }}>

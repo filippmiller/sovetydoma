@@ -14,8 +14,13 @@ Required Auth URL settings:
 Subject:
 
 ```text
-Подтвердите почту в СоветыДома
+SovetyDoma: confirm your email
 ```
+
+Do not use a Cyrillic subject while Supabase Auth is sending through custom SMTP:
+the current GoTrue/Supabase SMTP path stored/sent the non-ASCII subject as
+question marks. Keep the subject ASCII and put the Russian brand/message in the
+HTML body.
 
 HTML body:
 
@@ -91,3 +96,10 @@ Notes:
 - Supabase built-in templates are static. The two advice items above are fixed.
 - Truly random advice in every auth email requires a custom Auth email hook or a
   separate transactional email service that generates the message body at send time.
+- Production Auth SMTP is configured through Supabase CLI to send via Mailcow
+  `mail.filippmiller.com:587` using a `1001sovet.ru` mailbox. Keep the password
+  only in `C:\Users\filip\.secrets\1001sovet-mailcow-mailboxes.env`; do not
+  commit SMTP credentials.
+- Production Auth rate limits were raised for QA/new-user bursts:
+  `email_sent = 60`, `sign_in_sign_ups = 120`, `token_verifications = 120`,
+  `max_frequency = "5s"`.

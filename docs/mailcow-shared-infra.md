@@ -109,3 +109,26 @@ Inbound public delivery is now DNS-routed to Mailcow. A local residential SMTP
 probe reached Mailcow but was rejected by Spamhaus sender-IP policy before RCPT;
 that confirms port 25 is public and anti-spam is active. A full live delivery
 test should be run from Gmail or another normal mail provider.
+
+## Supabase Auth sender
+
+`1001sovet.ru` Supabase Auth confirmation mail is configured to send through
+this Mailcow instance:
+
+- Host: `mail.filippmiller.com`
+- Port: `587`
+- TLS: STARTTLS
+- Sender name: `SovetyDoma`
+- Sender mailbox: a `1001sovet.ru` mailbox stored in the local secret file
+  `C:\Users\filip\.secrets\1001sovet-mailcow-mailboxes.env`
+
+Do not paste or commit the SMTP password. Push Auth SMTP changes with
+`supabase config push` from a temporary config that reads the password from the
+local secret file. Avoid `$` in the SMTP password for this path: one mailbox
+with `$` in the password authenticated locally but failed when Supabase relayed
+through GoTrue.
+
+The confirmation template is tracked in `supabase/templates/confirmation.html`
+and documented in `docs/supabase-auth-email-template.md`. The production subject
+is intentionally ASCII because the custom SMTP path converted a Cyrillic subject
+to question marks.

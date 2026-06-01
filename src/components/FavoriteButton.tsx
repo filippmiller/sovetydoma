@@ -31,16 +31,22 @@ export default function FavoriteButton({ slug }: Props) {
   const [showAuth, setShowAuth] = useState(false)
 
   useEffect(() => {
-    // Check localStorage
-    const favs = getFavoritesFromStorage()
-    setSaved(favs.includes(slug))
+    let cancelled = false
 
-    // Check Supabase auth and saved_articles
     ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+
+      // Check localStorage
+      const favs = getFavoritesFromStorage()
+      setSaved(favs.includes(slug))
+
+      // Check Supabase auth and saved_articles
       try {
         const sb = getSupabase()
         const { data } = await sb.auth.getUser()
         const uid = data.user?.id ?? null
+        if (cancelled) return
         setUserId(uid)
 
         if (uid) {
@@ -50,6 +56,7 @@ export default function FavoriteButton({ slug }: Props) {
             .eq('user_id', uid)
             .eq('article_slug', slug)
             .maybeSingle()
+          if (cancelled) return
           if (row) setSaved(true)
         }
       } catch {
@@ -57,6 +64,7 @@ export default function FavoriteButton({ slug }: Props) {
       }
     })()
 
+    return () => { cancelled = true }
   }, [slug])
 
   const toggle = async () => {

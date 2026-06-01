@@ -97,7 +97,6 @@ export default function MoyKabinetPage() {
     )
   }
 
-  const joinedDate = profile ? null : null
   const displayName = profile?.display_name || 'Пользователь'
   const initials = displayName.slice(0, 2).toUpperCase()
 

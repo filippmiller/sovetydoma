@@ -14,7 +14,7 @@ max_frequency = "1m0s"
 otp_length = 8
 
 [auth.email.template.confirmation]
-subject = "Подтвердите почту в СоветыДома"
+subject = "SovetyDoma: confirm your email"
 content_path = "./supabase/templates/confirmation.html"
 
 [auth.mfa.totp]

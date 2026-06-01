@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 
 interface Props {
@@ -22,7 +22,7 @@ export default function StarRating({ slug }: Props) {
 
   // Pull the public aggregate (everyone can read ratings) so we can show
   // "★ 4.6 · 12 оценок" as social proof regardless of login state.
-  const loadAggregate = async () => {
+  const loadAggregate = useCallback(async () => {
     try {
       const sb = getSupabase()
       const { data } = await sb.from('ratings').select('stars').eq('article_slug', slug)
@@ -37,24 +37,29 @@ export default function StarRating({ slug }: Props) {
     } catch {
       // ratings unreadable — hide aggregate
     }
-  }
+  }, [slug])
 
   useEffect(() => {
-    loadAggregate()
-
-    // Load the user's own prior rating (localStorage first, then Supabase)
-    const stored = localStorage.getItem(getStorageKey(slug))
-    if (stored) {
-      const n = parseInt(stored, 10)
-      if (n >= 1 && n <= 5) {
-        setUserRating(n)
-        setRated(true)
-        setLoading(false)
-        return
-      }
-    }
-
+    let cancelled = false
     ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+      await loadAggregate()
+
+      // Load the user's own prior rating (localStorage first, then Supabase)
+      const stored = localStorage.getItem(getStorageKey(slug))
+      if (stored) {
+        const n = parseInt(stored, 10)
+        if (n >= 1 && n <= 5) {
+          if (!cancelled) {
+            setUserRating(n)
+            setRated(true)
+            setLoading(false)
+          }
+          return
+        }
+      }
+
       try {
         const sb = getSupabase()
         const { data: user } = await sb.auth.getUser()
@@ -66,6 +71,7 @@ export default function StarRating({ slug }: Props) {
             .eq('article_slug', slug)
             .maybeSingle()
           if (data?.stars) {
+            if (cancelled) return
             setUserRating(data.stars)
             setRated(true)
             localStorage.setItem(getStorageKey(slug), String(data.stars))
@@ -74,9 +80,10 @@ export default function StarRating({ slug }: Props) {
       } catch {
         // Table may not exist — localStorage only
       }
-      setLoading(false)
+      if (!cancelled) setLoading(false)
     })()
-  }, [slug])
+    return () => { cancelled = true }
+  }, [slug, loadAggregate])
 
   const submitRating = async (n: number) => {
     setUserRating(n)
@@ -106,8 +113,7 @@ export default function StarRating({ slug }: Props) {
     }
   }
 
-  const AvgBadge = () =>
-    avg !== null ? (
+  const avgBadge = avg !== null ? (
       <span style={{ fontSize: '0.82rem', color: '#888', whiteSpace: 'nowrap' }}>
         <span style={{ color: '#f39c12' }}>★</span> {avg.toFixed(1)} · {voteCount}{' '}
         {voteCount % 10 === 1 && voteCount % 100 !== 11 ? 'оценка' : voteCount % 10 >= 2 && voteCount % 10 <= 4 && (voteCount % 100 < 10 || voteCount % 100 >= 20) ? 'оценки' : 'оценок'}
@@ -152,7 +158,7 @@ export default function StarRating({ slug }: Props) {
         <span style={{ fontSize: '0.85rem', color: '#888', fontStyle: 'italic' }}>
           Ваша оценка: {userRating}/5 · Спасибо!
         </span>
-        <AvgBadge />
+        {avgBadge}
       </div>
     )
   }
@@ -204,7 +210,7 @@ export default function StarRating({ slug }: Props) {
             </button>
           ))}
         </div>
-        <AvgBadge />
+        {avgBadge}
       </div>
     </div>
   )
