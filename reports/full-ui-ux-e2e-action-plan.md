@@ -23,7 +23,8 @@
 
 ## D. Auth/Session/Permission Bugs
 
-- Not fully tested. Admin code uses Supabase session plus `profiles.role = admin`; staging credentials are needed to validate redirects and role denial.
+- Critical: signup can create a user/profile but the user cannot sign in because email is not confirmed, and no confirmation email arrived in Gmail. Fix email delivery/confirmation settings before expecting real users or QA users to complete auth.
+- Admin code uses Supabase session plus `profiles.role = admin`; admin credentials or service-role setup are still needed to validate admin routes.
 
 ## E. UI Clarity Improvements
 
@@ -41,6 +42,7 @@
 
 - Done: removed avoidable preview 404s.
 - Critical next: reduce initial 180-card homepage payload. Evidence: home mobile Lighthouse performance 56, LCP 14701ms, 211 requests, 3157 KB transfer.
+- Critical: fix view-counter ingestion. Evidence: anonymous `feedback_events` insert is rejected by RLS, so current `ViewTracker` cannot persist anonymous article views.
 
 ## I. Accessibility Improvements
 

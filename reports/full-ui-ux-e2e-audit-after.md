@@ -4,6 +4,7 @@
 
 - `src/lib/cloudinary.ts`: `resolveArticlePreviewImage` now maps local article images to `/images/previews/<slug>.jpg`, avoiding stale frontmatter filenames.
 - `src/components/SearchClient.tsx`: search now initializes from URL query, submits as a GET form, and includes a static fallback renderer for query URLs.
+- `src/components/BookmarkButton.tsx`: saved-article insert no longer sends non-existent `article_title` to `saved_articles`.
 
 ## Browser Verification
 
@@ -29,4 +30,4 @@
 
 ## Remaining Gap
 
-Authenticated and mutating flows remain unaudited end-to-end because the prompt's staging assumptions do not match the current production target.
+Authenticated and mutating flows were attempted after explicit production approval but are blocked by auth confirmation: signup creates a QA auth/profile identity, login returns `Email not confirmed`, and no confirmation email was found in Gmail. Anonymous RLS correctly blocks protected writes, but it also blocks the implemented anonymous view-counter insert path.

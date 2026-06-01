@@ -1,0 +1,22 @@
+{
+  "marker": "QA_VIEW_20260601074003",
+  "articleSlug": "borba-s-oduvanchikami",
+  "steps": [
+    {
+      "name": "anon.feedback_events.insert.view",
+      "ok": false,
+      "id": null,
+      "error": "new row violates row-level security policy for table \"feedback_events\""
+    },
+    {
+      "name": "feedback_counters.read.view",
+      "ok": true,
+      "rows": 0,
+      "data": [],
+      "error": null
+    }
+  ],
+  "errors": [
+    "new row violates row-level security policy for table \"feedback_events\""
+  ]
+}

@@ -6,10 +6,10 @@ import AuthModal from '@/components/auth/AuthModal'
 
 interface Props {
   slug: string
-  title: string
+  title?: string
 }
 
-export default function BookmarkButton({ slug, title }: Props) {
+export default function BookmarkButton({ slug }: Props) {
   const [saved, setSaved] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -45,7 +45,7 @@ export default function BookmarkButton({ slug, title }: Props) {
       setSaved(true)
       await supabase
         .from('saved_articles')
-        .insert({ user_id: userId, article_slug: slug, article_title: title })
+        .insert({ user_id: userId, article_slug: slug })
     }
   }
 

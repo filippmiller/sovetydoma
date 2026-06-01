@@ -1,6 +1,6 @@
 # Test Accounts And Seed Data
 
-Status: not created yet; ready for owner-approved production QA mutation or staging run.
+Status: partially created after explicit approval.
 
 ## Reason
 
@@ -23,14 +23,32 @@ Checked with the public anon Supabase key:
 | `feedback_events` | 0 |
 | `feedback_counters` | 0 |
 
+## Created Production QA Identity
+
+- Email: `alexmiller.idothings+qa-20260601073656@gmail.com`
+- Password: `TestPassword123!`
+- User id: `d6eb17b9-01d7-42df-950a-d74a66a2d592`
+- Profile row: created automatically with `display_name = QA User 20260601073656`
+- Status: cannot sign in because Supabase returns `Email not confirmed`.
+- Gmail search result: no confirmation email found.
+
+The original requested `qa+user-...@example.test` address could not be used because Supabase rejected the `.test` domain as invalid.
+
 ## Proposed Production QA Data
 
-- Email: `qa+user-20260601@example.test`
+- Email: `alexmiller.idothings+qa-[timestamp]@gmail.com`
 - Password: `TestPassword123!`
 - Display name: `QA User 20260601`
 - Article target: `borba-s-oduvanchikami`
-- Seed interactions: saved article, 5-star rating, one heart reaction, one clearly marked QA comment, one user article draft if auth permits.
+- Seed interactions: saved article, 5-star rating, one heart reaction, one clearly marked QA comment, one user article draft if auth/email confirmation permits.
 - Cleanup: delete rows by QA email/user id and `QA` marker in content.
+
+## Cleanup Required
+
+Remove auth/profile QA identity:
+
+- `auth.users.id = d6eb17b9-01d7-42df-950a-d74a66a2d592`
+- `profiles.id = d6eb17b9-01d7-42df-950a-d74a66a2d592`
 
 ## Needed For Full E2E
 

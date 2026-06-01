@@ -1,0 +1,26 @@
+{
+  "stamp": "20260601073656",
+  "marker": "QA_E2E_20260601073656",
+  "articleSlug": "borba-s-oduvanchikami",
+  "email": "alexmiller.idothings+qa-20260601073656@gmail.com",
+  "password": "TestPassword123!",
+  "steps": [
+    {
+      "name": "auth.signUp",
+      "userId": "d6eb17b9-01d7-42df-950a-d74a66a2d592",
+      "hasSession": false,
+      "error": null
+    },
+    {
+      "name": "auth.signInWithPassword",
+      "userId": null,
+      "hasSession": false,
+      "error": "Email not confirmed"
+    }
+  ],
+  "created": {},
+  "errors": [
+    "signIn: Email not confirmed"
+  ],
+  "blocked": "Auth sign-up accepted but no usable session was returned. Email confirmation is likely required before authenticated E2E can continue."
+}

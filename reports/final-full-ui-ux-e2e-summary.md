@@ -12,6 +12,8 @@ Completed a safer first audit pass, then extended it after review with real Ligh
 - Build and automated checks pass.
 - Lighthouse evidence exists in `reports/lighthouse/summary.md`; mobile performance is the biggest confirmed weakness.
 - Screenshots exist in `reports/screenshots/`.
+- Production E2E mutation was attempted after explicit approval. Signup created one QA auth/profile identity, but login and all authenticated flows are blocked by missing email confirmation.
+- Anonymous view-counter persistence is broken by RLS.
 
 ## Verification Commands
 
@@ -21,9 +23,9 @@ Completed a safer first audit pass, then extended it after review with real Ligh
 - `npm run audit:images -- --json`
 - `pnpm run build`
 
-## Not Done By Design
+## Not Fully Completed
 
-I did not yet create users, seed records, submit contact emails, upload photos, post comments, rate articles, or use admin credentials against production. The Supabase public table counts are near-empty, so this is low-impact, but still a production mutation. The next step is explicit approval to create clearly marked QA production data or a staging target.
+One QA auth/profile identity was created. I could not create comments, ratings, reactions, saved articles, photos, or user article drafts because Supabase requires email confirmation and no confirmation email arrived. Admin/moderator flows still require credentials or a service-role seed path.
 
 ## Next Prompt
 
