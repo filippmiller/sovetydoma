@@ -1,10 +1,9 @@
-﻿import { getAllArticles, CATEGORIES } from '@/lib/articles'
+import { getAllArticles } from '@/lib/articles'
 import ArticleCatalogGrid from '@/components/ArticleCatalogGrid'
 import SeasonalBanner from '@/components/SeasonalBanner'
 import PopularArticles from '@/components/PopularArticles'
 import PersonalisedSection from '@/components/PersonalisedSection'
 import StartHereSection from '@/components/StartHereSection'
-import HeroSearchControls from '@/components/HeroSearchControls'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath, absoluteUrl } from '@/lib/seo'
@@ -43,25 +42,8 @@ const organizationJsonLd = {
   logo: absoluteUrl('/icon-512.png'),
 }
 
-const CATEGORY_COLOR: Record<string, string> = {
-  kulinaria: '#e67e22',
-  'dom-i-uborka': '#27ae60',
-  'dacha-i-ogorod': '#16a085',
-  layfkhaki: '#8e44ad',
-  ekonomiya: '#2980b9',
-  rybalka: '#2c7da0',
-}
-
 export default function HomePage() {
   const articles = getAllArticles()
-  const catCounts = Object.fromEntries(
-    Object.keys(CATEGORIES).map((cat) => [cat, articles.filter((a) => a.category === cat).length])
-  )
-  const categoryOptions = Object.values(CATEGORIES).map((cat) => ({
-    slug: cat.slug,
-    name: cat.name,
-    count: catCounts[cat.slug] || 0,
-  }))
 
   const popularArticleData = articles.map((a) => ({
     title: a.title,
@@ -91,13 +73,13 @@ export default function HomePage() {
         <section style={{
           marginBottom: '1rem',
           background: 'linear-gradient(135deg, #c0392b 0%, #922b21 100%)',
-          borderRadius: '10px',
-          padding: '0.8rem 1.15rem',
+          borderRadius: '8px',
+          padding: '0.72rem 1rem',
           color: '#fff',
           position: 'relative',
-          overflow: 'visible',
-          zIndex: 20,
-          minHeight: '94px',
+          overflow: 'hidden',
+          zIndex: 1,
+          minHeight: '74px',
           display: 'flex',
           alignItems: 'center',
         }}>
@@ -106,50 +88,16 @@ export default function HomePage() {
             backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
             backgroundSize: '30px 30px',
           }} />
-          <div style={{ position: 'relative', zIndex: 1, width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-            <div style={{ minWidth: '240px', flex: '1 1 320px' }}>
+          <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
             <p style={{ fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.72, margin: '0 0 0.22rem' }}>
               Практичные советы для дома
             </p>
-            <h1 style={{ fontSize: 'clamp(1.15rem, 2.7vw, 1.65rem)', fontWeight: 800, lineHeight: 1.18, margin: '0 0 0.25rem' }}>
+            <h1 style={{ fontSize: 'clamp(1.1rem, 2.3vw, 1.45rem)', fontWeight: 800, lineHeight: 1.18, margin: '0 0 0.18rem' }}>
               Полезные советы на каждый день
             </h1>
             <p style={{ fontSize: '0.88rem', opacity: 0.86, margin: 0, maxWidth: '620px', lineHeight: 1.4 }}>
               Рецепты, лайфхаки, дача и экономия — всё проверено на практике.
             </p>
-            </div>
-            <div style={{ flex: '1 1 520px', minWidth: '280px' }}>
-              <HeroSearchControls articles={articlesForClient} categories={categoryOptions} />
-            </div>
-          </div>
-        </section>
-
-        {/* Category chips */}
-        <section style={{ marginBottom: '1rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <h2 style={{ fontSize: '0.78rem', fontWeight: 800, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0, flexShrink: 0 }}>
-            Разделы
-          </h2>
-          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-            {Object.values(CATEGORIES).map((cat) => {
-              const color = CATEGORY_COLOR[cat.slug]
-              return (
-                <Link key={cat.slug} href={`/${cat.slug}`} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                  padding: '0.38rem 0.85rem', borderRadius: '999px',
-                  border: `2px solid ${color}55`, fontSize: '0.88rem',
-                  color: color, textDecoration: 'none', backgroundColor: color + '12',
-                  fontWeight: 700, minHeight: '36px',
-                }}>
-                  {cat.name}
-                  <span style={{
-                    background: color, color: '#fff', borderRadius: '999px',
-                    padding: '1px 7px', fontSize: '0.72rem', fontWeight: 800,
-                  }}>
-                    {catCounts[cat.slug]}
-                  </span>
-                </Link>
-              )
-            })}
           </div>
         </section>
 
