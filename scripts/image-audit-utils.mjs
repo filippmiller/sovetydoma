@@ -71,6 +71,7 @@ export const QUERY_MAP = {
   'otkryt-tuguyu-kryshku': 'opening jar lid',
   'ohladit-napitok-bystro': 'cold drink ice',
   'osy-pchely-osam': 'wasp window',
+  'borba-s-oduvanchikami': 'yellow dandelion lawn weed',
   'sornyaki-na-gazone': 'weeds lawn',
   'gryadki-iz-dosok': 'wooden raised garden beds',
   'sladkiy-perec': 'bell pepper garden',

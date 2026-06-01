@@ -36,13 +36,15 @@
     "fetchedAt": "2026-05-31T11:11:23.760Z"
   },
   "borba-s-oduvanchikami": {
-    "provider": "unsplash",
-    "id": "_2q4ofj18-w",
-    "query": "одуванчики сорняки дача огород борьба с сорняками",
-    "alt": "a field of white and yellow flowers",
-    "userName": "mai lan",
-    "userUrl": "https://unsplash.com/@lanmai552",
-    "fetchedAt": "2026-05-31T11:11:26.009Z"
+    "provider": "openverse",
+    "id": "8a81f38a-5908-426c-81e1-dc0559b46f36",
+    "query": "yellow dandelion lawn",
+    "title": "dandelions field",
+    "creator": "Artem Beliaikin",
+    "license": "cc0",
+    "foreignLandingUrl": "https://www.flickr.com/photos/157635012@N07/48124796546",
+    "url": "https://live.staticflickr.com/65535/48124796546_21e47d2634_b.jpg",
+    "fetchedAt": "2026-06-01T08:57:54.649Z"
   },
   "borba-s-tley": {
     "provider": "unsplash",
@@ -1447,7 +1449,7 @@
     "width": 240,
     "height": 240,
     "quality": 72,
-    "generatedAt": "2026-05-31T21:29:26.755384+00:00"
+    "generatedAt": "2026-06-01T08:57:54.649Z"
   },
   "previews/borba-s-tley": {
     "provider": "local-preview",
