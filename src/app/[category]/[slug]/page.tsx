@@ -31,8 +31,7 @@ import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import type { Metadata } from 'next'
 import { readingTime, formatDate, relativeDate, CATEGORY_COLOR } from '@/lib/utils'
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://1001sovet.ru'
+import { SITE_NAME, SITE_URL, articleCanonicalUrl, articleImageUrl, absoluteUrl, truncateForMeta } from '@/lib/seo'
 
 interface Props { params: Promise<{ category: string; slug: string }> }
 
@@ -44,27 +43,43 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!article) return {}
   const { frontmatter: fm } = article
   const cat = CATEGORIES[category]
-  const url = `${SITE_URL}/${category}/${slug}`
-  const ogUrl = `${SITE_URL}/api/og?title=${encodeURIComponent(fm.title)}&category=${category}&categoryName=${encodeURIComponent(cat?.name || fm.categoryName)}`
+  const url = articleCanonicalUrl(fm)
+  const imageUrl = articleImageUrl(fm)
+  const description = truncateForMeta(fm.description)
   return {
     title: fm.title,
-    description: fm.description,
+    description,
     alternates: { canonical: url },
     keywords: fm.tags.join(', '),
+    authors: [{ name: SITE_NAME, url: SITE_URL }],
+    category: cat?.name || fm.categoryName,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
     openGraph: {
       title: fm.title,
-      description: fm.description,
+      description,
       url,
       type: 'article',
       publishedTime: fm.date,
+      modifiedTime: fm.updated || fm.date,
+      section: cat?.name || fm.categoryName,
       tags: fm.tags,
-      images: [{ url: ogUrl, width: 1200, height: 630, alt: fm.title }],
+      images: [{ url: imageUrl, width: 1200, height: 800, alt: fm.title }],
     },
     twitter: {
       card: 'summary_large_image',
       title: fm.title,
-      description: fm.description,
-      images: [{ url: ogUrl, width: 1200, height: 630 }],
+      description,
+      images: [{ url: imageUrl, width: 1200, height: 800 }],
     },
   }
 }
@@ -77,7 +92,8 @@ export default async function ArticlePage({ params }: Props) {
   const { frontmatter: fm, content, wordCount } = article
   const cat = CATEGORIES[category]
   const color = CATEGORY_COLOR[category] || '#888'
-  const url = `${SITE_URL}/${category}/${slug}`
+  const url = articleCanonicalUrl(fm)
+  const imageUrl = articleImageUrl(fm)
   const timeToRead = readingTime('x '.repeat(wordCount))
 
   // F7+F9: all articles needed for ViewTracker slug + tag-based similarity
@@ -92,12 +108,21 @@ export default async function ArticlePage({ params }: Props) {
     headline: fm.title,
     description: fm.description,
     datePublished: fm.date,
-    dateModified: fm.date,
-    author: { '@type': 'Organization', name: 'СоветыДома', url: SITE_URL },
-    publisher: { '@type': 'Organization', name: 'СоветыДома', url: SITE_URL },
+    dateModified: fm.updated || fm.date,
+    image: [imageUrl],
+    thumbnailUrl: imageUrl,
+    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: { '@type': 'ImageObject', url: absoluteUrl('/icon-512.png'), width: 512, height: 512 },
+    },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     keywords: fm.tags.join(', '),
+    articleSection: cat?.name || fm.categoryName,
     inLanguage: 'ru-RU',
+    isAccessibleForFree: true,
     wordCount,
     timeRequired: `PT${Math.max(1, Math.round(wordCount / 180))}M`,
   }
@@ -107,7 +132,7 @@ export default async function ArticlePage({ params }: Props) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Главная', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: cat?.name || fm.categoryName, item: `${SITE_URL}/${category}` },
+      { '@type': 'ListItem', position: 2, name: cat?.name || fm.categoryName, item: `${SITE_URL}/${category}/` },
       { '@type': 'ListItem', position: 3, name: fm.title, item: url },
     ],
   }
@@ -152,9 +177,9 @@ export default async function ArticlePage({ params }: Props) {
       '@type': 'Recipe',
       name: fm.title,
       description: fm.description,
-      author: { '@type': 'Organization', name: 'СоветыДома', url: SITE_URL },
+      author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
       datePublished: fm.date,
-      image: fm.image ? `${SITE_URL}${fm.image}` : undefined,
+      image: imageUrl,
       prepTime: fm.prepTime,
       cookTime: fm.cookTime,
       recipeYield: fm.recipeYield,
@@ -173,6 +198,7 @@ export default async function ArticlePage({ params }: Props) {
       '@type': 'HowTo',
       name: fm.title,
       description: fm.description,
+      image: imageUrl,
       step: steps,
       inLanguage: 'ru-RU',
     }

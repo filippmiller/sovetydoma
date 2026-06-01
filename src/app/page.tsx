@@ -6,26 +6,25 @@ import PersonalisedSection from '@/components/PersonalisedSection'
 import StartHereSection from '@/components/StartHereSection'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://1001sovet.ru'
+import { SITE_NAME, SITE_URL, canonicalPath, absoluteUrl } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: 'СоветыДома — полезные советы для дома, кухни и дачи',
   description: 'Лайфхаки, рецепты, советы по уборке, огороду и экономии. Практичные идеи для жизни в России.',
-  alternates: { canonical: SITE_URL },
+  alternates: { canonical: canonicalPath('/') },
   openGraph: {
     title: 'СоветыДома — полезные советы для дома, кухни и дачи',
     description: 'Лайфхаки, рецепты, советы по уборке, огороду и экономии.',
     type: 'website',
-    url: SITE_URL,
+    url: canonicalPath('/'),
   },
 }
 
 const websiteJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'СоветыДома',
-  url: SITE_URL,
+  name: SITE_NAME,
+  url: canonicalPath('/'),
   description: 'Полезные советы и лайфхаки для дома, кухни, дачи и экономии',
   inLanguage: 'ru-RU',
   potentialAction: {
@@ -33,6 +32,14 @@ const websiteJsonLd = {
     target: { '@type': 'EntryPoint', urlTemplate: `${SITE_URL}/search?q={search_term_string}` },
     'query-input': 'required name=search_term_string',
   },
+}
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE_NAME,
+  url: canonicalPath('/'),
+  logo: absoluteUrl('/icon-512.png'),
 }
 
 const CATEGORY_COLOR: Record<string, string> = {
@@ -70,6 +77,7 @@ export default function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
 
         {/* Hero */}

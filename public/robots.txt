@@ -1,5 +1,18 @@
-User-agent: *
+User-agent: Googlebot
 Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Video
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: Yandex
+Allow: /
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid&fbclid /
 
 User-agent: YandexBot
 Allow: /
@@ -13,5 +26,7 @@ Allow: /
 User-agent: YandexMedia
 Allow: /
 
+User-agent: *
+Disallow: /
+
 Sitemap: https://1001sovet.ru/sitemap.xml
-Host: https://1001sovet.ru

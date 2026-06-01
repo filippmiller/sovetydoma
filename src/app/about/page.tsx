@@ -1,4 +1,5 @@
-﻿import type { Metadata } from 'next'
+﻿import Link from 'next/link'
+import type { Metadata } from 'next'
 import { getAllArticles, CATEGORIES } from '@/lib/articles'
 
 export const metadata: Metadata = {
@@ -46,6 +47,12 @@ export default function AboutPage() {
         <p>
           Есть вопросы, предложения или хотите поделиться своим советом? Напишите нам:
           {' '}<a href="mailto:redaktion@sovetydoma.ru" style={{ color: '#c0392b' }}>redaktion@sovetydoma.ru</a>
+        </p>
+
+        <h2>Связаться с разработчиком</h2>
+        <p>
+          Для технических ошибок, вопросов по SEO и предложений по работе сайта используйте
+          {' '}<Link href="/contact/" style={{ color: '#c0392b' }}>форму связи с разработчиком</Link>.
         </p>
       </div>
     </div>

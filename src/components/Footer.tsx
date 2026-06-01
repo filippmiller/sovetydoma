@@ -71,6 +71,7 @@ export default function Footer() {
           <span>© {year} СоветыДома. Все права защищены.</span>
           <div style={{ display: 'flex', gap: '1rem' }}>
             <Link href="/about" style={{ color: '#999', textDecoration: 'none' }}>О сайте</Link>
+            <Link href="/contact" style={{ color: '#999', textDecoration: 'none' }}>Связаться с разработчиком</Link>
             <Link href="/feed.xml" style={{ color: '#999', textDecoration: 'none' }}>RSS</Link>
           </div>
         </div>

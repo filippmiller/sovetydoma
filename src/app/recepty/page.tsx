@@ -2,11 +2,12 @@
 import RecipeFilter from '@/components/RecipeFilter'
 import Breadcrumb from '@/components/Breadcrumb'
 import type { Metadata } from 'next'
+import { canonicalPath } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: 'Рецепты — пошаговые рецепты на СоветыДома',
   description: 'Домашние рецепты с фильтрами по времени приготовления и теме. Быстрые блюда, супы, выпечка и многое другое.',
-  alternates: { canonical: 'https://1001sovet.ru/recepty' },
+  alternates: { canonical: canonicalPath('/recepty/') },
 }
 
 export default function ReceptyPage() {

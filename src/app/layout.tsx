@@ -5,29 +5,38 @@ import Footer from '@/components/Footer'
 import YandexMetrika from '@/components/YandexMetrika'
 import BackToTop from '@/components/BackToTop'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://1001sovet.ru'
+import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/seo'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: 'СоветыДома — полезные советы для дома, кухни и дачи',
-    template: '%s | СоветыДома',
+    template: `%s | ${SITE_NAME}`,
   },
   description:
     'Лайфхаки, рецепты, советы по уборке, огороду и экономии. Всё проверено на практике — просто и понятно.',
   openGraph: {
-    siteName: 'СоветыДома',
+    siteName: SITE_NAME,
     locale: 'ru_RU',
     type: 'website',
-    images: [{ url: '/og-default.png', width: 1200, height: 630 }],
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     site: '@sovetydoma',
     creator: '@sovetydoma',
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   other: {
     'yandex-verification': process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || '',
   },

@@ -5,8 +5,7 @@ import ArticleCard from '@/components/ArticleCard'
 import Breadcrumb from '@/components/Breadcrumb'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://1001sovet.ru'
+import { SITE_NAME, SITE_URL, canonicalPath } from '@/lib/seo'
 const CATEGORY_EMOJI: Record<string, string> = {
   kulinaria: '🍲', 'dom-i-uborka': '🧹', 'dacha-i-ogorod': '🌱', layfkhaki: '💡', ekonomiya: '💰', rybalka: '🎣',
 }
@@ -21,12 +20,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params
   const cat = CATEGORIES[category]
   if (!cat) return {}
-  const url = `${SITE_URL}/${category}`
+  const url = canonicalPath(`/${category}/`)
   return {
     title: `${cat.name} — советы и лайфхаки`,
     description: cat.description,
     alternates: { canonical: url },
-    openGraph: { title: `${cat.name} | СоветыДома`, description: cat.description, url },
+    openGraph: { title: `${cat.name} | ${SITE_NAME}`, description: cat.description, url },
   }
 }
 
@@ -43,7 +42,7 @@ export default async function CategoryPage({ params }: Props) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Главная', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: cat.name, item: `${SITE_URL}/${category}` },
+      { '@type': 'ListItem', position: 2, name: cat.name, item: canonicalPath(`/${category}/`) },
     ],
   }
 
