@@ -37,7 +37,7 @@ export default function HeroSearchControls({ articles, categories }: Props) {
   }
 
   return (
-    <div style={{ position: 'relative', width: '100%' }}>
+    <div style={{ position: 'relative', width: '100%', zIndex: 30 }}>
       <div className="hero-search-shell">
         <details className="hero-taxonomy-details">
           <summary aria-label="Открыть все категории">
@@ -185,6 +185,8 @@ export default function HeroSearchControls({ articles, categories }: Props) {
           gap: 0.4rem;
           list-style: none;
           height: 100%;
+          position: relative;
+          z-index: 52;
         }
         .hero-taxonomy-details summary::-webkit-details-marker {
           display: none;
@@ -198,7 +200,7 @@ export default function HeroSearchControls({ articles, categories }: Props) {
         }
         .hero-taxonomy-panel {
           position: absolute;
-          z-index: 6;
+          z-index: 60;
           left: 0;
           top: calc(100% + 0.55rem);
           width: min(960px, calc(100vw - 2rem));
