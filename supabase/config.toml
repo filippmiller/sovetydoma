@@ -1,0 +1,16 @@
+project_id = "sovetydoma"
+
+[auth]
+site_url = "https://1001sovet.ru"
+additional_redirect_urls = [
+  "https://1001sovet.ru/**",
+  "http://localhost:3000/**",
+  "http://127.0.0.1:3000/**",
+]
+
+[auth.email]
+enable_confirmations = true
+
+[auth.email.template.confirmation]
+subject = "Подтвердите почту в СоветыДома"
+content_path = "./supabase/templates/confirmation.html"

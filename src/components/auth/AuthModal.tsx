@@ -72,11 +72,15 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setError('')
     setInfo('')
     if (!displayName.trim()) { setError('Введите имя пользователя'); return }
+    const emailRedirectTo = getAuthRedirectTo()
     setLoading(true)
     const { error: err } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { display_name: displayName } },
+      options: {
+        data: { display_name: displayName },
+        emailRedirectTo,
+      },
     })
     setLoading(false)
     if (err) { setError(err.message); return }
@@ -87,8 +91,13 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     if (!email.trim()) { setError('Введите email, чтобы отправить письмо повторно'); return }
     setError('')
     setInfo('')
+    const emailRedirectTo = getAuthRedirectTo()
     setResending(true)
-    const { error: err } = await supabase.auth.resend({ type: 'signup', email: email.trim() })
+    const { error: err } = await supabase.auth.resend({
+      type: 'signup',
+      email: email.trim(),
+      options: { emailRedirectTo },
+    })
     setResending(false)
     if (err) {
       setError(err.message === 'email rate limit exceeded'
@@ -369,6 +378,14 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     </div>,
     document.body,
   )
+}
+
+function getAuthRedirectTo() {
+  if (typeof window === 'undefined') return 'https://1001sovet.ru/moy-kabinet/'
+  const origin = window.location.origin
+  const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+  const siteOrigin = isLocal ? origin : 'https://1001sovet.ru'
+  return `${siteOrigin}/moy-kabinet/`
 }
 
 // --- Shared styles ---
