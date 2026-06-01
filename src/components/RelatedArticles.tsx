@@ -6,29 +6,43 @@ import type { ArticleRecommendation } from '@/lib/article-recommendations'
 
 interface Props {
   articles: ArticleRecommendation[]
+  compact?: boolean
 }
 
-export default function RelatedArticles({ articles }: Props) {
+export default function RelatedArticles({ articles, compact = false }: Props) {
   if (articles.length === 0) return null
 
   return (
-    <section className="related-articles" aria-label="Похожие статьи" style={{ marginTop: '3rem' }}>
+    <section
+      className="related-articles"
+      aria-label="Читайте также"
+      style={{
+        marginTop: compact ? '1rem' : '3rem',
+        borderTop: compact ? '0' : '1px solid #e8e4df',
+        paddingTop: compact ? '0' : '2rem',
+      }}
+    >
       <h2 style={{
-        fontSize: '1.2rem',
-        fontWeight: 700,
-        marginBottom: '1rem',
-        color: '#1a1a1a',
-        borderTop: '1px solid #e8e4df',
-        paddingTop: '2rem',
+        fontSize: compact ? '0.9rem' : '1.2rem',
+        fontWeight: 800,
+        marginBottom: compact ? '0.65rem' : '1rem',
+        color: compact ? '#555' : '#1a1a1a',
+        textTransform: compact ? 'uppercase' : 'none',
+        letterSpacing: compact ? '0.05em' : 0,
       }}>
-        Похожие статьи
+        Читайте также
       </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.9rem' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: compact ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: compact ? '0.65rem' : '0.9rem',
+      }}>
         {articles.map((article) => {
           const color = CATEGORY_COLOR[article.category] || '#888'
           const emoji = CATEGORY_EMOJI[article.category] || '📄'
           const imageSrc = resolveArticlePreviewImage(article.image, article.slug, { width: 220, height: 160 })
           const cardImageSrc = imageSrc?.startsWith('/images/') ? `${imageSrc}?v=20260531-previews` : imageSrc
+          const imageSize = compact ? 62 : 88
 
           return (
             <Link
@@ -40,35 +54,47 @@ export default function RelatedArticles({ articles }: Props) {
                 background: '#fff',
                 borderRadius: '8px',
                 overflow: 'hidden',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+                boxShadow: compact ? '0 1px 3px rgba(0,0,0,0.05)' : '0 1px 4px rgba(0,0,0,0.07)',
                 display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1fr) 88px',
-                gap: '0.8rem',
-                minHeight: '128px',
+                gridTemplateColumns: `minmax(0, 1fr) ${imageSize}px`,
+                gap: compact ? '0.6rem' : '0.8rem',
+                minHeight: compact ? '82px' : '128px',
                 height: '100%',
-                padding: '0.85rem',
-                border: `1.5px solid ${color}33`,
+                padding: compact ? '0.65rem' : '0.85rem',
+                border: `1px solid ${color}33`,
               }}>
                 <div style={{ minWidth: 0 }}>
-                  <span style={{
-                    display: 'inline-flex',
-                    width: 'fit-content',
-                    maxWidth: '100%',
-                    marginBottom: '0.45rem',
-                    padding: '3px 8px',
-                    borderRadius: '5px',
-                    background: `${color}12`,
-                    color,
-                    fontSize: '0.68rem',
-                    fontWeight: 750,
-                    textTransform: 'uppercase',
+                  {!compact && (
+                    <span style={{
+                      display: 'inline-flex',
+                      width: 'fit-content',
+                      maxWidth: '100%',
+                      marginBottom: '0.45rem',
+                      padding: '3px 8px',
+                      borderRadius: '5px',
+                      background: `${color}12`,
+                      color,
+                      fontSize: '0.68rem',
+                      fontWeight: 750,
+                      textTransform: 'uppercase',
+                    }}>
+                      {article.categoryName}
+                    </span>
+                  )}
+                  <p style={{
+                    fontSize: compact ? '0.78rem' : '0.88rem',
+                    fontWeight: 700,
+                    color: '#1a1a1a',
+                    lineHeight: 1.35,
+                    margin: '0 0 0.25rem',
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: compact ? 3 : 2,
+                    WebkitBoxOrient: 'vertical',
                   }}>
-                    {article.categoryName}
-                  </span>
-                  <p style={{ fontSize: '0.88rem', fontWeight: 600, color: '#1a1a1a', lineHeight: 1.4, margin: '0 0 0.3rem' }}>
                     {article.title}
                   </p>
-                  {article.description && (
+                  {!compact && article.description && (
                     <p style={{
                       fontSize: '0.76rem',
                       color: '#666',
@@ -82,7 +108,7 @@ export default function RelatedArticles({ articles }: Props) {
                       {article.description}
                     </p>
                   )}
-                  {article.recommendationReasons.length > 0 && (
+                  {!compact && article.recommendationReasons.length > 0 && (
                     <p style={{ fontSize: '0.72rem', color: '#999', margin: '0.45rem 0 0' }}>
                       По теме: {article.recommendationReasons.slice(0, 2).join(' · ')}
                     </p>
@@ -90,15 +116,15 @@ export default function RelatedArticles({ articles }: Props) {
                 </div>
                 <div style={{
                   position: 'relative',
-                  width: '88px',
-                  height: '88px',
+                  width: `${imageSize}px`,
+                  height: `${imageSize}px`,
                   borderRadius: '8px',
                   overflow: 'hidden',
                   background: '#f4f0ea',
                   boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
                 }}>
                   {cardImageSrc ? (
-                    <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize="1.5rem" loading="eager" />
+                    <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={compact ? '1.1rem' : '1.5rem'} loading="eager" />
                   ) : (
                     <span aria-hidden="true" style={{
                       position: 'absolute',
@@ -106,7 +132,7 @@ export default function RelatedArticles({ articles }: Props) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '1.5rem',
+                      fontSize: compact ? '1.1rem' : '1.5rem',
                     }}>
                       {emoji}
                     </span>

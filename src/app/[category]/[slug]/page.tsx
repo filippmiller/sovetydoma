@@ -314,6 +314,7 @@ export default async function ArticlePage({ params }: Props) {
 
             <div className="toc-inline">
               <TableOfContents content={content} />
+              <RelatedArticles articles={similarArticles} compact />
             </div>
 
             {/* Visual recipe card — shown for Recipe articles with ingredients */}
@@ -364,7 +365,6 @@ export default async function ArticlePage({ params }: Props) {
             {/* Share panel */}
             <SharePanel url={url} title={fm.title} />
 
-            <RelatedArticles articles={similarArticles} />
             <MoreArticles articles={moreInterestingArticles} />
 
             {/* Questions — live Q&A for this article */}
@@ -376,6 +376,7 @@ export default async function ArticlePage({ params }: Props) {
           {/* Sidebar TOC (desktop only) */}
           <div className="article-sidebar">
             <TableOfContents content={content} sidebar />
+            <RelatedArticles articles={similarArticles} compact />
           </div>
         </div>
       </div>
