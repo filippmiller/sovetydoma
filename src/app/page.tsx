@@ -4,6 +4,7 @@ import SeasonalBanner from '@/components/SeasonalBanner'
 import PopularArticles from '@/components/PopularArticles'
 import PersonalisedSection from '@/components/PersonalisedSection'
 import StartHereSection from '@/components/StartHereSection'
+import HomeSmartSearch from '@/components/HomeSmartSearch'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath, absoluteUrl } from '@/lib/seo'
@@ -78,43 +79,49 @@ export default function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem 1rem 2rem' }}>
 
         {/* Hero */}
         <section style={{
-          marginBottom: '2.5rem',
+          marginBottom: '1rem',
           background: 'linear-gradient(135deg, #c0392b 0%, #922b21 100%)',
-          borderRadius: '16px',
-          padding: '2.5rem 2rem',
+          borderRadius: '10px',
+          padding: '0.8rem 1.15rem',
           color: '#fff',
           position: 'relative',
           overflow: 'hidden',
+          minHeight: '94px',
+          display: 'flex',
+          alignItems: 'center',
         }}>
           <div style={{
             position: 'absolute', inset: 0, opacity: 0.04,
             backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
             backgroundSize: '30px 30px',
           }} />
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <p style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.75, margin: '0 0 0.5rem' }}>
+          <div style={{ position: 'relative', zIndex: 1, width: '100%', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ minWidth: 0 }}>
+            <p style={{ fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.72, margin: '0 0 0.22rem' }}>
               Практичные советы для дома
             </p>
-            <h1 style={{ fontSize: 'clamp(1.6rem, 4vw, 2.4rem)', fontWeight: 800, lineHeight: 1.2, margin: '0 0 0.75rem' }}>
-              Полезные советы<br />на каждый день
+            <h1 style={{ fontSize: 'clamp(1.15rem, 2.7vw, 1.65rem)', fontWeight: 800, lineHeight: 1.18, margin: '0 0 0.25rem' }}>
+              Полезные советы на каждый день
             </h1>
-            <p style={{ fontSize: '1.05rem', opacity: 0.88, margin: '0 0 1.5rem', maxWidth: '520px', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '0.88rem', opacity: 0.86, margin: 0, maxWidth: '620px', lineHeight: 1.4 }}>
               Рецепты, лайфхаки, дача и экономия — всё проверено на практике.
             </p>
+            </div>
             <Link href="/search" style={{
               display: 'inline-block',
               backgroundColor: '#fff',
               color: '#c0392b',
               fontWeight: 700,
-              fontSize: '0.95rem',
-              padding: '0.65rem 1.5rem',
-              borderRadius: '8px',
+              fontSize: '0.82rem',
+              padding: '0.45rem 0.8rem',
+              borderRadius: '6px',
               textDecoration: 'none',
               boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+              whiteSpace: 'nowrap',
             }}>
               Читать советы →
             </Link>
@@ -122,8 +129,8 @@ export default function HomePage() {
         </section>
 
         {/* Category chips */}
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '0.8rem', fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.9rem' }}>
+        <section style={{ marginBottom: '1rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <h2 style={{ fontSize: '0.78rem', fontWeight: 800, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0, flexShrink: 0 }}>
             Разделы
           </h2>
           <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
@@ -132,10 +139,10 @@ export default function HomePage() {
               return (
                 <Link key={cat.slug} href={`/${cat.slug}`} style={{
                   display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                  padding: '0.5rem 1.1rem', borderRadius: '999px',
+                  padding: '0.38rem 0.85rem', borderRadius: '999px',
                   border: `2px solid ${color}55`, fontSize: '0.88rem',
                   color: color, textDecoration: 'none', backgroundColor: color + '12',
-                  fontWeight: 700, minHeight: '44px',
+                  fontWeight: 700, minHeight: '36px',
                 }}>
                   {cat.name}
                   <span style={{
@@ -149,6 +156,8 @@ export default function HomePage() {
             })}
           </div>
         </section>
+
+        <HomeSmartSearch articles={articlesForClient} />
 
         {/* F15: Seasonal content banner */}
         <SeasonalBanner />

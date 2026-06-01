@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import { CATEGORIES } from '@/lib/categories'
 import { CATEGORY_COLOR, CATEGORY_EMOJI, relativeDate } from '@/lib/utils'
+import { searchArticles } from '@/lib/search'
 
 interface ArticleData {
   title: string
@@ -20,20 +21,6 @@ interface Props {
   articles: ArticleData[]
 }
 
-function scoreArticle(article: ArticleData, query: string): number {
-  const q = query.toLowerCase().trim()
-  if (!q) return 0
-  const terms = q.split(/\s+/)
-  let score = 0
-  for (const term of terms) {
-    if (article.title.toLowerCase().includes(term)) score += 10
-    if (article.description.toLowerCase().includes(term)) score += 5
-    if (article.tags.some((t) => t.toLowerCase().includes(term))) score += 8
-    if (article.categoryName.toLowerCase().includes(term)) score += 3
-  }
-  return score
-}
-
 export default function SearchClient({ articles }: Props) {
   const [query, setQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
@@ -47,24 +34,19 @@ export default function SearchClient({ articles }: Props) {
     return () => { if (timerRef.current) clearTimeout(timerRef.current) }
   }, [query])
 
-  // Read URL param on mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search)
-      const q = params.get('q') || ''
-      if (q) {
-        setQuery(q)
-        setDebouncedQuery(q)
-      }
-    }
+    const urlQuery = new URLSearchParams(window.location.search).get('q') || ''
+    if (!urlQuery) return
+    const id = window.setTimeout(() => {
+      setQuery(urlQuery)
+      setDebouncedQuery(urlQuery)
+    }, 0)
+    return () => window.clearTimeout(id)
   }, [])
 
   const results = useMemo(() => {
     if (!debouncedQuery.trim()) return []
-    return articles
-      .map((a) => ({ ...a, score: scoreArticle(a, debouncedQuery) }))
-      .filter((a) => a.score > 0)
-      .sort((a, b) => b.score - a.score)
+    return searchArticles(articles, debouncedQuery)
   }, [debouncedQuery, articles])
 
   const hasQuery = debouncedQuery.trim().length > 0
@@ -88,6 +70,7 @@ export default function SearchClient({ articles }: Props) {
         </span>
         <input
           type="search"
+          name="q"
           autoFocus
           placeholder="Введите запрос — например: борщ, уборка, огород..."
           value={query}
