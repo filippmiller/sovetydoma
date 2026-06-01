@@ -49,6 +49,7 @@ Mailboxes created:
 - `maryana.sidorova@1001sovet.ru`
 - `petr.pupkin@1001sovet.ru`
 - `andrey.rybakov@1001sovet.ru`
+- `filipp@1001sovet.ru`
 
 Aliases created:
 
@@ -59,6 +60,13 @@ Aliases created:
 - `developer@1001sovet.ru -> admin@1001sovet.ru`
 - `dev@1001sovet.ru -> admin@1001sovet.ru`
 - `petr.ivanov@1001sovet.ru -> peter.ivanov@1001sovet.ru`
+
+Mailbox-level forwarding:
+
+- `filipp@1001sovet.ru` keeps a local inbox copy and forwards one copy to
+  `alexmiller.idothings@gmail.com` via an active postfilter Sieve rule.
+- Do not also create an exact-address alias for `filipp@1001sovet.ru`; that
+  can duplicate forwarded copies.
 
 Mailbox credentials are not committed. They are stored locally at:
 `C:\Users\filip\.secrets\1001sovet-mailcow-mailboxes.env`.
