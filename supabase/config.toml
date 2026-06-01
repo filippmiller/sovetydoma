@@ -10,7 +10,13 @@ additional_redirect_urls = [
 
 [auth.email]
 enable_confirmations = true
+max_frequency = "1m0s"
+otp_length = 8
 
 [auth.email.template.confirmation]
 subject = "Подтвердите почту в СоветыДома"
 content_path = "./supabase/templates/confirmation.html"
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
