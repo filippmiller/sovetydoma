@@ -7,6 +7,7 @@
 3. Preserve Enter-submit behavior on the search page by wrapping the input in a GET form.
 4. Verify anonymous public routes in the in-app browser.
 5. Run TypeScript, ESLint, unit tests, SEO audit, image audit, and production build.
+6. Run Lighthouse and extract numeric metrics/screenshots.
 
 ## A. Critical Functional Bugs
 
@@ -14,7 +15,7 @@
 
 ## B. Cross-Role Visibility/Persistence Bugs
 
-- Blocked: requires staging users for user/moderator/admin checks. Risk of testing on production is unacceptable without explicit approval.
+- Blocked at mutation gate: requires staging users or explicit approval to create `qa+...@example.test` production users and marked QA rows.
 
 ## C. Storage/Image/Upload Bugs
 
@@ -38,7 +39,8 @@
 
 ## H. Performance/Resource Improvements
 
-- Done: removed avoidable preview 404s. Recommended next: reduce initial 180-card homepage payload.
+- Done: removed avoidable preview 404s.
+- Critical next: reduce initial 180-card homepage payload. Evidence: home mobile Lighthouse performance 56, LCP 14701ms, 211 requests, 3157 KB transfer.
 
 ## I. Accessibility Improvements
 

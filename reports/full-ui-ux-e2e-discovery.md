@@ -39,13 +39,15 @@ Production reference: `https://1001sovet.ru`
 - The attached prompt assumes a staging/testing app and permission to create test users/data.
 - The available site target is production-live. I did not create accounts, comments, uploads, ratings, admin records, or other production data.
 - Full authenticated cross-role testing needs a staging Supabase project or explicit approval for disposable production test accounts.
+- Public Supabase table counts show core UGC tables are currently empty, so controlled QA writes would be low-impact but still production mutations.
 
 ## First Findings
 
 - Homepage cards were requesting many missing preview URLs based on old frontmatter image names, for example `/images/previews/bliny.jpg`, while generated previews are slug-based.
 - `/search/?q=как избавится от одуванчиков` could render the browse state if client hydration did not run promptly, despite the query being present in the URL.
-- Existing `npm test`, SEO audit, and image audit surfaces are useful and should remain part of the release gate.
+- Existing `npm test`, SEO audit, image audit, and Lighthouse summary surfaces are useful and should remain part of the release gate.
+- Mobile performance is now a confirmed issue: home mobile Lighthouse performance 56 and article mobile 49.
 
 ## Screenshot Note
 
-The browser screenshot API repeatedly timed out during capture, so screenshots were not embedded in this report. Browser DOM and visual-state checks were still performed through the in-app browser.
+The in-app browser screenshot API repeatedly timed out during capture. Lighthouse final screenshots were extracted instead into `reports/screenshots/`.

@@ -2,7 +2,7 @@
 
 ## Summary
 
-Completed a safe browser-backed audit pass on an isolated branch and fixed two real public UX defects: missing catalog thumbnails from stale preview paths and unreliable query-result rendering on `/search/?q=...`.
+Completed a safer first audit pass, then extended it after review with real Lighthouse metrics, extracted screenshots, stricter visual critique, and a clearer production-QA mutation gate. Fixed two real public UX defects: missing catalog thumbnails from stale preview paths and unreliable query-result rendering on `/search/?q=...`.
 
 ## Current Status
 
@@ -10,6 +10,8 @@ Completed a safe browser-backed audit pass on an isolated branch and fixed two r
 - Search for `как избавится от одуванчиков` returns the dandelion article as the first result.
 - Homepage catalog thumbnails use compact slug previews and do not report failed image loads in the browser sweep.
 - Build and automated checks pass.
+- Lighthouse evidence exists in `reports/lighthouse/summary.md`; mobile performance is the biggest confirmed weakness.
+- Screenshots exist in `reports/screenshots/`.
 
 ## Verification Commands
 
@@ -21,7 +23,7 @@ Completed a safe browser-backed audit pass on an isolated branch and fixed two r
 
 ## Not Done By Design
 
-I did not create users, seed records, submit contact emails, upload photos, post comments, rate articles, or use admin credentials against production. Full role-based E2E needs a staging target or explicit production-test approval.
+I did not yet create users, seed records, submit contact emails, upload photos, post comments, rate articles, or use admin credentials against production. The Supabase public table counts are near-empty, so this is low-impact, but still a production mutation. The next step is explicit approval to create clearly marked QA production data or a staging target.
 
 ## Next Prompt
 

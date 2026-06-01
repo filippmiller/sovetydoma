@@ -23,8 +23,9 @@
 
 ## Lighthouse / Axe
 
-- Full Lighthouse and axe-core runs were not installed or executed in this pass. The performance/accessibility reports are based on browser DOM checks, source inspection, image audit, and build output.
-- Before/after numeric Lighthouse metrics are therefore unavailable and should be collected in the next pass if the owner wants formal scores.
+- Lighthouse was run and parsed; see `reports/lighthouse/summary.md`.
+- Lighthouse found good desktop performance but poor mobile performance: home mobile 56, article mobile 49.
+- Standalone axe failed because ChromeDriver expected Chrome 149 while installed Chrome is 148. Direct axe injection was blocked by the in-app browser sandbox, so Lighthouse accessibility scores are the accessibility metric source for this pass.
 
 ## Remaining Gap
 
