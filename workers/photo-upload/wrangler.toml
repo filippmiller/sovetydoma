@@ -10,6 +10,7 @@ bucket_name = "sovetydoma-photos"
 SUPABASE_URL = "https://plwkjdpuxjkmpkqiqzkk.supabase.co"
 ALLOWED_ORIGIN = "*"
 CONTACT_ALLOWED_ORIGINS = "https://1001sovet.ru,http://127.0.0.1:4177,http://localhost:4177"
+VIEW_ALLOWED_ORIGINS = "https://1001sovet.ru,http://127.0.0.1:3000,http://localhost:3000,http://127.0.0.1:4177,http://localhost:4177"
 CONTACT_TO_EMAIL = "alexmiller.idothings@gmail.com"
 CONTACT_FROM_EMAIL = "noreply@vsedomatut.com"
 

@@ -18,6 +18,8 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm run audit:images
       - run: pnpm run build
       - name: TypeScript check
         run: pnpm exec tsc --noEmit
