@@ -9,7 +9,7 @@ Approval: user explicitly approved controlled production QA mutation.
 
 - Requested pattern `qa+user-...@example.test` was rejected by Supabase as an invalid email domain.
 - Retried with deliverable owner alias: `alexmiller.idothings+qa-20260601073656@gmail.com`.
-- Password: `TestPassword123!`
+- Password: redacted; use a fresh QA password for any future test account.
 - Marker: `QA_E2E_20260601073656`
 - Auth user id: `d6eb17b9-01d7-42df-950a-d74a66a2d592`
 

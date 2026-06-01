@@ -3,7 +3,7 @@
   "marker": "QA_E2E_20260601073609",
   "articleSlug": "borba-s-oduvanchikami",
   "email": "qa+user-20260601073609@example.test",
-  "password": "TestPassword123!",
+  "password": "[redacted]",
   "steps": [
     {
       "name": "auth.signUp",

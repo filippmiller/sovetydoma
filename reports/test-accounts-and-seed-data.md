@@ -26,7 +26,7 @@ Checked with the public anon Supabase key:
 ## Created Production QA Identity
 
 - Email: `alexmiller.idothings+qa-20260601073656@gmail.com`
-- Password: `TestPassword123!`
+- Password: redacted; use a fresh QA password for any future test account.
 - User id: `d6eb17b9-01d7-42df-950a-d74a66a2d592`
 - Profile row: created automatically with `display_name = QA User 20260601073656`
 - Status: cannot sign in because Supabase returns `Email not confirmed`.
@@ -37,7 +37,7 @@ The original requested `qa+user-...@example.test` address could not be used beca
 ## Proposed Production QA Data
 
 - Email: `alexmiller.idothings+qa-[timestamp]@gmail.com`
-- Password: `TestPassword123!`
+- Password: fresh QA password, not committed.
 - Display name: `QA User 20260601`
 - Article target: `borba-s-oduvanchikami`
 - Seed interactions: saved article, 5-star rating, one heart reaction, one clearly marked QA comment, one user article draft if auth/email confirmation permits.

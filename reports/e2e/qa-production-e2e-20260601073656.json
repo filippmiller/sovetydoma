@@ -3,7 +3,7 @@
   "marker": "QA_E2E_20260601073656",
   "articleSlug": "borba-s-oduvanchikami",
   "email": "alexmiller.idothings+qa-20260601073656@gmail.com",
-  "password": "TestPassword123!",
+  "password": "[redacted]",
   "steps": [
     {
       "name": "auth.signUp",
