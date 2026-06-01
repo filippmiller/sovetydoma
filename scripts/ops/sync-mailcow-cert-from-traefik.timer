@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily Mailcow certificate sync from Traefik
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=30m
+
+[Install]
+WantedBy=timers.target

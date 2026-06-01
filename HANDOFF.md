@@ -30,6 +30,7 @@ a large SEO content library.
 | Backend (current) | **Supabase** (managed, ref `plwkjdpuxjkmpkqiqzkk`) | Postgres + Auth + RLS + Storage + Edge Functions (Deno). Auth = email/password. |
 | Photos (UGC) | **Cloudflare R2** via a Worker | `NEXT_PUBLIC_PHOTO_WORKER_URL`. Moves to Timeweb S3 in Этап 2. |
 | AI moderation | **Anthropic Claude** (vision) edge functions | `moderate-photo`, `moderate-comment`. Key in Supabase Vault. Moves to GigaChat in Этап 2. |
+| Mailboxes | **Mailcow on Hetzner** | Shared human/editor inboxes at `mail.filippmiller.com`; see `docs/mailcow-shared-infra.md`. |
 | Hosting | **nginx on a Timeweb Cloud VPS** (Russia) | Static files only. Replaced Vercel. |
 | CI/CD | **GitHub Actions** → SSH deploy to VPS | See §4. |
 
@@ -184,6 +185,7 @@ code error — just re-run. CI (Linux) never hits it.
 | VPS root SSH key | `C:\Users\filip\.ssh\timeweb_1001sovet` |
 | CI deploy SSH key | `C:\Users\filip\.secrets\gha_deploy_1001sovet` |
 | Resend API key | `C:\Users\filip\.secrets\1001sovet-resend.env`; also on VPS in `/etc/1001sovet/secrets.env` and Cloudflare Worker secret `RESEND_API_KEY` |
+| Mailcow mailbox credentials | `C:\Users\filip\.secrets\1001sovet-mailcow-mailboxes.env` |
 | Anthropic API key | Supabase Vault: `get_secret('ANTHROPIC_API_KEY')` — **ROTATE** (was exposed in chat) |
 | Unsplash Access Key | currently in chat history — move to `.secrets` |
 | reg.ru login | **not stored** — user performs registrar actions manually |

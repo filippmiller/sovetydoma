@@ -1,0 +1,8 @@
+[Unit]
+Description=Sync Traefik certificate into Mailcow
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/sync-mailcow-cert-from-traefik.sh mail.filippmiller.com
