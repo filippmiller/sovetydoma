@@ -1,7 +1,7 @@
 export const dynamicParams = false
 export const revalidate = false
 import { getArticlesByCategory, CATEGORIES } from '@/lib/articles'
-import ArticleCard from '@/components/ArticleCard'
+import CategoryArticleBrowser from '@/components/CategoryArticleBrowser'
 import Breadcrumb from '@/components/Breadcrumb'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
@@ -65,11 +65,7 @@ export default async function CategoryPage({ params }: Props) {
         {articles.length === 0 ? (
           <p style={{ color: '#888' }}>Статьи в этом разделе появятся скоро.</p>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
-            {articles.map((article) => (
-              <ArticleCard key={article.slug} article={article} wordCount={article.wordCount} />
-            ))}
-          </div>
+          <CategoryArticleBrowser articles={articles} />
         )}
       </div>
     </>

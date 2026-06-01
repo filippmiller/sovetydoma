@@ -21,12 +21,14 @@ import AffiliateLink from '@/components/AffiliateLink'
 import RecipeCard from '@/components/RecipeCard'
 import ArticleSeries from '@/components/ArticleSeries'
 import ArticleQuickAnswer from '@/components/ArticleQuickAnswer'
+import ArticleActionSummary from '@/components/ArticleActionSummary'
 import ArticlePersonaCard from '@/components/ArticlePersonaCard'
 import ArticleFeedback from '@/components/ArticleFeedback'
 import ArticlePhotoSubmissionCTA from '@/components/ArticlePhotoSubmissionCTA'
 import ArticleQuestionsBlock from '@/components/ArticleQuestionsBlock'
 import ArticleViewCount from '@/components/ArticleViewCount'
 import ArticleImage from '@/components/ArticleImage'
+import { ArticleH2, ArticleH3 } from '@/components/ArticleHeading'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import type { Metadata } from 'next'
@@ -312,6 +314,8 @@ export default async function ArticlePage({ params }: Props) {
             {/* Fast-answer block — renders only when an answer is available/derivable */}
             <ArticleQuickAnswer fm={fm} />
 
+            <ArticleActionSummary fm={fm} content={content} />
+
             <div className="toc-inline">
               <TableOfContents content={content} />
               <RelatedArticles articles={similarArticles} compact />
@@ -330,7 +334,7 @@ export default async function ArticlePage({ params }: Props) {
             )}
 
             <article className="prose">
-              <MDXRemote source={content} components={{ ArticleChecklist, AffiliateLink }} />
+              <MDXRemote source={content} components={{ ArticleChecklist, AffiliateLink, h2: ArticleH2, h3: ArticleH3 }} />
             </article>
 
             {/* Tags */}
