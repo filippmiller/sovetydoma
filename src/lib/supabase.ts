@@ -17,7 +17,10 @@ export function getSupabase(): SupabaseClient {
 // Convenience alias for client components that are guaranteed to run in-browser
 export const supabase = {
   get auth() { return getSupabase().auth },
-  get from() { return getSupabase().from.bind(getSupabase()) },
+  get from() {
+    const client = getSupabase()
+    return client.from.bind(client)
+  },
 }
 
 export type UserRole = 'user' | 'moderator' | 'admin'

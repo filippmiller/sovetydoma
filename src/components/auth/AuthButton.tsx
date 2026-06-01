@@ -17,6 +17,7 @@ export default function AuthButton() {
     let alive = true
 
     const loadProfile = (userId: string) => {
+      setProfile(null)
       supabase
         .from('profiles')
         .select('*')

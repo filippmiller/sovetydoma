@@ -41,9 +41,10 @@ export default function CategoryArticleBrowser({ articles }: Props) {
 
   const filtered = useMemo(() => {
     const byTag = tag ? articles.filter((article) => article.tags?.includes(tag)) : articles
+    const bySlug = new Map(byTag.map((article) => [article.slug, article]))
     const searched = query.trim()
       ? searchArticles(byTag, query)
-        .map((result) => byTag.find((article) => article.slug === result.slug))
+        .map((result) => bySlug.get(result.slug))
         .filter((article): article is ArticleFrontmatter & { wordCount: number } => Boolean(article))
       : byTag
     return sortArticles(searched, sortMode)

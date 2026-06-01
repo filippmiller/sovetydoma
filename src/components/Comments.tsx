@@ -181,8 +181,13 @@ export default function Comments({ slug }: Props) {
   const replyTextareaRef = useAutoResize(replyText)
 
   useEffect(() => {
+    let alive = true
+
     supabase.auth.getUser().then(({ data }) => {
+      if (!alive) return
       setUserId(data.user?.id ?? null)
+    }).catch(() => {
+      if (alive) setUserId(null)
     })
 
     supabase
@@ -193,9 +198,18 @@ export default function Comments({ slug }: Props) {
       .eq('is_deleted', false)
       .order('created_at', { ascending: true })
       .then(({ data }) => {
+        if (!alive) return
         setComments((data as Comment[]) || [])
         setLoading(false)
+      }, () => {
+        if (!alive) return
+        setComments([])
+        setLoading(false)
       })
+
+    return () => {
+      alive = false
+    }
   }, [slug])
 
   const submitComment = async (content: string, parentId: string | null, attach?: File | null) => {
