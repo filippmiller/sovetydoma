@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import AdminShell from './AdminShell'
 import { useAdminAuth } from '@/lib/admin-auth'
 import { getSupabase } from '@/lib/supabase'
@@ -12,7 +12,7 @@ export default function AdminPhotoModeration() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected'>('pending')
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     try {
       const sb = getSupabase()
@@ -20,9 +20,13 @@ export default function AdminPhotoModeration() {
       setPhotos((data as PhotoRow[]) || [])
     } catch { /* */ }
     setLoading(false)
-  }
+  }, [filter])
 
-  useEffect(() => { if (authState === 'authed') load() }, [authState, filter])
+  useEffect(() => {
+    if (authState !== 'authed') return
+    const id = window.setTimeout(() => { void load() }, 0)
+    return () => window.clearTimeout(id)
+  }, [authState, load])
 
   const setStatus = async (id: string, status: 'approved' | 'rejected') => {
     try {
@@ -39,7 +43,7 @@ export default function AdminPhotoModeration() {
       <div style={{ padding: '2rem' }}>
         <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>Фото на модерации</h1>
         <p style={{ color: '#888', fontSize: '0.9rem', margin: '0.25rem 0 1.5rem' }}>
-          Загруженные читателями фото. AI выносит предварительный вердикт; спорные остаются здесь для ручной проверки.
+          Загруженные читателями фото. Автопроверка выносит предварительный вердикт; спорные остаются здесь для ручной проверки.
         </p>
 
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
@@ -73,7 +77,7 @@ export default function AdminPhotoModeration() {
                   </div>
                   {p.ai_verdict && (
                     <div style={{ fontSize: '0.72rem', color: p.ai_verdict === 'approved' ? '#1e8449' : p.ai_verdict === 'rejected' ? '#c0392b' : '#b8860b', marginBottom: '0.5rem' }}>
-                      🤖 AI: {p.ai_verdict} {p.ai_reason ? `— ${p.ai_reason}` : ''}
+                      Автопроверка: {p.ai_verdict} {p.ai_reason ? `— ${p.ai_reason}` : ''}
                     </div>
                   )}
                   {filter === 'pending' && (

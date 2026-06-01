@@ -298,7 +298,7 @@ export default async function ArticlePage({ params }: Props) {
               </figure>
             )}
 
-            {/* Editorial attribution (AI-assisted persona, with disclosure) */}
+            {/* Editorial attribution */}
             <ArticlePersonaCard author={fm.author} category={category} updated={fm.updated || fm.date} />
 
             {/* Fast-answer block — renders only when an answer is available/derivable */}

@@ -55,7 +55,7 @@ type KnowledgeArticleExport = {
 - Slugs are unique per site; namespace them on import (`sovetydoma:<slug>`).
 - `language: 'ru'` — Knowledge Core should keep language as a first-class field;
   do not auto-translate on import.
-- Personas are **AI-assisted virtual editors** (see `src/lib/personas.ts`), each
+- Editorial profiles live in `src/lib/personas.ts`, each
   with a disclosure string. Preserve that disclosure on import — never present
   them as real humans.
 - Recipe/HowTo/FAQ structured data lives in frontmatter

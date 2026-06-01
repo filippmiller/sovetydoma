@@ -14,10 +14,7 @@ function fmtDate(iso?: string): string | null {
   return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-/**
- * Visible article attribution. Uses an AI-assisted editorial persona; the role
- * line and disclosure make clear this is a virtual editor, not a real person.
- */
+/** Visible article attribution. */
 export default function ArticlePersonaCard({ author, category, updated }: Props) {
   const p = resolvePersona({ author, category })
   const updatedStr = fmtDate(updated)
@@ -42,21 +39,12 @@ export default function ArticlePersonaCard({ author, category, updated }: Props)
       </div>
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a1a1a' }}>
-          <Link href={`/author/${p.slug}/`} style={{ color: '#1a1a1a', textDecoration: 'none' }}>{p.name}</Link>{' '}
-          <span style={{
-            fontSize: '0.65rem', fontWeight: 700, verticalAlign: 'middle',
-            background: '#eef2ff', color: '#3b5bdb', borderRadius: '4px', padding: '1px 6px', marginLeft: '0.25rem',
-          }}>
-            AI-редактор
-          </span>
+          <Link href={`/author/${p.slug}/`} style={{ color: '#1a1a1a', textDecoration: 'none' }}>{p.name}</Link>
         </div>
         <div style={{ fontSize: '0.82rem', color: '#777', marginTop: '0.1rem' }}>{p.role}</div>
         {updatedStr && (
           <div style={{ fontSize: '0.78rem', color: '#aaa', marginTop: '0.25rem' }}>Обновлено: {updatedStr}</div>
         )}
-        <div style={{ fontSize: '0.72rem', color: '#b3a896', marginTop: '0.4rem', lineHeight: 1.4 }}>
-          {p.disclosure}
-        </div>
       </div>
     </div>
   )

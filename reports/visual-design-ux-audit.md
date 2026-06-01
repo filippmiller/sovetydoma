@@ -35,7 +35,7 @@
 
 - Compared with Medium: article readability is close enough, but social/action modules are less refined.
 - Compared with Дзен: the content grid is calmer and less clickbait, but lacks strong visual rhythm and feed controls.
-- Compared with Tinkoff Journal: trust, authorship, and editorial polish are weaker; expert/AI author disclosure helps but needs stronger styling.
+- Compared with Tinkoff Journal: trust, authorship, and editorial polish are weaker; author blocks need stronger styling.
 - Compared with Pinterest: image grid density and visual discovery are far weaker; current cards are text-first.
 - Compared with Notion/Linear-style products: UI is much less crisp; spacing and component consistency are acceptable but not premium.
 
@@ -54,7 +54,7 @@
 1. Replace the full homepage archive with: top 12 fresh articles, category tabs, then "load more".
 2. Add thumbnails to search results and highlight matched tokens.
 3. Give article engagement blocks a consistent compact panel style.
-4. Make author/persona blocks visually trustworthy: stronger labels, "AI editor" disclosure, and updated date.
+4. Make author/persona blocks visually trustworthy: stronger labels, editor contact, and updated date.
 5. Add empty-state cards for cabinet, saved articles, user submissions, and admin pages.
 6. Use a more editorial home section rhythm: featured article, two secondary articles, then compact list.
 

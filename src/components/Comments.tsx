@@ -220,7 +220,7 @@ export default function Comments({ slug }: Props) {
 
     if (error || !data) { setSubmitting(false); setNotice('Не удалось отправить комментарий.'); return }
 
-    // 3) Fire AI moderation; if it approves, show the comment immediately.
+    // 3) Fire automated moderation; if it approves, show the comment immediately.
     let approved = false
     try {
       const { data: sess } = await supabase.auth.getSession()

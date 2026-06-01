@@ -1,69 +1,60 @@
-// Editorial personas (AI-assisted virtual curators).
-// IMPORTANT: these are NOT presented as real humans. Each carries an explicit
-// disclosure string and the role wording makes the virtual/AI nature clear.
+// Editorial profiles shown on articles and author pages.
 
 export interface Persona {
   slug: string
   name: string
-  role: string            // e.g. "Виртуальный редактор раздела «Дом и хозяйство»"
+  role: string
   bio: string
-  icon: string            // emoji avatar fallback
-  categories: string[]    // category slugs this persona curates
-  contact: string         // email alias
-  disclosure: string      // shown verbatim near attribution
+  icon: string
+  categories: string[]
+  contact: string
 }
-
-const DISCLOSURE = 'AI-ассистированный виртуальный редактор. Материалы проверяются на практике, но автор — не реальный человек.'
 
 export const PERSONAS: Persona[] = [
   {
     slug: 'maryana-sidorova',
     name: 'Марьяна Сидорова',
-    role: 'Виртуальный редактор раздела «Дом и хозяйство»',
-    bio: 'Курирует материалы по дому, уборке, рецептам и заготовкам. Любит порядок, простые рецепты и проверенные бытовые лайфхаки.',
+    role: 'Редактор разделов «Дом и уборка» и «Кулинария»',
+    bio: 'Курирует материалы по дому, уборке, рецептам и заготовкам. Любит порядок, простые рецепты и проверенные бытовые советы.',
     icon: '🏡',
     categories: ['dom-i-uborka', 'kulinaria'],
-    contact: 'maryana@sovetydoma.ru',
-    disclosure: DISCLOSURE,
+    contact: 'maryana.sidorova@1001sovet.ru',
   },
   {
     slug: 'petr-pupkin',
     name: 'Пётр Пупкин',
-    role: 'Виртуальный редактор раздела «Ремонт и лайфхаки»',
+    role: 'Редактор раздела «Лайфхаки»',
     bio: 'Отвечает за мелкий ремонт, инструменты и бытовые лайфхаки. Считает, что почти всё можно починить своими руками.',
     icon: '🔧',
     categories: ['layfkhaki'],
-    contact: 'petr.pupkin@sovetydoma.ru',
-    disclosure: DISCLOSURE,
+    contact: 'petr.pupkin@1001sovet.ru',
   },
   {
     slug: 'petr-ivanov',
     name: 'Пётр Иванов',
-    role: 'Виртуальный редактор раздела «Дача, техника и экономия»',
+    role: 'Редактор разделов «Дача и огород» и «Экономия»',
     bio: 'Пишет про дачу и огород, технику и разумную экономию. Любит считать бюджет и планировать сезонные работы.',
     icon: '🚜',
     categories: ['dacha-i-ogorod', 'ekonomiya'],
-    contact: 'petr.ivanov@sovetydoma.ru',
-    disclosure: DISCLOSURE,
+    contact: 'peter.ivanov@1001sovet.ru',
   },
   {
     slug: 'andrey-rybak',
     name: 'Андрей Рыбаков',
-    role: 'Виртуальный редактор раздела «Рыбалка»',
+    role: 'Редактор раздела «Рыбалка»',
     bio: 'Разбирается в снастях, наживках и сезонах клёва. Любит тихие зори на берегу и делится проверенными приёмами ловли.',
     icon: '🎣',
     categories: ['rybalka'],
-    contact: 'andrey.rybak@sovetydoma.ru',
-    disclosure: DISCLOSURE,
+    contact: 'andrey.rybakov@1001sovet.ru',
   },
 ]
 
 const BY_SLUG = new Map(PERSONAS.map((p) => [p.slug, p]))
 
 /**
- * Resolve the persona for an article. An explicit `author` slug in frontmatter
- * wins; otherwise fall back to the persona that curates the article's category;
- * otherwise the first persona. Always returns a persona so attribution renders.
+ * Resolve the editorial profile for an article. An explicit `author` slug in
+ * frontmatter wins; otherwise fall back to the profile that curates the
+ * article's category; otherwise the first profile.
  */
 export function resolvePersona(opts: { author?: string; category?: string }): Persona {
   if (opts.author && BY_SLUG.has(opts.author)) return BY_SLUG.get(opts.author)!

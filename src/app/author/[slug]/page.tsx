@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const p = getPersona(slug)
   if (!p) return { title: 'Автор' }
   return {
-    title: `${p.name} — ${p.role} | СоветыДома`,
+    title: p.name,
     description: p.bio,
     alternates: { canonical: `${SITE_URL}/author/${slug}/` },
     openGraph: { title: p.name, description: p.bio, type: 'profile', url: `${SITE_URL}/author/${slug}/` },
@@ -57,8 +57,7 @@ export default async function AuthorPage({ params }: Props) {
         }}>{persona.icon}</div>
         <div>
           <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.2rem' }}>
-            {persona.name}{' '}
-            <span style={{ fontSize: '0.7rem', fontWeight: 700, verticalAlign: 'middle', background: '#eef2ff', color: '#3b5bdb', borderRadius: '4px', padding: '2px 7px' }}>AI-редактор</span>
+            {persona.name}
           </h1>
           <div style={{ fontSize: '0.9rem', color: '#777' }}>{persona.role}</div>
         </div>
@@ -66,9 +65,8 @@ export default async function AuthorPage({ params }: Props) {
 
       <p style={{ fontSize: '1rem', color: '#333', lineHeight: 1.7, margin: '0 0 1rem' }}>{persona.bio}</p>
 
-      {/* Disclosure */}
-      <div style={{ background: '#fbf7f2', border: '1px solid #ece3d8', borderRadius: '10px', padding: '0.9rem 1.1rem', fontSize: '0.85rem', color: '#8a7d6b', marginBottom: '1.75rem' }}>
-        ℹ️ {persona.disclosure}
+      <div style={{ background: '#fbf7f2', border: '1px solid #ece3d8', borderRadius: '10px', padding: '0.9rem 1.1rem', fontSize: '0.9rem', color: '#5f5143', marginBottom: '1.75rem' }}>
+        Почта редактора: <a href={`mailto:${persona.contact}`} style={{ color: '#c0392b', fontWeight: 700, textDecoration: 'none' }}>{persona.contact}</a>
       </div>
 
       {/* Categories */}

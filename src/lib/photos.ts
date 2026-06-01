@@ -58,7 +58,7 @@ export async function uploadToR2(opts: {
 
 /**
  * Upload a file to R2 via the Worker, create the metadata row (pending), then
- * trigger AI moderation. Returns the resulting moderation status.
+ * trigger automated moderation. Returns the resulting moderation status.
  */
 export async function uploadPhoto(opts: {
   file: File
@@ -106,7 +106,7 @@ export async function uploadPhoto(opts: {
   }).select().single()
   if (insErr || !row) return { ok: false, error: insErr?.message || 'insert_failed' }
 
-  // 3) Fire AI moderation (best-effort; on failure the photo stays pending).
+  // 3) Fire automated moderation (best-effort; on failure the photo stays pending).
   let status = 'pending'
   try {
     const res = await fetch(`${SUPABASE_URL}/functions/v1/moderate-photo`, {
