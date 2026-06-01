@@ -26,9 +26,15 @@ function getUrlQuery(): string {
   return new URLSearchParams(window.location.search).get('q') || ''
 }
 
+function getUrlCategory(): string {
+  if (typeof window === 'undefined') return ''
+  return new URLSearchParams(window.location.search).get('category') || ''
+}
+
 export default function SearchClient({ articles }: Props) {
   const [query, setQuery] = useState(getUrlQuery)
   const [debouncedQuery, setDebouncedQuery] = useState(getUrlQuery)
+  const [category] = useState(getUrlCategory)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const articleJson = JSON.stringify(articles).replace(/</g, '\\u003c')
 
@@ -40,12 +46,18 @@ export default function SearchClient({ articles }: Props) {
     return () => { if (timerRef.current) clearTimeout(timerRef.current) }
   }, [query])
 
-  const results = useMemo(() => {
-    if (!debouncedQuery.trim()) return []
-    return searchArticles(articles, debouncedQuery)
-  }, [debouncedQuery, articles])
+  const filteredArticles = useMemo(() => {
+    return category ? articles.filter((article) => article.category === category) : articles
+  }, [articles, category])
 
-  const hasQuery = debouncedQuery.trim().length > 0
+  const results = useMemo(() => {
+    if (!debouncedQuery.trim()) {
+      return category ? filteredArticles.map((article) => ({ ...article, score: 1 })) : []
+    }
+    return searchArticles(filteredArticles, debouncedQuery)
+  }, [debouncedQuery, filteredArticles, category])
+
+  const hasQuery = debouncedQuery.trim().length > 0 || category.length > 0
 
   return (
     <div data-search-page style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
@@ -87,6 +99,7 @@ export default function SearchClient({ articles }: Props) {
           onFocus={(e) => { e.target.style.borderColor = '#c0392b' }}
           onBlur={(e) => { e.target.style.borderColor = '#e8e4df' }}
         />
+        {category && <input type="hidden" name="category" value={category} />}
         {query && (
           <button
             type="button"
@@ -244,11 +257,14 @@ const searchPageBootstrap = String.raw`
   const box = root.querySelector('[data-search-fallback-results]');
   const browse = root.querySelector('[data-search-browse]');
   const dataNode = root.querySelector('#search-page-data');
-  const query = new URLSearchParams(window.location.search).get('q') || '';
-  if (!input || !box || !dataNode || query.trim().length < 1) return;
+  const params = new URLSearchParams(window.location.search);
+  const query = params.get('q') || '';
+  const categoryFilter = params.get('category') || '';
+  if (!input || !box || !dataNode || (query.trim().length < 1 && !categoryFilter)) return;
 
   input.value = query;
-  const articles = JSON.parse(dataNode.textContent || '[]');
+  const allArticles = JSON.parse(dataNode.textContent || '[]');
+  const articles = categoryFilter ? allArticles.filter((article) => article.category === categoryFilter) : allArticles;
   const stops = new Set(['а','без','бы','в','во','для','до','за','и','из','или','как','ко','на','над','не','о','об','от','по','под','при','про','с','со','у','что','это']);
   const suffixes = ['ться','тся','ся','иями','ями','ами','ого','его','ому','ему','ыми','ими','иях','ах','ях','ов','ев','ей','ой','ый','ий','ая','яя','ое','ее','ые','ие','ую','юю','ом','ем','ам','ям','а','я','ы','и','у','ю','е','о'];
   const colors = { kulinaria: '#e67e22', 'dom-i-uborka': '#27ae60', 'dacha-i-ogorod': '#16a085', layfkhaki: '#8e44ad', ekonomiya: '#2980b9', rybalka: '#555' };
@@ -298,10 +314,12 @@ const searchPageBootstrap = String.raw`
     return String(value || '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   }
 
-  const results = articles
-    .map((article) => ({ ...article, score: score(article, query) }))
-    .filter((article) => article.score > 0)
-    .sort((a, b) => b.score - a.score || Date.parse(b.date) - Date.parse(a.date));
+  const results = query.trim().length < 1
+    ? articles.map((article) => ({ ...article, score: 1 })).sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
+    : articles
+      .map((article) => ({ ...article, score: score(article, query) }))
+      .filter((article) => article.score > 0)
+      .sort((a, b) => b.score - a.score || Date.parse(b.date) - Date.parse(a.date));
 
   if (browse) browse.style.display = 'none';
   root.dataset.hasStaticResults = '1';

@@ -4,7 +4,7 @@ import SeasonalBanner from '@/components/SeasonalBanner'
 import PopularArticles from '@/components/PopularArticles'
 import PersonalisedSection from '@/components/PersonalisedSection'
 import StartHereSection from '@/components/StartHereSection'
-import HomeSmartSearch from '@/components/HomeSmartSearch'
+import HeroSearchControls from '@/components/HeroSearchControls'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath, absoluteUrl } from '@/lib/seo'
@@ -49,6 +49,7 @@ const CATEGORY_COLOR: Record<string, string> = {
   'dacha-i-ogorod': '#16a085',
   layfkhaki: '#8e44ad',
   ekonomiya: '#2980b9',
+  rybalka: '#2c7da0',
 }
 
 export default function HomePage() {
@@ -56,6 +57,11 @@ export default function HomePage() {
   const catCounts = Object.fromEntries(
     Object.keys(CATEGORIES).map((cat) => [cat, articles.filter((a) => a.category === cat).length])
   )
+  const categoryOptions = Object.values(CATEGORIES).map((cat) => ({
+    slug: cat.slug,
+    name: cat.name,
+    count: catCounts[cat.slug] || 0,
+  }))
 
   const popularArticleData = articles.map((a) => ({
     title: a.title,
@@ -99,8 +105,8 @@ export default function HomePage() {
             backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)',
             backgroundSize: '30px 30px',
           }} />
-          <div style={{ position: 'relative', zIndex: 1, width: '100%', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ minWidth: 0 }}>
+          <div style={{ position: 'relative', zIndex: 1, width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ minWidth: '240px', flex: '1 1 320px' }}>
             <p style={{ fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.72, margin: '0 0 0.22rem' }}>
               Практичные советы для дома
             </p>
@@ -111,20 +117,9 @@ export default function HomePage() {
               Рецепты, лайфхаки, дача и экономия — всё проверено на практике.
             </p>
             </div>
-            <Link href="/search" style={{
-              display: 'inline-block',
-              backgroundColor: '#fff',
-              color: '#c0392b',
-              fontWeight: 700,
-              fontSize: '0.82rem',
-              padding: '0.45rem 0.8rem',
-              borderRadius: '6px',
-              textDecoration: 'none',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-              whiteSpace: 'nowrap',
-            }}>
-              Читать советы →
-            </Link>
+            <div style={{ flex: '1 1 520px', minWidth: '280px' }}>
+              <HeroSearchControls articles={articlesForClient} categories={categoryOptions} />
+            </div>
           </div>
         </section>
 
@@ -156,8 +151,6 @@ export default function HomePage() {
             })}
           </div>
         </section>
-
-        <HomeSmartSearch articles={articlesForClient} />
 
         {/* F15: Seasonal content banner */}
         <SeasonalBanner />
