@@ -6,13 +6,53 @@
     <description>Лайфхаки для чистоты и порядка в доме</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-dom-i-uborka.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Sun, 31 May 2026 13:16:13 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 01 Jun 2026 14:32:31 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
       <link>https://1001sovet.ru/</link>
     </image>
     
+  <item>
+    <title>Как убрать шерсть с дивана, ковра и одежды: все рабочие способы</title>
+    <link>https://1001sovet.ru/dom-i-uborka/ubrat-sherst-s-divana-i-kovra/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/ubrat-sherst-s-divana-i-kovra/</guid>
+    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Обзор методов удаления шерсти животных с мягкой мебели, ковров и ткани: от резиновых перчаток до специальных насадок на пылесос.</description>
+  </item>
+  <item>
+    <title>Как почистить вытяжку на кухне от липкого жира без химии</title>
+    <link>https://1001sovet.ru/dom-i-uborka/pochistit-kuhonnuyu-vytyazhku/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/pochistit-kuhonnuyu-vytyazhku/</guid>
+    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Пошаговая чистка кухонной вытяжки: фильтры, вентилятор и корпус. Рецепты растворов из соды и уксуса для застарелого жира.</description>
+  </item>
+  <item>
+    <title>Как освежить шторы без полной стирки: быстрые способы</title>
+    <link>https://1001sovet.ru/dom-i-uborka/osvezhit-shtory-bez-stirki/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/osvezhit-shtory-bez-stirki/</guid>
+    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Методы освежения штор в домашних условиях без снятия и стирки: парообработка, пылесос, спреи и проветривание.</description>
+  </item>
+  <item>
+    <title>Как отмыть москитные сетки и не порвать их: проверенные способы</title>
+    <link>https://1001sovet.ru/dom-i-uborka/kak-otmyt-moskitnye-setki/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-otmyt-moskitnye-setki/</guid>
+    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Пошаговая инструкция по мойке москитных сеток вручную и в ванной: растворы, температуру воды и способы сушки без деформации.</description>
+  </item>
+  <item>
+    <title>Как организовать хранение круп, муки и специй: 7 практичных правил</title>
+    <link>https://1001sovet.ru/dom-i-uborka/hranenie-krup-muki-spetsiy/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/hranenie-krup-muki-spetsiy/</guid>
+    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Принципы хранения сыпучих продуктов на кухне: контейнеры, температура, сроки годности и защита от жучков-пищевиков.</description>
+  </item>
   <item>
     <title>Как избавиться от неприятного запаха в посудомоечной машине</title>
     <link>https://1001sovet.ru/dom-i-uborka/zapah-v-posudomoyke/</link>
@@ -132,46 +172,6 @@
     <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
     <description>Эффективные методы удаления пятен с обивки дивана: от кофе и вина до жира и чернил.</description>
-  </item>
-  <item>
-    <title>Как удалить плесень в ванной комнате навсегда за 1 день</title>
-    <link>https://1001sovet.ru/dom-i-uborka/plesen-v-vannoy/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/plesen-v-vannoy/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Надёжные способы избавиться от чёрной плесени в ванной и предотвратить её повторное появление.</description>
-  </item>
-  <item>
-    <title>Как отстирать кухонные полотенца от жира и запаха</title>
-    <link>https://1001sovet.ru/dom-i-uborka/otstirat-polotentsa/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/otstirat-polotentsa/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Проверенные рецепты отстирывания кухонных полотенец: замачивание, сода, уксус и правильная стирка.</description>
-  </item>
-  <item>
-    <title>Как быстро отмыть жалюзи от пыли и грязи за 30 минут</title>
-    <link>https://1001sovet.ru/dom-i-uborka/otmyt-zhalyuzi/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/otmyt-zhalyuzi/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Быстрые методы очистки горизонтальных и вертикальных жалюзи от пыли без снятия с окна.</description>
-  </item>
-  <item>
-    <title>Как отмыть зеркало до идеального блеска без разводов</title>
-    <link>https://1001sovet.ru/dom-i-uborka/otmyt-zerkalo/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/otmyt-zerkalo/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Проверенные способы мытья зеркал без разводов с помощью уксуса, нашатыря и правильной техники протирки.</description>
-  </item>
-  <item>
-    <title>Как отмыть духовку от жира без химии за 1 час</title>
-    <link>https://1001sovet.ru/dom-i-uborka/otmyt-duhovku-ot-zhira/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/otmyt-duhovku-ot-zhira/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Простые способы очистить духовку от застарелого жира народными средствами без агрессивной химии.</description>
   </item>
   </channel>
 </rss>

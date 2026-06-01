@@ -6,13 +6,29 @@
     <description>Советы для сада, огорода и загородной жизни</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-dacha-i-ogorod.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Sun, 31 May 2026 13:16:13 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 01 Jun 2026 14:32:31 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
       <link>https://1001sovet.ru/</link>
     </image>
     
+  <item>
+    <title>Как защитить клубнику от птиц без вреда для участка</title>
+    <link>https://1001sovet.ru/dacha-i-ogorod/zashchita-klubniki-ot-ptits/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/zashchita-klubniki-ot-ptits/</guid>
+    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Эффективные и безопасные способы защиты ягодник клубники от птиц: сетки, отпугиватели и ловушки без химии.</description>
+  </item>
+  <item>
+    <title>Как поливать теплицу в жару, чтобы растения не болели</title>
+    <link>https://1001sovet.ru/dacha-i-ogorod/poliv-teplitsy-v-zharu/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/poliv-teplitsy-v-zharu/</guid>
+    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Правила полива томатов, огурцов и перца в теплице при температуре выше 30 °C: время, объём воды и способы удержания влаги.</description>
+  </item>
   <item>
     <title>Выращивание зелени на подоконнике круглый год в домашних условиях</title>
     <link>https://1001sovet.ru/dacha-i-ogorod/zelen-na-podokonnike/</link>
@@ -156,22 +172,6 @@
     <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дача и огород</category>
     <description>Как приготовить плодородный компост за 60 дней из огородных и кухонных отходов.</description>
-  </item>
-  <item>
-    <title>Как уничтожить колорадского жука без химии и с ней</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/koloradskiy-zhuk/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/koloradskiy-zhuk/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Все способы борьбы с колорадским жуком: ручной сбор, народные средства и эффективные препараты.</description>
-  </item>
-  <item>
-    <title>Клубника в открытом грунте: секреты сладкой ягоды</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/klubnika-v-grunte/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/klubnika-v-grunte/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Как вырастить сладкую и крупную клубнику в открытом грунте с первого года посадки.</description>
   </item>
   </channel>
 </rss>

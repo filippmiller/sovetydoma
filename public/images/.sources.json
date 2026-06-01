@@ -2850,5 +2850,261 @@
     "height": 240,
     "quality": 72,
     "generatedAt": "2026-05-31T21:29:31.053450+00:00"
+  },
+  "domashniy-kvas-bez-lishney-sladosti": {
+    "provider": "pollinations",
+    "model": "flux",
+    "prompt": "photorealistic editorial photo, Домашний квас без лишней сладости: рецепт на ржаной закваске, real homemade food on a table in a modest kitchen, natural window light, realistic documentary style, no text, no letters, no logo, no watermark, no illustration, no cartoon",
+    "generatedAt": "2026-06-01T14:28:55.603Z"
+  },
+  "bezopasnost-na-ldu-rybalka": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.506504+00:00"
+  },
+  "domashnyaya-aptechka-bez-lishnego": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.538613+00:00"
+  },
+  "donnaya-snast-svoimi-rukami": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.570638+00:00"
+  },
+  "dorozhnaya-sumka-za-20-minut": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.602107+00:00"
+  },
+  "ekonomiya-na-bytovoy-himii": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.634034+00:00"
+  },
+  "ekonomiya-na-dache": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.665856+00:00"
+  },
+  "ekonomiya-na-produktah-letom": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.697999+00:00"
+  },
+  "fidernaya-lovlya-dlya-novichkov": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.733494+00:00"
+  },
+  "hranenie-krup-muki-spetsiy": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.765655+00:00"
+  },
+  "hranenie-rybolovnyh-snastey": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.797643+00:00"
+  },
+  "hrnanenie-na-kuhne": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.835600+00:00"
+  },
+  "kak-ne-zaputyvat-snasti": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.874101+00:00"
+  },
+  "kak-otmyt-moskitnye-setki": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.911104+00:00"
+  },
+  "kak-sohranit-rybu-svezhey": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.944183+00:00"
+  },
+  "kak-solit-i-vyalit-rybu": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:36.977286+00:00"
+  },
+  "lovlya-golavlya-letom": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.009863+00:00"
+  },
+  "lovlya-karasya-letom": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.043226+00:00"
+  },
+  "lovlya-karpa-na-prudu": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.081186+00:00"
+  },
+  "lovlya-nalima-osenyu": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.117379+00:00"
+  },
+  "lovlya-okunya-na-mikrodzhig": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.156064+00:00"
+  },
+  "lovlya-plotvy-vesnoy": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.191573+00:00"
+  },
+  "lovlya-shchuki-osenyu": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.224134+00:00"
+  },
+  "lovlya-sudaka-na-dzhig": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.259931+00:00"
+  },
+  "malosolnye-ogurtsy-v-pakete": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.294933+00:00"
+  },
+  "markirovka-provodov-i-zaryadok": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.328774+00:00"
+  },
+  "nedelnoe-menyu-bez-othodov": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.363084+00:00"
+  },
+  "obsluzhivanie-rybolovnoy-katushki": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.394552+00:00"
+  },
+  "ohladit-kvartiru-bez-konditsionera": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.430060+00:00"
+  },
+  "osvezhit-shtory-bez-stirki": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.462177+00:00"
+  },
+  "pochistit-kuhonnuyu-vytyazhku": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.494920+00:00"
+  },
+  "poliv-teplitsy-v-zharu": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.526229+00:00"
+  },
+  "prikormka-dlya-leshcha": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.558997+00:00"
+  },
+  "proverka-skidok-v-magazine": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.590110+00:00"
+  },
+  "rybalka-s-berega-na-maloy-reke": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.621099+00:00"
+  },
+  "rybalka-s-detmi": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.652290+00:00"
+  },
+  "rybalka-v-dozhd": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.686068+00:00"
+  },
+  "rybolovnye-uzly": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.716848+00:00"
+  },
+  "rybolovnyy-yashchik-k-sezonu": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.747812+00:00"
+  },
+  "ubrat-sherst-s-divana-i-kovra": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.781116+00:00"
+  },
+  "uha-iz-rechnoy-ryby": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.813623+00:00"
+  },
+  "vybor-bura-dlya-zimney-rybalki": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.845695+00:00"
+  },
+  "vybor-eholota-dlya-rybalki": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.879073+00:00"
+  },
+  "vybor-katushki-dlya-spinninga": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.911030+00:00"
+  },
+  "vybor-kryuchka-dlya-rybalki": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.943606+00:00"
+  },
+  "vybor-leski-dlya-udochki": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:37.976204+00:00"
+  },
+  "vybor-sapog-dlya-rybalki": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:38.007761+00:00"
+  },
+  "vybor-spinninga-dlya-nachinayushchih": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:38.042978+00:00"
+  },
+  "zapah-v-termose-i-butylke": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:38.090036+00:00"
+  },
+  "zashchita-klubniki-ot-ptits": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:38.121529+00:00"
+  },
+  "zimnyaya-lovlya-okunya": {
+    "provider": "generated-card",
+    "style": "muted-topic-thumbnail",
+    "generatedAt": "2026-06-01T14:29:38.152402+00:00"
   }
 }

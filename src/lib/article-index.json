@@ -3,6 +3,10 @@
     "category": "dacha-i-ogorod",
     "title": "Баклажаны в теплице: от рассады до сбора урожая за один сезон"
   },
+  "bezopasnost-na-ldu-rybalka": {
+    "category": "rybalka",
+    "title": "Безопасность на льду: правила для зимней рыбалки"
+  },
   "bliny-na-moloke": {
     "category": "kulinaria",
     "title": "Тонкие блины на молоке без комочков: проверенный рецепт"
@@ -79,9 +83,25 @@
     "category": "kulinaria",
     "title": "Домашние пельмени: рецепт теста и техника лепки"
   },
+  "domashniy-kvas-bez-lishney-sladosti": {
+    "category": "kulinaria",
+    "title": "Домашний квас без лишней сладости: рецепт на ржаной закваске"
+  },
   "domashniy-mayonez-bystro": {
     "category": "kulinaria",
     "title": "Домашний майонез за 2 минуты без взбивания венчиком"
+  },
+  "domashnyaya-aptechka-bez-lishnego": {
+    "category": "layfkhaki",
+    "title": "Как быстро собрать тревожную домашнюю аптечку без лишнего"
+  },
+  "donnaya-snast-svoimi-rukami": {
+    "category": "rybalka",
+    "title": "Донная снасть своими руками: простой рабочий монтаж"
+  },
+  "dorozhnaya-sumka-za-20-minut": {
+    "category": "layfkhaki",
+    "title": "Как собрать дорожную сумку за 20 минут и ничего не забыть"
   },
   "drenazh-na-uchastke": {
     "category": "dacha-i-ogorod",
@@ -107,6 +127,14 @@
     "category": "ekonomiya",
     "title": "Как сэкономить на электроэнергии дома: 10 рабочих способов"
   },
+  "ekonomiya-na-bytovoy-himii": {
+    "category": "ekonomiya",
+    "title": "Как покупать бытовую химию выгодно и не брать лишнее"
+  },
+  "ekonomiya-na-dache": {
+    "category": "ekonomiya",
+    "title": "Как экономить на даче: вода, свет, рассада и инвентарь"
+  },
   "ekonomiya-na-himii": {
     "category": "ekonomiya",
     "title": "Как экономить на бытовой химии в 3 раза без вреда для чистоты"
@@ -118,6 +146,10 @@
   "ekonomiya-na-otoplenii": {
     "category": "ekonomiya",
     "title": "Как сократить расходы на отопление зимой без замерзания"
+  },
+  "ekonomiya-na-produktah-letom": {
+    "category": "ekonomiya",
+    "title": "Как снизить расходы на продукты летом без жесткой экономии"
   },
   "ekonomiya-na-produktah": {
     "category": "ekonomiya",
@@ -138,6 +170,10 @@
   "ekonomnyy-otpusk": {
     "category": "ekonomiya",
     "title": "Как подготовиться к отпуску без лишних трат и финансовых сюрпризов"
+  },
+  "fidernaya-lovlya-dlya-novichkov": {
+    "category": "rybalka",
+    "title": "Фидерная ловля для новичков: кормушка, поводок и монтаж оснастки"
   },
   "grechka-po-kupecheski": {
     "category": "kulinaria",
@@ -171,6 +207,10 @@
     "category": "kulinaria",
     "title": "Холодец из свиных ножек: классический рецепт с секретами прозрачности"
   },
+  "hranenie-krup-muki-spetsiy": {
+    "category": "dom-i-uborka",
+    "title": "Как организовать хранение круп, муки и специй: 7 практичных правил"
+  },
   "hranenie-morkovi": {
     "category": "dacha-i-ogorod",
     "title": "Как сохранить морковь свежей до нового урожая"
@@ -187,6 +227,10 @@
     "category": "layfkhaki",
     "title": "Как навести порядок с проводами и зарядками: 7 лайфхаков"
   },
+  "hranenie-rybolovnyh-snastey": {
+    "category": "rybalka",
+    "title": "Как хранить рыболовные снасти дома и в машине: практичные советы"
+  },
   "idealnyy-borshch": {
     "category": "kulinaria",
     "title": "Как сделать идеальный борщ: 7 секретов шеф-повара"
@@ -198,6 +242,22 @@
   "izbavitsya-ot-pyli": {
     "category": "dom-i-uborka",
     "title": "Как избавиться от пыли в квартире надолго: причины и решения"
+  },
+  "kak-ne-zaputyvat-snasti": {
+    "category": "rybalka",
+    "title": "Как не запутывать снасти при перевозке: системы хранения и транспортировки"
+  },
+  "kak-otmyt-moskitnye-setki": {
+    "category": "dom-i-uborka",
+    "title": "Как отмыть москитные сетки и не порвать их: проверенные способы"
+  },
+  "kak-sohranit-rybu-svezhey": {
+    "category": "rybalka",
+    "title": "Как сохранить рыбу свежей после улова в жару"
+  },
+  "kak-solit-i-vyalit-rybu": {
+    "category": "rybalka",
+    "title": "Как солить и вялить рыбу дома: безопасная технология для начинающих"
   },
   "kak-varit-makarony": {
     "category": "kulinaria",
@@ -275,9 +335,45 @@
     "category": "layfkhaki",
     "title": "Правила безопасности в лесу: как не заблудиться и что брать с собой"
   },
+  "lovlya-golavlya-letom": {
+    "category": "rybalka",
+    "title": "Ловля голавля летом: приманки и осторожная подача на мелкой реке"
+  },
+  "lovlya-karasya-letom": {
+    "category": "rybalka",
+    "title": "Как ловить карася на поплавочную удочку летом: снасти и наживки"
+  },
   "lovlya-karasya": {
     "category": "rybalka",
     "title": "Ловля карася весной: снасти, наживки и места"
+  },
+  "lovlya-karpa-na-prudu": {
+    "category": "rybalka",
+    "title": "Ловля карпа на пруду: место, прикормка и насадка"
+  },
+  "lovlya-nalima-osenyu": {
+    "category": "rybalka",
+    "title": "Ловля налима осенью: время, снасти и проверенная наживка"
+  },
+  "lovlya-okunya-na-mikrodzhig": {
+    "category": "rybalka",
+    "title": "Ловля окуня на микроджиг: снасти, проводка и типичные ошибки"
+  },
+  "lovlya-plotvy-vesnoy": {
+    "category": "rybalka",
+    "title": "Ловля плотвы весной: где искать и чем кормить"
+  },
+  "lovlya-shchuki-osenyu": {
+    "category": "rybalka",
+    "title": "Ловля щуки на спиннинг осенью: приманки, проводка и время"
+  },
+  "lovlya-sudaka-na-dzhig": {
+    "category": "rybalka",
+    "title": "Ловля судака на джиг: глубина, приманки, проводка"
+  },
+  "malosolnye-ogurtsy-v-pakete": {
+    "category": "kulinaria",
+    "title": "Малосольные огурцы в пакете за ночь: рецепт хрустящей закуски"
   },
   "marinad-dlya-shashlyka": {
     "category": "kulinaria",
@@ -286,6 +382,10 @@
   "marinovannyy-luk": {
     "category": "kulinaria",
     "title": "Маринованный лук к шашлыку: быстрый рецепт за 30 минут"
+  },
+  "markirovka-provodov-i-zaryadok": {
+    "category": "layfkhaki",
+    "title": "Как подписать провода и зарядки, чтобы не путаться"
   },
   "menshe-pyli-v-kvartire": {
     "category": "dom-i-uborka",
@@ -307,6 +407,10 @@
     "category": "dom-i-uborka",
     "title": "Как избавиться от накипи в чайнике за 10 минут"
   },
+  "nedelnoe-menyu-bez-othodov": {
+    "category": "ekonomiya",
+    "title": "Как составить недельное меню и меньше выбрасывать еды"
+  },
   "obrezka-smorodiny": {
     "category": "dacha-i-ogorod",
     "title": "Обрезка смородины после ягод: как подготовить кусты к следующему году"
@@ -314,6 +418,10 @@
   "obrezka-yabloni": {
     "category": "dacha-i-ogorod",
     "title": "Обрезка яблони весной: как не навредить дереву"
+  },
+  "obsluzhivanie-rybolovnoy-katushki": {
+    "category": "rybalka",
+    "title": "Как чистить и обслуживать катушку после рыбалки: пошаговый уход"
   },
   "ogurcy-ot-tli": {
     "category": "dacha-i-ogorod",
@@ -327,6 +435,10 @@
     "category": "dacha-i-ogorod",
     "title": "Как вырастить огурцы в открытом грунте: от посадки до урожая"
   },
+  "ohladit-kvartiru-bez-konditsionera": {
+    "category": "layfkhaki",
+    "title": "Как быстро охладить квартиру вечером без кондиционера"
+  },
   "ohladit-napitok-bystro": {
     "category": "layfkhaki",
     "title": "Как за 5 минут охладить любой напиток без льда"
@@ -338,6 +450,10 @@
   "organizatsiya-kuhni": {
     "category": "layfkhaki",
     "title": "Как организовать кухню: места хранения и порядок без усилий"
+  },
+  "osvezhit-shtory-bez-stirki": {
+    "category": "dom-i-uborka",
+    "title": "Как освежить шторы без полной стирки: быстрые способы"
   },
   "osy-pchely-osam": {
     "category": "layfkhaki",
@@ -391,6 +507,10 @@
     "category": "dom-i-uborka",
     "title": "Как почистить диван от пятен в домашних условиях"
   },
+  "pochistit-kuhonnuyu-vytyazhku": {
+    "category": "dom-i-uborka",
+    "title": "Как почистить вытяжку на кухне от липкого жира без химии"
+  },
   "pochistit-serebro": {
     "category": "dom-i-uborka",
     "title": "Как почистить серебро и золото в домашних условиях"
@@ -422,6 +542,10 @@
   "poliv-ogoroda": {
     "category": "dacha-i-ogorod",
     "title": "Полив огорода: сколько воды нужно и как часто поливать"
+  },
+  "poliv-teplitsy-v-zharu": {
+    "category": "dacha-i-ogorod",
+    "title": "Как поливать теплицу в жару, чтобы растения не болели"
   },
   "pomyt-okna-bez-razvodov": {
     "category": "dom-i-uborka",
@@ -467,9 +591,17 @@
     "category": "dom-i-uborka",
     "title": "Как отмыть пригоревшую кастрюлю без усилий за 30 минут"
   },
+  "prikormka-dlya-leshcha": {
+    "category": "rybalka",
+    "title": "Прикормка для леща своими руками: состав, пропорции и советы"
+  },
   "privivka-derevev": {
     "category": "dacha-i-ogorod",
     "title": "Прививка плодовых деревьев для новичков: простые способы"
+  },
+  "proverka-skidok-v-magazine": {
+    "category": "ekonomiya",
+    "title": "Как проверить скидку в магазине и не попасться на уловки"
   },
   "rassada-tomatov": {
     "category": "dacha-i-ogorod",
@@ -490,6 +622,26 @@
   "remont-kvartiry-byudzhet": {
     "category": "ekonomiya",
     "title": "Бюджетный ремонт квартиры: как сделать красиво и недорого"
+  },
+  "rybalka-s-berega-na-maloy-reke": {
+    "category": "rybalka",
+    "title": "Рыбалка с берега на малой реке: как выбрать место и поймать хищника"
+  },
+  "rybalka-s-detmi": {
+    "category": "rybalka",
+    "title": "Рыбалка с детьми: что взять и как не испортить ребёнку первый опыт"
+  },
+  "rybalka-v-dozhd": {
+    "category": "rybalka",
+    "title": "Рыбалка в дождь: когда клёв улучшается, а когда лучше остаться дома"
+  },
+  "rybolovnye-uzly": {
+    "category": "rybalka",
+    "title": "Лучшие узлы для рыбалки: как вязать правильно и избежать обрывов"
+  },
+  "rybolovnyy-yashchik-k-sezonu": {
+    "category": "rybalka",
+    "title": "Как подготовить рыболовный ящик к сезону"
   },
   "sel-telefon": {
     "category": "layfkhaki",
@@ -623,6 +775,10 @@
     "category": "dom-i-uborka",
     "title": "Как быстро убрать ванную комнату до блеска за 20 минут"
   },
+  "ubrat-sherst-s-divana-i-kovra": {
+    "category": "dom-i-uborka",
+    "title": "Как убрать шерсть с дивана, ковра и одежды: все рабочие способы"
+  },
   "udalit-nakip-limonkoy": {
     "category": "dom-i-uborka",
     "title": "Как удалить накипь в чайнике лимонной кислотой за 15 минут"
@@ -638,6 +794,10 @@
   "udobreniya-gryadki": {
     "category": "dacha-i-ogorod",
     "title": "Чем подкормить грядки: органика vs минералка, когда и сколько"
+  },
+  "uha-iz-rechnoy-ryby": {
+    "category": "kulinaria",
+    "title": "Как приготовить уху из речной рыбы без запаха тины"
   },
   "uhod-za-gazonom": {
     "category": "dacha-i-ogorod",
@@ -671,6 +831,34 @@
     "category": "kulinaria",
     "title": "Вареники с картошкой и луком: рецепт как у бабушки"
   },
+  "vybor-bura-dlya-zimney-rybalki": {
+    "category": "rybalka",
+    "title": "Как правильно выбрать бур для зимней рыбалки"
+  },
+  "vybor-eholota-dlya-rybalki": {
+    "category": "rybalka",
+    "title": "Как выбрать эхолот для любительской рыбалки: частота, мощность и функции"
+  },
+  "vybor-katushki-dlya-spinninga": {
+    "category": "rybalka",
+    "title": "Как выбрать катушку для спиннинга без переплаты: размер, фрикцион, подшипники"
+  },
+  "vybor-kryuchka-dlya-rybalki": {
+    "category": "rybalka",
+    "title": "Как подобрать крючок под наживку и размер рыбы"
+  },
+  "vybor-leski-dlya-udochki": {
+    "category": "rybalka",
+    "title": "Как выбрать леску для поплавочной удочки: диаметр, материал и цвет"
+  },
+  "vybor-sapog-dlya-rybalki": {
+    "category": "rybalka",
+    "title": "Как выбрать рыболовные сапоги и забродники: материалы, высота и уход"
+  },
+  "vybor-spinninga-dlya-nachinayushchih": {
+    "category": "rybalka",
+    "title": "Как выбрать спиннинг для начинающего рыбака: длина, тест и строй"
+  },
   "vyrashchivanie-kabachkov": {
     "category": "dacha-i-ogorod",
     "title": "Выращивание кабачков в открытом грунте: секреты большого урожая"
@@ -695,6 +883,10 @@
     "category": "dom-i-uborka",
     "title": "Как избавиться от неприятного запаха в посудомоечной машине"
   },
+  "zapah-v-termose-i-butylke": {
+    "category": "layfkhaki",
+    "title": "Как убрать запах в термосе и бутылке без агрессивной химии"
+  },
   "zapakh-v-holodilnike": {
     "category": "dom-i-uborka",
     "title": "Как избавиться от запаха в холодильнике навсегда"
@@ -707,6 +899,10 @@
     "category": "layfkhaki",
     "title": "12 лайфхаков для быстрой и безопасной зарядки телефона"
   },
+  "zashchita-klubniki-ot-ptits": {
+    "category": "dacha-i-ogorod",
+    "title": "Как защитить клубнику от птиц без вреда для участка"
+  },
   "zatochit-nozh": {
     "category": "layfkhaki",
     "title": "Как заточить нож без точилки: 6 рабочих способов"
@@ -718,5 +914,9 @@
   "zima-zagotovki": {
     "category": "kulinaria",
     "title": "Зимние заготовки: варенье, соленья и маринады — с чего начать"
+  },
+  "zimnyaya-lovlya-okunya": {
+    "category": "rybalka",
+    "title": "Зимняя ловля окуня на мормышку: что работает"
   }
 }
