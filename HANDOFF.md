@@ -5,7 +5,7 @@
 > Operational detail with secret-file paths lives in the **gitignored**
 > `DEPLOY-TIMEWEB.md` (project root) and `C:\dev\knowledge\sovetydoma-deploy.md`.
 
-Last updated: 2026-05-31.
+Last updated: 2026-06-01.
 
 ---
 
@@ -53,6 +53,19 @@ category emoji if an image is missing/404s.
   `@`/`www` (pogovorimdoma.ru) → 188.225.86.238.
 - **Timeweb API:** base `https://api.timeweb.cloud/api/v1`, `Authorization: Bearer <token>`.
 
+Current hosting mode:
+
+- The production site is a static Next.js export served by nginx on the Timeweb
+  VPS. There is no Docker/container runtime on this VPS yet.
+- Do not store all credentials in an app container. For now, build-time public
+  env values live in GitHub Actions secrets, local-only values live in
+  `C:\Users\filip\.secrets\` / `.env.local`, Cloudflare Worker values live as
+  Worker secrets, and future server-side backend/container env lives in
+  `/etc/1001sovet/secrets.env`.
+- `/etc/1001sovet/secrets.env` is present on the VPS as `root:root` mode `0600`.
+  It currently stores future backend/container secrets such as `RESEND_API_KEY`;
+  static nginx does not read it.
+
 ## 4. CI/CD — how to deploy
 
 **Just `git push` to master.** `.github/workflows/deploy.yml` does:
@@ -67,7 +80,8 @@ the VPS → `/opt/deploy/activate.sh <release>` (atomic symlink swap, keeps last
   `telegram-notify.yml` (pings Telegram when new article .mdx land).
 - Actions pinned to **v6 majors + Node 24**.
 - GitHub repo secrets (set; values not shown): `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`,
-  `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_PHOTO_WORKER_URL`.
+  `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  `NEXT_PUBLIC_PHOTO_WORKER_URL`, `NEXT_PUBLIC_CONTACT_WORKER_URL`.
   (`NEXT_PUBLIC_SITE_URL` is hardcoded to https://1001sovet.ru in the workflow.)
 
 ## 5. The article factory (how content gets made)
@@ -122,8 +136,8 @@ ASCII patterns) or Node for any edit touching Cyrillic.
   (Unsplash demo apps = 50 requests/hour; the script stops cleanly when the budget
   is gone — just re-run next hour). Currently **152/160** populated; re-run to fill
   the rest.
-- Images are committed to git so CI ships them. Missing ones degrade to the
-  category emoji automatically.
+- Images are committed to git so CI ships them. `npm run audit:images -- --json`
+  must report no duplicates and no missing images before deploy.
 - Unsplash Access Key currently lives in chat history — recommend moving it to
   `C:\Users\filip\.secrets\` and exporting from there.
 
@@ -169,6 +183,7 @@ code error — just re-run. CI (Linux) never hits it.
 | Timeweb API token | `C:\Users\filip\.secrets\timeweb_api_token` |
 | VPS root SSH key | `C:\Users\filip\.ssh\timeweb_1001sovet` |
 | CI deploy SSH key | `C:\Users\filip\.secrets\gha_deploy_1001sovet` |
+| Resend API key | `C:\Users\filip\.secrets\1001sovet-resend.env`; also on VPS in `/etc/1001sovet/secrets.env` and Cloudflare Worker secret `RESEND_API_KEY` |
 | Anthropic API key | Supabase Vault: `get_secret('ANTHROPIC_API_KEY')` — **ROTATE** (was exposed in chat) |
 | Unsplash Access Key | currently in chat history — move to `.secrets` |
 | reg.ru login | **not stored** — user performs registrar actions manually |

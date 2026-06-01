@@ -106,6 +106,7 @@ npm run build                             # should pass; pages scale fine
 git log --oneline | head -12              # expect 10 "batch N/10" commits
 ```
 
-Each push auto-deploys via Vercel and the build re-indexes the new articles.
+Each push auto-deploys via GitHub Actions to the Timeweb Cloud VPS and the build
+re-indexes the new articles.
 Images stay on the category-emoji fallback until you add real photos (Unsplash
 batch script is still pending an API key).
