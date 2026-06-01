@@ -13,19 +13,26 @@ export default function ArticleChecklist({ items, id }: ArticleChecklistProps) {
 
   // Load from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(storageKey)
-      if (stored) {
-        const parsed = JSON.parse(stored) as boolean[]
-        // Ensure length matches items in case items changed
-        const normalized = items.map((_, i) => parsed[i] ?? false)
-        setChecked(normalized)
-      } else {
+    let cancelled = false
+    ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+      try {
+        const stored = localStorage.getItem(storageKey)
+        if (stored) {
+          const parsed = JSON.parse(stored) as boolean[]
+          // Ensure length matches items in case items changed
+          const normalized = items.map((_, i) => parsed[i] ?? false)
+          if (!cancelled) setChecked(normalized)
+        } else if (!cancelled) {
+          setChecked(items.map(() => false))
+        }
+      } catch {
+        if (cancelled) return
         setChecked(items.map(() => false))
       }
-    } catch {
-      setChecked(items.map(() => false))
-    }
+    })()
+    return () => { cancelled = true }
   }, [storageKey, items.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Persist to localStorage on change

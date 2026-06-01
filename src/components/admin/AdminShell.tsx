@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 const ACCENT = '#c0392b'
 
@@ -75,14 +76,14 @@ export default function AdminShell({ activeNav, children }: Props) {
         padding: '1.5rem 1.25rem 1rem',
         borderBottom: '1px solid #2e2e2e',
       }}>
-        <a href="/" style={{ textDecoration: 'none' }}>
+        <Link href="/" style={{ textDecoration: 'none' }}>
           <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
             🏠 СоветыДома
           </div>
           <div style={{ fontSize: '0.7rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '0.15rem' }}>
             Панель управления
           </div>
-        </a>
+        </Link>
       </div>
 
       {/* Nav links */}

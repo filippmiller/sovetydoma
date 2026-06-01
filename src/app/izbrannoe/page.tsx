@@ -32,27 +32,34 @@ export default function FavoritesPage() {
       .filter((x): x is FavItem => x !== null)
 
   useEffect(() => {
-    const local = readLocalFavorites()
-    setItems(resolve(local))
-    setLoading(false)
-
-    // Merge in DB-backed saves when logged in (cross-device favorites).
+    let cancelled = false
     ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+
+      const local = readLocalFavorites()
+      setItems(resolve(local))
+      setLoading(false)
+
+      // Merge in DB-backed saves when logged in (cross-device favorites).
       try {
         const sb = getSupabase()
         const { data: u } = await sb.auth.getUser()
+        if (cancelled) return
         if (u.user) {
           const { data } = await sb
             .from('saved_articles')
             .select('article_slug')
             .eq('user_id', u.user.id)
           const dbSlugs = (data || []).map((r: { article_slug: string }) => r.article_slug)
+          if (cancelled) return
           setItems(resolve([...local, ...dbSlugs]))
         }
       } catch {
         // localStorage-only mode
       }
     })()
+    return () => { cancelled = true }
   }, [])
 
   const remove = (slug: string) => {

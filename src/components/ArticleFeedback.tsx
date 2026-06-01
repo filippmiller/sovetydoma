@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 
 interface Props {
@@ -29,7 +29,7 @@ export default function ArticleFeedback({ slug }: Props) {
   const [counts, setCounts] = useState<Counts>({})
 
   // Load aggregate counters (public) + restore this visitor's prior choices.
-  const loadCounts = async () => {
+  const loadCounts = useCallback(async () => {
     try {
       const sb = getSupabase()
       const { data } = await sb.from('feedback_counters').select('kind, count').eq('article_slug', slug)
@@ -39,17 +39,23 @@ export default function ArticleFeedback({ slug }: Props) {
         setCounts(c)
       }
     } catch { /* offline */ }
-  }
+  }, [slug])
 
   useEffect(() => {
-    try {
-      setSignal(localStorage.getItem(`fb_signal_${slug}`))
-      const v = localStorage.getItem(`fb_verdict_${slug}`)
-      if (v === 'yes' || v === 'no') { setVerdict(v); setShowComment(true) }
-      if (localStorage.getItem(`fb_sent_${slug}`) === '1') setSent(true)
-    } catch {}
-    loadCounts()
-  }, [slug])
+    let cancelled = false
+    ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+      try {
+        setSignal(localStorage.getItem(`fb_signal_${slug}`))
+        const v = localStorage.getItem(`fb_verdict_${slug}`)
+        if (v === 'yes' || v === 'no') { setVerdict(v); setShowComment(true) }
+        if (localStorage.getItem(`fb_sent_${slug}`) === '1') setSent(true)
+      } catch {}
+      await loadCounts()
+    })()
+    return () => { cancelled = true }
+  }, [slug, loadCounts])
 
   // Record an event to Supabase (anon allowed); optimistic local count bump.
   const record = async (kind: string, extra: { comment?: string } = {}) => {

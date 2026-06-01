@@ -14,7 +14,7 @@ export default function HamburgerMenu() {
 
   // Close on route change
   useEffect(() => {
-    setOpen(false)
+    Promise.resolve().then(() => setOpen(false))
   }, [pathname])
 
   // Prevent body scroll when open

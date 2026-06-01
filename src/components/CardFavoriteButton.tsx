@@ -30,13 +30,18 @@ export default function CardFavoriteButton({ slug }: Props) {
   const [showAuth, setShowAuth] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
-    setSaved(readFavorites().includes(slug))
+    let cancelled = false
     ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+
+      setMounted(true)
+      setSaved(readFavorites().includes(slug))
       try {
         const sb = getSupabase()
         const { data } = await sb.auth.getUser()
         const uid = data.user?.id ?? null
+        if (cancelled) return
         setUserId(uid)
         if (uid) {
           const { data: row } = await sb
@@ -45,12 +50,14 @@ export default function CardFavoriteButton({ slug }: Props) {
             .eq('user_id', uid)
             .eq('article_slug', slug)
             .maybeSingle()
+          if (cancelled) return
           if (row) setSaved(true)
         }
       } catch {
         // localStorage-only mode
       }
     })()
+    return () => { cancelled = true }
   }, [slug])
 
   const toggle = async (e: React.MouseEvent) => {

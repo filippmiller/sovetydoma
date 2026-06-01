@@ -12,7 +12,7 @@ export default function SharePanel({ url, title }: Props) {
   const [hasNativeShare, setHasNativeShare] = useState(false)
 
   useEffect(() => {
-    setHasNativeShare(typeof navigator !== 'undefined' && !!navigator.share)
+    Promise.resolve().then(() => setHasNativeShare(typeof navigator !== 'undefined' && !!navigator.share))
   }, [])
 
   const handleCopy = async () => {

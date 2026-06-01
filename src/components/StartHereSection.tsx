@@ -31,15 +31,21 @@ export default function StartHereSection() {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
-    try {
-      const visited = localStorage.getItem('has_visited')
-      if (!visited) {
-        setShow(true)
-        localStorage.setItem('has_visited', '1')
+    let cancelled = false
+    ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+      try {
+        const visited = localStorage.getItem('has_visited')
+        if (!visited) {
+          setShow(true)
+          localStorage.setItem('has_visited', '1')
+        }
+      } catch {
+        // localStorage unavailable (SSR guard)
       }
-    } catch {
-      // localStorage unavailable (SSR guard)
-    }
+    })()
+    return () => { cancelled = true }
   }, [])
 
   if (!show) return null

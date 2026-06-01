@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# СоветыДома
+
+Production site: https://1001sovet.ru
+
+This is a static Next.js site deployed only to the Timeweb Cloud VPS via GitHub
+Actions. Do not set up Vercel deployment for this repository.
 
 ## Getting Started
 
-First, run the development server:
+Run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Quality Gates
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm test
+npm run audit:images
+pnpm exec tsc --noEmit
+npm run build
+```
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+Pushes to `master` run GitHub Actions:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `CI`
+- `Deploy to Timeweb VPS`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The deploy workflow builds the static export, uploads it over SSH to the Timeweb
+VPS, activates the release with an atomic symlink swap, and smoke-tests
+`https://1001sovet.ru`.
 
-## Deploy on Vercel
+## Operations
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [HANDOFF.md](./HANDOFF.md) for Timeweb VPS details, CI/CD, Mailcow,
+Supabase Auth email, content generation, and rollback procedures.

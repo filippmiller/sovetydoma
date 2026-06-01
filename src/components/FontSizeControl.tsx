@@ -12,17 +12,23 @@ export default function FontSizeControl() {
   const [active, setActive] = useState(16)
 
   useEffect(() => {
-    const stored = localStorage.getItem('font-size')
-    const size = stored ? parseInt(stored, 10) : 16
-    const valid = SIZES.find((s) => s.value === size)?.value ?? 16
-    setActive(valid)
-    document.documentElement.style.fontSize = `${valid}px`
+    let cancelled = false
+    ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+      const stored = localStorage.getItem('font-size')
+      const size = stored ? parseInt(stored, 10) : 16
+      const valid = SIZES.find((s) => s.value === size)?.value ?? 16
+      setActive(valid)
+      document.documentElement.style.setProperty('font-size', `${valid}px`)
+    })()
+    return () => { cancelled = true }
   }, [])
 
   function setSize(value: number) {
     setActive(value)
     localStorage.setItem('font-size', String(value))
-    document.documentElement.style.fontSize = `${value}px`
+    document.documentElement.style.setProperty('font-size', `${value}px`)
   }
 
   return (

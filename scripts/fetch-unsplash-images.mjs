@@ -117,7 +117,7 @@ async function fetchUniqueImage(article, dest, usedIds, usedHashes, sources) {
           fetchedAt: new Date().toISOString(),
         }
         return { fetched: true, remaining, query, id: picked.id }
-      } catch (error) {
+      } catch {
         try { if (fs.existsSync(temp)) fs.unlinkSync(temp) } catch {}
         candidates = candidates.filter((item) => item.id !== picked.id)
       }

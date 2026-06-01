@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import AdminShell from './AdminShell'
 import { useAdminAuth } from '@/lib/admin-auth'
@@ -75,7 +76,7 @@ export default function AdminArticlesList({ articles }: Props) {
     else { setSortKey(key); setSortDir(key === 'date' || key === 'wordCount' ? 'desc' : 'asc') }
   }
 
-  function SortIndicator({ col }: { col: SortKey }) {
+  function renderSortIndicator(col: SortKey) {
     if (sortKey !== col) return <span style={{ color: '#ccc', marginLeft: '0.25rem' }}>↕</span>
     return <span style={{ color: '#c0392b', marginLeft: '0.25rem' }}>{sortDir === 'asc' ? '↑' : '↓'}</span>
   }
@@ -180,19 +181,19 @@ export default function AdminArticlesList({ articles }: Props) {
                   style={{ padding: '0.7rem 1rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', userSelect: 'none' }}
                   onClick={() => toggleSort('title')}
                 >
-                  Заголовок <SortIndicator col="title" />
+                  Заголовок {renderSortIndicator('title')}
                 </th>
                 <th
                   style={{ padding: '0.7rem 0.75rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
                   onClick={() => toggleSort('category')}
                 >
-                  Категория <SortIndicator col="category" />
+                  Категория {renderSortIndicator('category')}
                 </th>
                 <th
                   style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
                   onClick={() => toggleSort('date')}
                 >
-                  Дата <SortIndicator col="date" />
+                  Дата {renderSortIndicator('date')}
                 </th>
                 <th style={{ padding: '0.7rem 0.75rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Теги</th>
                 <th style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Schema</th>
@@ -200,7 +201,7 @@ export default function AdminArticlesList({ articles }: Props) {
                   style={{ padding: '0.7rem 0.75rem', textAlign: 'right', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
                   onClick={() => toggleSort('wordCount')}
                 >
-                  Слов <SortIndicator col="wordCount" />
+                  Слов {renderSortIndicator('wordCount')}
                 </th>
                 <th style={{ padding: '0.7rem 1rem', textAlign: 'right', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}></th>
               </tr>
@@ -226,9 +227,9 @@ export default function AdminArticlesList({ articles }: Props) {
                     <td style={{ padding: '0.7rem 1rem', color: '#bbb', fontSize: '0.78rem' }}>{i + 1}</td>
                     <td style={{ padding: '0.7rem 1rem', maxWidth: '260px' }}>
                       <div style={{ fontWeight: 600, color: '#1a1a1a', lineHeight: 1.35 }}>
-                        <a href={`/admin/articles/${art.slug}/`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <Link href={`/admin/articles/${art.slug}/`} style={{ color: 'inherit', textDecoration: 'none' }}>
                           {art.title}
-                        </a>
+                        </Link>
                       </div>
                       <div style={{ fontSize: '0.74rem', color: '#aaa', marginTop: '0.1rem', fontFamily: 'monospace' }}>{art.slug}</div>
                     </td>

@@ -74,7 +74,6 @@ const articles = files
 function buildTurboItem(a) {
   const url = `${SITE_URL}/${a.category}/${a.slug}/`
   const bodyHtml = markdownToHtml(a.body)
-  const descHtml = escapeXml(a.description || '')
 
   return `
   <item turbo="true">

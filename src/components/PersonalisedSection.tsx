@@ -21,42 +21,49 @@ export default function PersonalisedSection({ articles }: Props) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const history: Record<string, number> = JSON.parse(
-      localStorage.getItem('viewed_categories') || '{}'
-    )
+    let cancelled = false
+    ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+      const history: Record<string, number> = JSON.parse(
+        localStorage.getItem('viewed_categories') || '{}'
+      )
 
-    let selected: Article[]
+      let selected: Article[]
 
-    const entries = Object.entries(history)
-    if (entries.length === 0) {
-      // No history: show 4 most recent
-      selected = [...articles]
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .slice(0, 4)
-    } else {
-      // Top 2 most-viewed categories
-      const top2 = entries
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 2)
-        .map(([cat]) => cat)
-
-      selected = [...articles]
-        .filter((a) => top2.includes(a.category))
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .slice(0, 4)
-
-      // Fallback if not enough articles in top categories
-      if (selected.length < 4) {
-        const extras = [...articles]
-          .filter((a) => !top2.includes(a.category))
+      const entries = Object.entries(history)
+      if (entries.length === 0) {
+        // No history: show 4 most recent
+        selected = [...articles]
           .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-          .slice(0, 4 - selected.length)
-        selected = [...selected, ...extras]
-      }
-    }
+          .slice(0, 4)
+      } else {
+        // Top 2 most-viewed categories
+        const top2 = entries
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 2)
+          .map(([cat]) => cat)
 
-    setPicks(selected)
-    setMounted(true)
+        selected = [...articles]
+          .filter((a) => top2.includes(a.category))
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+          .slice(0, 4)
+
+        // Fallback if not enough articles in top categories
+        if (selected.length < 4) {
+          const extras = [...articles]
+            .filter((a) => !top2.includes(a.category))
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+            .slice(0, 4 - selected.length)
+          selected = [...selected, ...extras]
+        }
+      }
+
+      if (cancelled) return
+      setPicks(selected)
+      setMounted(true)
+    })()
+    return () => { cancelled = true }
   }, [articles])
 
   if (!mounted || picks.length === 0) return null

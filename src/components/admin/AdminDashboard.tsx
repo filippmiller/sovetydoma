@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import AdminShell from './AdminShell'
 import { useAdminAuth } from '@/lib/admin-auth'
@@ -128,7 +129,7 @@ export default function AdminDashboard({ articles, categories }: Props) {
           <div style={{ background: '#fff', borderRadius: '12px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
             <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#1a1a1a' }}>Последние статьи</h2>
-              <a href="/admin/articles/" style={{ fontSize: '0.82rem', color: '#c0392b', textDecoration: 'none', fontWeight: 600 }}>Все →</a>
+              <Link href="/admin/articles/" style={{ fontSize: '0.82rem', color: '#c0392b', textDecoration: 'none', fontWeight: 600 }}>Все →</Link>
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
               <thead>
@@ -142,9 +143,9 @@ export default function AdminDashboard({ articles, categories }: Props) {
                   <tr key={art.slug} style={{ background: i % 2 === 0 ? '#fff' : '#fafafa', borderTop: '1px solid #f0f0f0' }}>
                     <td style={{ padding: '0.65rem 1.5rem' }}>
                       <div style={{ fontWeight: 600, color: '#1a1a1a', fontSize: '0.85rem', lineHeight: 1.3, marginBottom: '0.15rem' }}>
-                        <a href={`/admin/articles/${art.slug}/`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <Link href={`/admin/articles/${art.slug}/`} style={{ color: 'inherit', textDecoration: 'none' }}>
                           {art.title.length > 55 ? art.title.slice(0, 55) + '…' : art.title}
-                        </a>
+                        </Link>
                       </div>
                       <div style={{ fontSize: '0.76rem', color: '#aaa' }}>{formatDate(art.date)}</div>
                     </td>

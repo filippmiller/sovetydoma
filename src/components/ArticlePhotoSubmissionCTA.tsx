@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import { getSupabase } from '@/lib/supabase'
 import { uploadPhoto, photoPublicUrl, type PhotoRow } from '@/lib/photos'
@@ -33,7 +33,7 @@ export default function ArticlePhotoSubmissionCTA({ fm }: Props) {
   const [error, setError] = useState('')
   const [showAuth, setShowAuth] = useState(false)
 
-  const loadGallery = async () => {
+  const loadGallery = useCallback(async () => {
     try {
       const sb = getSupabase()
       const { data } = await sb.from('photos').select('*')
@@ -41,7 +41,7 @@ export default function ArticlePhotoSubmissionCTA({ fm }: Props) {
         .order('created_at', { ascending: false })
       setGallery((data as PhotoRow[]) || [])
     } catch { /* offline */ }
-  }
+  }, [fm.slug])
 
   useEffect(() => {
     ;(async () => {
@@ -52,7 +52,7 @@ export default function ArticlePhotoSubmissionCTA({ fm }: Props) {
       } catch {}
       loadGallery()
     })()
-  }, [fm.slug])
+  }, [fm.slug, loadGallery])
 
   const submit = async () => {
     if (!userId) { setShowAuth(true); return }

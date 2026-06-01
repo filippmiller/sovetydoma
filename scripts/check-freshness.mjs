@@ -53,7 +53,7 @@ function run() {
 
   const rows = files.map((file) => {
     const raw = fs.readFileSync(path.join(articlesDir, file), 'utf8')
-    const { slug, title, date, updated } = parseFrontmatter(raw)
+    const { slug, date, updated } = parseFrontmatter(raw)
 
     const effectiveDate = updated && updated > (date || '') ? updated : date
     const age = effectiveDate ? daysSince(effectiveDate) : 9999

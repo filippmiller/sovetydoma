@@ -7,11 +7,17 @@ export default function DarkModeToggle() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const stored = localStorage.getItem('theme')
-    const dark = stored === 'dark'
-    setIsDark(dark)
-    document.documentElement.classList.toggle('dark', dark)
-    setMounted(true)
+    let cancelled = false
+    ;(async () => {
+      await Promise.resolve()
+      if (cancelled) return
+      const stored = localStorage.getItem('theme')
+      const dark = stored === 'dark'
+      setIsDark(dark)
+      document.documentElement.classList.toggle('dark', dark)
+      setMounted(true)
+    })()
+    return () => { cancelled = true }
   }, [])
 
   function toggle() {

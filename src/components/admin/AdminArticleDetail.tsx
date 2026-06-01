@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import type { Article } from '@/lib/articles'
 import AdminShell from './AdminShell'
 import { useAdminAuth } from '@/lib/admin-auth'
@@ -73,12 +74,12 @@ export default function AdminArticleDetail({ article }: Props) {
       <div style={{ padding: '2rem', maxWidth: '1000px' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-          <a
+          <Link
             href="/admin/articles/"
             style={{ color: '#888', textDecoration: 'none', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
           >
             ← Все статьи
-          </a>
+          </Link>
           <span style={{ color: '#ddd' }}>|</span>
           <a
             href={liveUrl}
