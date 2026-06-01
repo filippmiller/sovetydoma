@@ -63,10 +63,10 @@ Aliases created:
 Mailbox credentials are not committed. They are stored locally at:
 `C:\Users\filip\.secrets\1001sovet-mailcow-mailboxes.env`.
 
-## Required DNS At reg.ru
+## DNS At reg.ru
 
-Agents currently do not have reg.ru credentials. The user must add these records
-for `1001sovet.ru`.
+Status: verified on 2026-06-01 via Cloudflare `1.1.1.1`, Google `8.8.8.8`,
+and Quad9 `9.9.9.9`.
 
 | Type | Host | Value | Priority |
 |------|------|-------|----------|
@@ -97,5 +97,7 @@ Local TLS/auth checks used during setup:
 - SMTP STARTTLS/login succeeded for `admin@1001sovet.ru` on port 587.
 - SMTP/IMAP certs validated against Let's Encrypt R13, expiring 2026-07-06.
 
-Inbound public delivery for `1001sovet.ru` remains blocked until reg.ru DNS records
-above are added and propagated.
+Inbound public delivery is now DNS-routed to Mailcow. A local residential SMTP
+probe reached Mailcow but was rejected by Spamhaus sender-IP policy before RCPT;
+that confirms port 25 is public and anti-spam is active. A full live delivery
+test should be run from Gmail or another normal mail provider.

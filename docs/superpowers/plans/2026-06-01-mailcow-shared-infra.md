@@ -65,9 +65,9 @@
 - Docs: `docs/mailcow-shared-infra.md`
 
 - [x] Produce exact reg.ru DNS records.
-- [ ] User adds MX/SPF/DKIM/DMARC records at reg.ru.
-- [ ] After DNS propagation, verify public MX and TXT records.
-- [ ] Send and receive a real email test with Gmail.
+- [x] User adds MX/SPF/DKIM/DMARC records at reg.ru.
+- [x] After DNS propagation, verify public MX and TXT records.
+- [ ] Send and receive a real email test with Gmail or another normal mail provider.
 
 ### Task 6: Reusable Project Workflow
 
