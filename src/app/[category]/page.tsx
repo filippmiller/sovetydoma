@@ -3,6 +3,7 @@ export const revalidate = false
 import { getArticlesByCategory, CATEGORIES } from '@/lib/articles'
 import CategoryArticleBrowser from '@/components/CategoryArticleBrowser'
 import Breadcrumb from '@/components/Breadcrumb'
+import CategorySubscriptionCta from '@/components/subscriptions/CategorySubscriptionCta'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath } from '@/lib/seo'
@@ -59,6 +60,13 @@ export default async function CategoryPage({ params }: Props) {
             <p style={{ color: '#777', fontSize: '0.95rem', margin: 0 }}>
               {cat.description} · {articles.length} {articles.length === 1 ? 'статья' : articles.length < 5 ? 'статьи' : 'статей'}
             </p>
+            <div style={{ marginTop: '0.75rem' }}>
+              <CategorySubscriptionCta
+                categorySlug={category}
+                categoryName={cat.name}
+                placement="category-header"
+              />
+            </div>
           </div>
         </header>
 

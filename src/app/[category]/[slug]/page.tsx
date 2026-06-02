@@ -28,6 +28,7 @@ import ArticlePhotoSubmissionCTA from '@/components/ArticlePhotoSubmissionCTA'
 import ArticleQuestionsBlock from '@/components/ArticleQuestionsBlock'
 import ArticleViewCount from '@/components/ArticleViewCount'
 import ArticleImage from '@/components/ArticleImage'
+import CategorySubscriptionCta from '@/components/subscriptions/CategorySubscriptionCta'
 import { ArticleH2, ArticleH3 } from '@/components/ArticleHeading'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
@@ -258,16 +259,22 @@ export default async function ArticlePage({ params }: Props) {
             {fm.sponsored && <SponsoredBadge />}
 
             <header style={{ marginBottom: '1.75rem' }}>
-              <span style={{
-                display: 'inline-block',
-                backgroundColor: color + '18', color,
-                borderRadius: '4px', padding: '3px 10px',
-                fontSize: '0.78rem', fontWeight: 700,
-                marginBottom: '0.9rem',
-                textTransform: 'uppercase', letterSpacing: '0.05em',
-              }}>
-                {cat?.name || fm.categoryName}
-              </span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.6rem', marginBottom: '0.9rem' }}>
+                <span style={{
+                  display: 'inline-block',
+                  backgroundColor: color + '18', color,
+                  borderRadius: '4px', padding: '3px 10px',
+                  fontSize: '0.78rem', fontWeight: 700,
+                  textTransform: 'uppercase', letterSpacing: '0.05em',
+                }}>
+                  {cat?.name || fm.categoryName}
+                </span>
+                <CategorySubscriptionCta
+                  categorySlug={category}
+                  categoryName={cat?.name || fm.categoryName}
+                  placement="article-header"
+                />
+              </div>
 
               <h1 style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1.3, color: '#1a1a1a', marginBottom: '0.75rem' }}>
                 {fm.title}
@@ -337,7 +344,6 @@ export default async function ArticlePage({ params }: Props) {
               <MDXRemote source={content} components={{ ArticleChecklist, AffiliateLink, h2: ArticleH2, h3: ArticleH3 }} />
             </article>
 
-            {/* Tags */}
             {fm.tags.length > 0 && (
               <div style={{ marginTop: '2rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {fm.tags.map((tag) => (
@@ -368,6 +374,14 @@ export default async function ArticlePage({ params }: Props) {
 
             {/* Share panel */}
             <SharePanel url={url} title={fm.title} />
+
+            <div style={{ margin: '1.5rem 0 0' }}>
+              <CategorySubscriptionCta
+                categorySlug={category}
+                categoryName={cat?.name || fm.categoryName}
+                placement="article-footer"
+              />
+            </div>
 
             <MoreArticles articles={moreInterestingArticles} />
 

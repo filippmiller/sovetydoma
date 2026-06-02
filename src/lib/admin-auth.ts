@@ -25,8 +25,12 @@ export function useAdminAuth(): AdminAuthState {
         // getUser() intermittently returns null when Supabase is slow/degraded,
         // which used to bounce an authenticated admin to /admin/login/ and back
         // in a reload loop. getSession is consistent and offline-safe.
-        const { data } = await sb.auth.getSession()
-        const uid = data.session?.user?.id
+        const { data: userData, error: userError } = await sb.auth.getUser()
+        let uid = userData.user?.id
+        if (!uid && !userError) {
+          const { data } = await sb.auth.getSession()
+          uid = data.session?.user?.id
+        }
         if (!uid) {
           if (!cancelled) { setState('denied'); window.location.href = '/admin/login/' }
           return
