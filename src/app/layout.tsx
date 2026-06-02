@@ -5,6 +5,7 @@ import Footer from '@/components/Footer'
 import YandexMetrika from '@/components/YandexMetrika'
 import BackToTop from '@/components/BackToTop'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
+import AnalyticsTracker from '@/components/AnalyticsTracker'
 import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/seo'
 
 export const metadata: Metadata = {
@@ -73,6 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <BackToTop />
         <ServiceWorkerRegistration />
+        <AnalyticsTracker />
       </body>
     </html>
   )

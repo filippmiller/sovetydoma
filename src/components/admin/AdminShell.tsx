@@ -7,6 +7,7 @@ const ACCENT = '#c0392b'
 
 const NAV_LINKS = [
   { key: 'overview', label: 'Обзор', href: '/admin/', icon: '📊' },
+  { key: 'analytics', label: 'Аналитика', href: '/admin/analytics/', icon: '📈' },
   { key: 'articles', label: 'Статьи', href: '/admin/articles/', icon: '📄' },
   { key: 'photos', label: 'Фото на модерации', href: '/admin/photos/', icon: '📷' },
   { key: 'categories', label: 'Категории', href: '#', icon: '🗂️' },

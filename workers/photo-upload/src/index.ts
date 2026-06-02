@@ -31,6 +31,7 @@ const CONTACT_MIN_SECONDS = 3
 const CONTACT_MAX_SECONDS = 30 * 60
 const contactHits = new Map<string, number[]>()
 const viewHits = new Map<string, number[]>()
+const analyticsHits = new Map<string, number[]>()
 
 function cors(env: Env): Record<string, string> {
   return {
@@ -70,6 +71,15 @@ function restrictedCors(req: Request, allowedValue: string | undefined, fallback
   }
 }
 
+function analyticsCors(req: Request, env: Env): Record<string, string> {
+  const headers = restrictedCors(req, env.VIEW_ALLOWED_ORIGINS || env.CONTACT_ALLOWED_ORIGINS, env.ALLOWED_ORIGIN || 'https://1001sovet.ru')
+  return {
+    ...headers,
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, content-type',
+  }
+}
+
 async function validateUser(env: Env, authHeader: string): Promise<string | null> {
   if (!authHeader) return null
   try {
@@ -81,6 +91,26 @@ async function validateUser(env: Env, authHeader: string): Promise<string | null
     return u?.id || null
   } catch {
     return null
+  }
+}
+
+async function validateAdmin(env: Env, authHeader: string): Promise<boolean> {
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) return false
+  const userId = await validateUser(env, authHeader)
+  if (!userId) return false
+
+  try {
+    const res = await fetch(`${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=role&limit=1`, {
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+    })
+    if (!res.ok) return false
+    const rows = await res.json() as Array<{ role?: string }>
+    return rows[0]?.role === 'admin'
+  } catch {
+    return false
   }
 }
 
@@ -174,8 +204,109 @@ function rateLimitView(ip: string, articleSlug: string): boolean {
   return true
 }
 
+function rateLimitAnalytics(ip: string): boolean {
+  const now = Date.now()
+  const recent = (analyticsHits.get(ip) || []).filter((time) => now - time < 60 * 1000)
+  if (recent.length >= 90) {
+    analyticsHits.set(ip, recent)
+    return false
+  }
+  recent.push(now)
+  analyticsHits.set(ip, recent)
+  return true
+}
+
 function cleanArticleSlug(value: unknown): string {
   return String(value || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 120)
+}
+
+function cleanId(value: unknown, maxLength = 80): string {
+  return String(value || '').trim().replace(/[^a-zA-Z0-9_-]/g, '').slice(0, maxLength)
+}
+
+function cleanPath(value: unknown): string {
+  const path = String(value || '/').trim().slice(0, 500)
+  if (!path.startsWith('/')) return '/'
+  return path.replace(/[\r\n]/g, '')
+}
+
+function referrerDomain(value: unknown): string {
+  try {
+    const referrer = String(value || '').trim()
+    if (!referrer) return ''
+    return new URL(referrer).hostname.replace(/^www\./, '').slice(0, 200)
+  } catch {
+    return ''
+  }
+}
+
+function parseUtm(pathValue: string): { utm_source: string; utm_medium: string; utm_campaign: string } {
+  try {
+    const url = new URL(pathValue, 'https://1001sovet.ru')
+    return {
+      utm_source: cleanText(url.searchParams.get('utm_source'), 120),
+      utm_medium: cleanText(url.searchParams.get('utm_medium'), 120),
+      utm_campaign: cleanText(url.searchParams.get('utm_campaign'), 200),
+    }
+  } catch {
+    return { utm_source: '', utm_medium: '', utm_campaign: '' }
+  }
+}
+
+function parseUserAgent(userAgent: string): { device_type: string; browser: string; os: string } {
+  const ua = userAgent.toLowerCase()
+  const device_type = /mobile|android|iphone|ipod/.test(ua) ? 'mobile' : /ipad|tablet/.test(ua) ? 'tablet' : 'desktop'
+  const browser = /edg\//.test(ua) ? 'Edge'
+    : /opr\//.test(ua) ? 'Opera'
+      : /chrome\//.test(ua) ? 'Chrome'
+        : /firefox\//.test(ua) ? 'Firefox'
+          : /safari\//.test(ua) ? 'Safari'
+            : 'Other'
+  const os = /windows/.test(ua) ? 'Windows'
+    : /android/.test(ua) ? 'Android'
+      : /iphone|ipad|ipod/.test(ua) ? 'iOS'
+        : /mac os|macintosh/.test(ua) ? 'macOS'
+          : /linux/.test(ua) ? 'Linux'
+            : 'Other'
+  return { device_type, browser, os }
+}
+
+function classifyTraffic(req: Request, payload: Record<string, unknown>): { classification: string; bot_reason: string } {
+  const ua = req.headers.get('User-Agent') || ''
+  const lower = ua.toLowerCase()
+  const cf = (req as unknown as { cf?: { botManagement?: { verifiedBot?: boolean; score?: number }; clientTcpRtt?: number } }).cf
+  const signals = (payload.signals || {}) as Record<string, unknown>
+
+  if (cf?.botManagement?.verifiedBot) return { classification: 'bot', bot_reason: 'cloudflare_verified_bot' }
+  if (typeof cf?.botManagement?.score === 'number' && cf.botManagement.score < 20) {
+    return { classification: 'bot', bot_reason: 'cloudflare_low_score' }
+  }
+  if (/bot|crawler|spider|slurp|yandex|googlebot|bingbot|duckduckbot|baiduspider|ahrefs|semrush|mj12bot|dotbot|bytespider|curl|wget|python|headless|phantom|puppeteer|playwright/.test(lower)) {
+    return { classification: 'bot', bot_reason: 'user_agent' }
+  }
+  if (signals.webdriver === true) return { classification: 'bot', bot_reason: 'webdriver' }
+
+  const hasHumanSignals = Boolean(signals.language) && Boolean(signals.timezone) && Number(signals.viewport_width || 0) > 0
+  if (payload.event_name === 'page_view_end' && Number(payload.duration_seconds || 0) >= 5 && hasHumanSignals) {
+    return { classification: 'human', bot_reason: '' }
+  }
+  if (hasHumanSignals) return { classification: 'likely_human', bot_reason: '' }
+  return { classification: 'unknown', bot_reason: '' }
+}
+
+async function callSupabaseRpc(env: Env, name: string, body: unknown): Promise<Response> {
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) {
+    return new Response(JSON.stringify({ error: 'supabase_service_role_not_configured' }), { status: 503 })
+  }
+  return fetch(`${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/rpc/${name}`, {
+    method: 'POST',
+    headers: {
+      apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
 }
 
 function escapeHtml(value: string): string {
@@ -273,6 +404,9 @@ const worker = {
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url)
     const h = cors(env)
+    if (req.method === 'OPTIONS' && url.pathname.startsWith('/analytics')) {
+      return new Response('ok', { headers: analyticsCors(req, env) })
+    }
     if (req.method === 'OPTIONS' && url.pathname === '/view') {
       return new Response('ok', { headers: restrictedCors(req, env.VIEW_ALLOWED_ORIGINS || env.CONTACT_ALLOWED_ORIGINS, env.ALLOWED_ORIGIN || 'https://1001sovet.ru') })
     }
@@ -320,6 +454,86 @@ const worker = {
         return json({ error: 'email_delivery_failed' }, 502, contactHeaders)
       }
       return json({ ok: true }, 200, contactHeaders)
+    }
+
+    if (url.pathname === '/analytics/event') {
+      const analyticsHeaders = analyticsCors(req, env)
+      if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, analyticsHeaders)
+      if (!env.SUPABASE_SERVICE_ROLE_KEY) return json({ error: 'analytics_not_configured' }, 503, analyticsHeaders)
+
+      const ip = getClientIp(req)
+      if (!rateLimitAnalytics(ip)) return json({ error: 'rate_limited' }, 429, analyticsHeaders)
+
+      const payload = await req.json().catch(() => null) as null | Record<string, unknown>
+      if (!payload) return json({ error: 'bad_json' }, 400, analyticsHeaders)
+
+      const eventName = cleanText(payload.event_name, 60)
+      if (!['page_view_start', 'page_view_end', 'custom'].includes(eventName)) {
+        return json({ error: 'bad_event_name' }, 400, analyticsHeaders)
+      }
+
+      const pathValue = cleanPath(payload.path)
+      const userAgent = req.headers.get('User-Agent') || ''
+      const parsedUa = parseUserAgent(userAgent)
+      const classification = classifyTraffic(req, { ...payload, event_name: eventName })
+      const utm = parseUtm(pathValue)
+      const signals = (payload.signals || {}) as Record<string, unknown>
+      const cf = (req as unknown as { cf?: { country?: string } }).cf
+
+      const eventData = {
+        event_name: eventName,
+        session_id: cleanId(payload.session_id),
+        pageview_id: cleanId(payload.pageview_id),
+        visitor_id: cleanId(payload.visitor_id),
+        path: pathValue,
+        title: cleanText(payload.title, 300),
+        article_slug: cleanArticleSlug(payload.article_slug),
+        category: cleanText(payload.category, 120),
+        referrer: cleanText(payload.referrer, 1000),
+        referrer_domain: referrerDomain(payload.referrer),
+        utm_source: utm.utm_source,
+        utm_medium: utm.utm_medium,
+        utm_campaign: utm.utm_campaign,
+        country: cleanText(cf?.country, 16),
+        device_type: parsedUa.device_type,
+        browser: parsedUa.browser,
+        os: parsedUa.os,
+        language: cleanText(signals.language, 40),
+        timezone: cleanText(signals.timezone, 80),
+        viewport_width: Number(signals.viewport_width || 0) || null,
+        viewport_height: Number(signals.viewport_height || 0) || null,
+        duration_seconds: Number(payload.duration_seconds || 0) || 0,
+        sequence_index: Number(payload.sequence_index || 0) || 0,
+        classification: classification.classification,
+        bot_reason: classification.bot_reason,
+        payload: {
+          scroll_depth: Number(payload.scroll_depth || 0) || 0,
+        },
+      }
+
+      if (!eventData.session_id || !eventData.visitor_id) return json({ error: 'missing_session' }, 400, analyticsHeaders)
+
+      const res = await callSupabaseRpc(env, 'ingest_analytics_event', { event_data: eventData })
+      if (!res.ok) return json({ error: 'analytics_insert_failed' }, 502, analyticsHeaders)
+      return json({ ok: true, classification: classification.classification }, 200, analyticsHeaders)
+    }
+
+    if (url.pathname === '/analytics/summary') {
+      const analyticsHeaders = analyticsCors(req, env)
+      if (req.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, analyticsHeaders)
+      if (!(await validateAdmin(env, req.headers.get('Authorization') || ''))) {
+        return json({ error: 'unauthorized' }, 401, analyticsHeaders)
+      }
+
+      const days = Math.max(1, Math.min(Number(url.searchParams.get('days') || 7) || 7, 90))
+      const [summaryRes, sessionsRes] = await Promise.all([
+        callSupabaseRpc(env, 'admin_analytics_summary', { days_back: days }),
+        callSupabaseRpc(env, 'admin_analytics_recent_sessions', { days_back: days, row_limit: 60 }),
+      ])
+      if (!summaryRes.ok || !sessionsRes.ok) return json({ error: 'analytics_query_failed' }, 502, analyticsHeaders)
+      const summary = await summaryRes.json()
+      const sessions = await sessionsRes.json()
+      return json({ summary, sessions, days }, 200, analyticsHeaders)
     }
 
     if (url.pathname === '/view') {
