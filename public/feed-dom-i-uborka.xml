@@ -6,13 +6,93 @@
     <description>Лайфхаки для чистоты и порядка в доме</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-dom-i-uborka.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Mon, 01 Jun 2026 19:27:36 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jun 2026 09:38:27 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
       <link>https://1001sovet.ru/</link>
     </image>
     
+  <item>
+    <title>Уход за кожаным диваном: чистка, защита и частые ошибки</title>
+    <link>https://1001sovet.ru/dom-i-uborka/uhod-za-kozhanym-divanom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/uhod-za-kozhanym-divanom/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Как правильно чистить и ухаживать за кожаным диваном, чтобы кожа не трескалась и сохраняла вид.</description>
+  </item>
+  <item>
+    <title>Порядок в прихожей: обувь, ключи, сумки и сезонные вещи</title>
+    <link>https://1001sovet.ru/dom-i-uborka/poryadok-v-prihozhey/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/poryadok-v-prihozhey/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Как организовать пространство прихожей, чтобы утренний сбор на работу занимал минуты, а не полчаса.</description>
+  </item>
+  <item>
+    <title>Как организовать хозяйственный шкаф без хаоса</title>
+    <link>https://1001sovet.ru/dom-i-uborka/organizatsiya-hozyaystvennogo-shkafa/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/organizatsiya-hozyaystvennogo-shkafa/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Система хранения для хозяйственного шкафа: зоны, контейнеры и правила, которые уберегут от беспорядка.</description>
+  </item>
+  <item>
+    <title>Как отмыть душевую кабину от налёта без едкой химии</title>
+    <link>https://1001sovet.ru/dom-i-uborka/ochistka-dushevoy-kabiny-ot-naleta/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/ochistka-dushevoy-kabiny-ot-naleta/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Простые способы очистки душевой кабины от известкового налёта и мыла без агрессивной химии.</description>
+  </item>
+  <item>
+    <title>Как убрать запах табака в квартире после гостей</title>
+    <link>https://1001sovet.ru/dom-i-uborka/kak-ubrat-zapah-tabaka-v-kvartire/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-ubrat-zapah-tabaka-v-kvartire/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Эффективные методы удаления запаха сигарет из квартиры после посиделок с курящими гостями.</description>
+  </item>
+  <item>
+    <title>Как убрать пятна от чая и кофе с одежды и мебели</title>
+    <link>https://1001sovet.ru/dom-i-uborka/kak-ubrat-pyatna-ot-chaya-i-kofe/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-ubrat-pyatna-ot-chaya-i-kofe/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Проверенные способы выведения свежих и застарелых пятен от чая и кофе с разных тканей и поверхностей.</description>
+  </item>
+  <item>
+    <title>Как помыть люстру и плафоны без разводов</title>
+    <link>https://1001sovet.ru/dom-i-uborka/kak-pomyt-lyustru-bez-razvodov/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-pomyt-lyustru-bez-razvodov/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Техника мытья люстр и плафонов из разных материалов без разводов, царапин и повреждений.</description>
+  </item>
+  <item>
+    <title>Как отмыть пластиковые подоконники от желтизны и пятен</title>
+    <link>https://1001sovet.ru/dom-i-uborka/kak-otmyt-plastikovye-podokonniki/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-otmyt-plastikovye-podokonniki/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Способы очистки пластиковых подоконников от жёлтых пятен, пыли и застарелых загрязнений.</description>
+  </item>
+  <item>
+    <title>Как хранить постельное бельё, чтобы оно не пахло шкафом</title>
+    <link>https://1001sovet.ru/dom-i-uborka/hranenie-postelnogo-belya/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/hranenie-postelnogo-belya/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Практические советы по хранению постельного белья без запаха сырости и застоя в шкафу.</description>
+  </item>
+  <item>
+    <title>Чистка матраса дома: пятна, запах и пыль без лишней влаги</title>
+    <link>https://1001sovet.ru/dom-i-uborka/chistka-matrasa-doma/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/chistka-matrasa-doma/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Пошаговая инструкция по чистке матраса от пятен, запахов и пылевых клещей без заливки водой.</description>
+  </item>
   <item>
     <title>Как убрать шерсть с дивана, ковра и одежды: все рабочие способы</title>
     <link>https://1001sovet.ru/dom-i-uborka/ubrat-sherst-s-divana-i-kovra/</link>
@@ -92,86 +172,6 @@
     <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
     <description>Быстрый и безопасный способ очистить электрический чайник от накипи с помощью лимонной кислоты.</description>
-  </item>
-  <item>
-    <title>Уборка после ремонта: пошаговый план с чего начать</title>
-    <link>https://1001sovet.ru/dom-i-uborka/uborka-posle-remonta/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/uborka-posle-remonta/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Подробный план уборки квартиры после ремонта: последовательность действий, средства и полезные лайфхаки.</description>
-  </item>
-  <item>
-    <title>Как быстро убрать запах из холодильника и помыть его за 45 минут</title>
-    <link>https://1001sovet.ru/dom-i-uborka/uborka-holodilnika/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/uborka-holodilnika/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Пошаговая инструкция по уборке холодильника и устранению неприятных запахов без химии.</description>
-  </item>
-  <item>
-    <title>Как правильно постирать пуховик в стиральной машине</title>
-    <link>https://1001sovet.ru/dom-i-uborka/stirka-puhovika/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/stirka-puhovika/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Пошаговая инструкция по стирке пуховика в машинке: режимы, средства, сушка и восстановление пуха.</description>
-  </item>
-  <item>
-    <title>Как отбелить и очистить швы между плиткой без химии</title>
-    <link>https://1001sovet.ru/dom-i-uborka/shvy-mezhdu-plitkoy/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/shvy-mezhdu-plitkoy/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Простые и безопасные способы очистки межплиточных швов в ванной и на кухне подручными средствами.</description>
-  </item>
-  <item>
-    <title>Как отмыть пригоревшую кастрюлю без усилий за 30 минут</title>
-    <link>https://1001sovet.ru/dom-i-uborka/prigorevshaya-kastryulya/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/prigorevshaya-kastryulya/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Проверенные методы очистки пригоревших кастрюль из нержавейки и эмали в домашних условиях.</description>
-  </item>
-  <item>
-    <title>Система складывания вещей: как навести порядок в шкафу</title>
-    <link>https://1001sovet.ru/dom-i-uborka/poryadok-v-shkafu/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/poryadok-v-shkafu/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Методы организации шкафа: вертикальное хранение, раскладка по цветам и правила отбора ненужного.</description>
-  </item>
-  <item>
-    <title>Как помыть окна без разводов: секреты идеальной чистоты</title>
-    <link>https://1001sovet.ru/dom-i-uborka/pomyt-okna-bez-razvodov/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/pomyt-okna-bez-razvodov/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Проверенные методы мытья окон, которые оставляют стекла кристально чистыми без разводов и разводов.</description>
-  </item>
-  <item>
-    <title>Как почистить утюг от нагара и пригара на подошве за 20 минут</title>
-    <link>https://1001sovet.ru/dom-i-uborka/pochistit-utyug/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/pochistit-utyug/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Простые способы очистить подошву утюга от пригара, нагара и пятен без повреждения покрытия.</description>
-  </item>
-  <item>
-    <title>Как почистить серебро и золото в домашних условиях</title>
-    <link>https://1001sovet.ru/dom-i-uborka/pochistit-serebro/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/pochistit-serebro/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Безопасные домашние методы чистки серебряных и золотых украшений от потускнения, налёта и окисления.</description>
-  </item>
-  <item>
-    <title>Как почистить диван от пятен в домашних условиях</title>
-    <link>https://1001sovet.ru/dom-i-uborka/pochistit-divan/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/pochistit-divan/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Эффективные методы удаления пятен с обивки дивана: от кофе и вина до жира и чернил.</description>
   </item>
   </channel>
 </rss>

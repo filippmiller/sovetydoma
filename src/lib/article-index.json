@@ -39,6 +39,10 @@
     "category": "layfkhaki",
     "title": "Уборка за 15 минут: порядок без нервов и усталости"
   },
+  "byudzhet-na-dachu-na-mesyats": {
+    "category": "ekonomiya",
+    "title": "Бюджет на дачу на месяц: вода, дорога, семена и мелочи"
+  },
   "carapiny-na-mebeli": {
     "category": "layfkhaki",
     "title": "Как убрать царапины с мебели: 7 способов без мастера"
@@ -54,6 +58,10 @@
   "chistka-kovra-doma": {
     "category": "dom-i-uborka",
     "title": "Как почистить ковёр в домашних условиях без стиральной машины"
+  },
+  "chistka-matrasa-doma": {
+    "category": "dom-i-uborka",
+    "title": "Чистка матраса дома: пятна, запах и пыль без лишней влаги"
   },
   "chistka-mikrovolnovki": {
     "category": "dom-i-uborka",
@@ -90,6 +98,10 @@
   "domashniy-mayonez-bystro": {
     "category": "kulinaria",
     "title": "Домашний майонез за 2 минуты без взбивания венчиком"
+  },
+  "domashniy-tvorog-iz-moloka": {
+    "category": "kulinaria",
+    "title": "Домашний творог из молока: простой способ без лишней кислоты"
   },
   "domashnyaya-aptechka-bez-lishnego": {
     "category": "layfkhaki",
@@ -159,6 +171,14 @@
     "category": "ekonomiya",
     "title": "Как сэкономить 5000 рублей в месяц на продуктах без ущерба для качества"
   },
+  "ekonomiya-na-remonte-kvartiry": {
+    "category": "ekonomiya",
+    "title": "Как экономить на ремонте квартиры и не получить переделки"
+  },
+  "ekonomiya-na-shkolnyh-tovarah": {
+    "category": "ekonomiya",
+    "title": "Как сэкономить на школьных товарах без потери качества"
+  },
   "ekonomiya-vody": {
     "category": "ekonomiya",
     "title": "Как сократить расход воды в квартире вдвое без дискомфорта"
@@ -195,6 +215,10 @@
     "category": "dacha-i-ogorod",
     "title": "Подготовка грядок к зиме: пошаговая инструкция для дачника"
   },
+  "gryadki-posle-sbora-urozhaya": {
+    "category": "dacha-i-ogorod",
+    "title": "Что делать с грядками после сбора урожая"
+  },
   "gulyash-iz-govyadiny": {
     "category": "kulinaria",
     "title": "Гуляш из говядины с густой подливкой: рецепт как в садике"
@@ -219,6 +243,10 @@
     "category": "dom-i-uborka",
     "title": "Как организовать хранение на маленькой кухне: 10 идей"
   },
+  "hranenie-postelnogo-belya": {
+    "category": "dom-i-uborka",
+    "title": "Как хранить постельное бельё, чтобы оно не пахло шкафом"
+  },
   "hranenie-produktov": {
     "category": "layfkhaki",
     "title": "Как хранить продукты чтобы дольше не портились: 12 правил"
@@ -230,6 +258,10 @@
   "hranenie-rybolovnyh-snastey": {
     "category": "rybalka",
     "title": "Как хранить рыболовные снасти дома и в машине: практичные советы"
+  },
+  "hranenie-yablok-zimoy": {
+    "category": "dacha-i-ogorod",
+    "title": "Как хранить яблоки зимой без гнили и пересыхания"
   },
   "idealnyy-borshch": {
     "category": "kulinaria",
@@ -243,6 +275,18 @@
     "category": "dom-i-uborka",
     "title": "Как избавиться от пыли в квартире надолго: причины и решения"
   },
+  "kabachkovye-oladi": {
+    "category": "kulinaria",
+    "title": "Кабачковые оладьи: как сделать нежными и не водянистыми"
+  },
+  "kak-bystro-nayti-poteryannuyu-veshch": {
+    "category": "layfkhaki",
+    "title": "Как быстро найти потерянную вещь дома"
+  },
+  "kak-ne-pereplatit-za-dostavku": {
+    "category": "ekonomiya",
+    "title": "Как не переплатить за доставку продуктов и вещей"
+  },
   "kak-ne-zaputyvat-snasti": {
     "category": "rybalka",
     "title": "Как не запутывать снасти при перевозке: системы хранения и транспортировки"
@@ -251,6 +295,14 @@
     "category": "dom-i-uborka",
     "title": "Как отмыть москитные сетки и не порвать их: проверенные способы"
   },
+  "kak-otmyt-plastikovye-podokonniki": {
+    "category": "dom-i-uborka",
+    "title": "Как отмыть пластиковые подоконники от желтизны и пятен"
+  },
+  "kak-pomyt-lyustru-bez-razvodov": {
+    "category": "dom-i-uborka",
+    "title": "Как помыть люстру и плафоны без разводов"
+  },
   "kak-sohranit-rybu-svezhey": {
     "category": "rybalka",
     "title": "Как сохранить рыбу свежей после улова в жару"
@@ -258,6 +310,26 @@
   "kak-solit-i-vyalit-rybu": {
     "category": "rybalka",
     "title": "Как солить и вялить рыбу дома: безопасная технология для начинающих"
+  },
+  "kak-sushit-odezhdu-v-kvartire": {
+    "category": "layfkhaki",
+    "title": "Как сушить одежду в квартире без запаха сырости"
+  },
+  "kak-ubrat-nakleyku-bez-sledov": {
+    "category": "layfkhaki",
+    "title": "Как убрать наклейку без следов со стекла, пластика и посуды"
+  },
+  "kak-ubrat-pyatna-ot-chaya-i-kofe": {
+    "category": "dom-i-uborka",
+    "title": "Как убрать пятна от чая и кофе с одежды и мебели"
+  },
+  "kak-ubrat-zapah-tabaka-v-kvartire": {
+    "category": "dom-i-uborka",
+    "title": "Как убрать запах табака в квартире после гостей"
+  },
+  "kak-upakovat-podarok-bez-korobki": {
+    "category": "layfkhaki",
+    "title": "Как упаковать подарок без коробки аккуратно и недорого"
   },
   "kak-varit-makarony": {
     "category": "kulinaria",
@@ -270,6 +342,10 @@
   "kak-vybrat-arbuz": {
     "category": "layfkhaki",
     "title": "Как выбрать спелый арбуз: 7 признаков хорошего арбуза"
+  },
+  "kapelnyy-poliv-svoimi-rukami": {
+    "category": "dacha-i-ogorod",
+    "title": "Капельный полив своими руками для теплицы и грядок"
   },
   "kartofelnoe-pyure": {
     "category": "kulinaria",
@@ -331,9 +407,25 @@
     "category": "kulinaria",
     "title": "Как правильно варить куриный бульон: прозрачный и ароматный"
   },
+  "kuritsa-v-rukave": {
+    "category": "kulinaria",
+    "title": "Курица в рукаве: сочное мясо и румяная корочка"
+  },
+  "lenivye-golubtsy": {
+    "category": "kulinaria",
+    "title": "Ленивые голубцы: быстрый домашний рецепт на каждый день"
+  },
   "les-bezopasnost": {
     "category": "layfkhaki",
     "title": "Правила безопасности в лесу: как не заблудиться и что брать с собой"
+  },
+  "letniy-cheklist-pered-otpuskom": {
+    "category": "layfkhaki",
+    "title": "Летний чек-лист перед отпуском: дом, документы и вещи"
+  },
+  "lovlya-foreli-na-platnike": {
+    "category": "rybalka",
+    "title": "Ловля форели на платнике: снасти, приманки и время выхода"
   },
   "lovlya-golavlya-letom": {
     "category": "rybalka",
@@ -350,6 +442,10 @@
   "lovlya-karpa-na-prudu": {
     "category": "rybalka",
     "title": "Ловля карпа на пруду: место, прикормка и насадка"
+  },
+  "lovlya-leshcha-letom-na-fider": {
+    "category": "rybalka",
+    "title": "Ловля леща летом на фидер: место, кормушка и поводок"
   },
   "lovlya-nalima-osenyu": {
     "category": "rybalka",
@@ -395,9 +491,17 @@
     "category": "ekonomiya",
     "title": "Меню на неделю за 3000 рублей на двоих: реальный план питания"
   },
+  "mini-remont-bez-instrumentov": {
+    "category": "layfkhaki",
+    "title": "Мелкий ремонт без набора инструментов: что можно сделать дома"
+  },
   "morkov-vyraschivanie": {
     "category": "dacha-i-ogorod",
     "title": "Как вырастить морковь на даче: посев, уход и уборка"
+  },
+  "mulcha-dlya-ogoroda": {
+    "category": "dacha-i-ogorod",
+    "title": "Мульча для огорода: что выбрать и где не навредить"
   },
   "muravi-na-uchastke": {
     "category": "dacha-i-ogorod",
@@ -411,6 +515,14 @@
     "category": "ekonomiya",
     "title": "Как составить недельное меню и меньше выбрасывать еды"
   },
+  "nochnaya-rybalka-s-berega": {
+    "category": "rybalka",
+    "title": "Ночная рыбалка с берега: свет, безопасность и снасти"
+  },
+  "obrezka-maliny-posle-plodonosheniya": {
+    "category": "dacha-i-ogorod",
+    "title": "Обрезка малины после плодоношения: что оставить и что убрать"
+  },
   "obrezka-smorodiny": {
     "category": "dacha-i-ogorod",
     "title": "Обрезка смородины после ягод: как подготовить кусты к следующему году"
@@ -422,6 +534,10 @@
   "obsluzhivanie-rybolovnoy-katushki": {
     "category": "rybalka",
     "title": "Как чистить и обслуживать катушку после рыбалки: пошаговый уход"
+  },
+  "ochistka-dushevoy-kabiny-ot-naleta": {
+    "category": "dom-i-uborka",
+    "title": "Как отмыть душевую кабину от налёта без едкой химии"
   },
   "ogurcy-ot-tli": {
     "category": "dacha-i-ogorod",
@@ -446,6 +562,14 @@
   "oladi-na-kefire": {
     "category": "kulinaria",
     "title": "Пышные оладьи на кефире: секрет воздушного теста"
+  },
+  "organizatsiya-dokumentov-doma": {
+    "category": "layfkhaki",
+    "title": "Организация документов дома: папки, сроки и быстрый поиск"
+  },
+  "organizatsiya-hozyaystvennogo-shkafa": {
+    "category": "dom-i-uborka",
+    "title": "Как организовать хозяйственный шкаф без хаоса"
   },
   "organizatsiya-kuhni": {
     "category": "layfkhaki",
@@ -491,6 +615,14 @@
     "category": "dacha-i-ogorod",
     "title": "Как избавиться от паутинного клеща на огурцах: экстренные меры"
   },
+  "pechenye-yabloki": {
+    "category": "kulinaria",
+    "title": "Печёные яблоки: начинка, температура и время в духовке"
+  },
+  "perlovka-bez-zamachivaniya": {
+    "category": "kulinaria",
+    "title": "Перловка без замачивания: как сварить мягко и вкусно"
+  },
   "plesen-v-vannoy": {
     "category": "dom-i-uborka",
     "title": "Как удалить плесень в ванной комнате навсегда за 1 день"
@@ -523,6 +655,10 @@
     "category": "dacha-i-ogorod",
     "title": "Как подготовить почву для весенних посадок: пошаговый план"
   },
+  "podkormka-klubniki-posle-urozhaya": {
+    "category": "dacha-i-ogorod",
+    "title": "Подкормка клубники после урожая для сильных кустов"
+  },
   "podkormka-ogurtsov": {
     "category": "dacha-i-ogorod",
     "title": "Подкормка огурцов: схема для рекордного урожая"
@@ -550,6 +686,14 @@
   "pomyt-okna-bez-razvodov": {
     "category": "dom-i-uborka",
     "title": "Как помыть окна без разводов: секреты идеальной чистоты"
+  },
+  "poplavok-dlya-techeniya": {
+    "category": "rybalka",
+    "title": "Как выбрать поплавок для течения и стоячей воды"
+  },
+  "poryadok-v-prihozhey": {
+    "category": "dom-i-uborka",
+    "title": "Порядок в прихожей: обувь, ключи, сумки и сезонные вещи"
   },
   "poryadok-v-shkafu": {
     "category": "dom-i-uborka",
@@ -591,6 +735,10 @@
     "category": "dom-i-uborka",
     "title": "Как отмыть пригоревшую кастрюлю без усилий за 30 минут"
   },
+  "prikormka-dlya-karasya-letom": {
+    "category": "rybalka",
+    "title": "Прикормка для карася летом: запах, фракция и ошибки"
+  },
   "prikormka-dlya-leshcha": {
     "category": "rybalka",
     "title": "Прикормка для леща своими руками: состав, пропорции и советы"
@@ -602,6 +750,10 @@
   "proverka-skidok-v-magazine": {
     "category": "ekonomiya",
     "title": "Как проверить скидку в магазине и не попасться на уловки"
+  },
+  "rassada-pertsa-doma": {
+    "category": "dacha-i-ogorod",
+    "title": "Рассада перца дома: сроки, свет, полив и пересадка"
   },
   "rassada-tomatov": {
     "category": "dacha-i-ogorod",
@@ -623,6 +775,10 @@
     "category": "ekonomiya",
     "title": "Бюджетный ремонт квартиры: как сделать красиво и недорого"
   },
+  "ryba-v-duhovke": {
+    "category": "kulinaria",
+    "title": "Рыба в духовке без сухости: температура, время и маринад"
+  },
   "rybalka-s-berega-na-maloy-reke": {
     "category": "rybalka",
     "title": "Рыбалка с берега на малой реке: как выбрать место и поймать хищника"
@@ -643,13 +799,25 @@
     "category": "rybalka",
     "title": "Как подготовить рыболовный ящик к сезону"
   },
+  "salat-iz-svezhey-kapusty": {
+    "category": "kulinaria",
+    "title": "Салат из свежей капусты как в столовой"
+  },
   "sel-telefon": {
     "category": "layfkhaki",
     "title": "Телефон сел в дороге: что делать и как остаться на связи"
   },
+  "semena-sbor-i-hranenie": {
+    "category": "dacha-i-ogorod",
+    "title": "Как собрать и хранить семена овощей со своего участка"
+  },
   "semeynyy-byudzhet": {
     "category": "ekonomiya",
     "title": "Планирование семейного бюджета: система, которая работает"
+  },
+  "sezonnyy-spisok-pokupok": {
+    "category": "ekonomiya",
+    "title": "Сезонный список покупок: как покупать дешевле и без запасов"
   },
   "sharlotka-s-yablokami": {
     "category": "kulinaria",
@@ -695,6 +863,10 @@
     "category": "dacha-i-ogorod",
     "title": "Как избавиться от сорняков на газоне без химии: 7 проверенных способов"
   },
+  "sous-dlya-grechki": {
+    "category": "kulinaria",
+    "title": "Соус для гречки: 5 простых домашних вариантов"
+  },
   "sousy-k-myasu": {
     "category": "kulinaria",
     "title": "5 простых соусов к мясу: рецепты на каждый день"
@@ -702,6 +874,10 @@
   "spisok-pokupok": {
     "category": "ekonomiya",
     "title": "Как составить список покупок, который реально экономит деньги"
+  },
+  "sravnenie-tsen-pered-pokupkoy": {
+    "category": "ekonomiya",
+    "title": "Как сравнивать цены перед покупкой и не попасться на скидку"
   },
   "starye-dzhinsy": {
     "category": "layfkhaki",
@@ -727,6 +903,10 @@
     "category": "kulinaria",
     "title": "Пышные сырники из творога, которые не разваливаются"
   },
+  "telefon-v-zharkuyu-pogodu": {
+    "category": "layfkhaki",
+    "title": "Как защитить телефон в жаркую погоду и не испортить батарею"
+  },
   "teplaya-gryadka": {
     "category": "dacha-i-ogorod",
     "title": "Как сделать тёплую грядку своими руками для раннего урожая"
@@ -734,6 +914,10 @@
   "teplitsa-iz-polikarbonata": {
     "category": "dacha-i-ogorod",
     "title": "Теплица из поликарбоната своими руками: проект на выходные"
+  },
+  "teplitsa-osenyu": {
+    "category": "dacha-i-ogorod",
+    "title": "Теплица осенью: уборка, обеззараживание и подготовка почвы"
   },
   "testo-dlya-pelmeney": {
     "category": "kulinaria",
@@ -806,6 +990,10 @@
   "uhod-za-grushey": {
     "category": "dacha-i-ogorod",
     "title": "Уход за грушей летом и осенью: инструкция для сочного урожая"
+  },
+  "uhod-za-kozhanym-divanom": {
+    "category": "dom-i-uborka",
+    "title": "Уход за кожаным диваном: чистка, защита и частые ошибки"
   },
   "uhod-za-malinoy": {
     "category": "dacha-i-ogorod",
@@ -891,6 +1079,10 @@
     "category": "dom-i-uborka",
     "title": "Как избавиться от запаха в холодильнике навсегда"
   },
+  "zapasy-produktov-bez-pereplat": {
+    "category": "ekonomiya",
+    "title": "Домашние запасы продуктов без переплаты и просрочки"
+  },
   "zapechennaya-kuritsa": {
     "category": "kulinaria",
     "title": "Запечённая курица с хрустящей корочкой: секреты хруста"
@@ -902,6 +1094,10 @@
   "zashchita-klubniki-ot-ptits": {
     "category": "dacha-i-ogorod",
     "title": "Как защитить клубнику от птиц без вреда для участка"
+  },
+  "zashchita-rassady-ot-zamorozkov": {
+    "category": "dacha-i-ogorod",
+    "title": "Как защитить рассаду от заморозков весной"
   },
   "zatochit-nozh": {
     "category": "layfkhaki",

@@ -6,13 +6,69 @@
     <description>Как жить хорошо и тратить меньше</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-ekonomiya.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Mon, 01 Jun 2026 19:27:36 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jun 2026 09:38:27 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
       <link>https://1001sovet.ru/</link>
     </image>
     
+  <item>
+    <title>Домашние запасы продуктов без переплаты и просрочки</title>
+    <link>https://1001sovet.ru/ekonomiya/zapasy-produktov-bez-pereplat/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/zapasy-produktov-bez-pereplat/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Как создать запас продуктов дома, не покупая лишнего и не выбрасывая просроченное.</description>
+  </item>
+  <item>
+    <title>Как сравнивать цены перед покупкой и не попасться на скидку</title>
+    <link>https://1001sovet.ru/ekonomiya/sravnenie-tsen-pered-pokupkoy/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/sravnenie-tsen-pered-pokupkoy/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Методы сравнения цен и распознавания ложных скидок при покупках в интернете и офлайне.</description>
+  </item>
+  <item>
+    <title>Сезонный список покупок: как покупать дешевле и без запасов</title>
+    <link>https://1001sovet.ru/ekonomiya/sezonnyy-spisok-pokupok/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/sezonnyy-spisok-pokupok/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Как составить сезонный список покупок, чтобы тратить меньше и не захламлять квартиру ненужными запасами.</description>
+  </item>
+  <item>
+    <title>Как не переплатить за доставку продуктов и вещей</title>
+    <link>https://1001sovet.ru/ekonomiya/kak-ne-pereplatit-za-dostavku/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/kak-ne-pereplatit-za-dostavku/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Способы сэкономить на доставке еды и товаров: бесплатные пороги, подписки и правильное оформление заказа.</description>
+  </item>
+  <item>
+    <title>Как сэкономить на школьных товарах без потери качества</title>
+    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-shkolnyh-tovarah/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-shkolnyh-tovarah/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Способы сэкономить на подготовке к школе: где покупать, что можно взять дешевле и на чём не стоит экономить.</description>
+  </item>
+  <item>
+    <title>Как экономить на ремонте квартиры и не получить переделки</title>
+    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-remonte-kvartiry/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-remonte-kvartiry/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Где можно сэкономить при ремонте квартиры, а на чём экономить опасно: советы от опытных прорабов.</description>
+  </item>
+  <item>
+    <title>Бюджет на дачу на месяц: вода, дорога, семена и мелочи</title>
+    <link>https://1001sovet.ru/ekonomiya/byudzhet-na-dachu-na-mesyats/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/byudzhet-na-dachu-na-mesyats/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Как спланировать расходы на дачу, чтобы не выходить за рамки бюджета и не отказываться от удовольствия.</description>
+  </item>
   <item>
     <title>Как проверить скидку в магазине и не попасться на уловки</title>
     <link>https://1001sovet.ru/ekonomiya/proverka-skidok-v-magazine/</link>
@@ -116,62 +172,6 @@
     <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Стратегии выгодных покупок одежды: сезонные распродажи, вторичный рынок и правильный подбор базового гардероба.</description>
-  </item>
-  <item>
-    <title>Как экономить на бытовой химии в 3 раза без вреда для чистоты</title>
-    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-himii/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-himii/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Способы сократить расходы на моющие средства с помощью концентратов, универсальных средств и домашних рецептов.</description>
-  </item>
-  <item>
-    <title>Как снизить счета за электричество на 20–40% без вреда для комфорта</title>
-    <link>https://1001sovet.ru/ekonomiya/ekonomiya-elektrichestva/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-elektrichestva/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Проверенные способы уменьшить потребление электроэнергии в квартире и доме с помощью техники и привычек.</description>
-  </item>
-  <item>
-    <title>Как сократить расходы на бензин на 20–30% без продажи машины</title>
-    <link>https://1001sovet.ru/ekonomiya/ekonomiya-benzina/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-benzina/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Практические советы по экономии топлива: стиль вождения, техническое состояние и планирование поездок.</description>
-  </item>
-  <item>
-    <title>Дешёвые и полезные продукты: как питаться полноценно на скромный бюджет</title>
-    <link>https://1001sovet.ru/ekonomiya/deshevye-produkty/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/deshevye-produkty/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Список доступных по цене продуктов с высокой питательной ценностью для сбалансированного рациона.</description>
-  </item>
-  <item>
-    <title>Меню на неделю за 3000 рублей на двоих: реальный план питания</title>
-    <link>https://1001sovet.ru/ekonomiya/menyu-na-nedelyu-3000/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/menyu-na-nedelyu-3000/</guid>
-    <pubDate>Sat, 30 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Бюджетное меню на неделю для двух человек с полным списком продуктов за 3000 рублей — вкусно, разнообразно и без жертв.</description>
-  </item>
-  <item>
-    <title>Бюджетный ремонт квартиры: как сделать красиво и недорого</title>
-    <link>https://1001sovet.ru/ekonomiya/remont-kvartiry-byudzhet/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/remont-kvartiry-byudzhet/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Как сделать ремонт квартиры красиво и недорого: планирование бюджета, выбор материалов, очерёдность работ и способы сэкономить без потери качества.</description>
-  </item>
-  <item>
-    <title>Как делать покупки выгодно: скидки, акции и правила экономного шопинга</title>
-    <link>https://1001sovet.ru/ekonomiya/pokupki-bez-pereplat/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/pokupki-bez-pereplat/</guid>
-    <pubDate>Fri, 29 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Как покупать выгодно: кешбэк, агрегаторы скидок, правила планирования покупок, ловушки маркетинга и стратегии экономного шопинга в магазине и онлайн.</description>
   </item>
   </channel>
 </rss>

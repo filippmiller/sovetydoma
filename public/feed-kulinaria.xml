@@ -6,13 +6,85 @@
     <description>Рецепты, советы и секреты вкусной домашней кухни</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-kulinaria.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Mon, 01 Jun 2026 19:27:36 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jun 2026 09:38:27 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
       <link>https://1001sovet.ru/</link>
     </image>
     
+  <item>
+    <title>Соус для гречки: 5 простых домашних вариантов</title>
+    <link>https://1001sovet.ru/kulinaria/sous-dlya-grechki/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/sous-dlya-grechki/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Пять простых рецептов соуса, которые превратят обычную гречку в полноценное вкусное блюдо.</description>
+  </item>
+  <item>
+    <title>Салат из свежей капусты как в столовой</title>
+    <link>https://1001sovet.ru/kulinaria/salat-iz-svezhey-kapusty/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/salat-iz-svezhey-kapusty/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Рецепт классического салата из свежей капусты с морковью и уксусной заправкой, как в советской столовой.</description>
+  </item>
+  <item>
+    <title>Рыба в духовке без сухости: температура, время и маринад</title>
+    <link>https://1001sovet.ru/kulinaria/ryba-v-duhovke/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/ryba-v-duhovke/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Как запечь рыбу в духовке, чтобы филе оставалось сочным, а кожа не прилипла к противню.</description>
+  </item>
+  <item>
+    <title>Перловка без замачивания: как сварить мягко и вкусно</title>
+    <link>https://1001sovet.ru/kulinaria/perlovka-bez-zamachivaniya/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/perlovka-bez-zamachivaniya/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Рецепт рассыпчатой перловки без предварительного замачивания: пропорции воды, время и секреты варки.</description>
+  </item>
+  <item>
+    <title>Печёные яблоки: начинка, температура и время в духовке</title>
+    <link>https://1001sovet.ru/kulinaria/pechenye-yabloki/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/pechenye-yabloki/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Как запечь яблоки в духовке с разными начинками: медом, орехами, творогом и изюмом.</description>
+  </item>
+  <item>
+    <title>Ленивые голубцы: быстрый домашний рецепт на каждый день</title>
+    <link>https://1001sovet.ru/kulinaria/lenivye-golubtsy/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/lenivye-golubtsy/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Упрощённый рецепт голубцов без заворачивания: фарш с рисом и капустой, тушёный в томатном соусе.</description>
+  </item>
+  <item>
+    <title>Курица в рукаве: сочное мясо и румяная корочка</title>
+    <link>https://1001sovet.ru/kulinaria/kuritsa-v-rukave/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/kuritsa-v-rukave/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Как запечь курицу в рукаве, чтобы мясо осталось сочным, а кожа приобрела аппетитный цвет.</description>
+  </item>
+  <item>
+    <title>Кабачковые оладьи: как сделать нежными и не водянистыми</title>
+    <link>https://1001sovet.ru/kulinaria/kabachkovye-oladi/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/kabachkovye-oladi/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Рецепт кабачковых оладей без лишней влаги: пропорции, способ отжима и секреты жарки.</description>
+  </item>
+  <item>
+    <title>Домашний творог из молока: простой способ без лишней кислоты</title>
+    <link>https://1001sovet.ru/kulinaria/domashniy-tvorog-iz-moloka/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/domashniy-tvorog-iz-moloka/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Как приготовить нежный домашний творог из молока с мягким вкусом и приятной консистенцией.</description>
+  </item>
   <item>
     <title>Как приготовить уху из речной рыбы без запаха тины</title>
     <link>https://1001sovet.ru/kulinaria/uha-iz-rechnoy-ryby/</link>
@@ -100,78 +172,6 @@
     <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Кулинария</category>
     <description>Классическая сборная солянка из трёх видов мяса с солёными огурцами, каперсами и лимоном — насыщенный первый обеденный суп.</description>
-  </item>
-  <item>
-    <title>Сочные котлеты: секреты фарша и правильной обжарки</title>
-    <link>https://1001sovet.ru/kulinaria/sochnye-kotlety/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/sochnye-kotlety/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Как сделать сочные котлеты из любого фарша: секреты выбора мяса, замочки хлеба и температурного режима сковороды.</description>
-  </item>
-  <item>
-    <title>Простая шарлотка с яблоками: рецепт высокого бисквита</title>
-    <link>https://1001sovet.ru/kulinaria/sharlotka-s-yablokami/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/sharlotka-s-yablokami/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Рецепт пышной шарлотки с яблоками — простой пошаговый способ приготовить высокий ароматный пирог из доступных продуктов.</description>
-  </item>
-  <item>
-    <title>Как сварить рассыпчатый рис без единого комочка</title>
-    <link>https://1001sovet.ru/kulinaria/rassypchatyy-ris/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/rassypchatyy-ris/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Секреты приготовления идеального рассыпчатого риса: правильные пропорции воды, способ промывки и режим варки.</description>
-  </item>
-  <item>
-    <title>Плов из свинины в казане: пряный и рассыпчатый</title>
-    <link>https://1001sovet.ru/kulinaria/plov-iz-svininy/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/plov-iz-svininy/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Ароматный плов из свинины в казане с рассыпчатым рисом и золотистой корочкой: пропорции и специи.</description>
-  </item>
-  <item>
-    <title>Домашнее овсяное печенье: рассыпчатое и ароматное</title>
-    <link>https://1001sovet.ru/kulinaria/ovsyanoe-pechenie/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/ovsyanoe-pechenie/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Рецепт классического овсяного печенья с хлопьями — рассыпчатое, ароматное и простое в приготовлении для всей семьи.</description>
-  </item>
-  <item>
-    <title>Пышные оладьи на кефире: секрет воздушного теста</title>
-    <link>https://1001sovet.ru/kulinaria/oladi-na-kefire/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/oladi-na-kefire/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Узнайте, как приготовить пышные оладьи на кефире с дырочками — простой рецепт с точными пропорциями для идеального результата.</description>
-  </item>
-  <item>
-    <title>Маринованный лук к шашлыку: быстрый рецепт за 30 минут</title>
-    <link>https://1001sovet.ru/kulinaria/marinovannyy-luk/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/marinovannyy-luk/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Быстрый рецепт маринованного лука к шашлыку и салатам — хрустящий, с приятной кислинкой и без горечи за полчаса.</description>
-  </item>
-  <item>
-    <title>Маринад для шашлыка, который делает мясо мягким и сочным</title>
-    <link>https://1001sovet.ru/kulinaria/marinad-dlya-shashlyka/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/marinad-dlya-shashlyka/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Проверенные маринады для шашлыка из свинины и курицы: лук, кефир, гранатовый сок и правильное время выдержки.</description>
-  </item>
-  <item>
-    <title>Вкусный компот из сухофруктов: пропорции и время варки</title>
-    <link>https://1001sovet.ru/kulinaria/kompot-iz-suhofruktov/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/kompot-iz-suhofruktov/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Научитесь варить насыщенный компот из сухофруктов с правильными пропорциями сахара и временем настаивания для яркого вкуса.</description>
   </item>
   </channel>
 </rss>
