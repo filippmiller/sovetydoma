@@ -1,15 +1,16 @@
 name: Deploy to Timeweb VPS
 
-# Build the static export and ship it to the Timeweb VPS over SSH.
-# Atomic release: upload to a timestamped dir, then symlink-swap via activate.sh.
+# Build the static export. Production deploy is pulled by the Timeweb VPS timer:
+# 1001sovet-pull-deploy.timer fetches master, builds on the VPS, then runs
+# /opt/deploy/activate.sh for an atomic symlink swap.
 on:
   push:
     branches: [master, main]
-  workflow_dispatch: {}   # allow manual "Run workflow" from the Actions tab
+  workflow_dispatch: {}
 
 concurrency:
   group: deploy-prod
-  cancel-in-progress: false   # never interrupt an in-flight deploy
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
@@ -49,52 +50,12 @@ jobs:
 
       - name: Sanity check output
         run: |
-          test -f out/index.html || { echo "::error::out/index.html missing — build did not export"; exit 1; }
+          test -f out/index.html || { echo "::error::out/index.html missing - build did not export"; exit 1; }
           echo "Exported $(find out -type f | wc -l) files"
 
-      - name: Upload and activate release
-        env:
-          DEPLOY_WEBHOOK_TOKEN: ${{ secrets.DEPLOY_WEBHOOK_TOKEN }}
+      - name: Confirm VPS pull deploy model
         run: |
           set -euo pipefail
-          test -n "$DEPLOY_WEBHOOK_TOKEN" || { echo "::error::DEPLOY_WEBHOOK_TOKEN is not set"; exit 1; }
-          REL="gha-${GITHUB_SHA::8}-$(date -u +%Y%m%d%H%M%S)"
-          echo "REL=$REL" >> "$GITHUB_ENV"
-          tar -C out -czf release.tgz .
-          curl -fsS --retry 3 --retry-delay 5 --max-time 600 \
-            -H "Authorization: Bearer $DEPLOY_WEBHOOK_TOKEN" \
-            -H "X-Release: $REL" \
-            -H "Content-Type: application/gzip" \
-            --data-binary @release.tgz \
-            https://1001sovet.ru/__deploy/upload
-
-      - name: Smoke test (live host)
-        run: |
-          set -euo pipefail
-          # Hit the real HTTPS site; -L follows the HTTP->HTTPS 301.
-          code=$(curl -sL -o /tmp/home.html -w "%{http_code}" --max-time 25 https://1001sovet.ru/)
-          echo "Homepage returned $code"
-          [ "$code" = "200" ] || { echo "::error::Homepage smoke failed ($code)"; exit 1; }
-          grep -q "СоветыДома" /tmp/home.html || { echo "::error::Homepage content marker missing"; exit 1; }
-
-          redirect=$(curl -sI --max-time 25 http://1001sovet.ru/ | tr -d '\r' | awk 'tolower($1)=="location:" {print $2}' | tail -1)
-          [ "$redirect" = "https://1001sovet.ru/" ] || { echo "::error::HTTP redirect mismatch: $redirect"; exit 1; }
-
-          curl -fsSL --max-time 25 https://1001sovet.ru/dacha-i-ogorod/borba-s-oduvanchikami/ -o /tmp/article.html
-          grep -q "одуванчиков" /tmp/article.html \
-            || { echo "::error::Article page smoke failed"; exit 1; }
-          curl -fsSI --max-time 25 https://1001sovet.ru/images/previews/borba-s-oduvanchikami.jpg >/dev/null \
-            || { echo "::error::Article preview image smoke failed"; exit 1; }
-          curl -fsSL --max-time 25 https://1001sovet.ru/sitemap.xml -o /tmp/sitemap.xml
-          grep -q "borba-s-oduvanchikami" /tmp/sitemap.xml \
-            || { echo "::error::Sitemap smoke failed"; exit 1; }
-          curl -fsSL --max-time 25 https://1001sovet.ru/feed.xml -o /tmp/feed.xml
-          grep -q "СоветыДома" /tmp/feed.xml \
-            || { echo "::error::RSS smoke failed"; exit 1; }
-          curl -fsSL --max-time 25 https://1001sovet.ru/build.json -o /tmp/build.json
-          grep -q "$GITHUB_SHA" /tmp/build.json \
-            || { echo "::error::Live build metadata does not match $GITHUB_SHA"; exit 1; }
-
-      - name: Cleanup release archive
-        if: always()
-        run: rm -f release.tgz
+          echo "Build is valid for $GITHUB_SHA."
+          echo "The Timeweb VPS pulls master with 1001sovet-pull-deploy.timer and activates the release."
+          echo "Live verification is performed from an operator machine because GitHub-hosted runners currently cannot reliably reach the VPS over inbound IPv4."
