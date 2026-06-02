@@ -8,7 +8,12 @@ SUBSCRIPTIONS_API_URL = "https://api.1001sovet.ru"
 PUBLIC_SITE_URL = "https://1001sovet.ru"
 MAX_API_BASE_URL = "https://platform-api.max.ru/"
 TURNSTILE_SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
-SUBSCRIPTIONS_ALLOW_UNVERIFIED_TURNSTILE = "true"
+# SUBSCRIPTIONS_ALLOW_UNVERIFIED_TURNSTILE: dev-only Turnstile bypass. Never commit
+# it here — a plain `wrangler deploy` would then ship the bypass to production.
+# For local testing put `SUBSCRIPTIONS_ALLOW_UNVERIFIED_TURNSTILE = "true"` in an
+# (uncommitted) workers/subscriptions/.dev.vars file. In production, set the real
+# TURNSTILE_SECRET_KEY secret instead; with neither set, /subscriptions/start
+# denies by default.
 
 [triggers]
 crons = ["0 * * * *"]

@@ -21,10 +21,11 @@ export function useAdminAuth(): AdminAuthState {
     ;(async () => {
       try {
         const sb = getSupabase()
-        // Use getSession() (local storage read) not getUser() (network round-trip).
-        // getUser() intermittently returns null when Supabase is slow/degraded,
-        // which used to bounce an authenticated admin to /admin/login/ and back
-        // in a reload loop. getSession is consistent and offline-safe.
+        // Verify with getUser() first — it validates the token against the auth
+        // server, so a stale/forged local session can't pass the admin gate.
+        // Only on a non-error null (e.g. transient network blip, not a rejected
+        // token) do we fall back to the cached getSession() to avoid bouncing a
+        // genuinely-authenticated admin into a login reload loop.
         const { data: userData, error: userError } = await sb.auth.getUser()
         let uid = userData.user?.id
         if (!uid && !userError) {
