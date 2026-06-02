@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "sovetydoma",
+  "project_id": "26e5baad-c07e-4e2f-825e-d01f52e4089e"
+}
