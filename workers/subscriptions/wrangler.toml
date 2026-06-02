@@ -4,7 +4,7 @@ compatibility_date = "2026-06-02"
 
 [vars]
 ALLOWED_ORIGINS = "https://1001sovet.ru,http://localhost:3000,http://127.0.0.1:3000"
-SUBSCRIPTIONS_API_URL = "https://api.1001sovet.ru"
+SUBSCRIPTIONS_API_URL = "https://sovetydoma-subscriptions.filippmiller.workers.dev"
 PUBLIC_SITE_URL = "https://1001sovet.ru"
 MAX_API_BASE_URL = "https://platform-api.max.ru/"
 TURNSTILE_SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
