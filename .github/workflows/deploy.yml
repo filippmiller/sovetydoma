@@ -52,29 +52,21 @@ jobs:
           test -f out/index.html || { echo "::error::out/index.html missing — build did not export"; exit 1; }
           echo "Exported $(find out -type f | wc -l) files"
 
-      - name: Add VPS to known_hosts
+      - name: Upload and activate release
+        env:
+          DEPLOY_WEBHOOK_TOKEN: ${{ secrets.DEPLOY_WEBHOOK_TOKEN }}
         run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
-
-      - name: Install SSH deploy key
-        run: |
-          install -m 600 /dev/stdin ~/.ssh/deploy_key <<< "${{ secrets.VPS_SSH_KEY }}"
-
-      - name: Upload release (rsync)
-        run: |
-          REL="gha-${GITHUB_SHA::8}-$(date +%Y%m%d%H%M%S)"
-          echo "REL=$REL" >> $GITHUB_ENV
-          rsync -az --delete \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes" \
-            out/ \
-            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/1001sovet-releases/$REL/
-
-      - name: Activate release (atomic symlink swap)
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes \
-            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "/opt/deploy/activate.sh '$REL'"
+          set -euo pipefail
+          test -n "$DEPLOY_WEBHOOK_TOKEN" || { echo "::error::DEPLOY_WEBHOOK_TOKEN is not set"; exit 1; }
+          REL="gha-${GITHUB_SHA::8}-$(date -u +%Y%m%d%H%M%S)"
+          echo "REL=$REL" >> "$GITHUB_ENV"
+          tar -C out -czf release.tgz .
+          curl -fsS --retry 3 --retry-delay 5 --max-time 600 \
+            -H "Authorization: Bearer $DEPLOY_WEBHOOK_TOKEN" \
+            -H "X-Release: $REL" \
+            -H "Content-Type: application/gzip" \
+            --data-binary @release.tgz \
+            https://1001sovet.ru/__deploy/upload
 
       - name: Smoke test (live host)
         run: |
@@ -103,6 +95,6 @@ jobs:
           grep -q "$GITHUB_SHA" /tmp/build.json \
             || { echo "::error::Live build metadata does not match $GITHUB_SHA"; exit 1; }
 
-      - name: Cleanup key
+      - name: Cleanup release archive
         if: always()
-        run: rm -f ~/.ssh/deploy_key
+        run: rm -f release.tgz

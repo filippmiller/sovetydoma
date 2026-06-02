@@ -32,7 +32,7 @@ a large SEO content library.
 | AI moderation | **Anthropic Claude** (vision) edge functions | `moderate-photo`, `moderate-comment`. Key in Supabase Vault. Moves to GigaChat in Этап 2. |
 | Mailboxes | **Mailcow on Hetzner** | Shared human/editor inboxes at `mail.filippmiller.com`; see `docs/mailcow-shared-infra.md`. |
 | Hosting | **nginx on a Timeweb Cloud VPS** (Russia) | Static files only. Replaced Vercel. |
-| CI/CD | **GitHub Actions** → SSH deploy to VPS | See §4. |
+| CI/CD | **GitHub Actions** → HTTPS deploy webhook on VPS | See §4. SSH remains the manual fallback. |
 
 Article images: `public/images/<slug>.jpg` (real photos, committed to git, shipped
 by CI). `src/lib/cloudinary.ts > resolveArticleImage()` maps frontmatter `image`
@@ -71,16 +71,23 @@ Current hosting mode:
 
 **Just `git push` to master.** `.github/workflows/deploy.yml` does:
 `pnpm install --frozen-lockfile` → `tsc --noEmit` → `pnpm run build` (static export)
-→ sanity-check `out/index.html` → rsync `out/` to a new timestamped release dir on
-the VPS → `/opt/deploy/activate.sh <release>` (atomic symlink swap, keeps last 5)
-→ live smoke test (homepage must return 200).
+→ sanity-check `out/index.html` → tar `out/` → POST the archive to
+`https://1001sovet.ru/__deploy/upload` with `DEPLOY_WEBHOOK_TOKEN` → the VPS
+unpacks to a new timestamped release dir and runs `/opt/deploy/activate.sh <release>`
+(atomic symlink swap, keeps last 5) → live smoke test (homepage must return 200).
+
+The deploy receiver is a systemd service on the VPS:
+`1001sovet-deploy-webhook.service` running
+`/usr/local/sbin/1001sovet-deploy-webhook.py` on `127.0.0.1:9101`, proxied by
+nginx only at `/__deploy/health` and `/__deploy/upload`.
 
 - Manual run: `gh workflow run deploy.yml --repo filippmiller/sovetydoma`
 - **Rollback:** `ssh -i ~/.ssh/timeweb_1001sovet root@188.225.86.238 /opt/deploy/activate.sh <older-release-dirname>`
 - Also: `.github/workflows/ci.yml` (build + typecheck on PRs) and
   `telegram-notify.yml` (pings Telegram when new article .mdx land).
 - Actions pinned to **v6 majors + Node 24**.
-- GitHub repo secrets (set; values not shown): `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`,
+- GitHub repo secrets (set; values not shown): `DEPLOY_WEBHOOK_TOKEN`,
+  `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`,
   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
   `NEXT_PUBLIC_PHOTO_WORKER_URL`, `NEXT_PUBLIC_CONTACT_WORKER_URL`.
   (`NEXT_PUBLIC_SITE_URL` is hardcoded to https://1001sovet.ru in the workflow.)
