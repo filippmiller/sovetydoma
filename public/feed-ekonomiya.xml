@@ -6,7 +6,7 @@
     <description>Как жить хорошо и тратить меньше</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-ekonomiya.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Tue, 02 Jun 2026 09:38:27 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jun 2026 10:55:22 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
@@ -30,12 +30,44 @@
     <description>Методы сравнения цен и распознавания ложных скидок при покупках в интернете и офлайне.</description>
   </item>
   <item>
+    <title>Список покупок для семьи: как покупать на неделю без лишнего</title>
+    <link>https://1001sovet.ru/ekonomiya/spisok-pokupok-dlya-semi/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/spisok-pokupok-dlya-semi/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Как составить семейный список покупок на неделю и не покупать лишнего в магазине.</description>
+  </item>
+  <item>
     <title>Сезонный список покупок: как покупать дешевле и без запасов</title>
     <link>https://1001sovet.ru/ekonomiya/sezonnyy-spisok-pokupok/</link>
     <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/sezonnyy-spisok-pokupok/</guid>
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Как составить сезонный список покупок, чтобы тратить меньше и не захламлять квартиру ненужными запасами.</description>
+  </item>
+  <item>
+    <title>Как выбрать удлинитель для дома и не перегрузить сеть</title>
+    <link>https://1001sovet.ru/ekonomiya/kak-vybrat-udlinitel-dlya-doma/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/kak-vybrat-udlinitel-dlya-doma/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>На что обращать внимание при покупке удлинителя и как правильно им пользоваться без риска для электропроводки.</description>
+  </item>
+  <item>
+    <title>Как выбрать шуруповёрт для дома без переплаты</title>
+    <link>https://1001sovet.ru/ekonomiya/kak-vybrat-shurupovert-dlya-doma/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/kak-vybrat-shurupovert-dlya-doma/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>На что обращать внимание при покупке шуруповёрта для домашнего использования и как не переплатить.</description>
+  </item>
+  <item>
+    <title>Как выбрать настольную лампу для учёбы и работы дома</title>
+    <link>https://1001sovet.ru/ekonomiya/kak-vybrat-nastolnuyu-lampu/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/kak-vybrat-nastolnuyu-lampu/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>На что обращать внимание при покупке настольной лампы для комфортной работы и учёбы.</description>
   </item>
   <item>
     <title>Как не переплатить за доставку продуктов и вещей</title>
@@ -140,38 +172,6 @@
     <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Планирование отпуска с экономией на билетах, жилье, питании и развлечениях без потери качества отдыха.</description>
-  </item>
-  <item>
-    <title>Как сократить расход воды в квартире вдвое без дискомфорта</title>
-    <link>https://1001sovet.ru/ekonomiya/ekonomiya-vody/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-vody/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Практические способы экономии холодной и горячей воды с помощью приборов, привычек и простых доработок.</description>
-  </item>
-  <item>
-    <title>Как экономить на продуктах до 30% без потери качества питания</title>
-    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-produktah/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-produktah/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Практические стратегии снижения расходов на продукты питания с сохранением полноценного и вкусного рациона.</description>
-  </item>
-  <item>
-    <title>Как сократить расходы на отопление зимой без замерзания</title>
-    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-otoplenii/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-otoplenii/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Практические меры по утеплению квартиры и снижению трат на отопление без капитального ремонта.</description>
-  </item>
-  <item>
-    <title>Как покупать качественную одежду и экономить до 50% на гардеробе</title>
-    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-odezhde/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-odezhde/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Стратегии выгодных покупок одежды: сезонные распродажи, вторичный рынок и правильный подбор базового гардероба.</description>
   </item>
   </channel>
 </rss>

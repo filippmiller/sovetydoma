@@ -6,7 +6,7 @@
     <description>Советы для сада, огорода и загородной жизни</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-dacha-i-ogorod.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Tue, 02 Jun 2026 09:38:27 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jun 2026 10:55:22 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
@@ -20,6 +20,14 @@
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Дача и огород</category>
     <description>Практические способы защиты весенней рассады от возвратных заморозков в открытом грунте и теплице.</description>
+  </item>
+  <item>
+    <title>Уход за розами летом: полив, подкормка и обрезка бутонов</title>
+    <link>https://1001sovet.ru/dacha-i-ogorod/uhod-za-rozami-letom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/uhod-za-rozami-letom/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Правила летнего ухода за розами для пышного цветения и здоровых кустов.</description>
   </item>
   <item>
     <title>Теплица осенью: уборка, обеззараживание и подготовка почвы</title>
@@ -54,6 +62,14 @@
     <description>Чем и как подкормить клубнику после сбора ягод, чтобы закладки цветочных почек были полноценными.</description>
   </item>
   <item>
+    <title>Осенняя подготовка газона: стрижка, подкормка и уборка листьев</title>
+    <link>https://1001sovet.ru/dacha-i-ogorod/osennyaya-podgotovka-gazona/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/osennyaya-podgotovka-gazona/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Комплекс работ по подготовке газона к зиме для здорового роста весной.</description>
+  </item>
+  <item>
     <title>Обрезка малины после плодоношения: что оставить и что убрать</title>
     <link>https://1001sovet.ru/dacha-i-ogorod/obrezka-maliny-posle-plodonosheniya/</link>
     <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/obrezka-maliny-posle-plodonosheniya/</guid>
@@ -70,12 +86,28 @@
     <description>Виды мульчи, правила применения и ошибки, которые могут навредить растениям на огороде.</description>
   </item>
   <item>
+    <title>Многолетники для начинающих: что посадить и не пересаживать каждый год</title>
+    <link>https://1001sovet.ru/dacha-i-ogorod/mnogoletenniki-dlya-nachinayushchih/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/mnogoletenniki-dlya-nachinayushchih/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Неприхотливые многолетние цветы для начинающих садоводов, которые цветут год за годом.</description>
+  </item>
+  <item>
     <title>Капельный полив своими руками для теплицы и грядок</title>
     <link>https://1001sovet.ru/dacha-i-ogorod/kapelnyy-poliv-svoimi-rukami/</link>
     <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/kapelnyy-poliv-svoimi-rukami/</guid>
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Дача и огород</category>
     <description>Как сделать капельный полив для огорода самостоятельно: материалы, схема, расчёт и монтаж.</description>
+  </item>
+  <item>
+    <title>Как сажать луковичные осенью: сроки, глубина и защита</title>
+    <link>https://1001sovet.ru/dacha-i-ogorod/kak-sazhat-lukovichnye-osenyu/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/kak-sazhat-lukovichnye-osenyu/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Правила осенней посадки луковичных цветов: тюльпанов, нарциссов, крокусов и гиацинтов.</description>
   </item>
   <item>
     <title>Как хранить яблоки зимой без гнили и пересыхания</title>
@@ -92,6 +124,22 @@
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Дача и огород</category>
     <description>Осенняя подготовка грядок после уборки урожая: посев сидератов, перекопка и уход за почвой.</description>
+  </item>
+  <item>
+    <title>Борьба с муравьями в теплице без вреда для растений</title>
+    <link>https://1001sovet.ru/dacha-i-ogorod/borba-s-muravyami-v-teplitse/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/borba-s-muravyami-v-teplitse/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Способы избавления от муравьёв в теплице, которые не навредят овощам и рассаде.</description>
+  </item>
+  <item>
+    <title>Аптечка для дачи: что держать под рукой летом</title>
+    <link>https://1001sovet.ru/dacha-i-ogorod/apteka-dlya-dachi/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/apteka-dlya-dachi/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дача и огород</category>
+    <description>Состав дачной аптечки на лето: от укусов насекомых до ожогов и порезов.</description>
   </item>
   <item>
     <title>Как защитить клубнику от птиц без вреда для участка</title>
@@ -124,54 +172,6 @@
     <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Дача и огород</category>
     <description>Пошаговая инструкция по выращиванию кабачков в открытом грунте — от посева семян до сбора урожая.</description>
-  </item>
-  <item>
-    <title>Как укрыть розы на зиму: правила утепления для разных сортов</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/ukryt-rozy-na-zimu/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/ukryt-rozy-na-zimu/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Узнайте, как правильно укрыть розы на зиму, чтобы кусты не вымерзли и весну встретили здоровыми.</description>
-  </item>
-  <item>
-    <title>Уход за смородиной для большого урожая: обрезка, полив и подкормка</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/uhod-za-smorodinoy/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/uhod-za-smorodinoy/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Правильный уход за смородиной — обрезка, подкормки и полив — гарантирует обильный урожай крупных ягод.</description>
-  </item>
-  <item>
-    <title>Как сделать тёплую грядку своими руками для раннего урожая</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/teplaya-gryadka/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/teplaya-gryadka/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Пошаговая инструкция по созданию тёплой грядки из органики для выращивания овощей раньше срока.</description>
-  </item>
-  <item>
-    <title>Сидераты для улучшения почвы: какие сеять и когда заделывать</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/sideraty/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/sideraty/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Какие сидераты лучше сеять для обогащения почвы азотом и структуры, когда сажать и как правильно заделывать.</description>
-  </item>
-  <item>
-    <title>Что посадить в тени на даче: лучшие овощи и зелень для затенённых участков</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/rasteniya-dlya-teni/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/rasteniya-dlya-teni/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Подборка овощей, ягод и зелени, которые хорошо растут в тени и полутени на дачном участке.</description>
-  </item>
-  <item>
-    <title>Выращивание рассады томатов дома: пошаговое руководство</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/rassada-tomatov/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/rassada-tomatov/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Как вырастить крепкую рассаду томатов в домашних условиях без пикировки и вытягивания.</description>
   </item>
   </channel>
 </rss>

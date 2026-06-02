@@ -6,7 +6,7 @@
     <description>Полезные идеи и хитрости на каждый день</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-layfkhaki.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Tue, 02 Jun 2026 09:38:27 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jun 2026 10:55:22 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
@@ -20,6 +20,46 @@
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Лайфхаки</category>
     <description>Практические советы по защите смартфона от перегрева летом и продлению срока службы батареи.</description>
+  </item>
+  <item>
+    <title>Как организовать школьный уголок дома без отдельной комнаты</title>
+    <link>https://1001sovet.ru/layfkhaki/shkolnyy-ugolok-doma/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/shkolnyy-ugolok-doma/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Создание функционального места для учёбы ребёнка в условиях ограниченного пространства.</description>
+  </item>
+  <item>
+    <title>Семейный календарь на холодильнике: как перестать всё забывать</title>
+    <link>https://1001sovet.ru/layfkhaki/semeynyy-kalendar-na-holodilnike/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/semeynyy-kalendar-na-holodilnike/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Как организовать семейный календарь и систему напоминаний на холодильнике.</description>
+  </item>
+  <item>
+    <title>Порядок в игрушках: как хранить, менять и не покупать лишнее</title>
+    <link>https://1001sovet.ru/layfkhaki/poryadok-v-igrushkah/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/poryadok-v-igrushkah/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>??????? ???????? ??????? ??????? ? ????????, ????????? ????????? ? ????????? ??????????.</description>
+  </item>
+  <item>
+    <title>Порядок в детских вещах: система без ежедневного хаоса</title>
+    <link>https://1001sovet.ru/layfkhaki/poryadok-v-detskih-veshchah/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/poryadok-v-detskih-veshchah/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Как организовать хранение детских вещей, чтобы поддерживать порядок без постоянной уборки.</description>
+  </item>
+  <item>
+    <title>Порядок на рабочем столе дома: минимум вещей, максимум удобства</title>
+    <link>https://1001sovet.ru/layfkhaki/poryadok-na-rabochem-stole/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/poryadok-na-rabochem-stole/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Как организовать домашнее рабочее место, чтобы повысить продуктивность и снизить усталость.</description>
   </item>
   <item>
     <title>Организация документов дома: папки, сроки и быстрый поиск</title>
@@ -70,6 +110,38 @@
     <description>Способы сушки белья в квартире без появления затхлого запаха и сырости на стенах.</description>
   </item>
   <item>
+    <title>Как собрать ребёнка в лагерь и ничего важного не забыть</title>
+    <link>https://1001sovet.ru/layfkhaki/kak-sobrat-rebenka-v-lager/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/kak-sobrat-rebenka-v-lager/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Полный список вещей для сборов ребёнка в летний лагерь с учётом лимита багажа.</description>
+  </item>
+  <item>
+    <title>Как разобрать балкон без стресса и не вернуть хлам обратно</title>
+    <link>https://1001sovet.ru/layfkhaki/kak-razobrat-balkon-bez-stressa/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/kak-razobrat-balkon-bez-stressa/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Пошаговая система разбора захламлённого балкона с вывозом мусора и организацией пространства.</description>
+  </item>
+  <item>
+    <title>Как организовать утро с детьми без спешки и крика</title>
+    <link>https://1001sovet.ru/layfkhaki/kak-organizovat-utro-s-detmi/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/kak-organizovat-utro-s-detmi/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>Система утренних ритуалов, которая помогает выходить из дома вовремя и без стресса.</description>
+  </item>
+  <item>
+    <title>Как не перегреться дома в жару без кондиционера</title>
+    <link>https://1001sovet.ru/layfkhaki/kak-ne-peregretsya-v-zharu-doma/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/kak-ne-peregretsya-v-zharu-doma/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Лайфхаки</category>
+    <description>??????????? ??????? ?????????? ? ????? ? ???????? ??? ???????????? ? ????????? ??????? ????.</description>
+  </item>
+  <item>
     <title>Как быстро найти потерянную вещь дома</title>
     <link>https://1001sovet.ru/layfkhaki/kak-bystro-nayti-poteryannuyu-veshch/</link>
     <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/kak-bystro-nayti-poteryannuyu-veshch/</guid>
@@ -78,100 +150,28 @@
     <description>Методика поиска утерянных вещей в квартире: куда смотреть в первую очередь и как не потерять время.</description>
   </item>
   <item>
-    <title>Как убрать запах в термосе и бутылке без агрессивной химии</title>
-    <link>https://1001sovet.ru/layfkhaki/zapah-v-termose-i-butylke/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/zapah-v-termose-i-butylke/</guid>
-    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <title>Как хранить лекарства дома безопасно и понятно</title>
+    <link>https://1001sovet.ru/layfkhaki/hranenie-lekarstv-doma/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/hranenie-lekarstv-doma/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Лайфхаки</category>
-    <description>Безопасные способы удаления неприятных запахов из термосов, бутылок и поильников с помощью подручных средств.</description>
+    <description>Правила организации домашней аптечки: сроки годности, условия хранения и безопасность для детей.</description>
   </item>
   <item>
-    <title>Как быстро охладить квартиру вечером без кондиционера</title>
-    <link>https://1001sovet.ru/layfkhaki/ohladit-kvartiru-bez-konditsionera/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/ohladit-kvartiru-bez-konditsionera/</guid>
-    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <title>Безопасность дома для ребёнка: что проверить в первую очередь</title>
+    <link>https://1001sovet.ru/layfkhaki/bezopasnost-doma-dlya-rebenka/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/bezopasnost-doma-dlya-rebenka/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Лайфхаки</category>
-    <description>Эффективные способы снизить температуру в квартире жарким вечером без кондиционера и вентилятора.</description>
+    <description>Чек-лист мер по обеспечению безопасности дома для малышей и дошкольников.</description>
   </item>
   <item>
-    <title>Как подписать провода и зарядки, чтобы не путаться</title>
-    <link>https://1001sovet.ru/layfkhaki/markirovka-provodov-i-zaryadok/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/markirovka-provodov-i-zaryadok/</guid>
-    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <title>Безопасная зарядка телефона ночью: что важно знать дома</title>
+    <link>https://1001sovet.ru/layfkhaki/bezopasnaya-zaryadka-telefona-nochyu/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/bezopasnaya-zaryadka-telefona-nochyu/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Лайфхаки</category>
-    <description>Простые способы маркировки кабелей, адаптеров и зарядок, которые избавят от путаницы в ящике и у розетки.</description>
-  </item>
-  <item>
-    <title>Как собрать дорожную сумку за 20 минут и ничего не забыть</title>
-    <link>https://1001sovet.ru/layfkhaki/dorozhnaya-sumka-za-20-minut/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/dorozhnaya-sumka-za-20-minut/</guid>
-    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Проверенный способ упаковки вещей в дорогу, который исключает забытые предметы и перегруз багажа.</description>
-  </item>
-  <item>
-    <title>Как быстро собрать тревожную домашнюю аптечку без лишнего</title>
-    <link>https://1001sovet.ru/layfkhaki/domashnyaya-aptechka-bez-lishnego/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/domashnyaya-aptechka-bez-lishnego/</guid>
-    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Минимальный набор лекарств и предметов для домашней аптечки, который покроет большинство бытовых ситуаций.</description>
-  </item>
-  <item>
-    <title>Как заточить нож без точилки: 6 рабочих способов</title>
-    <link>https://1001sovet.ru/layfkhaki/zatochit-nozh/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/zatochit-nozh/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Экстренная заточка кухонного ножа подручными средствами: керамика, камень, стекло и другие методы.</description>
-  </item>
-  <item>
-    <title>12 лайфхаков для быстрой и безопасной зарядки телефона</title>
-    <link>https://1001sovet.ru/layfkhaki/zaryadka-telefona-layfhaki/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/zaryadka-telefona-layfhaki/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Практические советы, как ускорить зарядку смартфона и продлить срок службы аккумулятора.</description>
-  </item>
-  <item>
-    <title>Как быстро высушить мокрую обувь и убрать запах за час</title>
-    <link>https://1001sovet.ru/layfkhaki/vysushit-obuv/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/vysushit-obuv/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Безопасные методы сушки обуви из кожи, замши и текстиля без деформации и неприятного запаха.</description>
-  </item>
-  <item>
-    <title>Как убрать царапины с мебели из дерева и ламината</title>
-    <link>https://1001sovet.ru/layfkhaki/tsarapiny-na-mebeli/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/tsarapiny-na-mebeli/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Домашние средства для удаления мелких и глубоких царапин с деревянной и ламинированной мебели.</description>
-  </item>
-  <item>
-    <title>Как избавиться от статического электричества на одежде и в квартире</title>
-    <link>https://1001sovet.ru/layfkhaki/staticheskoe-elektrichestvo/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/staticheskoe-elektrichestvo/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Проверенные методы борьбы с электризацией одежды, волос и мебели в сухой период года.</description>
-  </item>
-  <item>
-    <title>15 способов применения пищевой соды в быту, о которых мало кто знает</title>
-    <link>https://1001sovet.ru/layfkhaki/soda-v-bytu/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/soda-v-bytu/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Нестандартные и эффективные применения соды для чистки, стирки, устранения запахов и ухода за домом.</description>
-  </item>
-  <item>
-    <title>Телефон сел в дороге: что делать и как остаться на связи</title>
-    <link>https://1001sovet.ru/layfkhaki/sel-telefon/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/layfkhaki/sel-telefon/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Лайфхаки</category>
-    <description>Экстренные действия при разрядке смартфона в поездке: как продлить работу и найти помощь.</description>
+    <description>Правила безопасной ночной зарядки смартфона дома, чтобы избежать перегрева и продлить срок службы батареи.</description>
   </item>
   </channel>
 </rss>

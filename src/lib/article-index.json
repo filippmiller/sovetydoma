@@ -1,7 +1,19 @@
 {
+  "apteka-dlya-dachi": {
+    "category": "dacha-i-ogorod",
+    "title": "Аптечка для дачи: что держать под рукой летом"
+  },
   "baklazhany-v-teplitse": {
     "category": "dacha-i-ogorod",
     "title": "Баклажаны в теплице: от рассады до сбора урожая за один сезон"
+  },
+  "bezopasnaya-zaryadka-telefona-nochyu": {
+    "category": "layfkhaki",
+    "title": "Безопасная зарядка телефона ночью: что важно знать дома"
+  },
+  "bezopasnost-doma-dlya-rebenka": {
+    "category": "layfkhaki",
+    "title": "Безопасность дома для ребёнка: что проверить в первую очередь"
   },
   "bezopasnost-na-ldu-rybalka": {
     "category": "rybalka",
@@ -18,6 +30,10 @@
   "borba-s-medvedkoy": {
     "category": "dacha-i-ogorod",
     "title": "Эффективная борьба с медведкой: проверенные способы защиты огорода"
+  },
+  "borba-s-muravyami-v-teplitse": {
+    "category": "dacha-i-ogorod",
+    "title": "Борьба с муравьями в теплице без вреда для растений"
   },
   "borba-s-oduvanchikami": {
     "category": "dacha-i-ogorod",
@@ -55,6 +71,10 @@
     "category": "dom-i-uborka",
     "title": "Как отмыть духовку от жира без химии за 30 минут"
   },
+  "chistka-filtra-konditsionera": {
+    "category": "dom-i-uborka",
+    "title": "Как почистить фильтр кондиционера и не повредить технику"
+  },
   "chistka-kovra-doma": {
     "category": "dom-i-uborka",
     "title": "Как почистить ковёр в домашних условиях без стиральной машины"
@@ -70,6 +90,10 @@
   "chistka-stiralnoy-mashiny": {
     "category": "dom-i-uborka",
     "title": "Как избавиться от запаха в стиральной машине за 30 минут"
+  },
+  "chto-delat-esli-pylesos-ploho-tyanet": {
+    "category": "dom-i-uborka",
+    "title": "Что делать, если пылесос стал плохо тянуть"
   },
   "chto-posadit-v-teni": {
     "category": "dacha-i-ogorod",
@@ -231,9 +255,25 @@
     "category": "kulinaria",
     "title": "Холодец из свиных ножек: классический рецепт с секретами прозрачности"
   },
+  "hranenie-elochnyh-igrushek": {
+    "category": "dom-i-uborka",
+    "title": "Как хранить ёлочные игрушки, гирлянды и декор после праздников"
+  },
+  "hranenie-instrumentov-v-kvartire": {
+    "category": "dom-i-uborka",
+    "title": "Как хранить инструменты в квартире, чтобы всё было под рукой"
+  },
+  "hranenie-kartofelya-v-kvartire": {
+    "category": "kulinaria",
+    "title": "Как хранить картофель в квартире, чтобы он не пророс"
+  },
   "hranenie-krup-muki-spetsiy": {
     "category": "dom-i-uborka",
     "title": "Как организовать хранение круп, муки и специй: 7 практичных правил"
+  },
+  "hranenie-lekarstv-doma": {
+    "category": "layfkhaki",
+    "title": "Как хранить лекарства дома безопасно и понятно"
   },
   "hranenie-morkovi": {
     "category": "dacha-i-ogorod",
@@ -259,6 +299,10 @@
     "category": "rybalka",
     "title": "Как хранить рыболовные снасти дома и в машине: практичные советы"
   },
+  "hranenie-v-malenkoy-kuhne": {
+    "category": "dom-i-uborka",
+    "title": "Хранение в маленькой кухне: как освободить рабочую поверхность"
+  },
   "hranenie-yablok-zimoy": {
     "category": "dacha-i-ogorod",
     "title": "Как хранить яблоки зимой без гнили и пересыхания"
@@ -283,6 +327,26 @@
     "category": "layfkhaki",
     "title": "Как быстро найти потерянную вещь дома"
   },
+  "kak-hranit-bytovuyu-tehniku": {
+    "category": "dom-i-uborka",
+    "title": "Как хранить бытовую технику, которой пользуются редко"
+  },
+  "kak-hranit-shkolnye-tetradi": {
+    "category": "dom-i-uborka",
+    "title": "Как хранить школьные тетради, грамоты и рисунки без хаоса"
+  },
+  "kak-hranit-sumki-i-ryukzaki": {
+    "category": "dom-i-uborka",
+    "title": "Как хранить сумки и рюкзаки без заломов и пыли"
+  },
+  "kak-hranit-zimnyuyu-obuv": {
+    "category": "dom-i-uborka",
+    "title": "Как хранить зимнюю обувь, чтобы она не потеряла форму"
+  },
+  "kak-ne-peregretsya-v-zharu-doma": {
+    "category": "layfkhaki",
+    "title": "Как не перегреться дома в жару без кондиционера"
+  },
   "kak-ne-pereplatit-za-dostavku": {
     "category": "ekonomiya",
     "title": "Как не переплатить за доставку продуктов и вещей"
@@ -290,6 +354,14 @@
   "kak-ne-zaputyvat-snasti": {
     "category": "rybalka",
     "title": "Как не запутывать снасти при перевозке: системы хранения и транспортировки"
+  },
+  "kak-obnovit-staryy-stul": {
+    "category": "dom-i-uborka",
+    "title": "Как обновить старый стул без полной реставрации"
+  },
+  "kak-organizovat-utro-s-detmi": {
+    "category": "layfkhaki",
+    "title": "Как организовать утро с детьми без спешки и крика"
   },
   "kak-otmyt-moskitnye-setki": {
     "category": "dom-i-uborka",
@@ -299,9 +371,33 @@
     "category": "dom-i-uborka",
     "title": "Как отмыть пластиковые подоконники от желтизны и пятен"
   },
+  "kak-pokrasit-batareyu-bez-razvodov": {
+    "category": "dom-i-uborka",
+    "title": "Как покрасить батарею без подтёков и запаха на всю квартиру"
+  },
   "kak-pomyt-lyustru-bez-razvodov": {
     "category": "dom-i-uborka",
     "title": "Как помыть люстру и плафоны без разводов"
+  },
+  "kak-povesit-polku-rovno": {
+    "category": "dom-i-uborka",
+    "title": "Как повесить полку ровно: разметка, крепёж и ошибки"
+  },
+  "kak-prodlit-zhizn-stiralnoy-mashiny": {
+    "category": "dom-i-uborka",
+    "title": "Как продлить жизнь стиральной машине простым уходом"
+  },
+  "kak-razobrat-balkon-bez-stressa": {
+    "category": "layfkhaki",
+    "title": "Как разобрать балкон без стресса и не вернуть хлам обратно"
+  },
+  "kak-sazhat-lukovichnye-osenyu": {
+    "category": "dacha-i-ogorod",
+    "title": "Как сажать луковичные осенью: сроки, глубина и защита"
+  },
+  "kak-sobrat-rebenka-v-lager": {
+    "category": "layfkhaki",
+    "title": "Как собрать ребёнка в лагерь и ничего важного не забыть"
   },
   "kak-sohranit-rybu-svezhey": {
     "category": "rybalka",
@@ -339,9 +435,29 @@
     "category": "kulinaria",
     "title": "Как варить пельмени правильно: чтобы не слипались и не рвались"
   },
+  "kak-vybrat-arbuz-i-dynyu": {
+    "category": "kulinaria",
+    "title": "Как выбрать арбуз и дыню: признаки спелости без мифов"
+  },
   "kak-vybrat-arbuz": {
     "category": "layfkhaki",
     "title": "Как выбрать спелый арбуз: 7 признаков хорошего арбуза"
+  },
+  "kak-vybrat-nastolnuyu-lampu": {
+    "category": "ekonomiya",
+    "title": "Как выбрать настольную лампу для учёбы и работы дома"
+  },
+  "kak-vybrat-shurupovert-dlya-doma": {
+    "category": "ekonomiya",
+    "title": "Как выбрать шуруповёрт для дома без переплаты"
+  },
+  "kak-vybrat-udlinitel-dlya-doma": {
+    "category": "ekonomiya",
+    "title": "Как выбрать удлинитель для дома и не перегрузить сеть"
+  },
+  "kak-zadelat-treshchinu-v-shtukaturke": {
+    "category": "dom-i-uborka",
+    "title": "Как заделать трещину в штукатурке без лишней пыли"
   },
   "kapelnyy-poliv-svoimi-rukami": {
     "category": "dacha-i-ogorod",
@@ -398,6 +514,10 @@
   "kompot-iz-suhofruktov": {
     "category": "kulinaria",
     "title": "Вкусный компот из сухофруктов: пропорции и время варки"
+  },
+  "kompoty-na-zimu-bez-sterilizatsii": {
+    "category": "kulinaria",
+    "title": "Компоты на зиму без стерилизации: что важно соблюдать"
   },
   "krossovki-otmyt": {
     "category": "dom-i-uborka",
@@ -483,6 +603,10 @@
     "category": "layfkhaki",
     "title": "Как подписать провода и зарядки, чтобы не путаться"
   },
+  "melkiy-remont-sten-posle-dyubelov": {
+    "category": "dom-i-uborka",
+    "title": "Как заделать мелкие отверстия в стене после дюбелей"
+  },
   "menshe-pyli-v-kvartire": {
     "category": "dom-i-uborka",
     "title": "12 способов сократить количество пыли в квартире вдвое"
@@ -494,6 +618,10 @@
   "mini-remont-bez-instrumentov": {
     "category": "layfkhaki",
     "title": "Мелкий ремонт без набора инструментов: что можно сделать дома"
+  },
+  "mnogoletenniki-dlya-nachinayushchih": {
+    "category": "dacha-i-ogorod",
+    "title": "Многолетники для начинающих: что посадить и не пересаживать каждый год"
   },
   "morkov-vyraschivanie": {
     "category": "dacha-i-ogorod",
@@ -574,6 +702,14 @@
   "organizatsiya-kuhni": {
     "category": "layfkhaki",
     "title": "Как организовать кухню: места хранения и порядок без усилий"
+  },
+  "organizatsiya-pod-rakovinoy": {
+    "category": "dom-i-uborka",
+    "title": "Организация пространства под раковиной на кухне и в ванной"
+  },
+  "osennyaya-podgotovka-gazona": {
+    "category": "dacha-i-ogorod",
+    "title": "Осенняя подготовка газона: стрижка, подкормка и уборка листьев"
   },
   "osvezhit-shtory-bez-stirki": {
     "category": "dom-i-uborka",
@@ -691,6 +827,18 @@
     "category": "rybalka",
     "title": "Как выбрать поплавок для течения и стоячей воды"
   },
+  "poryadok-na-rabochem-stole": {
+    "category": "layfkhaki",
+    "title": "Порядок на рабочем столе дома: минимум вещей, максимум удобства"
+  },
+  "poryadok-v-detskih-veshchah": {
+    "category": "layfkhaki",
+    "title": "Порядок в детских вещах: система без ежедневного хаоса"
+  },
+  "poryadok-v-igrushkah": {
+    "category": "layfkhaki",
+    "title": "Порядок в игрушках: как хранить, менять и не покупать лишнее"
+  },
   "poryadok-v-prihozhey": {
     "category": "dom-i-uborka",
     "title": "Порядок в прихожей: обувь, ключи, сумки и сезонные вещи"
@@ -775,6 +923,10 @@
     "category": "ekonomiya",
     "title": "Бюджетный ремонт квартиры: как сделать красиво и недорого"
   },
+  "remont-rozetki-kogda-vyzyvat-mastera": {
+    "category": "dom-i-uborka",
+    "title": "Розетка искрит или болтается: что можно проверить, а когда звать мастера"
+  },
   "ryba-v-duhovke": {
     "category": "kulinaria",
     "title": "Рыба в духовке без сухости: температура, время и маринад"
@@ -815,6 +967,10 @@
     "category": "ekonomiya",
     "title": "Планирование семейного бюджета: система, которая работает"
   },
+  "semeynyy-kalendar-na-holodilnike": {
+    "category": "layfkhaki",
+    "title": "Семейный календарь на холодильнике: как перестать всё забывать"
+  },
   "sezonnyy-spisok-pokupok": {
     "category": "ekonomiya",
     "title": "Сезонный список покупок: как покупать дешевле и без запасов"
@@ -822,6 +978,10 @@
   "sharlotka-s-yablokami": {
     "category": "kulinaria",
     "title": "Простая шарлотка с яблоками: рецепт высокого бисквита"
+  },
+  "shkolnyy-ugolok-doma": {
+    "category": "layfkhaki",
+    "title": "Как организовать школьный уголок дома без отдельной комнаты"
   },
   "shvy-mezhdu-plitkoy": {
     "category": "dom-i-uborka",
@@ -831,9 +991,17 @@
     "category": "dacha-i-ogorod",
     "title": "Сидераты для улучшения почвы: какие сеять и когда заделывать"
   },
+  "sistema-korobok-dlya-kladovki": {
+    "category": "dom-i-uborka",
+    "title": "Система коробок для кладовки: как подписывать и сортировать"
+  },
   "skovoroda-ot-zhira": {
     "category": "dom-i-uborka",
     "title": "5 способов почистить сковороду от застарелого жира"
+  },
+  "skrip-dveri-i-petel": {
+    "category": "dom-i-uborka",
+    "title": "Скрип двери и петель: простые способы убрать звук"
   },
   "sladkiy-perec": {
     "category": "dacha-i-ogorod",
@@ -871,6 +1039,10 @@
     "category": "kulinaria",
     "title": "5 простых соусов к мясу: рецепты на каждый день"
   },
+  "spisok-pokupok-dlya-semi": {
+    "category": "ekonomiya",
+    "title": "Список покупок для семьи: как покупать на неделю без лишнего"
+  },
   "spisok-pokupok": {
     "category": "ekonomiya",
     "title": "Как составить список покупок, который реально экономит деньги"
@@ -898,6 +1070,10 @@
   "stirka-pukhovika": {
     "category": "dom-i-uborka",
     "title": "Как стирать пуховик дома чтобы не испортить"
+  },
+  "sushka-zeleni-doma": {
+    "category": "kulinaria",
+    "title": "Сушка зелени дома: укроп, петрушка и базилик без плесени"
   },
   "syrniki-iz-tvoroga": {
     "category": "kulinaria",
@@ -983,6 +1159,10 @@
     "category": "kulinaria",
     "title": "Как приготовить уху из речной рыбы без запаха тины"
   },
+  "uhod-za-elektrochaynikom": {
+    "category": "dom-i-uborka",
+    "title": "Уход за электрочайником: накипь, запах и срок службы"
+  },
   "uhod-za-gazonom": {
     "category": "dacha-i-ogorod",
     "title": "Зелёный газон в июльскую жару: правила полива и стрижки"
@@ -990,6 +1170,10 @@
   "uhod-za-grushey": {
     "category": "dacha-i-ogorod",
     "title": "Уход за грушей летом и осенью: инструкция для сочного урожая"
+  },
+  "uhod-za-holodilnikom": {
+    "category": "dom-i-uborka",
+    "title": "Уход за холодильником: запах, наледь и чистые полки"
   },
   "uhod-za-kozhanym-divanom": {
     "category": "dom-i-uborka",
@@ -1002,6 +1186,14 @@
   "uhod-za-mebelyu": {
     "category": "dom-i-uborka",
     "title": "Как ухаживать за деревянной мебелью: секреты долговечности"
+  },
+  "uhod-za-posudomoechnoy-mashinoy": {
+    "category": "dom-i-uborka",
+    "title": "Уход за посудомоечной машиной без дорогих средств"
+  },
+  "uhod-za-rozami-letom": {
+    "category": "dacha-i-ogorod",
+    "title": "Уход за розами летом: полив, подкормка и обрезка бутонов"
   },
   "uhod-za-smorodinoy": {
     "category": "dacha-i-ogorod",
@@ -1062,6 +1254,14 @@
   "yaichnitsa-omlet": {
     "category": "kulinaria",
     "title": "Идеальная яичница и пышный омлет: техника за 15 минут"
+  },
+  "zamena-silikona-v-vannoy": {
+    "category": "dom-i-uborka",
+    "title": "Замена силикона в ванной: как убрать старый и нанести новый"
+  },
+  "zamrazhivanie-yagod-na-zimu": {
+    "category": "kulinaria",
+    "title": "Как заморозить ягоды на зиму, чтобы они не слиплись"
   },
   "zapah-iz-obuvi": {
     "category": "dom-i-uborka",

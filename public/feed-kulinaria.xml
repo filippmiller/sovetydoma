@@ -6,13 +6,29 @@
     <description>Рецепты, советы и секреты вкусной домашней кухни</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-kulinaria.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Tue, 02 Jun 2026 09:38:27 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jun 2026 10:55:22 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
       <link>https://1001sovet.ru/</link>
     </image>
     
+  <item>
+    <title>Как заморозить ягоды на зиму, чтобы они не слиплись</title>
+    <link>https://1001sovet.ru/kulinaria/zamrazhivanie-yagod-na-zimu/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/zamrazhivanie-yagod-na-zimu/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Способ заморозки ягод для хранения в морозилке без комка льда и слипания.</description>
+  </item>
+  <item>
+    <title>Сушка зелени дома: укроп, петрушка и базилик без плесени</title>
+    <link>https://1001sovet.ru/kulinaria/sushka-zeleni-doma/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/sushka-zeleni-doma/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Как правильно сушить зелень в домашних условиях, сохранив аромат и избежав плесени.</description>
+  </item>
   <item>
     <title>Соус для гречки: 5 простых домашних вариантов</title>
     <link>https://1001sovet.ru/kulinaria/sous-dlya-grechki/</link>
@@ -70,12 +86,36 @@
     <description>Как запечь курицу в рукаве, чтобы мясо осталось сочным, а кожа приобрела аппетитный цвет.</description>
   </item>
   <item>
+    <title>Компоты на зиму без стерилизации: что важно соблюдать</title>
+    <link>https://1001sovet.ru/kulinaria/kompoty-na-zimu-bez-sterilizatsii/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/kompoty-na-zimu-bez-sterilizatsii/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Рецепт приготовления компота на зиму без стерилизации с соблюдением правил безопасности.</description>
+  </item>
+  <item>
+    <title>Как выбрать арбуз и дыню: признаки спелости без мифов</title>
+    <link>https://1001sovet.ru/kulinaria/kak-vybrat-arbuz-i-dynyu/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/kak-vybrat-arbuz-i-dynyu/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Реальные признаки спелости арбуза и дыни, которые работают, и мифы, которым не стоит верить.</description>
+  </item>
+  <item>
     <title>Кабачковые оладьи: как сделать нежными и не водянистыми</title>
     <link>https://1001sovet.ru/kulinaria/kabachkovye-oladi/</link>
     <guid isPermaLink="true">https://1001sovet.ru/kulinaria/kabachkovye-oladi/</guid>
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Кулинария</category>
     <description>Рецепт кабачковых оладей без лишней влаги: пропорции, способ отжима и секреты жарки.</description>
+  </item>
+  <item>
+    <title>Как хранить картофель в квартире, чтобы он не пророс</title>
+    <link>https://1001sovet.ru/kulinaria/hranenie-kartofelya-v-kvartire/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/hranenie-kartofelya-v-kvartire/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Кулинария</category>
+    <description>Способы хранения картофеля в квартире без погреба: условия, контейнеры и сроки.</description>
   </item>
   <item>
     <title>Домашний творог из молока: простой способ без лишней кислоты</title>
@@ -132,46 +172,6 @@
     <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Кулинария</category>
     <description>Рецепт пышной творожной запеканки с манкой — воздушная, нежная и с румяной корочкой, точно как в детском саду.</description>
-  </item>
-  <item>
-    <title>Тушёная капуста как в столовой: секрет мягкости и цвета</title>
-    <link>https://1001sovet.ru/kulinaria/tushenaya-kapusta/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/tushenaya-kapusta/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Рецепт тушёной капусты с мягким вкусом и аппетитным цветом: правильная нарезка, специи и время тушения.</description>
-  </item>
-  <item>
-    <title>Тонкое хрустящее тесто для пиццы: рецепт итальянской основы</title>
-    <link>https://1001sovet.ru/kulinaria/testo-dlya-pitstsy/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/testo-dlya-pitstsy/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Как приготовить тонкое хрустящее тесто для пиццы в домашних условиях — пропорции, время расстойки и температура выпечки.</description>
-  </item>
-  <item>
-    <title>Пышные сырники из творога, которые не разваливаются</title>
-    <link>https://1001sovet.ru/kulinaria/syrniki-iz-tvoroga/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/syrniki-iz-tvoroga/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Рецепт пышных сырников из творога без муки в тесте: секрет консистенции и правильной жарки.</description>
-  </item>
-  <item>
-    <title>5 простых соусов к мясу: рецепты на каждый день</title>
-    <link>https://1001sovet.ru/kulinaria/sousy-k-myasu/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/sousy-k-myasu/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Подборка из пяти простых соусов к мясу — сметанный, грибной, томатный, горчичный и винный — на скорую руку.</description>
-  </item>
-  <item>
-    <title>Сборная мясная солянка: классический рецепт навара</title>
-    <link>https://1001sovet.ru/kulinaria/solyanka-sbornaya-myasnaya/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/kulinaria/solyanka-sbornaya-myasnaya/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Кулинария</category>
-    <description>Классическая сборная солянка из трёх видов мяса с солёными огурцами, каперсами и лимоном — насыщенный первый обеденный суп.</description>
   </item>
   </channel>
 </rss>

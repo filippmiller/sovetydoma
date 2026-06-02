@@ -6,13 +6,29 @@
     <description>Лайфхаки для чистоты и порядка в доме</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-dom-i-uborka.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Tue, 02 Jun 2026 09:38:27 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jun 2026 10:55:22 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
       <link>https://1001sovet.ru/</link>
     </image>
     
+  <item>
+    <title>Замена силикона в ванной: как убрать старый и нанести новый</title>
+    <link>https://1001sovet.ru/dom-i-uborka/zamena-silikona-v-vannoy/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/zamena-silikona-v-vannoy/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Пошаговая инструкция по замене силиконового герметика в ванной без специальных инструментов.</description>
+  </item>
+  <item>
+    <title>Уход за посудомоечной машиной без дорогих средств</title>
+    <link>https://1001sovet.ru/dom-i-uborka/uhod-za-posudomoechnoy-mashinoy/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/uhod-za-posudomoechnoy-mashinoy/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Как содержать посудомоечную машину в чистоте и порядке, используя подручные средства.</description>
+  </item>
   <item>
     <title>Уход за кожаным диваном: чистка, защита и частые ошибки</title>
     <link>https://1001sovet.ru/dom-i-uborka/uhod-za-kozhanym-divanom/</link>
@@ -22,12 +38,60 @@
     <description>Как правильно чистить и ухаживать за кожаным диваном, чтобы кожа не трескалась и сохраняла вид.</description>
   </item>
   <item>
+    <title>Уход за холодильником: запах, наледь и чистые полки</title>
+    <link>https://1001sovet.ru/dom-i-uborka/uhod-za-holodilnikom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/uhod-za-holodilnikom/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Правила ухода за холодильником: борьба с запахом, разморозка и профилактика поломок.</description>
+  </item>
+  <item>
+    <title>Уход за электрочайником: накипь, запах и срок службы</title>
+    <link>https://1001sovet.ru/dom-i-uborka/uhod-za-elektrochaynikom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/uhod-za-elektrochaynikom/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Как ухаживать за электрочайником, удалять накипь и избавиться от запаха пластика.</description>
+  </item>
+  <item>
+    <title>Скрип двери и петель: простые способы убрать звук</title>
+    <link>https://1001sovet.ru/dom-i-uborka/skrip-dveri-i-petel/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/skrip-dveri-i-petel/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Как устранить скрип дверей и петель подручными средствами без вызова мастера.</description>
+  </item>
+  <item>
+    <title>Система коробок для кладовки: как подписывать и сортировать</title>
+    <link>https://1001sovet.ru/dom-i-uborka/sistema-korobok-dlya-kladovki/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/sistema-korobok-dlya-kladovki/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Как организовать хранение в кладовке с помощью коробок, этикеток и зонирования.</description>
+  </item>
+  <item>
+    <title>Розетка искрит или болтается: что можно проверить, а когда звать мастера</title>
+    <link>https://1001sovet.ru/dom-i-uborka/remont-rozetki-kogda-vyzyvat-mastera/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/remont-rozetki-kogda-vyzyvat-mastera/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Безопасная диагностика неисправностей розетки и критерии, при которых нужен электрик.</description>
+  </item>
+  <item>
     <title>Порядок в прихожей: обувь, ключи, сумки и сезонные вещи</title>
     <link>https://1001sovet.ru/dom-i-uborka/poryadok-v-prihozhey/</link>
     <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/poryadok-v-prihozhey/</guid>
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
     <description>Как организовать пространство прихожей, чтобы утренний сбор на работу занимал минуты, а не полчаса.</description>
+  </item>
+  <item>
+    <title>Организация пространства под раковиной на кухне и в ванной</title>
+    <link>https://1001sovet.ru/dom-i-uborka/organizatsiya-pod-rakovinoy/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/organizatsiya-pod-rakovinoy/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Как организовать шкафчик под раковиной, чтобы вместить максимум вещей и сохранить доступ.</description>
   </item>
   <item>
     <title>Как организовать хозяйственный шкаф без хаоса</title>
@@ -46,6 +110,22 @@
     <description>Простые способы очистки душевой кабины от известкового налёта и мыла без агрессивной химии.</description>
   </item>
   <item>
+    <title>Как заделать мелкие отверстия в стене после дюбелей</title>
+    <link>https://1001sovet.ru/dom-i-uborka/melkiy-remont-sten-posle-dyubelov/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/melkiy-remont-sten-posle-dyubelov/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Простые способы заделать отверстия от дюбелей и шурупов в стенах без профессионального инструмента.</description>
+  </item>
+  <item>
+    <title>Как заделать трещину в штукатурке без лишней пыли</title>
+    <link>https://1001sovet.ru/dom-i-uborka/kak-zadelat-treshchinu-v-shtukaturke/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-zadelat-treshchinu-v-shtukaturke/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Пошаговая инструкция по заделке трещин в штукатурке с минимумом пыли и без профессионального инструментария.</description>
+  </item>
+  <item>
     <title>Как убрать запах табака в квартире после гостей</title>
     <link>https://1001sovet.ru/dom-i-uborka/kak-ubrat-zapah-tabaka-v-kvartire/</link>
     <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-ubrat-zapah-tabaka-v-kvartire/</guid>
@@ -62,6 +142,22 @@
     <description>Проверенные способы выведения свежих и застарелых пятен от чая и кофе с разных тканей и поверхностей.</description>
   </item>
   <item>
+    <title>Как продлить жизнь стиральной машине простым уходом</title>
+    <link>https://1001sovet.ru/dom-i-uborka/kak-prodlit-zhizn-stiralnoy-mashiny/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-prodlit-zhizn-stiralnoy-mashiny/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Простые привычки, которые помогут стиральной машине работать дольше без поломок.</description>
+  </item>
+  <item>
+    <title>Как повесить полку ровно: разметка, крепёж и ошибки</title>
+    <link>https://1001sovet.ru/dom-i-uborka/kak-povesit-polku-rovno/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-povesit-polku-rovno/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Пошаговая инструкция по монтажу полок на стену ровно и надёжно без лишних отверстий.</description>
+  </item>
+  <item>
     <title>Как помыть люстру и плафоны без разводов</title>
     <link>https://1001sovet.ru/dom-i-uborka/kak-pomyt-lyustru-bez-razvodov/</link>
     <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-pomyt-lyustru-bez-razvodov/</guid>
@@ -70,108 +166,12 @@
     <description>Техника мытья люстр и плафонов из разных материалов без разводов, царапин и повреждений.</description>
   </item>
   <item>
-    <title>Как отмыть пластиковые подоконники от желтизны и пятен</title>
-    <link>https://1001sovet.ru/dom-i-uborka/kak-otmyt-plastikovye-podokonniki/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-otmyt-plastikovye-podokonniki/</guid>
+    <title>Как покрасить батарею без подтёков и запаха на всю квартиру</title>
+    <link>https://1001sovet.ru/dom-i-uborka/kak-pokrasit-batareyu-bez-razvodov/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-pokrasit-batareyu-bez-razvodov/</guid>
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
-    <description>Способы очистки пластиковых подоконников от жёлтых пятен, пыли и застарелых загрязнений.</description>
-  </item>
-  <item>
-    <title>Как хранить постельное бельё, чтобы оно не пахло шкафом</title>
-    <link>https://1001sovet.ru/dom-i-uborka/hranenie-postelnogo-belya/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/hranenie-postelnogo-belya/</guid>
-    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Практические советы по хранению постельного белья без запаха сырости и застоя в шкафу.</description>
-  </item>
-  <item>
-    <title>Чистка матраса дома: пятна, запах и пыль без лишней влаги</title>
-    <link>https://1001sovet.ru/dom-i-uborka/chistka-matrasa-doma/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/chistka-matrasa-doma/</guid>
-    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Пошаговая инструкция по чистке матраса от пятен, запахов и пылевых клещей без заливки водой.</description>
-  </item>
-  <item>
-    <title>Как убрать шерсть с дивана, ковра и одежды: все рабочие способы</title>
-    <link>https://1001sovet.ru/dom-i-uborka/ubrat-sherst-s-divana-i-kovra/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/ubrat-sherst-s-divana-i-kovra/</guid>
-    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Обзор методов удаления шерсти животных с мягкой мебели, ковров и ткани: от резиновых перчаток до специальных насадок на пылесос.</description>
-  </item>
-  <item>
-    <title>Как почистить вытяжку на кухне от липкого жира без химии</title>
-    <link>https://1001sovet.ru/dom-i-uborka/pochistit-kuhonnuyu-vytyazhku/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/pochistit-kuhonnuyu-vytyazhku/</guid>
-    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Пошаговая чистка кухонной вытяжки: фильтры, вентилятор и корпус. Рецепты растворов из соды и уксуса для застарелого жира.</description>
-  </item>
-  <item>
-    <title>Как освежить шторы без полной стирки: быстрые способы</title>
-    <link>https://1001sovet.ru/dom-i-uborka/osvezhit-shtory-bez-stirki/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/osvezhit-shtory-bez-stirki/</guid>
-    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Методы освежения штор в домашних условиях без снятия и стирки: парообработка, пылесос, спреи и проветривание.</description>
-  </item>
-  <item>
-    <title>Как отмыть москитные сетки и не порвать их: проверенные способы</title>
-    <link>https://1001sovet.ru/dom-i-uborka/kak-otmyt-moskitnye-setki/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-otmyt-moskitnye-setki/</guid>
-    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Пошаговая инструкция по мойке москитных сеток вручную и в ванной: растворы, температуру воды и способы сушки без деформации.</description>
-  </item>
-  <item>
-    <title>Как организовать хранение круп, муки и специй: 7 практичных правил</title>
-    <link>https://1001sovet.ru/dom-i-uborka/hranenie-krup-muki-spetsiy/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/hranenie-krup-muki-spetsiy/</guid>
-    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Принципы хранения сыпучих продуктов на кухне: контейнеры, температура, сроки годности и защита от жучков-пищевиков.</description>
-  </item>
-  <item>
-    <title>Как избавиться от неприятного запаха в посудомоечной машине</title>
-    <link>https://1001sovet.ru/dom-i-uborka/zapah-v-posudomoyke/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/zapah-v-posudomoyke/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Причины запаха из посудомойки и эффективные способы его устранения: чистка фильтров, уксус и профилактика.</description>
-  </item>
-  <item>
-    <title>7 надёжных способов вывести неприятный запах из обуви</title>
-    <link>https://1001sovet.ru/dom-i-uborka/zapah-iz-obuvi/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/zapah-iz-obuvi/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Эффективные домашние методы удаления запаха из обуви с помощью соды, уксуса, чая и других подручных средств.</description>
-  </item>
-  <item>
-    <title>Как ухаживать за деревянной мебелью: секреты долговечности</title>
-    <link>https://1001sovet.ru/dom-i-uborka/uhod-za-mebelyu/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/uhod-za-mebelyu/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Практические советы по уходу за деревянной мебелью для сохранения её вида и продления срока службы.</description>
-  </item>
-  <item>
-    <title>Как удалить жвачку с одежды, ковра и мебели без следа</title>
-    <link>https://1001sovet.ru/dom-i-uborka/udalit-zhvachku/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/udalit-zhvachku/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Проверенные способы удаления жевательной резинки с разных поверхностей: заморозка, уксус, утюг и спирт.</description>
-  </item>
-  <item>
-    <title>Как удалить накипь в чайнике лимонной кислотой за 15 минут</title>
-    <link>https://1001sovet.ru/dom-i-uborka/udalit-nakip-limonkoy/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/udalit-nakip-limonkoy/</guid>
-    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Быстрый и безопасный способ очистить электрический чайник от накипи с помощью лимонной кислоты.</description>
+    <description>Техника покраски радиаторов отопления без разводов, подтёков и с минимальным запахом.</description>
   </item>
   </channel>
 </rss>
