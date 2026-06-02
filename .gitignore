@@ -77,3 +77,6 @@ HANDOFF-RESUME.md
 # Cloudflare Worker local dev secrets
 .dev.vars
 **/.dev.vars
+
+# Codex QA screenshots / scratch artifacts
+.codex-artifacts/
