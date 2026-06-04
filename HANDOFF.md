@@ -225,3 +225,19 @@ Full codebase forensic review executed (structure, gates, security deep-dive on 
 - Follow-ups: P0s above + finish the 7md.* omnichannel subscriptions series (tests, VK/OK/FB, audit trail).
 
 Update this section on future reviews. All protocol followed (bd, commits, push).
+
+## Recent subagent deep forensic scan (2026-06-04)
+Max-depth forensic using 3 specialized background subagents (execute/read-only, 300+ tool calls total, non-mutating, full protocol followed at their starts + main):
+- Security (107 calls, 278s): full workers (photo monolith 605 LOC + subs 912 LOC), RLS/migrations, authz (getUser first), UGC direct inserts, in-mem rates, crypto (timingSafe/HMAC/Svix/turnstile), contact challenge, admin client gate. Confirmed no regressions; amplified P1 UGC proxy/rate + RLS versioning gaps + personal emails. See sub report in session.
+- Content (136 calls, 420s): exhaustive on 329 MDX (word counts, mojibake grep, fm keys, samples across cats/dates), all generators/audits/validate/import/image scripts + Kimi prompts + cross to subs/recs/search. Found exactly 29 shorts <300w, 2 real mojibake-corrupted in prod (full garbage in title/desc/tags), 58 image fm drifts, rybalka omitted from sitemap/rss generators (hardcoded 5 cats), import (200w) vs validate (300w+mojibake) mismatch, broken audit-links (0 internal links), crude turbo/zen. See sub report.
+- Quality/Hygiene (90 calls, 296s): full src/ (56 'use client', fav desync local<->server no migrate, category dupe lists, reactions optimistic races), package.json (inner "npm run" in tests), tracked package-lock.json, 7 stray root dupes (gray-matter 4.0.3 exact match), stale numbers in reports/HANDOFF (180 vs 329), no new any/dangerous/catch abuse (0). Confirmed gates clean. See sub report.
+
+**Main + batch confirms:** 29 shorts + 2 garbled (real mojibake in 2 prod fm; inspected), direct .from inserts in Comments.tsx:229 etc, stray versions match, npm-run skew.
+
+**Gates (re-runs):** tsc/lint/SEO/images clean for 329; subs tests pass; validate now catches shorts/mojibake (legacy still in tree).
+
+**New beads created (P0/P1, linked to rnh tracker):** see bd list. Key: sync import/validate + fix 29+2 corpus (5r9), derive sitemap/rss cats (incl rybalka), fix 58 image drifts, pnpm consistency (replace npm run + rm package-lock), rm 7 strays, fav local-server migrate, UGC server proxies/rates (xoq), version RLS, update stale docs. Existing csv/3ch/5r9/xoq/7md.* updated with notes + evidence.
+
+**Report:** `reports/forensic-subagent-deep-scan-2026-06-04.md` (exec summary, 29/2/58/ counts, top findings with files, bead cmds, verification commands).
+
+**Next:** Close 5r9 after corpus+gate sync; address P0 content + hygiene first; then UGC defense-in-depth. All protocol (bd, git commit/push this) followed. Update this section on future reviews.
