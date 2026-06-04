@@ -34,10 +34,8 @@ for ($pass = 1; $pass -le $Passes; $pass++) {
     $so = "$root\.matrix-ideas\out\$vertical-p$pass-$i.kimi.out"
     $se = "$root\.matrix-ideas\out\$vertical-p$pass-$i.kimi.err"
     try {
-      $p = Start-Process -FilePath $kimi -ArgumentList "--quiet","--input-format","text","--no-thinking" `
-        -RedirectStandardInput $instrFile -RedirectStandardOutput $so -RedirectStandardError $se `
-        -WindowStyle Hidden -PassThru
-      if (-not $p.WaitForExit(480000)) { Write-Host "  kimi TIMEOUT (>8min) — killing and skipping"; try { $p.Kill() } catch {} }
+      $p = Start-Process -FilePath $kimi -ArgumentList @("--quiet","--input-format","text","--no-thinking") -RedirectStandardInput $instrFile -RedirectStandardOutput $so -RedirectStandardError $se -WindowStyle Hidden -PassThru
+      if (-not $p.WaitForExit(480000)) { Write-Host "  kimi TIMEOUT (>8min) - killing and skipping"; try { $p.Kill() } catch {} }
     } catch { Write-Host "  kimi error: $_" }
     if (Test-Path "$root\$($of -replace '/','\')") {
       & node scripts/matrix/insert-ideas.mjs $of 2>&1 | Select-Object -Last 1 | ForEach-Object { Write-Host "  $_" }
