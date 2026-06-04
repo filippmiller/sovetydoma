@@ -1,8 +1,4 @@
 {
-  "agrovolokno-pod-klubniku-vesnoy": {
-    "category": "dacha-i-ogorod",
-    "title": "Как постелить агроволокно на грядки под клубнику весной"
-  },
   "apteka-dlya-dachi": {
     "category": "dacha-i-ogorod",
     "title": "Аптечка для дачи: что держать под рукой летом"
@@ -66,14 +62,6 @@
   "carapiny-na-mebeli": {
     "category": "layfkhaki",
     "title": "Как убрать царапины с мебели: 7 способов без мастера"
-  },
-  "chem-pokrasit-derevyanny-saray-snaruzhi": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем покрасить деревянный сарай снаружи, чтобы не гнило 10 лет"
-  },
-  "chem-zashit-potolok-v-sare": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем зашить потолок в сарае недорого и быстро"
   },
   "chesnok-osenyu": {
     "category": "dacha-i-ogorod",
@@ -151,17 +139,9 @@
     "category": "layfkhaki",
     "title": "Как собрать дорожную сумку за 20 минут и ничего не забыть"
   },
-  "dozhdevaya-voda-dlya-poliva": {
-    "category": "dacha-i-ogorod",
-    "title": "Как собрать дождевую воду для полива огорода на даче"
-  },
   "drenazh-na-uchastke": {
     "category": "dacha-i-ogorod",
     "title": "Сухая дача больше не проблема: как правильно сделать дренаж участка"
-  },
-  "dver-v-saray-iz-dosok-bez-petel-skripa": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать дверь в сарай из досок без петель скрипа"
   },
   "dyni-vyrashchivanie": {
     "category": "dacha-i-ogorod",
@@ -239,14 +219,6 @@
     "category": "rybalka",
     "title": "Фидерная ловля для новичков: кормушка, поводок и монтаж оснастки"
   },
-  "gazonnaya-trava-osenyu-posadka": {
-    "category": "dacha-i-ogorod",
-    "title": "Как посеять газонную траву осенью на даче правильно"
-  },
-  "gazonnaya-trava-pod-zimu": {
-    "category": "dacha-i-ogorod",
-    "title": "Как посадить газонную траву под зиму на даче"
-  },
   "grechka-po-kupecheski": {
     "category": "kulinaria",
     "title": "Гречка с мясом по-купечески: сытная классика"
@@ -259,10 +231,6 @@
     "category": "kulinaria",
     "title": "Как засолить грибы на зиму: холодный и горячий способ"
   },
-  "grusha-ot-plodozhorki-posle-tsveteniya": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем обработать грушу от плодожорки после цветения"
-  },
   "gryadki-iz-dosok": {
     "category": "dacha-i-ogorod",
     "title": "Грядки из досок своими руками: пошаговая инструкция для начинающих"
@@ -271,17 +239,9 @@
     "category": "dacha-i-ogorod",
     "title": "Подготовка грядок к зиме: пошаговая инструкция для дачника"
   },
-  "gryadki-po-mitlayderu-s-nulya": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать грядки по Митлайдеру на даче с нуля"
-  },
   "gryadki-posle-sbora-urozhaya": {
     "category": "dacha-i-ogorod",
     "title": "Что делать с грядками после сбора урожая"
-  },
-  "gryadki-v-teplice-pravilno": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать грядки в теплице из поликарбоната правильно"
   },
   "gulyash-iz-govyadiny": {
     "category": "kulinaria",
@@ -307,10 +267,6 @@
     "category": "kulinaria",
     "title": "Как хранить картофель в квартире, чтобы он не пророс"
   },
-  "hranenie-kartoshki-v-pogrebe": {
-    "category": "dacha-i-ogorod",
-    "title": "Как хранить картошку в погребе до весны без прорастания"
-  },
   "hranenie-krup-muki-spetsiy": {
     "category": "dom-i-uborka",
     "title": "Как организовать хранение круп, муки и специй: 7 практичных правил"
@@ -318,14 +274,6 @@
   "hranenie-lekarstv-doma": {
     "category": "layfkhaki",
     "title": "Как хранить лекарства дома безопасно и понятно"
-  },
-  "hranenie-luka-v-kolgotkah": {
-    "category": "dacha-i-ogorod",
-    "title": "Как хранить лук в квартире зимой в колготках"
-  },
-  "hranenie-morkovi-v-peske": {
-    "category": "dacha-i-ogorod",
-    "title": "Как хранить морковь в песке в подвале до лета"
   },
   "hranenie-morkovi": {
     "category": "dacha-i-ogorod",
@@ -479,10 +427,6 @@
     "category": "layfkhaki",
     "title": "Как упаковать подарок без коробки аккуратно и недорого"
   },
-  "kak-uteplit-verandu-na-dache": {
-    "category": "dacha-i-ogorod",
-    "title": "Как утеплить веранду на даче за выходные своими руками"
-  },
   "kak-varit-makarony": {
     "category": "kulinaria",
     "title": "Как правильно варить макароны аль денте: секреты идеальной текстуры"
@@ -514,10 +458,6 @@
   "kak-zadelat-treshchinu-v-shtukaturke": {
     "category": "dom-i-uborka",
     "title": "Как заделать трещину в штукатурке без лишней пыли"
-  },
-  "kapelnyy-poliv-iz-butylok": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать капельный полив из пластиковых бутылок на грядках"
   },
   "kapelnyy-poliv-svoimi-rukami": {
     "category": "dacha-i-ogorod",
@@ -567,17 +507,9 @@
     "category": "dacha-i-ogorod",
     "title": "Как сделать компост быстро: горячее компостирование за 2 недели"
   },
-  "kompost-iz-listev-bystro": {
-    "category": "dacha-i-ogorod",
-    "title": "Как приготовить компост из опавших листьев быстро"
-  },
   "kompost-svoimi-rukami": {
     "category": "dacha-i-ogorod",
     "title": "Компост за 2 месяца: быстрый способ без запаха"
-  },
-  "kompostnaya-yama-bez-zapaha": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать компостную яму на даче без запаха"
   },
   "kompot-iz-suhofruktov": {
     "category": "kulinaria",
@@ -587,21 +519,9 @@
     "category": "kulinaria",
     "title": "Компоты на зиму без стерилизации: что важно соблюдать"
   },
-  "kozyrek-nad-kryltcom-polikarbonat": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать козырек над крыльцом веранды из поликарбоната"
-  },
   "krossovki-otmyt": {
     "category": "dom-i-uborka",
     "title": "Как отчистить белые кроссовки дома: 5 способов"
-  },
-  "kryltso-u-verandy-beton-za-den": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать крыльцо у веранды из бетона за один день"
-  },
-  "krysha-saray-odnoskatnaya-profnastil": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать крышу у сарая односкатную из профнастила"
   },
   "kuriniy-bulon": {
     "category": "kulinaria",
@@ -615,10 +535,6 @@
     "category": "kulinaria",
     "title": "Ленивые голубцы: быстрый домашний рецепт на каждый день"
   },
-  "lenta-dlya-polikarbonata-svoimi-rukami": {
-    "category": "dacha-i-ogorod",
-    "title": "Как приклеить ленту к поликарбонату теплицы своими руками"
-  },
   "les-bezopasnost": {
     "category": "layfkhaki",
     "title": "Правила безопасности в лесу: как не заблудиться и что брать с собой"
@@ -626,18 +542,6 @@
   "letniy-cheklist-pered-otpuskom": {
     "category": "layfkhaki",
     "title": "Летний чек-лист перед отпуском: дом, документы и вещи"
-  },
-  "letniy-dush-iz-bochki-s-podogrevom": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать летний душ на даче из бочки с подогревом"
-  },
-  "letnyaya-kuhnya-iz-poddonov-3-dnya": {
-    "category": "dacha-i-ogorod",
-    "title": "Как построить летнюю кухню на даче из поддонов за 3 дня"
-  },
-  "leyka-iz-kanistry-svoimi-rukami": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать лейку для полива из пластиковой канистры"
   },
   "lovlya-foreli-na-platnike": {
     "category": "rybalka",
@@ -687,10 +591,6 @@
     "category": "kulinaria",
     "title": "Малосольные огурцы в пакете за ночь: рецепт хрустящей закуски"
   },
-  "mansarda-nad-sarem-letniy-son": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать мансарду над сараем для летнего сна"
-  },
   "marinad-dlya-shashlyka": {
     "category": "kulinaria",
     "title": "Маринад для шашлыка, который делает мясо мягким и сочным"
@@ -702,10 +602,6 @@
   "markirovka-provodov-i-zaryadok": {
     "category": "layfkhaki",
     "title": "Как подписать провода и зарядки, чтобы не путаться"
-  },
-  "medvedka-lovushka-banka": {
-    "category": "dacha-i-ogorod",
-    "title": "Как поймать медведку на даче в ловушку из банки"
   },
   "melkiy-remont-sten-posle-dyubelov": {
     "category": "dom-i-uborka",
@@ -739,21 +635,9 @@
     "category": "dacha-i-ogorod",
     "title": "Как избавиться от муравьёв на дачном участке"
   },
-  "muravi-na-yablone-bez-himii": {
-    "category": "dacha-i-ogorod",
-    "title": "Как избавиться от муравьев на яблоне без химии"
-  },
   "nakip-v-chaynike": {
     "category": "dom-i-uborka",
     "title": "Как избавиться от накипи в чайнике за 10 минут"
-  },
-  "naves-dlya-drov-svoimi-rukami": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать навес для дров на даче своими руками"
-  },
-  "naves-dlya-drov-u-saraya-5-kubov": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать навес для дров у сарая на 5 кубометров"
   },
   "nedelnoe-menyu-bez-othodov": {
     "category": "ekonomiya",
@@ -763,46 +647,6 @@
     "category": "rybalka",
     "title": "Ночная рыбалка с берега: свет, безопасность и снасти"
   },
-  "obrabotat-brevna-sruba-treshchiny-usadka": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем обработать бревна сруба от трещин и усадки"
-  },
-  "obrabotat-brus-verandy-ot-zhuka-drovoseka": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем обработать брус для веранды от жука-дровосека"
-  },
-  "obrabotat-dnishche-saraya-ot-gnili-snizu": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем обработать днище деревянного сарая от гнили снизу"
-  },
-  "obrabotat-doski-pola-verandy-ot-skripa": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем обработать доски пола веранды от скрипа без разбора"
-  },
-  "obrabotat-metallicheskiy-saray-ot-rzhavchiny": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем обработать металлический сарай от ржавчины перед покраской"
-  },
-  "obrabotat-srub-bani-ot-gnili-zhukov": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем обработать сруб бани от гнили и жуков снаружи"
-  },
-  "obrabotat-vagonku-verandy-ot-pleseni": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем обработать вагонку в веранде от плесени осенью"
-  },
-  "obrabotat-zheleznuyu-kryshu-saraya-shum": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем обработать железную крышу сарая от шума дождя"
-  },
-  "obrabotka-teplicy-osenyu-fitoftora": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем обработать теплицу из поликарбоната осенью от фитофторы"
-  },
-  "obreshetka-pod-profnastil-krysha-saraya": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать обрешетку под профнастил на крыше сарая"
-  },
   "obrezka-maliny-posle-plodonosheniya": {
     "category": "dacha-i-ogorod",
     "title": "Обрезка малины после плодоношения: что оставить и что убрать"
@@ -810,10 +654,6 @@
   "obrezka-smorodiny": {
     "category": "dacha-i-ogorod",
     "title": "Обрезка смородины после ягод: как подготовить кусты к следующему году"
-  },
-  "obrezka-tui-vesnoy": {
-    "category": "dacha-i-ogorod",
-    "title": "Как обрезать живую изгородь из тую весной правильно"
   },
   "obrezka-yabloni": {
     "category": "dacha-i-ogorod",
@@ -846,10 +686,6 @@
   "ohladit-napitok-bystro": {
     "category": "layfkhaki",
     "title": "Как за 5 минут охладить любой напиток без льда"
-  },
-  "okno-v-sare-iz-staroy-ramy": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать окно в сарае из старой рамы своими руками"
   },
   "oladi-na-kefire": {
     "category": "kulinaria",
@@ -911,10 +747,6 @@
     "category": "dacha-i-ogorod",
     "title": "Болезни и паразиты овощей: мучнистая роса, фитофтора, нематода"
   },
-  "pautinnyy-klesch-na-klubnike": {
-    "category": "dacha-i-ogorod",
-    "title": "Как избавиться от паутинного клеща на клубнике без химии"
-  },
   "pautinnyy-kleshch": {
     "category": "dacha-i-ogorod",
     "title": "Как избавиться от паутинного клеща на огурцах: экстренные меры"
@@ -922,10 +754,6 @@
   "pechenye-yabloki": {
     "category": "kulinaria",
     "title": "Печёные яблоки: начинка, температура и время в духовке"
-  },
-  "perekopka-ogoroda-osenyu-sideraty": {
-    "category": "dacha-i-ogorod",
-    "title": "Как правильно перекопать огород осенью под сидераты"
   },
   "perlovka-bez-zamachivaniya": {
     "category": "kulinaria",
@@ -971,10 +799,6 @@
     "category": "dacha-i-ogorod",
     "title": "Подкормка огурцов: схема для рекордного урожая"
   },
-  "podkormka-pomidorov-drozhzhami": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем подкормить помидоры в период плодоношения дрожжами"
-  },
   "podkormka-pomidorov-teplitsa": {
     "category": "dacha-i-ogorod",
     "title": "Подкормка помидоров в теплице: схема по фазам роста"
@@ -983,69 +807,17 @@
     "category": "dacha-i-ogorod",
     "title": "Когда и как подкармливать помидоры в теплице: схема на весь сезон"
   },
-  "podkormka-smorodiny-zoloy-vesnoy": {
-    "category": "dacha-i-ogorod",
-    "title": "Как подкормить смородину золой весной после таяния снега"
-  },
-  "podsvetka-rassady-mart-deshevo": {
-    "category": "dacha-i-ogorod",
-    "title": "Как подсветить рассаду в марте на подоконнике дешево"
-  },
-  "pogreb-pod-sarem-za-2-nedeli": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать погреб под сараем своими руками за 2 недели"
-  },
-  "pokrasit-metallicheskuyu-dver-saraya": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем покрасить металлическую дверь сарая, чтобы не облезла за год"
-  },
-  "pokrasit-pol-v-sare-ne-pydil-ne-skolzil": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем покрасить пол в сарае, чтобы не пылил и не скользил"
-  },
-  "pokryt-kryshu-verandy-polikarbonat-kondensat": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем покрыть крышу веранды из поликарбоната от конденсата"
-  },
-  "pokrytie-pol-letney-kuhni-ne-gnilo": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем покрыть пол в летней кухне, чтобы не скользило и не гнило"
-  },
-  "pokrytie-sten-letney-kuhni-ot-zhira": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем покрыть стены в летней кухне, чтобы легко мыть от жира"
-  },
   "pokupki-bez-pereplat": {
     "category": "ekonomiya",
     "title": "Как делать покупки выгодно: скидки, акции и правила экономного шопинга"
-  },
-  "pol-v-sare-prognil-zadelat-diry": {
-    "category": "dacha-i-ogorod",
-    "title": "Пол в сарае прогнил: чем заделать дыры без замены досок"
-  },
-  "pol-veranda-palubnaya-doska-svoimi-rukami": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать пол в веранде из палубной доски своими руками"
-  },
-  "polikarbonat-4mm-ili-6mm-teplica": {
-    "category": "dacha-i-ogorod",
-    "title": "Какой поликарбонат лучше для теплицы: 4 мм или 6 мм"
   },
   "poliv-ogoroda": {
     "category": "dacha-i-ogorod",
     "title": "Полив огорода: сколько воды нужно и как часто поливать"
   },
-  "poliv-ogurcov-v-teplice-kapelnyy": {
-    "category": "dacha-i-ogorod",
-    "title": "Как правильно поливать огурцы в теплице капельным способом"
-  },
   "poliv-teplitsy-v-zharu": {
     "category": "dacha-i-ogorod",
     "title": "Как поливать теплицу в жару, чтобы растения не болели"
-  },
-  "polki-v-pogrebe-plastikovye-truby": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать полки в погребе под сараем из пластиковых труб"
   },
   "pomyt-okna-bez-razvodov": {
     "category": "dom-i-uborka",
@@ -1107,10 +879,6 @@
     "category": "dacha-i-ogorod",
     "title": "Посадка земляники из усиков: получите 50 новых кустов бесплатно"
   },
-  "poteyet-teplica-iz-polikarbonata": {
-    "category": "dacha-i-ogorod",
-    "title": "Почему потеет теплица из поликарбоната и как это исправить"
-  },
   "prigorevshaya-kastryulya": {
     "category": "dom-i-uborka",
     "title": "Как отмыть пригоревшую кастрюлю без усилий за 30 минут"
@@ -1131,21 +899,9 @@
     "category": "ekonomiya",
     "title": "Как проверить скидку в магазине и не попасться на уловки"
   },
-  "raskislenie-pochvy-osenyu": {
-    "category": "dacha-i-ogorod",
-    "title": "Как раскислить почву на участке осенью под овощи"
-  },
-  "rassada-perca-torfyanye-tabletki-bez-pikirovki": {
-    "category": "dacha-i-ogorod",
-    "title": "Как вырастить рассаду перца без пикировки в торфяных таблетках"
-  },
   "rassada-pertsa-doma": {
     "category": "dacha-i-ogorod",
     "title": "Рассада перца дома: сроки, свет, полив и пересадка"
-  },
-  "rassada-pomidorov-lunnyy-kalendar-2026": {
-    "category": "dacha-i-ogorod",
-    "title": "Когда сажать рассаду помидоров в 2026 году по лунному календарю"
   },
   "rassada-tomatov": {
     "category": "dacha-i-ogorod",
@@ -1194,10 +950,6 @@
   "rybolovnyy-yashchik-k-sezonu": {
     "category": "rybalka",
     "title": "Как подготовить рыболовный ящик к сезону"
-  },
-  "sadovaya-tachka-vybor": {
-    "category": "dacha-i-ogorod",
-    "title": "Как выбрать садовую тачку для дачи: одно или два колеса"
   },
   "salat-iz-svezhey-kapusty": {
     "category": "kulinaria",
@@ -1255,14 +1007,6 @@
     "category": "dacha-i-ogorod",
     "title": "Выращивание сладкого перца в открытом грунте: секреты урожая"
   },
-  "sliv-na-verande-linoleum-bez-pleseni": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать слив на веранде из линолеума без плесени"
-  },
-  "smotrovaya-yama-v-sare-motoblok": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать смотровую яму в сарае для ремонта мотоблока"
-  },
   "sochnye-kotlety": {
     "category": "kulinaria",
     "title": "Сочные котлеты: секреты фарша и правильной обжарки"
@@ -1275,10 +1019,6 @@
     "category": "layfkhaki",
     "title": "15 способов применения пищевой соды в быту, о которых мало кто знает"
   },
-  "solenye-ogurcy-v-vedre-holodnyy": {
-    "category": "dacha-i-ogorod",
-    "title": "Как засолить огурцы в ведре на зиму холодным способом"
-  },
   "solyanka-myasnaya": {
     "category": "kulinaria",
     "title": "Сборная мясная солянка: настоящий рецепт с каперсами и оливками"
@@ -1286,10 +1026,6 @@
   "solyanka-sbornaya-myasnaya": {
     "category": "kulinaria",
     "title": "Сборная мясная солянка: классический рецепт навара"
-  },
-  "sornyaki-na-gazone-bez-gerbicidov": {
-    "category": "dacha-i-ogorod",
-    "title": "Как бороться с сорняками на газоне без гербицидов"
   },
   "sornyaki-na-gazone": {
     "category": "dacha-i-ogorod",
@@ -1323,10 +1059,6 @@
     "category": "layfkhaki",
     "title": "Как избавиться от статического электричества на одежде и в квартире"
   },
-  "stellazhi-v-sare-profil-fanera": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать стеллажи в сарае из профиля и фанеры"
-  },
   "stirka-belih-veshchey": {
     "category": "dom-i-uborka",
     "title": "Как стирать белые вещи чтобы они оставались белыми"
@@ -1339,22 +1071,6 @@
     "category": "dom-i-uborka",
     "title": "Как стирать пуховик дома чтобы не испортить"
   },
-  "strijka-izgorodi-kizilnik-avgust": {
-    "category": "dacha-i-ogorod",
-    "title": "Как подстричь живую изгородь из кизильника в августе"
-  },
-  "stupenki-u-verandy-iz-brusa": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать ступеньки у веранды из бруса своими руками"
-  },
-  "styk-saray-pristroyka-germetik": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем заделать стык между сараем и новой пристройкой"
-  },
-  "sushka-yablok-v-duhovke": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сушить яблоки на зиму в духовке с лимонным соком"
-  },
   "sushka-zeleni-doma": {
     "category": "kulinaria",
     "title": "Сушка зелени дома: укроп, петрушка и базилик без плесени"
@@ -1363,17 +1079,9 @@
     "category": "kulinaria",
     "title": "Пышные сырники из творога, которые не разваливаются"
   },
-  "taymer-dlya-kapelnogo-poliva": {
-    "category": "dacha-i-ogorod",
-    "title": "Как выбрать таймер для капельного полива на даче"
-  },
   "telefon-v-zharkuyu-pogodu": {
     "category": "layfkhaki",
     "title": "Как защитить телефон в жаркую погоду и не испортить батарею"
-  },
-  "teplaya-gryadka-osenyu-ogurcy": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать теплую грядку осенью для огурцов весной"
   },
   "teplaya-gryadka": {
     "category": "dacha-i-ogorod",
@@ -1387,14 +1095,6 @@
     "category": "dacha-i-ogorod",
     "title": "Теплица осенью: уборка, обеззараживание и подготовка почвы"
   },
-  "teplyy-pol-veranda-ot-pechki": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать теплый пол в веранде от печки без электричества"
-  },
-  "terrasa-u-saraya-betonnyy-plitka": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать террасу у сарая из бетонной плитки своими руками"
-  },
   "testo-dlya-pelmeney": {
     "category": "kulinaria",
     "title": "Тесто для пельменей которое не рвётся: простой рецепт"
@@ -1407,25 +1107,13 @@
     "category": "dacha-i-ogorod",
     "title": "Вредители сада: как распознать и уничтожить тлю, клеща и белокрылку"
   },
-  "tlya-na-smorodine-narodnye-sredstva-iyun": {
-    "category": "dacha-i-ogorod",
-    "title": "Как бороться с тлей на смородине народными средствами в июне"
-  },
   "tomaty-bolezni": {
     "category": "dacha-i-ogorod",
     "title": "Болезни томатов: почему желтеют, скручиваются и чернеют листья"
   },
-  "treshchina-v-fundamente-bytovki": {
-    "category": "dacha-i-ogorod",
-    "title": "Как заделать трещину в фундаменте бытовки гидроцементом"
-  },
   "tsarapiny-na-mebeli": {
     "category": "layfkhaki",
     "title": "Как убрать царапины с мебели из дерева и ламината"
-  },
-  "tualet-na-dache-bez-zapaha-deshevo": {
-    "category": "dacha-i-ogorod",
-    "title": "Как построить туалет на даче без запаха дешево"
   },
   "tushenaya-kapusta": {
     "category": "kulinaria",
@@ -1442,10 +1130,6 @@
   "uborka-posle-remonta": {
     "category": "dom-i-uborka",
     "title": "Уборка после ремонта: пошаговый план с чего начать"
-  },
-  "uborka-sornyakov-pered-zimoy": {
-    "category": "dacha-i-ogorod",
-    "title": "Как убрать сорняки на участке перед зимой правильно"
   },
   "uborka-vannoy": {
     "category": "dom-i-uborka",
@@ -1515,10 +1199,6 @@
     "category": "dacha-i-ogorod",
     "title": "Уход за смородиной для большого урожая: обрезка, полив и подкормка"
   },
-  "ukreplenie-karkasa-teplicy-zima": {
-    "category": "dacha-i-ogorod",
-    "title": "Как укрепить каркас теплицы из поликарбоната перед зимой"
-  },
   "ukryt-gortenziyu": {
     "category": "dacha-i-ogorod",
     "title": "Как правильно укрыть гортензию на зиму: инструкция для каждого вида"
@@ -1527,45 +1207,9 @@
     "category": "dacha-i-ogorod",
     "title": "Как укрыть розы на зиму: правила утепления для разных сортов"
   },
-  "ukrytie-roz-zima-podmoskove": {
-    "category": "dacha-i-ogorod",
-    "title": "Как укрыть розы на зиму в Подмосковье без дышла"
-  },
-  "ukrytie-teplicy-zima-plenkoy": {
-    "category": "dacha-i-ogorod",
-    "title": "Как укрыть теплицу из поликарбоната на зиму пленкой"
-  },
-  "uteplenie-bytovki-penopleksom": {
-    "category": "dacha-i-ogorod",
-    "title": "Как утеплить бытовку на зиму пеноплексом снаружи"
-  },
-  "uteplit-pol-saray-kartoshku-zimu": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем утеплить пол в сарае под картошку на зиму"
-  },
-  "uteplit-steny-saray-penopleks-minvata": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем утеплить стены сарая изнутри: пеноплекс или минвата"
-  },
   "vareniki-s-kartoshkoy": {
     "category": "kulinaria",
     "title": "Вареники с картошкой и луком: рецепт как у бабушки"
-  },
-  "ventilyaciya-v-sare-cherez-kryshu": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать вентиляцию в сарае через крышу без электричества"
-  },
-  "veranda-zakrytaya-na-zimu-bez-ram": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать веранду закрытой на зиму без оконных рам"
-  },
-  "vinograd-ot-os-osenyu": {
-    "category": "dacha-i-ogorod",
-    "title": "Как защитить виноград от ос осенью на даче"
-  },
-  "vodostok-kryshi-saraya-v-bochku": {
-    "category": "dacha-i-ogorod",
-    "title": "Как сделать водосток с крыши сарая в бочку своими руками"
   },
   "vybor-bura-dlya-zimney-rybalki": {
     "category": "rybalka",
@@ -1587,17 +1231,9 @@
     "category": "rybalka",
     "title": "Как выбрать леску для поплавочной удочки: диаметр, материал и цвет"
   },
-  "vybor-motobloka-dlya-dachi": {
-    "category": "dacha-i-ogorod",
-    "title": "Как выбрать мотоблок для дачи: бензиновый или электрический"
-  },
   "vybor-sapog-dlya-rybalki": {
     "category": "rybalka",
     "title": "Как выбрать рыболовные сапоги и забродники: материалы, высота и уход"
-  },
-  "vybor-sekatora-dlya-dachi": {
-    "category": "dacha-i-ogorod",
-    "title": "Как выбрать секатор для дачи: обычный или контактный"
   },
   "vybor-spinninga-dlya-nachinayushchih": {
     "category": "rybalka",
@@ -1615,33 +1251,13 @@
     "category": "layfkhaki",
     "title": "Как быстро высушить мокрую обувь и убрать запах за час"
   },
-  "vytiagivaetsya-rassada-ogurcov": {
-    "category": "dacha-i-ogorod",
-    "title": "Почему вытягивается рассада огурцов и как это остановить"
-  },
   "yaichnitsa-omlet": {
     "category": "kulinaria",
     "title": "Идеальная яичница и пышный омлет: техника за 15 минут"
   },
-  "zadelat-dyrki-profnastil-krysha-saraya": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем заделать дырки в профнастиле на крыше сарая"
-  },
-  "zadelat-shcheli-polu-verandy-myshey": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем заделать щели в полу веранды от мышей и сквозняков"
-  },
-  "zamachivanie-semyan-svekly": {
-    "category": "dacha-i-ogorod",
-    "title": "Как замачивать семена свеклы перед посевом на рассаду"
-  },
   "zamena-silikona-v-vannoy": {
     "category": "dom-i-uborka",
     "title": "Замена силикона в ванной: как убрать старый и нанести новый"
-  },
-  "zamorozka-kabachkov-kubikami": {
-    "category": "dacha-i-ogorod",
-    "title": "Как заморозить кабачки на зиму кубиками без варки"
   },
   "zamrazhivanie-yagod-na-zimu": {
     "category": "kulinaria",
@@ -1683,21 +1299,9 @@
     "category": "dacha-i-ogorod",
     "title": "Как защитить рассаду от заморозков весной"
   },
-  "zashit-fronton-saraya-nedorogo": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем зашить фронтон сарая недорого и красиво"
-  },
-  "zashit-torcy-dosok-verandy-rassloenie": {
-    "category": "dacha-i-ogorod",
-    "title": "Чем зашить торцы досок на веранде, чтобы не расслаивались"
-  },
   "zatochit-nozh": {
     "category": "layfkhaki",
     "title": "Как заточить нож без точилки: 6 рабочих способов"
-  },
-  "zatochka-lopaty-dlya-kopki": {
-    "category": "dacha-i-ogorod",
-    "title": "Как заточить лопату для копки огорода в домашних условиях"
   },
   "zelen-na-podokonnike": {
     "category": "dacha-i-ogorod",
@@ -1710,9 +1314,5 @@
   "zimnyaya-lovlya-okunya": {
     "category": "rybalka",
     "title": "Зимняя ловля окуня на мормышку: что работает"
-  },
-  "zola-dlya-kartoshki-posadka": {
-    "category": "dacha-i-ogorod",
-    "title": "Как приготовить золу как удобрение для картошки при посадке"
   }
 }
