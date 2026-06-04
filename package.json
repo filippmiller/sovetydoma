@@ -24,7 +24,8 @@
     "fetch:openverse-images": "node scripts/fetch-openverse-images.mjs",
     "normalize:images": "python scripts/normalize-article-images.py",
     "generate:previews": "python scripts/generate-image-previews.py",
-    "fix:image-frontmatter": "node scripts/fix-image-frontmatter-drifts.mjs"
+    "fix:image-frontmatter": "node scripts/fix-image-frontmatter-drifts.mjs",
+    "matrix:seed": "node scripts/matrix/seed-from-current.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

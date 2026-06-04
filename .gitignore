@@ -80,3 +80,7 @@ HANDOFF-RESUME.md
 
 # Codex QA screenshots / scratch artifacts
 .codex-artifacts/
+
+# content-matrix idea-gen scratch (JSON batches from Kimi)
+.matrix-ideas/
+public/images/_grok-test.jpg
