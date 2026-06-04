@@ -1,4 +1,5 @@
 import { EmailMessage } from 'cloudflare:email'
+import { buildRateLimitBucket, checkIngestionRateLimit } from './rate-limit'
 
 // Cloudflare Worker: photo upload + serving backed by R2.
 // The static site cannot write to R2 directly, so this Worker:
@@ -30,8 +31,6 @@ const CONTACT_FROM_EMAIL = 'noreply@vsedomatut.com'
 const CONTACT_MIN_SECONDS = 3
 const CONTACT_MAX_SECONDS = 30 * 60
 const contactHits = new Map<string, number[]>()
-const viewHits = new Map<string, number[]>()
-const analyticsHits = new Map<string, number[]>()
 
 function cors(env: Env): Record<string, string> {
   return {
@@ -190,30 +189,19 @@ function rateLimitContact(ip: string): boolean {
   return true
 }
 
-function rateLimitView(ip: string, articleSlug: string): boolean {
-  const now = Date.now()
-  const key = `${ip}:${articleSlug}`
-  const recent = (viewHits.get(key) || []).filter((time) => now - time < 60 * 60 * 1000)
-  const perMinute = recent.filter((time) => now - time < 60 * 1000).length
-  if (perMinute >= 3 || recent.length >= 12) {
-    viewHits.set(key, recent)
-    return false
-  }
-  recent.push(now)
-  viewHits.set(key, recent)
-  return true
+async function rateLimitView(env: Env, ip: string, articleSlug: string): Promise<boolean> {
+  const minuteBucket = await buildRateLimitBucket('view-minute', ip, articleSlug)
+  const hourBucket = await buildRateLimitBucket('view-hour', ip, articleSlug)
+  const [minuteAllowed, hourAllowed] = await Promise.all([
+    checkIngestionRateLimit({ env, bucketKey: minuteBucket, windowSeconds: 60, maxHits: 3 }),
+    checkIngestionRateLimit({ env, bucketKey: hourBucket, windowSeconds: 60 * 60, maxHits: 12 }),
+  ])
+  return minuteAllowed && hourAllowed
 }
 
-function rateLimitAnalytics(ip: string): boolean {
-  const now = Date.now()
-  const recent = (analyticsHits.get(ip) || []).filter((time) => now - time < 60 * 1000)
-  if (recent.length >= 90) {
-    analyticsHits.set(ip, recent)
-    return false
-  }
-  recent.push(now)
-  analyticsHits.set(ip, recent)
-  return true
+async function rateLimitAnalytics(env: Env, ip: string): Promise<boolean> {
+  const bucket = await buildRateLimitBucket('analytics', ip)
+  return checkIngestionRateLimit({ env, bucketKey: bucket, windowSeconds: 60, maxHits: 90 })
 }
 
 function cleanArticleSlug(value: unknown): string {
@@ -462,7 +450,7 @@ const worker = {
       if (!env.SUPABASE_SERVICE_ROLE_KEY) return json({ error: 'analytics_not_configured' }, 503, analyticsHeaders)
 
       const ip = getClientIp(req)
-      if (!rateLimitAnalytics(ip)) return json({ error: 'rate_limited' }, 429, analyticsHeaders)
+      if (!(await rateLimitAnalytics(env, ip))) return json({ error: 'rate_limited' }, 429, analyticsHeaders)
 
       const payload = await req.json().catch(() => null) as null | Record<string, unknown>
       if (!payload) return json({ error: 'bad_json' }, 400, analyticsHeaders)
@@ -480,6 +468,8 @@ const worker = {
       const signals = (payload.signals || {}) as Record<string, unknown>
       const cf = (req as unknown as { cf?: { country?: string } }).cf
 
+      // Privacy boundary: the client IP is used only for the hashed durable rate-limit bucket above.
+      // Do not add raw IP addresses to eventData or the analytics tables.
       const eventData = {
         event_name: eventName,
         session_id: cleanId(payload.session_id),
@@ -546,7 +536,7 @@ const worker = {
       if (!articleSlug || articleSlug.length < 3) return json({ error: 'bad_article_slug' }, 400, viewHeaders)
 
       const ip = getClientIp(req)
-      if (!rateLimitView(ip, articleSlug)) return json({ error: 'rate_limited' }, 429, viewHeaders)
+      if (!(await rateLimitView(env, ip, articleSlug))) return json({ error: 'rate_limited' }, 429, viewHeaders)
 
       const res = await fetch(`${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/feedback_events`, {
         method: 'POST',
