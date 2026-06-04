@@ -303,3 +303,136 @@ ssh ... /opt/deploy/activate.sh <old-release>  # rollback
 **Review complete.** All claims verifiable via file:line or command output above. No fabricated data in this analysis.
 
 Append `REVIEW COMPLETE` for tooling if following critical-review template.
+
+---
+
+## Appendix: Parallel Subagent Deep Forensic Findings (2026-06-02/04)
+
+Follow-up to the initial review: 3 targeted "explore" subagents spawned in parallel for adversarial deep dives on the highest-risk flagged areas (RLS/authz/UGC, subscriptions implementation vs beads, content pipeline + short articles quality). (A 4th on deps/build drifted to another project in the workspace context and was discarded for sovetydoma analysis; manual `npm audit` + prior scans already confirmed postcss@8.5.12 patched in lock, no exploitable user-CSS paths, low risk.)
+
+All subagents used absolute paths, read-only tools (read_file/grep/list_dir/run_terminal for counts/tests), followed protocol where relevant, and ended with structured findings + scores. Raw subagent transcripts available via resume_from IDs if needed in future sessions.
+
+### A1. RLS / Authz / All Supabase Data Access + UGC Writes (subagent 019e90ee-2416-7e11-acc6-36d00539fca5)
+**Coverage**: Every `.from()`, `getSupabase()`, auth, insert/select/update/rpc/raw REST across src/ + workers/ + scripts/ (tables: profiles, comments, photos, feedback_events, user_articles, reactions, ratings, saved_articles, notification_*, analytics_*, etc.).
+
+**Key positives confirmed**:
+- Browser always anon client only (lazy singleton `src/lib/supabase.ts`; no SERVICE_ROLE ever in client bundles or NEXT_PUBLIC_*).
+- Privileged paths (views, analytics ingest/summary, admin) go through workers using service role + explicit `validateUser`/`validateAdmin` (JWT via /auth/v1/user then service profile.role query).
+- Old hardcoded admin + sessionStorage fully replaced (`src/lib/admin-auth.ts` + login form use real getUser() + role).
+- Notification_* tables have **explicit RLS policies in migration** (own via auth.uid(); public for social + pub index). Good.
+- Worker patterns (crypto, sanitization, CORS) strong.
+
+**Critical findings (P0 — bypass/spam if cloud RLS weak or absent)**:
+- Direct browser inserts (no server re-validation beyond client getUser state):
+  - `src/app/napisat/page.tsx:49` + `src/components/UserArticleForm.tsx`: `user_articles` insert with `author_id: userId` (from getUser). RLS must enforce `author_id = auth.uid()`.
+  - `src/components/Comments.tsx:231`: `comments` insert (user_id + optional photo via worker first). Selects only approved.
+  - `src/lib/photos.ts:99` (via CTA + comments): `photos` insert (pending) after worker `/upload` (which does validate JWT → uid-namespaced key).
+  - `src/components/ArticleFeedback.tsx:67`: `feedback_events` (incl. anon user_id=null + verdict kinds). LocalStorage dedup only. Worker `/view` uses service for kind='view'.
+  - Reactions/favorites/saved (multiple near-dupe files: ArticleReactions, FavoriteButton*, Bookmark*, moy-kabinet, izbrannoe): direct insert/delete/upsert with user_id from client state.
+- Admin moderation still client-direct in places (e.g. `AdminPhotoModeration.tsx:34` update by id after useAdminAuth gate; attacker can tamper JS).
+- Feedback/views remain spam vector if RLS allows raw anon REST inserts (bypasses all client rates + worker bot classif).
+- Many `.maybeSingle()` / `.single()` after own-id filters (silent fail risk if RLS or row missing).
+- No unified server rate/proxy for most UGC forms (only localStorage or per-worker in-mem for contact/view).
+
+**Inferred required RLS** (must exist in Supabase dashboard or via SECURITY DEFINER RPCs, else total bypass):
+- UGC tables (user_articles, comments, photos, ratings, reactions, saved_articles, feedback_events): `WITH CHECK ( (user|author)_id = auth.uid() )` on insert; select policies (approved/public or owner/admin); update/delete owner (pending) or admin/service.
+- profiles: own update + public basic read for comment joins; admin/service for role.
+- If missing, malicious client with anon key + stolen JWT can impersonate, spam, read pending content, etc.
+
+**Recs from subagent** (align with original review P1):
+- Add thin server proxies (new worker endpoints or Supabase Edge Functions) for high-risk writes (user_articles, comments, feedback, ratings etc.) + rate + ownership re-check. Or document + enforce strict dashboard policies + triggers.
+- Centralize duplicate reaction/favorite logic.
+- Make feedback_events insert service-only (or RPC) like views/analytics.
+- Replicate `validateAdmin` pattern for future admin UGC mod paths.
+- Add client debounce + monitor raw REST attempts.
+
+**RLS/authz risk: 5/10** (improved from pre-fix view era; strong worker layer + no key leaks + real admin gates; but still heavy "presumed RLS" reliance for browser UGC + missing defense-in-depth rates/proxies. Lower than many apps, but not "server-mediated only".)
+
+### A2. Omnichannel Subscriptions Deep Implementation Audit vs Beads (subagent 019e90ee-2417-7393-981c-3b24310d649a)
+**Full map**: UI (podpiski + SubscriptionPanel + CTAs + SocialFollowTargets + manage/unsub tokens via sessionStorage/query), shared validation (constants + validation.mjs), worker (index.ts ~900 LOC with start/manage/confirm/unsub + all webhooks + social + admin dry/test/diag; delivery.ts + planner + render + providers for 5 channels; security.ts (tokens, hmac, timingSafe, Svix/wa sigs); rate via durable RPC; supabase helpers service-only).
+
+**Status vs 7md.* P1 beads** (all still open in .beads):
+- 7md.1 (data model + rules): **Implemented** (full migration schema + RLS + RPC rate + publication_index + suppression + fairness + social).
+- 7md.2 (UI select): **Implemented** (multi-cat, 5 channels, freq, consents, Turnstile, manage mode, CTAs everywhere).
+- 7md.3 (delivery 5 channels): **Implemented** (email/Resend + webhook suppr, tg/max/wa/sms via registry + templates + idemp + claim + fairness + render + confirm flows).
+- 7md.4 (VK/OK/FB): **Partial** (table seed + /social/targets + track + UI component + RLS public; "needs_account" placeholders; no delivery).
+- 7md.5 (audit trail + operator vis): **Partial** (deliveries + items + suppression + consents + social_actions written + queryable in dry-run/admin worker endpoints; masking). **No admin/* UI or listings** (only raw Supabase or worker key /admin/*).
+- 7md.6 (tests): **Partial** (strong units: validation, planner, render, early handler rejects, pub index; CI + wrangler dry). Missing: full E2E (start+confirm+webhook+delivery+unsub+social+error states), security/rate/provider integration, real-DB flows.
+- 7md.7 (social pages): **Missing** (content task).
+
+**Security** (exemplary in implemented parts):
+- Tokens: 32 random bytes base64url + sha256 hashes in DB (unique); signed contact for unsub (HMAC + timingSafe); confirm 3d expiry + consume; manage hash lookup. No plain tokens persisted.
+- Rate: pure DB RPC (durable, per ip/contact/token buckets; e.g. 10/hr start ip).
+- Turnstile: hardened (bypass flag documented dev-only; widget only for new subs).
+- Webhooks: full sig verification (timingSafe + Svix age + wa hmac) for tg/max/resend/wa.
+- Consent: versioned + ip_hash (optional hmac) + ua on start.
+- Delivery: fairness (last_delivery_at + asc nulls-first), idemp (unique period), claim race + stale, suppression/prefs, PII minimal (masks in responses; contacts plaintext only where required for send).
+- Origin allow + no direct browser Supabase writes for subs (all via worker).
+
+**Gaps / risks** (high ops + regression if promoted heavy):
+- No operator audit UI (bead 5 open — blind on failures, suppressions, recipient lists).
+- Incomplete tests/E2E (bead 6).
+- Social delivery + pages missing.
+- SMS webhook handler absent (env secret exists but unused).
+- Token exposure (query params in emails/bots + sessionStorage only; no long-lived fallback).
+- No moy-kabinet integration for logged-in manage.
+- Pub index sync manual (service key); not in build.
+- Provider unconfigured states surfaced but setup friction.
+
+**Risk current subs production-ready for heavy use: NO** (matches original review + beads). Strong foundation (security/crypto best-in-class for the stack, delivery robust with fairness/idemp, 5 channels functional). But open beads + partial audit vis + incomplete tests + missing channels mean ship only after closing 7md.5/6 + social + ops runbooks + real provider tests.
+
+**Recs**: See subagent output for prioritized code changes (add admin subs visibility, expand tests/E2E, finish social delivery/pages, moy-kabinet tab, SMS webhook, token robustness, wire index sync, close beads).
+
+### A3. Content Pipeline + Article Quality / Short Articles (subagent 019e90f6-c3e8-7d61-8017-25ebdac1dcf4)
+**Pipeline**:
+- Prompts (docs/kimi-*.md): demand 700-1200w, 5-8 H2, concrete numbers/lists, Russian, specific structure, no "Заключение".
+- Validate (standalone): required FM fields + cat whitelist + slug ascii match filename + tags array + date + Recipe ingredients if needed; body <200 words = **warn**; no ## = warn. Exits 1 only on errs.
+- Import: stricter internal validate — **<200 words = hard error**; dedup; only valid move to src/content/articles/.
+- Build: always re-runs generators from live src/content/articles/ (index, sitemap, rss, etc.).
+- No length in SEO audit (only meta + has ## + image); no build gate beyond that.
+- Human gate: only manual `git diff` + commit (documented in HANDOFF/prompts). No code for review queue or "human_edited" flag.
+- Image side: unsplash primary + audit:images in CI (1:1 enforced).
+
+**Stats (current)**: 329 articles.
+- dacha-i-ogorod 80, dom-i-uborka 73, kulinaria 55, layfkhaki 49, ekonomiya 36, rybalka 36.
+- Shortest cluster (recent fill-in batches): ~210-250 words (e.g. kak-bystro-nayti-poteryannuyu-veshch ~210 layfkhaki, several others 215-250 in layfkhaki/ekonomiya/dom/dacha). All pass import (>200). Older recipes often 350-500+. No <150 or <200 published found.
+
+**Samples** (8-10 recent + recipes + rybalka; frontmatter + head body):
+- Shorts: practical, dense lists + concrete steps/temps/materials/numbers (good value for length). 5-7 H2. Sparse early internal links.
+- Recipes: full schema (ingredients array, prep/cook/yield, difficulty, schemaType).
+- One failure: corrupted mojibake in description (encoding trap — PowerShell save?); title/slug ok, body practical. Validate did not catch (no UTF8/Cyrillic validity check).
+- Overall: consistent structure per prompts; high practical/actionable in samples; AI artifacts low in heads (concrete per spec); recent shorts feel thin vs "aim 600+" prompt but usable.
+
+**Gaps** (matches original review P2):
+- No hard min length (import 200 error but direct-to-src Kimi + recent batches produce 210-250; standalone only warns; no 300/400/600 gate in build/SEO audit).
+- No mojibake/encoding detection (one slipped).
+- No human gate in code (only git).
+- audit-links has stale cat prefixes.
+- No wordCount persisted in article-index (computed on load).
+- Several image tools manual/not in CI.
+
+**Risk content quality: 6/10** (practical + structured in samples; gates catch meta + basic; but short thin cluster real, AI 100% volume, encoding failure, weak depth enforcement, no human gate beyond git).
+
+**Recs**:
+- Make `scripts/validate-article.mjs` (and import's validate) error on <300 words + add mojibake detect (e.g. /[\uFFFD?]{3,}/ or non-Cyrillic in Russian fields).
+- Add length/## checks to audit-seo + require in CI.
+- Add optional "human_reviewed" FM or require explicit review step in prompts/HANDOFF.
+- Run validate + audit-links on all; fix existing shorts/mojibake + add cross links; update stale prefixes.
+- Persist wordCount in generators.
+
+### Synthesis + Updated Risk View
+- RLS/authz remains the biggest "presumed" surface (5/10); subs feature has excellent implemented security but feature-incomplete (not ready per beads); content has real but mitigable short/AI quality issues (6/10); deps low (postcss already safe).
+- No new smoking guns; all findings amplify original report's P0/P1/P2 list.
+- Actionable low-risk code changes possible immediately (e.g. stricter validate).
+
+**Updated overall forensic posture**: Still GREEN/YELLOW with clear path to GREEN via the P0 beads (keys + email) + closing subs + tightening content gate + adding 1-2 server proxies for UGC + observability + docs refresh.
+
+---
+
+## Immediate Follow-up Actions (from subagents + original)
+- Create beads for: tighten validate (min words + encoding), add server UGC rate/proxy for comments/feedback/user_articles, subs audit UI + full E2E tests, fix slipped mojibake + run full content audits, add moy-kabinet subs integration.
+- Implement safe tightening of validate-article (see below).
+- Monitor/rotate keys + auth email (P0 beads).
+- Re-run full gates + real subs provider tests before promoting subscriptions.
+
+(End of deep-dive appendix. Original scores/risks/plan stand; these provide the "forensic evidence" depth requested.)

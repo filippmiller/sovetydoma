@@ -50,10 +50,16 @@ if (fm.date && !/^\d{4}-\d{2}-\d{2}$/.test(fm.date)) errs.push('date must be YYY
 if (fm.schemaType === 'Recipe' && (!fm.recipeIngredient || !Array.isArray(fm.recipeIngredient)))
   errs.push('Recipe articles need recipeIngredient (array)')
 
-// body sanity
+// body sanity (stricter per 2026-06 forensic deep-dive: hard error on thin AI content + mojibake detection)
 const words = content.trim().split(/\s+/).length
-if (words < 200) warns.push(`body only ${words} words (aim for 600+)`)
+if (words < 300) errs.push(`body only ${words} words (aim for 600+; minimum 300 enforced)`)
 if (!/^##\s/m.test(content)) warns.push('no "## " H2 headings found (TOC + structure need them)')
+
+// encoding / mojibake trap detection (PowerShell UTF8 BOM/CRLF or bad save corrupts Cyrillic)
+const textToCheck = (fm.title || '') + ' ' + (fm.description || '') + ' ' + content
+if (/[\uFFFD?]{2,}/.test(textToCheck) || /Ð|Ñ|Â|Ã/.test(textToCheck)) {
+  errs.push('possible mojibake / encoding corruption detected in title/desc/body (use UTF-8 save, never raw PowerShell Get-Content/Set-Content without -Encoding)')
+}
 
 console.log(`\n=== ${path.basename(file)} ===`)
 if (errs.length) { console.log('❌ ERRORS:'); errs.forEach((e) => console.log('  - ' + e)) }
