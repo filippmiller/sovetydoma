@@ -2,18 +2,11 @@ import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
 import { fileURLToPath } from 'url'
+import { CATEGORIES } from '../src/lib/categories.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const articlesDir = path.join(__dirname, '../src/content/articles')
 const SITE_URL = 'https://1001sovet.ru'
-
-const CATEGORIES = {
-  kulinaria: { name: 'Кулинария', description: 'Рецепты, советы и секреты вкусной домашней кухни' },
-  'dom-i-uborka': { name: 'Дом и уборка', description: 'Лайфхаки для чистоты и порядка в доме' },
-  'dacha-i-ogorod': { name: 'Дача и огород', description: 'Советы для сада, огорода и загородной жизни' },
-  layfkhaki: { name: 'Лайфхаки', description: 'Полезные идеи и хитрости на каждый день' },
-  ekonomiya: { name: 'Экономия', description: 'Как жить хорошо и тратить меньше' },
-}
 
 const files = fs.readdirSync(articlesDir).filter(f => f.endsWith('.mdx'))
 const allArticles = files
