@@ -31,6 +31,7 @@
 8. **D-2 (Russia localization) not started:** Supabase remote foreign, photos on CF R2, AI on Anthropic. Planned (self-host Supabase + Timeweb S3 + GigaChat) but zero code/migrations yet. Compliance risk if enforced.
 9. **Admin surface:** Statically generated (articles list baked at build) + client-only gate. If JS disabled or slow, raw dashboard HTML may be viewable (low impact: articles public). No server-side 403.
 10. **Legacy/leftover artifacts:** .vercel/, old logs, root-level unpacked package dirs (now ignored), incoming-articles/ (gitignored but present).
+11. **Dependency vulns (GH Dependabot on push):** 2 moderate in postcss (XSS via unescaped </style> in CSS stringify) transitive via Next 16's bundled postcss. Affects build-time mostly; no direct user-controlled CSS path obvious. `npm audit` suggests force downgrade (breaks). Monitor Next patch; no immediate exploit in this static content site.
 
 **Overall scores (inspired by 12-axis critical review rubric, 1-10):**
 - Security & data integrity: 8.5 (strong worker crypto/rate/sanitize; RLS assumed; UGC rate gaps)
