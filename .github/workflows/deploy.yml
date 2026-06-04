@@ -1,8 +1,8 @@
-name: Deploy to Timeweb VPS
+name: Build & publish static site to dist
 
-# Build the static export. Production deploy is pulled by the Timeweb VPS timer:
-# 1001sovet-pull-deploy.timer fetches master, builds on the VPS, then runs
-# /opt/deploy/activate.sh for an atomic symlink swap.
+# New deploy model (2026-06-04 incident fix): the VPS NEVER builds.
+# GitHub Actions builds the static export and publishes it to the `dist` branch.
+# The VPS pulls the PREBUILT `dist` and atomically swaps the symlink (no pnpm/next build on prod).
 on:
   push:
     branches: [master, main]
@@ -12,8 +12,11 @@ concurrency:
   group: deploy-prod
   cancel-in-progress: false
 
+permissions:
+  contents: write   # needed to push the dist branch
+
 jobs:
-  build-and-deploy:
+  build-publish:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -55,9 +58,23 @@ jobs:
           test -f out/index.html || { echo "::error::out/index.html missing - build did not export"; exit 1; }
           echo "Exported $(find out -type f | wc -l) files"
 
-      - name: Confirm VPS pull deploy model
+      - name: Stamp build.json
+        run: |
+          node -e "require('fs').writeFileSync('out/build.json', JSON.stringify({sha: process.env.GITHUB_SHA, ref: process.env.GITHUB_REF_NAME, built_at: new Date().toISOString()}))"
+          cat out/build.json
+
+      - name: Publish prebuilt site to dist branch
         run: |
           set -euo pipefail
-          echo "Build is valid for $GITHUB_SHA."
-          echo "The Timeweb VPS pulls master with 1001sovet-pull-deploy.timer and activates the release."
-          echo "Live verification is performed from an operator machine because GitHub-hosted runners currently cannot reliably reach the VPS over inbound IPv4."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          rm -rf /tmp/dist && mkdir -p /tmp/dist
+          cp -a out/. /tmp/dist/
+          touch /tmp/dist/.nojekyll
+          cd /tmp/dist
+          git init -q
+          git checkout -q -b dist
+          git add -A
+          git commit -q -m "build ${GITHUB_SHA} ($(date -u +%FT%TZ))"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" dist
+          echo "Published dist for ${GITHUB_SHA}"
