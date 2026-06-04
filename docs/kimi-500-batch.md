@@ -54,7 +54,7 @@ Paste the whole prompt below into Kimi.
                          ekonomiya→Экономия, rybalka→Рыбалка)
   description: "..."    (1 предложение, до 160 символов)
   date: "2026-05-31"
-  image: "/images/<slug>.jpg"
+  image: "/images/<slug>.jpg"   (exactly; matching jpg committed via fetch/generate scripts)
   tags: ["...","...","...","..."]   (4–6 тегов по-русски)
 
 Для рецептов (category: kulinaria) ДОБАВЬ:
@@ -108,5 +108,6 @@ git log --oneline | head -12              # expect 10 "batch N/10" commits
 
 Each push auto-deploys via GitHub Actions to the Timeweb Cloud VPS and the build
 re-indexes the new articles.
-Images stay on the category-emoji fallback until you add real photos (Unsplash
-batch script is still pending an API key).
+Always set the exact `image: "/images/<slug>.jpg"` in frontmatter. Scripts
+(fetch-openverse, generate-*-images, generate-previews) populate the jpgs + previews
+before deploy; build + validate now hard gate correct fm + files.

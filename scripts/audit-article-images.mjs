@@ -30,8 +30,13 @@ if (args.has('--json')) {
   if (audit.missingImages.length) console.log(`- ${audit.missingImages.join(', ')}`)
   console.log(`Orphan images: ${audit.orphanImages.length}`)
   if (audit.orphanImages.length) console.log(`- ${audit.orphanImages.join(', ')}`)
+  console.log(`Image frontmatter drifts: ${audit.imageFrontmatterDrifts.length}`)
+  if (audit.imageFrontmatterDrifts.length) console.log(`- ${audit.imageFrontmatterDrifts.join(', ')}`)
 }
 
 if (args.has('--fail-on-duplicates') && audit.exactDuplicateGroups.length > 0) {
+  process.exit(1)
+}
+if (args.has('--fail-on-drifts') && audit.imageFrontmatterDrifts.length > 0) {
   process.exit(1)
 }

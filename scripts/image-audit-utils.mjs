@@ -197,6 +197,15 @@ export function buildImageAudit({ articles, images }) {
     .map((group) => group.sort())
     .sort((a, b) => b.length - a.length || a[0].localeCompare(b[0]))
 
+  const expectedImage = (slug) => `/images/${slug}.jpg`
+  const imageFrontmatterDrifts = articles
+    .filter((a) => {
+      const exp = expectedImage(a.slug)
+      return (a.image || '').trim() !== exp
+    })
+    .map((a) => a.slug)
+    .sort()
+
   return {
     articleCount: articles.length,
     imageCount: images.length,
@@ -204,6 +213,7 @@ export function buildImageAudit({ articles, images }) {
     exactDuplicateGroups,
     missingImages: [...articleSlugs].filter((slug) => !imageSlugs.has(slug)).sort(),
     orphanImages: [...imageSlugs].filter((slug) => !articleSlugs.has(slug)).sort(),
+    imageFrontmatterDrifts,
   }
 }
 

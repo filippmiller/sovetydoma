@@ -13,6 +13,7 @@ describe('buildImageAudit', () => {
       { slug: 'bliny', image: '/images/bliny.jpg' },
       { slug: 'borshch', image: '/images/borshch.jpg' },
       { slug: 'kasha', image: '/images/kasha.jpg' },
+      { slug: 'drifty', image: '/images/old-name.jpg' }, // drift case
     ]
     const images = [
       { slug: 'bliny', sha256: 'same' },
@@ -23,9 +24,10 @@ describe('buildImageAudit', () => {
     const audit = buildImageAudit({ articles, images })
 
     assert.deepEqual(audit.exactDuplicateGroups, [['bliny', 'borshch']])
-    assert.deepEqual(audit.missingImages, ['kasha'])
+    assert.deepEqual(audit.missingImages, ['drifty', 'kasha'])
     assert.deepEqual(audit.orphanImages, ['unused'])
     assert.equal(audit.uniqueImageCount, 2)
+    assert.deepEqual(audit.imageFrontmatterDrifts, ['drifty'])
   })
 })
 

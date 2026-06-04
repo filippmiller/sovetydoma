@@ -20,6 +20,7 @@ export function validateArticles({ articlesDir = path.join(process.cwd(), 'src/c
       existingSlugs: new Set(),
       batchSlugs,
       requireFilenameSlug: true,
+      requireImageSlug: true,
     })
 
     for (const error of result.errors) failures.push(`${file}: ${error}`)

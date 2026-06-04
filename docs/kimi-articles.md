@@ -20,7 +20,7 @@ frontmatter. Use the prompt below with Kimi, then bulk-import.
                          dacha-i-ogorod→Дача и огород, layfkhaki→Лайфхаки, ekonomiya→Экономия)
   description: "..."    (1 предложение, до 160 символов)
   date: "ГГГГ-ММ-ДД"    (сегодня)
-  image: "/images/<slug>.jpg"
+  image: "/images/<slug>.jpg"   (exactly this; the matching /public/images/<slug>.jpg is committed before deploy)
   tags: ["...","...","..."]   (3–6 тегов по-русски)
 
 Для рецептов (kulinaria) добавь: schemaType: "Recipe", prepTime, cookTime
@@ -47,7 +47,8 @@ Cyrillic/duplicate slug, empty tags, bad date, recipes without ingredients,
 and bodies under 200 words. Nothing invalid reaches the build.
 
 ## 3. Notes
-- Images: `/images/<slug>.jpg` need not exist — cards/articles fall back to the
-  category emoji until you add real photos (or let users submit them).
+- Images: always output exactly `image: "/images/<slug>.jpg"`. Real photos (or
+  generated fallbacks) under public/images/<slug>.jpg are committed to git and
+  served; the build now hard-enforces the fm match and file presence.
 - New articles appear on the site automatically after deploy (build re-indexes).
 - Single article check: `node scripts/validate-article.mjs src/content/articles/<slug>.mdx`

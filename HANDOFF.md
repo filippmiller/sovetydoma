@@ -146,16 +146,18 @@ ASCII patterns) or Node for any edit touching Cyrillic.
 
 ## 6. Article images
 
-- `UNSPLASH_ACCESS_KEY=<key> node scripts/fetch-unsplash-images.mjs`
-- Downloads a relevant landscape photo per article to `public/images/<slug>.jpg`.
-- **Resumable** (skips slugs that already have a file) and **rate-limit-aware**
-  (Unsplash demo apps = 50 requests/hour; the script stops cleanly when the budget
-  is gone — just re-run next hour). Currently **152/160** populated; re-run to fill
-  the rest.
-- Images are committed to git so CI ships them. `npm run audit:images -- --json`
-  must report no duplicates and no missing images before deploy.
-- Unsplash Access Key currently lives in chat history — recommend moving it to
-  `C:\Users\filip\.secrets\` and exporting from there.
+All 329 articles now have dedicated images + correct frontmatter (as of 2026-06 fix).
+
+- Preferred: `node scripts/fetch-openverse-images.mjs` (free CC-licensed via openverse.org API; no key; supports --replace-generated --replace-procedural; MAX_FETCHES=... )
+- AI fallbacks: `node scripts/generate-photo-like-images.mjs` (pollinations flux), `python scripts/generate-procedural-photo-images.py`, `python scripts/generate-card-images.py`
+- Previews for cards: `python scripts/generate-image-previews.py` (always safe to re-run)
+- Normalize sizes: `pnpm run normalize:images`
+- Repair fm (if ever drift): `pnpm run fix:image-frontmatter`
+- Audit (now also catches fm drifts): `pnpm run audit:images` (or node ... --json); must be clean (0 dups, 0 missing, 0 orphans, 0 drifts) before deploy.
+- `src/lib/cloudinary.ts > resolveArticleImage()` + `src/components/ArticleImage.tsx` (404->emoji fallback).
+- Validate enforces `image: "/images/<slug>.jpg"` exactly (single + bulk + import).
+
+Images + previews committed to git. See also scripts/image-audit-utils.mjs (QUERY_MAP etc).
 
 ## 7. Этап 2 — backend migration to Russia (PLANNED, not started)
 
@@ -202,7 +204,7 @@ code error — just re-run. CI (Linux) never hits it.
 | Resend API key | `C:\Users\filip\.secrets\1001sovet-resend.env`; also on VPS in `/etc/1001sovet/secrets.env` and Cloudflare Worker secret `RESEND_API_KEY` |
 | Mailcow mailbox credentials | `C:\Users\filip\.secrets\1001sovet-mailcow-mailboxes.env` |
 | Anthropic API key | Supabase Vault: `get_secret('ANTHROPIC_API_KEY')` — **ROTATE** (was exposed in chat) |
-| Unsplash Access Key | currently in chat history — move to `.secrets` |
+| Unsplash Access Key (legacy) | rotate + move any remaining to `.secrets`; current path uses keyless Openverse + pollinations |
 | reg.ru login | **not stored** — user performs registrar actions manually |
 
 GitHub Actions secrets are set in the repo (see §4). `.env.local`, `DEPLOY-*.md`,
@@ -210,11 +212,12 @@ GitHub Actions secrets are set in the repo (see §4). `.env.local`, `DEPLOY-*.md
 
 ## 10. Immediate next steps / open items
 
-1. Refill the last ~8 article images (re-run the Unsplash fetcher next hour).
+1. (done) All 329 articles have images + correct fm + 329 previews (drifts repaired via fix script + gates synced; openverse + generators now primary).
 2. Confirm pogovorimdoma.ru DNS finished propagating, then verify the 301 over HTTPS.
 3. **Rotate the Anthropic API key** (exposed in chat) and update the Supabase Vault.
 4. Begin Этап 2 when ready (self-host Supabase + Timeweb S3 + GigaChat).
 5. Optional: build Этап-2 only after confirming a Russian payment method for GigaChat.
+6. (ongoing) When adding batches via Kimi, run fetch/generate previews + fix:image-frontmatter + audit:images + validate before push.
 ## Recent forensic review (2026-06-02)
 Full codebase forensic review executed (structure, gates, security deep-dive on both workers, auth/admin/UGC, subscriptions feature, content pipeline, CI/deploy, prior audits reconciled).
 
@@ -229,14 +232,14 @@ Update this section on future reviews. All protocol followed (bd, commits, push)
 ## Recent subagent deep forensic scan (2026-06-04)
 Max-depth forensic using 3 specialized background subagents (execute/read-only, 300+ tool calls total, non-mutating, full protocol followed at their starts + main):
 - Security (107 calls, 278s): full workers (photo monolith 605 LOC + subs 912 LOC), RLS/migrations, authz (getUser first), UGC direct inserts, in-mem rates, crypto (timingSafe/HMAC/Svix/turnstile), contact challenge, admin client gate. Confirmed no regressions; amplified P1 UGC proxy/rate + RLS versioning gaps + personal emails. See sub report in session.
-- Content (136 calls, 420s): exhaustive on 329 MDX (word counts, mojibake grep, fm keys, samples across cats/dates), all generators/audits/validate/import/image scripts + Kimi prompts + cross to subs/recs/search. Found exactly 29 shorts <300w, 2 real mojibake-corrupted in prod (full garbage in title/desc/tags), 58 image fm drifts, rybalka omitted from sitemap/rss generators (hardcoded 5 cats), import (200w) vs validate (300w+mojibake) mismatch, broken audit-links (0 internal links), crude turbo/zen. See sub report.
+- Content (136 calls, 420s): exhaustive on 329 MDX (word counts, mojibake grep, fm keys, samples across cats/dates), all generators/audits/validate/import/image scripts + Kimi prompts + cross to subs/recs/search. Found exactly 29 shorts <300w, 2 real mojibake-corrupted in prod (full garbage in title/desc/tags), 58 image fm drifts (FIXED post-scan: see sovetydoma-mou + fix-image-frontmatter-drifts.mjs + gates in validate-articles + audit), rybalka omitted from sitemap/rss generators (hardcoded 5 cats), import (200w) vs validate (300w+mojibake) mismatch, broken audit-links (0 internal links), crude turbo/zen. See sub report.
 - Quality/Hygiene (90 calls, 296s): full src/ (56 'use client', fav desync local<->server no migrate, category dupe lists, reactions optimistic races), package.json (inner "npm run" in tests), tracked package-lock.json, 7 stray root dupes (gray-matter 4.0.3 exact match), stale numbers in reports/HANDOFF (180 vs 329), no new any/dangerous/catch abuse (0). Confirmed gates clean. See sub report.
 
 **Main + batch confirms:** 29 shorts + 2 garbled (real mojibake in 2 prod fm; inspected), direct .from inserts in Comments.tsx:229 etc, stray versions match, npm-run skew.
 
 **Gates (re-runs):** tsc/lint/SEO/images clean for 329; subs tests pass; validate now catches shorts/mojibake (legacy still in tree).
 
-**New beads created (P0/P1, linked to rnh tracker):** see bd list. Key: sync import/validate + fix 29+2 corpus (5r9), derive sitemap/rss cats (incl rybalka), fix 58 image drifts, pnpm consistency (replace npm run + rm package-lock), rm 7 strays, fav local-server migrate, UGC server proxies/rates (xoq), version RLS, update stale docs. Existing csv/3ch/5r9/xoq/7md.* updated with notes + evidence.
+**New beads created (P0/P1, linked to rnh tracker):** see bd list. Key: sync import/validate + fix 29+2 corpus (5r9), derive sitemap/rss cats (incl rybalka), fix 58 image drifts (mou — now closed after repair+enforce), pnpm consistency (replace npm run + rm package-lock), rm 7 strays, fav local-server migrate, UGC server proxies/rates (xoq), version RLS, update stale docs. Existing csv/3ch/5r9/xoq/7md.* updated with notes + evidence.
 
 **Report:** `reports/forensic-subagent-deep-scan-2026-06-04.md` (exec summary, 29/2/58/ counts, top findings with files, bead cmds, verification commands).
 
