@@ -28,7 +28,17 @@ for ($pass = 1; $pass -le $Passes; $pass++) {
     [System.IO.File]::WriteAllText("$root\$($rel -replace '/','\')", $prompt, $utf8)
     $instr = "Read the file $rel in this workspace and follow its instructions exactly. Write ONLY the resulting JSON array (valid JSON, no markdown, no commentary) to the file $of using your file-write tool. Do not run git, do not explore the repo, do not run other commands. When finished print exactly: DONE"
     Write-Host "[pass $pass / item $i] $vertical :: $subtopic"
-    try { $instr | & $kimi --quiet --input-format text --no-thinking | Out-Null } catch { Write-Host "  kimi error: $_" }
+    # Run Kimi with an 8-min per-call timeout so a hung invocation can't block the driver.
+    $instrFile = "$root\.matrix-ideas\out\$vertical-p$pass-$i.instr.txt"
+    [System.IO.File]::WriteAllText($instrFile, $instr, (New-Object System.Text.ASCIIEncoding))
+    $so = "$root\.matrix-ideas\out\$vertical-p$pass-$i.kimi.out"
+    $se = "$root\.matrix-ideas\out\$vertical-p$pass-$i.kimi.err"
+    try {
+      $p = Start-Process -FilePath $kimi -ArgumentList "--quiet","--input-format","text","--no-thinking" `
+        -RedirectStandardInput $instrFile -RedirectStandardOutput $so -RedirectStandardError $se `
+        -WindowStyle Hidden -PassThru
+      if (-not $p.WaitForExit(480000)) { Write-Host "  kimi TIMEOUT (>8min) — killing and skipping"; try { $p.Kill() } catch {} }
+    } catch { Write-Host "  kimi error: $_" }
     if (Test-Path "$root\$($of -replace '/','\')") {
       & node scripts/matrix/insert-ideas.mjs $of 2>&1 | Select-Object -Last 1 | ForEach-Object { Write-Host "  $_" }
     } else { Write-Host "  no output file produced" }
