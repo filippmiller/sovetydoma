@@ -1,0 +1,23 @@
+{
+  "email": "filipp+authqa_20260604075626@1001sovet.ru",
+  "userId": "77061835-8aae-46a4-b022-0dc405a3b370",
+  "signupAccepted": true,
+  "signupError": null,
+  "initialSession": false,
+  "mailboxDelivery": {
+    "found": true,
+    "subject": "SovetyDoma: confirm your email",
+    "from": "SovetyDoma <maryana.sidorova@1001sovet.ru>",
+    "date": "Thu, 04 Jun 2026 07:56:30 +0000",
+    "hasConfirmUrl": true
+  },
+  "confirmation": {
+    "confirmedAt": "2026-06-04T07:57:13.977085Z",
+    "loginAfterConfirm": true,
+    "sessionAfterConfirm": true
+  },
+  "notes": [
+    "Confirmation URL was not stored in this artifact.",
+    "The local URL opener timed out after consuming the confirmation redirect, but password login verified the user as confirmed."
+  ]
+}
