@@ -12,6 +12,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import matter from 'gray-matter'
+import { validateArticle } from './article-validation.mjs'
 
 const ROOT = process.cwd()
 const SRC = process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : 'incoming-articles'
@@ -19,63 +20,53 @@ const DRY = process.argv.includes('--dry')
 const SRC_DIR = path.resolve(ROOT, SRC)
 const DEST_DIR = path.join(ROOT, 'src/content/articles')
 
-const CATEGORIES = {
-  kulinaria: 'Кулинария',
-  'dom-i-uborka': 'Дом и уборка',
-  'dacha-i-ogorod': 'Дача и огород',
-  layfkhaki: 'Лайфхаки',
-  ekonomiya: 'Экономия',
-  rybalka: 'Рыбалка',
-}
-
-function validate(fm, content, existingSlugs, batchSlugs) {
-  const errs = []
-  for (const k of ['title', 'slug', 'category', 'categoryName', 'description', 'date', 'image', 'tags']) {
-    if (fm[k] === undefined || fm[k] === null || fm[k] === '') errs.push(`missing ${k}`)
-  }
-  if (fm.category && !CATEGORIES[fm.category]) errs.push(`bad category "${fm.category}"`)
-  if (fm.category && CATEGORIES[fm.category] && fm.categoryName !== CATEGORIES[fm.category])
-    errs.push(`categoryName must be "${CATEGORIES[fm.category]}"`)
-  if (fm.slug && !/^[a-z0-9-]+$/.test(fm.slug)) errs.push('slug must be ascii lowercase/digits/hyphens')
-  if (fm.slug && existingSlugs.has(fm.slug)) errs.push(`slug already exists on site: ${fm.slug}`)
-  if (fm.slug && batchSlugs.has(fm.slug)) errs.push(`duplicate slug within this batch: ${fm.slug}`)
-  if (fm.tags && (!Array.isArray(fm.tags) || fm.tags.length === 0)) errs.push('tags must be a non-empty array')
-  if (fm.date && !/^\d{4}-\d{2}-\d{2}$/.test(fm.date)) errs.push('date must be YYYY-MM-DD')
-  if (fm.schemaType === 'Recipe' && !Array.isArray(fm.recipeIngredient)) errs.push('Recipe needs recipeIngredient[]')
-  if (content.trim().split(/\s+/).length < 200) errs.push('body too short (<200 words)')
-  return errs
-}
-
 if (!fs.existsSync(SRC_DIR)) {
   console.error(`Source folder not found: ${SRC_DIR}\nCreate it and drop Kimi .mdx files there, or pass a folder path.`)
   process.exit(2)
 }
 
 const existingSlugs = new Set(
-  fs.readdirSync(DEST_DIR).filter((f) => f.endsWith('.mdx')).map((f) => f.replace(/\.mdx$/, '')),
+  fs.readdirSync(DEST_DIR).filter((file) => file.endsWith('.mdx')).map((file) => file.replace(/\.mdx$/, '')),
 )
-const files = fs.readdirSync(SRC_DIR).filter((f) => f.endsWith('.mdx'))
-if (!files.length) { console.error(`No .mdx files in ${SRC_DIR}`); process.exit(2) }
+const files = fs.readdirSync(SRC_DIR).filter((file) => file.endsWith('.mdx'))
+if (!files.length) {
+  console.error(`No .mdx files in ${SRC_DIR}`)
+  process.exit(2)
+}
 
 const batchSlugs = new Set()
-let imported = 0, skipped = 0
+let imported = 0
+let skipped = 0
 console.log(`\nImporting from ${SRC_DIR}${DRY ? '  (DRY RUN)' : ''}\n`)
 
-for (const f of files) {
-  const raw = fs.readFileSync(path.join(SRC_DIR, f), 'utf8')
-  let fm, content
-  try { ({ data: fm, content } = matter(raw)) } catch (e) { console.log(`❌ ${f}: invalid frontmatter (${e.message})`); skipped++; continue }
-  const errs = validate(fm, content, existingSlugs, batchSlugs)
-  if (errs.length) {
-    console.log(`❌ ${f}:`)
-    errs.forEach((e) => console.log(`     - ${e}`))
+for (const file of files) {
+  const raw = fs.readFileSync(path.join(SRC_DIR, file), 'utf8')
+  let fm
+  let content
+  try {
+    ;({ data: fm, content } = matter(raw))
+  } catch (error) {
+    console.log(`${file}: invalid frontmatter (${error.message})`)
     skipped++
     continue
   }
+
+  const { errors, warnings } = validateArticle({ fm, content, existingSlugs, batchSlugs, requireImageSlug: true })
+  if (errors.length) {
+    console.log(`${file}:`)
+    errors.forEach((error) => console.log(`     - ${error}`))
+    skipped++
+    continue
+  }
+  if (warnings.length) {
+    console.log(`${file}: warnings:`)
+    warnings.forEach((warning) => console.log(`     - ${warning}`))
+  }
+
   batchSlugs.add(fm.slug)
   const dest = path.join(DEST_DIR, `${fm.slug}.mdx`)
   if (!DRY) fs.writeFileSync(dest, raw)
-  console.log(`✅ ${f}  →  src/content/articles/${fm.slug}.mdx  [${fm.category}]`)
+  console.log(`${file} -> src/content/articles/${fm.slug}.mdx [${fm.category}]`)
   imported++
 }
 

@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
 import { fileURLToPath } from 'url'
+import { validateArticle } from './article-validation.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(__dirname, '..')
@@ -26,6 +27,16 @@ for (const file of files) {
   const description = String(data.description || '').trim()
   const tags = Array.isArray(data.tags) ? data.tags : []
   const imagePath = path.join(imagesDir, `${slug}.jpg`)
+  const articleValidation = validateArticle({
+    fm: data,
+    content,
+    filePath: fullPath,
+    existingSlugs: new Set(),
+    batchSlugs: seenSlugs,
+    requireFilenameSlug: true,
+  })
+
+  for (const error of articleValidation.errors) fail(file, error)
 
   if (!title) fail(file, 'missing title')
   if (title.length < 20 || title.length > 95) fail(file, `title length should be 20-95 chars, got ${title.length}`)

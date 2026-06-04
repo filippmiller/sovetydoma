@@ -7,64 +7,42 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import matter from 'gray-matter'
-
-const CATEGORIES = {
-  kulinaria: 'Кулинария',
-  'dom-i-uborka': 'Дом и уборка',
-  'dacha-i-ogorod': 'Дача и огород',
-  layfkhaki: 'Лайфхаки',
-  ekonomiya: 'Экономия',
-  rybalka: 'Рыбалка',
-}
+import { validateArticle } from './article-validation.mjs'
 
 const file = process.argv[2]
-if (!file) { console.error('Usage: node scripts/validate-article.mjs <file.mdx>'); process.exit(2) }
+if (!file) {
+  console.error('Usage: node scripts/validate-article.mjs <file.mdx>')
+  process.exit(2)
+}
 
-const errs = []
-const warns = []
 const raw = fs.readFileSync(file, 'utf8')
 const { data: fm, content } = matter(raw)
 
-const req = ['title', 'slug', 'category', 'categoryName', 'description', 'date', 'image', 'tags']
-for (const k of req) if (!fm[k] && fm[k] !== '') if (fm[k] === undefined) errs.push(`missing frontmatter: ${k}`)
-
-if (fm.category && !CATEGORIES[fm.category]) errs.push(`invalid category "${fm.category}" (allowed: ${Object.keys(CATEGORIES).join(', ')})`)
-if (fm.category && fm.categoryName && CATEGORIES[fm.category] && fm.categoryName !== CATEGORIES[fm.category])
-  errs.push(`categoryName "${fm.categoryName}" must be "${CATEGORIES[fm.category]}" for category ${fm.category}`)
-
-// slug must match filename and be url-safe ascii
-const base = path.basename(file, '.mdx')
-if (fm.slug && fm.slug !== base) errs.push(`slug "${fm.slug}" must equal filename "${base}"`)
-if (fm.slug && !/^[a-z0-9-]+$/.test(fm.slug)) errs.push(`slug must be lowercase latin/digits/hyphens only (no Cyrillic)`)
-
-// duplicate slug check
 const dir = path.dirname(file)
-const dupes = fs.readdirSync(dir).filter((f) => f.endsWith('.mdx') && f !== path.basename(file) && f.replace(/\.mdx$/, '') === fm.slug)
-if (dupes.length) errs.push(`duplicate slug — already exists: ${dupes.join(', ')}`)
-
-if (fm.tags && (!Array.isArray(fm.tags) || fm.tags.length === 0)) errs.push('tags must be a non-empty array')
-if (fm.description && fm.description.length > 200) warns.push(`description ${fm.description.length} chars (keep <=160 for SEO)`)
-if (fm.date && !/^\d{4}-\d{2}-\d{2}$/.test(fm.date)) errs.push('date must be YYYY-MM-DD')
-
-// recipe-specific
-if (fm.schemaType === 'Recipe' && (!fm.recipeIngredient || !Array.isArray(fm.recipeIngredient)))
-  errs.push('Recipe articles need recipeIngredient (array)')
-
-// body sanity (stricter per 2026-06 forensic deep-dive: hard error on thin AI content + mojibake detection)
-const words = content.trim().split(/\s+/).length
-if (words < 300) errs.push(`body only ${words} words (aim for 600+; minimum 300 enforced)`)
-if (!/^##\s/m.test(content)) warns.push('no "## " H2 headings found (TOC + structure need them)')
-
-// encoding / mojibake trap detection (PowerShell UTF8 BOM/CRLF or bad save corrupts Cyrillic)
-const textToCheck = (fm.title || '') + ' ' + (fm.description || '') + ' ' + content
-if (/[\uFFFD?]{2,}/.test(textToCheck) || /Ð|Ñ|Â|Ã/.test(textToCheck)) {
-  errs.push('possible mojibake / encoding corruption detected in title/desc/body (use UTF-8 save, never raw PowerShell Get-Content/Set-Content without -Encoding)')
-}
+const existingSlugs = new Set(
+  fs.readdirSync(dir)
+    .filter((item) => item.endsWith('.mdx') && item !== path.basename(file) && item.replace(/\.mdx$/, '') === fm.slug)
+    .map(() => fm.slug),
+)
+const { errors, warnings } = validateArticle({
+  fm,
+  content,
+  filePath: file,
+  existingSlugs,
+  requireFilenameSlug: true,
+  requireImageSlug: true,
+})
 
 console.log(`\n=== ${path.basename(file)} ===`)
-if (errs.length) { console.log('❌ ERRORS:'); errs.forEach((e) => console.log('  - ' + e)) }
-if (warns.length) { console.log('⚠️  warnings:'); warns.forEach((w) => console.log('  - ' + w)) }
-if (!errs.length && !warns.length) console.log('✅ valid, no warnings')
-else if (!errs.length) console.log('✅ valid (warnings only)')
+if (errors.length) {
+  console.log('ERRORS:')
+  errors.forEach((error) => console.log(`  - ${error}`))
+}
+if (warnings.length) {
+  console.log('warnings:')
+  warnings.forEach((warning) => console.log(`  - ${warning}`))
+}
+if (!errors.length && !warnings.length) console.log('valid, no warnings')
+else if (!errors.length) console.log('valid (warnings only)')
 
-process.exit(errs.length ? 1 : 0)
+process.exit(errors.length ? 1 : 0)
