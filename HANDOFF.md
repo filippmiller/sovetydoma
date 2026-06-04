@@ -215,3 +215,13 @@ GitHub Actions secrets are set in the repo (see §4). `.env.local`, `DEPLOY-*.md
 3. **Rotate the Anthropic API key** (exposed in chat) and update the Supabase Vault.
 4. Begin Этап 2 when ready (self-host Supabase + Timeweb S3 + GigaChat).
 5. Optional: build Этап-2 only after confirming a Russian payment method for GigaChat.
+## Recent forensic review (2026-06-02)
+Full codebase forensic review executed (structure, gates, security deep-dive on both workers, auth/admin/UGC, subscriptions feature, content pipeline, CI/deploy, prior audits reconciled).
+
+- **Report:** `reports/forensic-codebase-review-2026-06-02.md` (Reality Check table, 11 risks with evidence, 12-axis style scores, P0/P1/P2 remediation with workstreams + success metrics).
+- **New P0 beads:** sovetydoma-csv (key rotation + Unsplash to .secrets), sovetydoma-3ch (auth email confirm repair — re-opens Jun audit P0).
+- Review also created tracking bead sovetydoma-rnh.
+- GitHub Dependabot surfaced 2 moderate postcss (transitive in Next) on push — noted in report; not critical for this surface.
+- Follow-ups: P0s above + finish the 7md.* omnichannel subscriptions series (tests, VK/OK/FB, audit trail).
+
+Update this section on future reviews. All protocol followed (bd, commits, push).
