@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { getSupabase, isSupabaseConfigured } from '@/lib/supabase'
 import type { Profile } from '@/lib/supabase'
 import AuthModal from './AuthModal'
 
 export default function AuthButton() {
+  const authConfigured = isSupabaseConfigured()
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -14,11 +15,13 @@ export default function AuthButton() {
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (!authConfigured) return
     let alive = true
+    const sb = getSupabase()
 
     const loadProfile = (userId: string) => {
       setProfile(null)
-      supabase
+      sb
         .from('profiles')
         .select('*')
         .eq('id', userId)
@@ -28,14 +31,14 @@ export default function AuthButton() {
         }, () => {})
     }
 
-    supabase.auth.getUser().then(({ data }) => {
+    sb.auth.getUser().then(({ data }) => {
       if (!alive) return
       const u = data.user
       setUser(u ?? null)
       if (u) loadProfile(u.id)
     }).catch(() => {})
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = sb.auth.onAuthStateChange((_event, session) => {
       if (!alive) return
       const u = session?.user ?? null
       setUser(u)
@@ -50,7 +53,7 @@ export default function AuthButton() {
       alive = false
       subscription.unsubscribe()
     }
-  }, [])
+  }, [authConfigured])
 
   useEffect(() => {
     if (!dropdownOpen) return
@@ -62,6 +65,8 @@ export default function AuthButton() {
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [dropdownOpen])
+
+  if (!authConfigured) return null
 
   if (!user) {
     return (
@@ -161,7 +166,7 @@ export default function AuthButton() {
           <button
             onClick={async () => {
               setDropdownOpen(false)
-              await supabase.auth.signOut().catch(() => {})
+              await getSupabase().auth.signOut().catch(() => {})
               window.location.reload()
             }}
             style={{ ...dropItemStyle, width: '100%', textAlign: 'left', background: 'none', border: 'none', color: '#c0392b', cursor: 'pointer' }}

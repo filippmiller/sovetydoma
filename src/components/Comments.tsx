@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase, isSupabaseConfigured } from '@/lib/supabase'
 import type { Comment } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
 import { uploadToR2, photoPublicUrl } from '@/lib/photos'
@@ -166,8 +166,9 @@ function CommentItem({ comment, depth, onReply }: CommentItemProps) {
 
 // --- Main component ---
 export default function Comments({ slug }: Props) {
+  const commentsConfigured = isSupabaseConfigured()
   const [comments, setComments] = useState<Comment[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(commentsConfigured)
   const [userId, setUserId] = useState<string | null>(null)
   const [text, setText] = useState('')
   const [replyTo, setReplyTo] = useState<string | null>(null)
@@ -181,16 +182,19 @@ export default function Comments({ slug }: Props) {
   const replyTextareaRef = useAutoResize(replyText)
 
   useEffect(() => {
-    let alive = true
+    if (!commentsConfigured) return
 
-    supabase.auth.getUser().then(({ data }) => {
+    let alive = true
+    const sb = getSupabase()
+
+    sb.auth.getUser().then(({ data }) => {
       if (!alive) return
       setUserId(data.user?.id ?? null)
     }).catch(() => {
       if (alive) setUserId(null)
     })
 
-    supabase
+    sb
       .from('comments')
       .select('*, profiles(display_name, avatar_url)')
       .eq('article_slug', slug)
@@ -210,10 +214,11 @@ export default function Comments({ slug }: Props) {
     return () => {
       alive = false
     }
-  }, [slug])
+  }, [commentsConfigured, slug])
 
   const submitComment = async (content: string, parentId: string | null, attach?: File | null) => {
-    if (!content.trim() || !userId) return
+    if (!commentsConfigured || !content.trim() || !userId) return
+    const sb = getSupabase()
     setSubmitting(true)
     setNotice(null)
 
@@ -226,7 +231,7 @@ export default function Comments({ slug }: Props) {
     }
 
     // 2) Insert as pending (is_approved defaults false now → moderation).
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('comments')
       .insert({ article_slug: slug, user_id: userId, content: content.trim(), parent_id: parentId, photo_path: photoKey })
       .select('*, profiles(display_name, avatar_url)')
@@ -237,7 +242,7 @@ export default function Comments({ slug }: Props) {
     // 3) Fire automated moderation; if it approves, show the comment immediately.
     let approved = false
     try {
-      const { data: sess } = await supabase.auth.getSession()
+      const { data: sess } = await sb.auth.getSession()
       const token = sess.session?.access_token
       const res = await fetch(`${SUPABASE_URL}/functions/v1/moderate-comment`, {
         method: 'POST',
@@ -261,6 +266,8 @@ export default function Comments({ slug }: Props) {
   const topLevel = comments.filter((c) => !c.parent_id)
   const getReplies = (parentId: string) => comments.filter((c) => c.parent_id === parentId)
   const approvedCount = comments.length
+
+  if (!commentsConfigured) return null
 
   return (
     <section style={{ marginTop: '3rem', borderTop: '2px solid #f0ede8', paddingTop: '2rem' }}>

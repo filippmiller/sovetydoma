@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase, isSupabaseConfigured } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
 
 interface Props {
@@ -10,17 +10,21 @@ interface Props {
 }
 
 export default function BookmarkButton({ slug }: Props) {
+  const authConfigured = isSupabaseConfigured()
   const [saved, setSaved] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(authConfigured)
   const [authOpen, setAuthOpen] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
+    if (!authConfigured) return
+
+    const sb = getSupabase()
+    sb.auth.getUser().then(async ({ data }) => {
       const uid = data.user?.id ?? null
       setUserId(uid)
       if (uid) {
-        const { data: row } = await supabase
+        const { data: row } = await sb
           .from('saved_articles')
           .select('id')
           .eq('user_id', uid)
@@ -29,27 +33,27 @@ export default function BookmarkButton({ slug }: Props) {
         setSaved(!!row)
       }
       setLoading(false)
-    })
-  }, [slug])
+    }).catch(() => setLoading(false))
+  }, [authConfigured, slug])
 
   const toggle = async () => {
     if (!userId) { setAuthOpen(true); return }
     if (saved) {
       setSaved(false)
-      await supabase
+      await getSupabase()
         .from('saved_articles')
         .delete()
         .eq('user_id', userId)
         .eq('article_slug', slug)
     } else {
       setSaved(true)
-      await supabase
+      await getSupabase()
         .from('saved_articles')
         .insert({ user_id: userId, article_slug: slug })
     }
   }
 
-  if (loading) return null
+  if (loading || !authConfigured) return null
 
   return (
     <>

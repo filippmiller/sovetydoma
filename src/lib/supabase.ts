@@ -5,6 +5,10 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 // call getSupabase() won't fail even without env vars at build time.
 let _client: SupabaseClient | null = null
 
+export function isSupabaseConfigured(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+}
+
 export function getSupabase(): SupabaseClient {
   if (_client) return _client
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
