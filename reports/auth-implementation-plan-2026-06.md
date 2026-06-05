@@ -59,7 +59,7 @@
 1. ✓ Forgot password entry point + request flow (no enumeration) — DONE (see commit and code in AuthModal).
 2. ✓ Supabase recovery token/session detection + new password form (with confirm + visibility + validation) — implemented in this slice (AuthModal + AuthButton listener). Needs full email link test (see blockers).
 3. ✓ Improve existing email confirmation "verify" state (resend with 60s cooldown, "Изменить email", "Назад к входу", better Russian copy per prompt: "Проверьте почту для подтверждения аккаунта", spam note, etc.) — implemented in this slice.
-4. ✓ `reports/auth-supabase-dashboard-checklist.md` created.
+4. ✓ `reports/auth-supabase-dashboard-checklist.md` created and expanded with full 8-point verification checklist, owner actions, current code status, and explicit blockers for real email testing.
 5. Basic error/success states and Russian copy (partially in progress with reset form).
 
 **Technical notes:**

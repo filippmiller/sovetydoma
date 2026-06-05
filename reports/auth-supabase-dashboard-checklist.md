@@ -56,7 +56,26 @@ Test with tools like mail-tester.com or by sending to a real inbox + checking he
 The reset link will redirect users (currently to `/moy-kabinet/` via our helper).
 The client must be able to detect `PASSWORD_RECOVERY` event or a recovery session and show the "set new password" form.
 
-See implementation in `src/components/auth/AuthModal.tsx` (Phase 1 work in progress).
+See implementation in `src/components/auth/AuthModal.tsx` (P0 slices done in code).
+
+## 8. Full Verification Checklist (owner must run with real emails)
+1. Register new QA account (use qa-test-delete-after- prefix, document in test-accounts-and-seed-data.md).
+2. Receive confirmation email (check subject, sender, link domain, CTA).
+3. Click confirm link → account confirmed, can login.
+4. Login with the account.
+5. Request password reset for the QA account.
+6. Receive reset email.
+7. Click reset link → lands, shows new password form.
+8. Set new password (test validation, mismatch, short).
+9. Login with new password succeeds, old fails.
+10. Test resend confirmation (cooldown works).
+11. Test "Изменить email" from verify screen.
+12. Check mobile viewport for all auth screens.
+13. No console errors, Supabase calls succeed as expected.
+
+Record results + any dashboard fixes needed in reports/auth-implementation-results-2026-06.md.
+
+**Note on blockers**: As of now, code for P0 flows (request, completion, confirmation UX+cooldown) is implemented and lint/type clean. Real email delivery and link clicking depend on Supabase dashboard config (SMTP, templates, URLs, rate limits) and DNS. Do not claim full verification without owner running the checklist above with actual emails.
 
 ---
 
