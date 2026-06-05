@@ -155,8 +155,23 @@
   - `С чего начать` is also too template-like.
   - Right-sidebar related cards now show placeholders rather than broken images, but they still look generic and low-value.
 
+### Open Issue: `pogovorimdoma.ru`
+
+- Before deleting old VPS `8194295`, DNS checks showed `pogovorimdoma.ru` and `www.pogovorimdoma.ru` still resolving to old IPv4 `188.225.86.238`.
+- HTTP on the old VPS returned a redirect to `http://1001sovet.ru/`.
+- HTTPS for `pogovorimdoma.ru` was not working, and the replacement VPS did not have a valid certificate for this domain during the check.
+- Owner explicitly accepted deleting the old VPS anyway on 2026-06-05.
+- Follow-up: decide whether `pogovorimdoma.ru` should be restored as a redirect on the replacement VPS, then update DNS/cert/nginx accordingly.
+
+### Old VPS Deletion
+
+- Old Timeweb VPS `8194295` (`1001sovet`, old IPv4 `188.225.86.238`) was deleted through the Timeweb Cloud API on 2026-06-05.
+- Post-delete Timeweb API verification: `GET /api/v1/servers/8194295` returned `404 server_not_found`.
+- Replacement VPS `8264713` (`1001sovet-replacement`) remained present in the server list.
+- Post-delete production check: `https://1001sovet.ru/build.json` still returned SHA `90896cbe63b52152d8e464109df8e5c3620716cc`, and the checked article URL still returned `HTTP/1.1 200 OK`.
+
 ### Do Not Lose
 
 - If production appears stale, check `/build.json` first.
 - If a future static deploy fails, inspect `/opt/deploy/pull-build-deploy.sh` on the replacement VPS before changing DNS or rebuilding the server.
-- Do not delete old VPS `8194295` until the owner explicitly confirms the rollback window is closed.
+- Old VPS `8194295` is no longer available as rollback; use git/build artifacts and replacement VPS `8264713` for future recovery.
