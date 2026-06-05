@@ -4,19 +4,12 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getSupabase } from '@/lib/supabase'
 import { getArticleMeta } from '@/lib/article-index'
+import { getLocalFavorites } from '@/lib/favorites'
 
 interface FavItem {
   slug: string
   category: string
   title: string
-}
-
-function readLocalFavorites(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem('favorites') || '[]')
-  } catch {
-    return []
-  }
 }
 
 export default function FavoritesPage() {
@@ -37,7 +30,7 @@ export default function FavoritesPage() {
       await Promise.resolve()
       if (cancelled) return
 
-      const local = readLocalFavorites()
+      const local = getLocalFavorites()
       setItems(resolve(local))
       setLoading(false)
 
@@ -63,7 +56,7 @@ export default function FavoritesPage() {
   }, [])
 
   const remove = (slug: string) => {
-    const local = readLocalFavorites().filter((s) => s !== slug)
+    const local = getLocalFavorites().filter((s) => s !== slug)
     localStorage.setItem('favorites', JSON.stringify(local))
     setItems((prev) => prev.filter((i) => i.slug !== slug))
     // Best-effort DB removal too

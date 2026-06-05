@@ -3,19 +3,10 @@
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
+import { getLocalFavorites } from '@/lib/favorites'
 
 interface Props {
   slug: string
-}
-
-const STORAGE_KEY = 'favorites'
-
-function readFavorites(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-  } catch {
-    return []
-  }
 }
 
 /**
@@ -36,7 +27,7 @@ export default function CardFavoriteButton({ slug }: Props) {
       if (cancelled) return
 
       setMounted(true)
-      setSaved(readFavorites().includes(slug))
+      setSaved(getLocalFavorites().includes(slug))
       try {
         const sb = getSupabase()
         const { data } = await sb.auth.getUser()
@@ -68,13 +59,13 @@ export default function CardFavoriteButton({ slug }: Props) {
     const next = !saved
     setSaved(next)
 
-    const favs = readFavorites()
+    const favs = getLocalFavorites()
     if (next) {
-      if (!favs.includes(slug)) localStorage.setItem(STORAGE_KEY, JSON.stringify([...favs, slug]))
+      if (!favs.includes(slug)) localStorage.setItem('favorites', JSON.stringify([...favs, slug]))
       // Politely invite anonymous users to register so favorites sync.
       if (!userId) setShowAuth(true)
     } else {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(favs.filter((s) => s !== slug)))
+      localStorage.setItem('favorites', JSON.stringify(favs.filter((s) => s !== slug)))
     }
 
     if (userId) {

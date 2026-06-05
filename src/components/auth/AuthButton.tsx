@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabase'
 import type { Profile } from '@/lib/supabase'
 import AuthModal from './AuthModal'
+import { migrateLocalFavoritesToServer, clearLocalFavorites } from '@/lib/favorites'
 
 export default function AuthButton() {
   const authConfigured = isSupabaseConfigured()
@@ -35,7 +36,11 @@ export default function AuthButton() {
       if (!alive) return
       const u = data.user
       setUser(u ?? null)
-      if (u) loadProfile(u.id)
+      if (u) {
+        loadProfile(u.id)
+        // Catch any local favorites from before this page load / previous anon session
+        migrateLocalFavoritesToServer(u.id).catch(() => {})
+      }
     }).catch(() => {})
 
     const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
@@ -44,6 +49,8 @@ export default function AuthButton() {
       setUser(u)
       if (u) {
         loadProfile(u.id)
+        // Migrate pending local favorites (covers post-login, recovery, cross-tab, etc.)
+        migrateLocalFavoritesToServer(u.id).catch(() => {})
       } else {
         setProfile(null)
       }
@@ -172,6 +179,9 @@ export default function AuthButton() {
             onClick={async () => {
               setDropdownOpen(false)
               await getSupabase().auth.signOut().catch(() => {})
+              // Privacy fix (browser QA): clear local favorites cache so hearts don't stay "saved"
+              // after logout on a shared device. Server side is authoritative for the account.
+              clearLocalFavorites()
               window.location.reload()
             }}
             style={{ ...dropItemStyle, width: '100%', textAlign: 'left', background: 'none', border: 'none', color: '#c0392b', cursor: 'pointer' }}

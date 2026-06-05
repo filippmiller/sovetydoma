@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
+import { getLocalFavorites } from '@/lib/favorites'
 
 interface Props {
   slug: string
@@ -10,18 +11,10 @@ interface Props {
   title?: string
 }
 
-const STORAGE_KEY = 'favorites'
-
-function getFavoritesFromStorage(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-  } catch {
-    return []
-  }
-}
-
+// Local writes still happen here for instant UI + cache while logged in.
+// Migration on auth (clq) is what moves anon saves to server.
 function saveFavoritesToStorage(slugs: string[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(slugs))
+  localStorage.setItem('favorites', JSON.stringify(slugs))
 }
 
 export default function FavoriteButton({ slug }: Props) {
@@ -37,8 +30,8 @@ export default function FavoriteButton({ slug }: Props) {
       await Promise.resolve()
       if (cancelled) return
 
-      // Check localStorage
-      const favs = getFavoritesFromStorage()
+      // Check localStorage (shared helper)
+      const favs = getLocalFavorites()
       setSaved(favs.includes(slug))
 
       // Check Supabase auth and saved_articles
@@ -71,8 +64,8 @@ export default function FavoriteButton({ slug }: Props) {
     const nextSaved = !saved
     setSaved(nextSaved)
 
-    // localStorage
-    const favs = getFavoritesFromStorage()
+    // localStorage (shared helper for read)
+    const favs = getLocalFavorites()
     if (nextSaved) {
       if (!favs.includes(slug)) saveFavoritesToStorage([...favs, slug])
       setShowPlus(true)

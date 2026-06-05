@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '@/lib/supabase'
 import PasswordInput from './PasswordInput'
+import { migrateLocalFavoritesToServer } from '@/lib/favorites'
 
 interface Props {
   isOpen: boolean
@@ -95,14 +96,25 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setError('')
     setInfo('')
     setLoading(true)
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error: err } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (err) {
-      setError(err.message === 'Email not confirmed'
-        ? 'Email ещё не подтверждён. Проверьте письмо с подтверждением или запросите его повторно.'
-        : err.message)
+      let msg = err.message
+      if (msg === 'Invalid login credentials' || msg.includes('Invalid login')) {
+        msg = 'Неверный email или пароль.'
+      } else if (msg === 'Email not confirmed') {
+        msg = 'Email ещё не подтверждён. Проверьте письмо с подтверждением или запросите его повторно.'
+      }
+      setError(msg)
       return
     }
+
+    // P1 (from browser QA + clq): migrate any favorites saved while logged-out
+    // so they appear in Мой кабинет. Fire-and-forget is fine; clear happens inside.
+    if (data?.user?.id) {
+      migrateLocalFavoritesToServer(data.user.id).catch(() => {})
+    }
+
     setSuccess('welcome')
     setTimeout(() => {
       onClose()
