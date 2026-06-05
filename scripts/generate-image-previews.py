@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import argparse
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -77,14 +78,26 @@ def make_preview(source: Path, target: Path) -> bool:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Generate square article preview images.")
+    parser.add_argument(
+        "--missing-only",
+        action="store_true",
+        help="Generate only previews that do not already exist.",
+    )
+    args = parser.parse_args()
+
     sources = read_sources()
     generated = 0
+    skipped = 0
     missing = []
 
     for article in load_articles():
         slug = str(article["slug"])
         source = next((IMAGES_DIR / name for name in source_candidates(article) if (IMAGES_DIR / name).exists()), None)
         target = PREVIEWS_DIR / f"{slug}.jpg"
+        if args.missing_only and target.exists():
+            skipped += 1
+            continue
         if source and make_preview(source, target):
             sources[f"previews/{slug}"] = {
                 "provider": "local-preview",
@@ -100,6 +113,8 @@ def main() -> None:
 
     write_sources(sources)
     print(f"Generated {generated} preview images")
+    if args.missing_only:
+        print(f"Skipped existing previews: {skipped}")
     if missing:
         print(f"Missing source images: {', '.join(missing)}")
         raise SystemExit(1)

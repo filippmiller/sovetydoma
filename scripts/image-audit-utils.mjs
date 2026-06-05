@@ -180,9 +180,10 @@ export function sha256File(filePath) {
   return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex')
 }
 
-export function buildImageAudit({ articles, images }) {
+export function buildImageAudit({ articles, images, previews = [] }) {
   const articleSlugs = new Set(articles.map((article) => article.slug))
   const imageSlugs = new Set(images.map((image) => image.slug))
+  const previewSlugs = new Set(previews.map((image) => image.slug))
   const hashGroups = new Map()
 
   for (const image of images) {
@@ -212,6 +213,7 @@ export function buildImageAudit({ articles, images }) {
     uniqueImageCount: hashGroups.size,
     exactDuplicateGroups,
     missingImages: [...articleSlugs].filter((slug) => !imageSlugs.has(slug)).sort(),
+    missingPreviews: [...articleSlugs].filter((slug) => !previewSlugs.has(slug)).sort(),
     orphanImages: [...imageSlugs].filter((slug) => !articleSlugs.has(slug)).sort(),
     imageFrontmatterDrifts,
   }

@@ -181,9 +181,18 @@
 - Local hosts override attempt for `1001sovet.ru` -> `147.45.146.11` failed due lack of administrator permission to edit `C:\Windows\System32\drivers\etc\hosts`.
 - If Chrome still shows `ERR_CONNECTION_TIMED_OUT`, restart Chrome or manually clear Chrome host cache, then retry Claude QA.
 
+### Article Card Image Preview Incident
+
+- Production homepage/cards showed category emoji placeholders for the 2026-06-04 matrix batch even though full-size article images existed.
+- Root cause: `ArticleCard` uses `resolveArticlePreviewImage()`, which maps `/images/<slug>.jpg` to `/images/previews/<slug>.jpg`; the matrix batch had full images but was missing 100 preview files.
+- Direct checks confirmed full images such as `/images/zola-dlya-kartoshki-posadka.jpg`, `/images/zatochka-lopaty-dlya-kopki.jpg`, and `/images/zamachivanie-semyan-svekly.jpg` returned `200`, while their `/images/previews/...` files were absent in the active release.
+- Fix: generated the 100 missing preview images with `python scripts/generate-image-previews.py --missing-only`.
+- Prevention: `audit:images` now checks missing previews via `--fail-on-missing-previews`, so future matrix publishes cannot pass CI with card placeholders caused by missing previews.
+
 ### Do Not Lose
 
 - If production appears stale, check `/build.json` first.
 - If a future static deploy fails, inspect `/opt/deploy/pull-build-deploy.sh` on the replacement VPS before changing DNS or rebuilding the server.
 - Old VPS `8194295` is no longer available as rollback; use git/build artifacts and replacement VPS `8264713` for future recovery.
 - Do not re-add AAAA records until external IPv6 reachability is verified from outside the VPS and Chrome/browser clients load reliably over IPv6.
+- For article images, publishing must include both `/images/<slug>.jpg` and `/images/previews/<slug>.jpg`; cards intentionally use previews.

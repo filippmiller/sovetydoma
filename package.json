@@ -17,7 +17,7 @@
     "sync:subscriptions:index": "node scripts/sync-subscription-publication-index.mjs",
     "validate:articles": "node scripts/validate-articles.mjs",
     "audit:seo": "node scripts/audit-seo.mjs",
-    "audit:images": "node scripts/audit-article-images.mjs --fail-on-duplicates --fail-on-drifts",
+    "audit:images": "node scripts/audit-article-images.mjs --fail-on-duplicates --fail-on-drifts --fail-on-missing-previews",
     "generate:card-images": "python scripts/generate-card-images.py",
     "generate:photo-like-images": "node scripts/generate-photo-like-images.mjs",
     "generate:procedural-photo-images": "python scripts/generate-procedural-photo-images.py",
