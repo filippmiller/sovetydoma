@@ -13,7 +13,6 @@ interface PasswordInputProps {
   minLength?: number
   style?: React.CSSProperties
   inputStyle?: React.CSSProperties
-  error?: string
   'aria-describedby'?: string
 }
 
@@ -28,7 +27,6 @@ export default function PasswordInput({
   minLength,
   style,
   inputStyle,
-  error,
   ...rest
 }: PasswordInputProps) {
   const [show, setShow] = useState(false)
