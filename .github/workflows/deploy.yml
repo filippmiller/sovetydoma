@@ -85,7 +85,6 @@ jobs:
           echo "Published dist for ${GITHUB_SHA}"
 
       - name: Activate production via deploy webhook
-        if: ${{ secrets.DEPLOY_WEBHOOK_TOKEN != '' }}
         env:
           DEPLOY_WEBHOOK_TOKEN: ${{ secrets.DEPLOY_WEBHOOK_TOKEN }}
         run: |
