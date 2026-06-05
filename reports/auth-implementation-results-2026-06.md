@@ -82,12 +82,15 @@ Do not claim "production-ready" for email flows or full post-register profile un
 Beads not closed without verification per prompt (esp. email verification ones remain open until real Mailcow/Supabase email tests by owner).
 
 ## Текущий git status
-(After clean push + this slice)
+(After this slice + push)
 ## master...origin/master
 ?? matrix-exports/
-?? public/images/* (hundreds — explicitly untouched per instructions)
+?? public/images/* (hundreds — explicitly untouched)
 ?? scripts/__pycache__/
-(no M/A/D for relevant auth/reports after push)
+(no M/A/D for relevant after push)
+
+Last commit for slice: 636fa5ac fix(auth): make profile loading resilient
+Pushed successfully.
 
 ## Следующий самый логичный шаг
 Per prompt phases: since P0 core flows (forgot, reset, confirmation+cooldown) are in code, next is to continue P1 (full registration hardening with terms, better validation, error mapping) or P1.4 profile reliability (fix .single() risk in moy-kabinet, add fallback or plan migration).
