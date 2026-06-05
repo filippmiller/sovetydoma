@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 
 interface PasswordInputProps {
   id?: string
+  name?: string
   value: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   placeholder?: string
@@ -18,6 +19,7 @@ interface PasswordInputProps {
 
 export default function PasswordInput({
   id,
+  name,
   value,
   onChange,
   placeholder = '••••••••',
@@ -48,6 +50,7 @@ export default function PasswordInput({
       <span style={{ padding: '0 0.5rem 0 0.75rem', fontSize: '1rem', userSelect: 'none', flexShrink: 0 }}>🔒</span>
       <input
         id={id}
+        name={name}
         type={show ? 'text' : 'password'}
         value={value}
         onChange={onChange}

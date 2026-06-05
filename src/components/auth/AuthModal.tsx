@@ -129,17 +129,29 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   // `if (!isOpen) return null` guard below, this never runs during SSR.
   if (!isOpen || typeof document === 'undefined') return null
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setInfo('')
     setEmailError('')
-    if (!isValidEmail(email)) {
+
+    const form = new FormData(e.currentTarget)
+    const submittedEmail = String(form.get('email') || '').trim()
+    const submittedPassword = String(form.get('password') || '')
+    setEmail(submittedEmail)
+    setPassword(submittedPassword)
+
+    if (!isValidEmail(submittedEmail)) {
       setEmailError('Введите корректный email адрес.')
       return
     }
+    if (!submittedPassword) {
+      setError('Введите пароль.')
+      return
+    }
+
     setLoading(true)
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password })
+    const { error: err } = await supabase.auth.signInWithPassword({ email: submittedEmail, password: submittedPassword })
     setLoading(false)
     if (err) {
       setError(mapAuthError(err.message))
@@ -171,23 +183,36 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     }, 900)
   }
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setInfo('')
     setEmailError('')
-    if (!displayName.trim()) { setError('Введите имя пользователя'); return }
-    if (!isValidEmail(registerEmail)) { setEmailError('Введите корректный email адрес.'); return }
-    if (registerPassword.length < 8) { setError('Пароль должен быть не короче 8 символов'); return }
-    if (registerPassword !== confirmRegisterPassword) { setError('Пароли не совпадают'); return }
-    // P1.2 terms checkbox is required (UI enforced below)
+
+    const form = new FormData(e.currentTarget)
+    const submittedDisplayName = String(form.get('displayName') || '').trim()
+    const submittedEmail = String(form.get('email') || '').trim()
+    const submittedPassword = String(form.get('password') || '')
+    const submittedConfirmPassword = String(form.get('confirmPassword') || '')
+    const termsAccepted = form.get('terms') === 'accepted'
+    setDisplayName(submittedDisplayName)
+    setRegisterEmail(submittedEmail)
+    setRegisterPassword(submittedPassword)
+    setConfirmRegisterPassword(submittedConfirmPassword)
+
+    if (!submittedDisplayName) { setError('Введите имя пользователя'); return }
+    if (!isValidEmail(submittedEmail)) { setEmailError('Введите корректный email адрес.'); return }
+    if (submittedPassword.length < 8) { setError('Пароль должен быть не короче 8 символов'); return }
+    if (submittedPassword !== submittedConfirmPassword) { setError('Пароли не совпадают'); return }
+    if (!termsAccepted) { setError('Подтвердите согласие с условиями и политикой конфиденциальности'); return }
+
     const emailRedirectTo = getAuthRedirectTo()
     setLoading(true)
     const { error: err } = await supabase.auth.signUp({
-      email: registerEmail.trim(),
-      password: registerPassword,
+      email: submittedEmail,
+      password: submittedPassword,
       options: {
-        data: { display_name: displayName },
+        data: { display_name: submittedDisplayName },
         emailRedirectTo,
       },
     })
@@ -226,10 +251,13 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setResendCooldown(60) // P0.2 cooldown
   }
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setEmailError('')
-    if (!isValidEmail(email)) {
+    const form = new FormData(e.currentTarget)
+    const submittedEmail = String(form.get('email') || '').trim()
+    setEmail(submittedEmail)
+    if (!isValidEmail(submittedEmail)) {
       setEmailError('Введите корректный email адрес.')
       return
     }
@@ -238,7 +266,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setLoading(true)
 
     const redirectTo = getAuthRedirectTo() // will land on cabinet; client can pick up recovery session later
-    const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+    const { error: err } = await supabase.auth.resetPasswordForEmail(submittedEmail, {
       redirectTo,
     })
 
@@ -280,22 +308,28 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setConfirmPassword('')
   }
 
-  const handleSetNewPassword = async (e: React.FormEvent) => {
+  const handleSetNewPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setInfo('')
 
-    if (!newPassword || newPassword.length < 8) {
+    const form = new FormData(e.currentTarget)
+    const submittedNewPassword = String(form.get('newPassword') || '')
+    const submittedConfirmPassword = String(form.get('confirmPassword') || '')
+    setNewPassword(submittedNewPassword)
+    setConfirmPassword(submittedConfirmPassword)
+
+    if (!submittedNewPassword || submittedNewPassword.length < 8) {
       setError('Пароль должен быть не короче 8 символов')
       return
     }
-    if (newPassword !== confirmPassword) {
+    if (submittedNewPassword !== submittedConfirmPassword) {
       setError('Пароли не совпадают')
       return
     }
 
     setResetLoading(true)
-    const { error: err } = await supabase.auth.updateUser({ password: newPassword })
+    const { error: err } = await supabase.auth.updateUser({ password: submittedNewPassword })
     setResetLoading(false)
 
     if (err) {
@@ -564,16 +598,17 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
 
         {/* Login form */}
         {!success && tab === 'login' && mode === 'login' && (
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form onSubmit={handleLogin} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <label style={labelStyle}>Email</label>
               <div style={inputWrapStyle}>
                 <span style={iconStyle}>📧</span>
                 <input
+                  name="email"
                   type="email"
-                  value={registerEmail}
-                  onChange={(e) => { setRegisterEmail(e.target.value); if (emailError) setEmailError('') }}
-                  onBlur={() => { if (registerEmail && !isValidEmail(registerEmail)) setEmailError('Введите корректный email адрес.') }}
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
+                  onBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
                   required
                   autoComplete="email"
                   placeholder="you@example.com"
@@ -602,6 +637,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                 </button>
               </div>
               <PasswordInput
+                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
@@ -624,12 +660,13 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
 
         {/* Forgot password request form (P0) */}
         {!success && tab === 'login' && mode === 'forgot' && (
-          <form onSubmit={handleForgotPassword} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form onSubmit={handleForgotPassword} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <label style={labelStyle}>Email</label>
               <div style={inputWrapStyle}>
                 <span style={iconStyle}>📧</span>
                 <input
+                  name="email"
                   type="email"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
@@ -658,7 +695,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
 
         {/* Reset password completion form (P0) */}
         {!success && mode === 'reset' && (
-          <form onSubmit={handleSetNewPassword} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form onSubmit={handleSetNewPassword} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', color: '#666' }}>
               Установите новый пароль для аккаунта {email ? email : ''}.
             </p>
@@ -666,6 +703,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             <div>
               <label style={labelStyle}>Новый пароль</label>
               <PasswordInput
+                name="newPassword"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 autoComplete="new-password"
@@ -677,6 +715,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             <div>
               <label style={labelStyle}>Повторите пароль</label>
               <PasswordInput
+                name="confirmPassword"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 autoComplete="new-password"
@@ -700,12 +739,13 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
 
         {/* Register form */}
         {!success && tab === 'register' && (
-          <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form onSubmit={handleRegister} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <label style={labelStyle}>Имя пользователя</label>
               <div style={inputWrapStyle}>
                 <span style={iconStyle}>👤</span>
                 <input
+                  name="displayName"
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
@@ -720,10 +760,11 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
               <div style={inputWrapStyle}>
                 <span style={iconStyle}>📧</span>
                 <input
+                  name="email"
                   type="email"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
-                  onBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
+                  value={registerEmail}
+                  onChange={(e) => { setRegisterEmail(e.target.value); if (emailError) setEmailError('') }}
+                  onBlur={() => { if (registerEmail && !isValidEmail(registerEmail)) setEmailError('Введите корректный email адрес.') }}
                   required
                   autoComplete="email"
                   placeholder="you@example.com"
@@ -735,6 +776,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             <div>
               <label style={labelStyle}>Пароль</label>
               <PasswordInput
+                name="password"
                 value={registerPassword}
                 onChange={(e) => setRegisterPassword(e.target.value)}
                 autoComplete="new-password"
@@ -746,6 +788,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             <div>
               <label style={labelStyle}>Повторите пароль</label>
               <PasswordInput
+                name="confirmPassword"
                 value={confirmRegisterPassword}
                 onChange={(e) => setConfirmRegisterPassword(e.target.value)}
                 autoComplete="new-password"
@@ -758,9 +801,11 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
               <input
                 type="checkbox"
                 id="terms"
+                name="terms"
+                value="accepted"
                 required
                 style={{ marginTop: '0.2rem' }}
-                onChange={() => { /* UI required, form submit will have native validation */ }}
+                onChange={() => { if (error) setError('') }}
               />
               <label htmlFor="terms" style={{ lineHeight: 1.3 }}>
                 Я согласен(а) с <a href="/terms" target="_blank" style={{ color: '#c0392b' }}>Условиями использования</a> и <a href="/privacy" target="_blank" style={{ color: '#c0392b' }}>Политикой конфиденциальности</a>.
