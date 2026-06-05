@@ -31,8 +31,6 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   // P0 reset flow state (kept minimal for this vertical slice)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [resetLoading, setResetLoading] = useState(false)
 
   useEffect(() => {
@@ -45,8 +43,6 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       setMode('login')
       setNewPassword('')
       setConfirmPassword('')
-      setShowNewPassword(false)
-      setShowConfirmPassword(false)
     }, 0)
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -201,8 +197,6 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setSuccess(null)
     setNewPassword('')
     setConfirmPassword('')
-    setShowNewPassword(false)
-    setShowConfirmPassword(false)
   }
 
   const handleSetNewPassword = async (e: React.FormEvent) => {
