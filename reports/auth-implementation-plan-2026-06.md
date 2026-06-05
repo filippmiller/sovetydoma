@@ -81,7 +81,7 @@
 - Accessible modal behavior (labels, focus, escape, semantics).
 
 **Reuse / extract:**
-- New `PasswordInput` component (used by both user modal and admin).
+- New `PasswordInput` component (used by both user modal and admin). ✓ Extracted minimal reusable PasswordInput.tsx (show/hide, accessible, used in reset/login/register for P0/P1 consistency). Not full refactor.
 
 ---
 

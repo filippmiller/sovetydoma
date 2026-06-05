@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '@/lib/supabase'
+import PasswordInput from './PasswordInput'
 
 interface Props {
   isOpen: boolean
@@ -523,18 +524,13 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                   Забыли пароль?
                 </button>
               </div>
-              <div style={inputWrapStyle}>
-                <span style={iconStyle}>🔒</span>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  style={inputStyle}
-                />
-              </div>
+              <PasswordInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                placeholder="••••••••"
+                required
+              />
             </div>
             {error && <p style={errorStyle}>{error}</p>}
             {info && <p style={successTextStyle}>{info}</p>}
@@ -590,50 +586,24 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
 
             <div>
               <label style={labelStyle}>Новый пароль</label>
-              <div style={inputWrapStyle}>
-                <span style={iconStyle}>🔒</span>
-                <input
-                  type={showNewPassword ? 'text' : 'password'}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                  placeholder="Минимум 8 символов"
-                  style={inputStyle}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  aria-label={showNewPassword ? 'Скрыть пароль' : 'Показать пароль'}
-                  style={{ background: 'none', border: 'none', padding: '0 0.75rem', cursor: 'pointer', fontSize: '1rem' }}
-                >
-                  {showNewPassword ? '🙈' : '👁️'}
-                </button>
-              </div>
+              <PasswordInput
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+                placeholder="Минимум 8 символов"
+                required
+              />
             </div>
 
             <div>
               <label style={labelStyle}>Повторите пароль</label>
-              <div style={inputWrapStyle}>
-                <span style={iconStyle}>🔒</span>
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                  placeholder="Повторите пароль"
-                  style={inputStyle}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  aria-label={showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'}
-                  style={{ background: 'none', border: 'none', padding: '0 0.75rem', cursor: 'pointer', fontSize: '1rem' }}
-                >
-                  {showConfirmPassword ? '🙈' : '👁️'}
-                </button>
-              </div>
+              <PasswordInput
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                placeholder="Повторите пароль"
+                required
+              />
             </div>
 
             {error && <p style={errorStyle}>{error}</p>}
@@ -683,19 +653,14 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             </div>
             <div>
               <label style={labelStyle}>Пароль</label>
-              <div style={inputWrapStyle}>
-                <span style={iconStyle}>🔒</span>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                  minLength={6}
-                  placeholder="Минимум 6 символов"
-                  style={inputStyle}
-                />
-              </div>
+              <PasswordInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                placeholder="Минимум 8 символов"
+                minLength={8}
+                required
+              />
             </div>
             {error && <p style={errorStyle}>{error}</p>}
             {info && <p style={successTextStyle}>{info}</p>}
