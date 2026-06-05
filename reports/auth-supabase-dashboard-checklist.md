@@ -14,6 +14,10 @@ This must be verified/fixed for reliable registration + password reset emails.
 
 For password reset, the redirect URL used in `resetPasswordForEmail` should be one of the above.
 
+**Current code behavior (as of 2026-06)**: `getAuthRedirectTo()` points reset links to `https://1001sovet.ru/moy-kabinet/`. The client listens for `PASSWORD_RECOVERY` event and can show the reset form in the auth modal.
+
+If recovery does not trigger properly on landing, the redirect target or additional allowed URLs may need adjustment in the dashboard.
+
 ## 2. Authentication → Providers → Email
 - Confirm "Email" provider is enabled.
 - **Email confirmation** — decide policy (currently enabled in code/config).
@@ -59,5 +63,15 @@ See implementation in `src/components/auth/AuthModal.tsx` (Phase 1 work in progr
 **Owner action required**: Go through sections 1–5 in the Supabase dashboard and confirm/fix. Then reply here or update the checklist with "Done" + date.
 
 If any of the above cannot be done from the code (they can't), this file serves as the exact handoff.
+
+**Current implementation status (2026-06)**:
+- Forgot request: done in code.
+- Reset completion form + PASSWORD_RECOVERY detection: implemented (modal switches to reset view, updateUser called).
+- Full end-to-end browser verification of clicking a real reset link requires:
+  - Correct recovery redirect target + allowed URLs in dashboard.
+  - Recovery email template configured.
+  - Working SMTP so the reset email actually arrives.
+
+**Blocker note**: Without owner confirmation that the Supabase Auth "Reset password" template and redirect URLs are correctly set (and that a test reset email can be sent), we cannot fully close the "completion flow works in production" item. Code is ready; email delivery side needs dashboard + DNS verification.
 
 Last updated: 2026-06 during auth rewrite (sovetydoma-0h3).

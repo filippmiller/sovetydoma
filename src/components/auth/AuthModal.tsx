@@ -22,9 +22,16 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const [info, setInfo] = useState('')
   const [loading, setLoading] = useState(false)
   const [resending, setResending] = useState(false)
-  const [success, setSuccess] = useState<'welcome' | 'verify' | 'forgot-sent' | null>(null)
-  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login')
+  const [success, setSuccess] = useState<'welcome' | 'verify' | 'forgot-sent' | 'reset-success' | null>(null)
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot' | 'reset'>('login')
   const overlayRef = useRef<HTMLDivElement>(null)
+
+  // P0 reset flow state (kept minimal for this vertical slice)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
 
   useEffect(() => {
     if (!isOpen) return
@@ -34,6 +41,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       setSuccess(null)
       setTab(initialTab)
       setMode('login')
+      setNewPassword('')
+      setConfirmPassword('')
+      setShowNewPassword(false)
+      setShowConfirmPassword(false)
     }, 0)
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -44,6 +55,28 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       window.removeEventListener('keydown', handleKey)
     }
   }, [isOpen, onClose, initialTab])
+
+  // P0: Listen for Supabase PASSWORD_RECOVERY event (fires when user follows the reset link and client picks up the tokens)
+  useEffect(() => {
+    if (!isOpen) return
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setMode('reset')
+        setError('')
+        setInfo('')
+        setSuccess(null)
+        // Pre-fill email from the temporary recovery session if available
+        if (session?.user?.email) {
+          setEmail(session.user.email)
+        }
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [isOpen])
 
   // Portal target — only available in the browser. Combined with the
   // `if (!isOpen) return null` guard below, this never runs during SSR.
@@ -156,6 +189,39 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setError('')
     setInfo('')
     setSuccess(null)
+    setNewPassword('')
+    setConfirmPassword('')
+    setShowNewPassword(false)
+    setShowConfirmPassword(false)
+  }
+
+  const handleSetNewPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setInfo('')
+
+    if (!newPassword || newPassword.length < 8) {
+      setError('Пароль должен быть не короче 8 символов')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setError('Пароли не совпадают')
+      return
+    }
+
+    setResetLoading(true)
+    const { error: err } = await supabase.auth.updateUser({ password: newPassword })
+    setResetLoading(false)
+
+    if (err) {
+      setError(err.message || 'Не удалось изменить пароль. Ссылка могла истечь.')
+      return
+    }
+
+    // Clear sensitive state
+    setNewPassword('')
+    setConfirmPassword('')
+    setSuccess('reset-success')
   }
 
   // Render through a portal to <body> so the fixed overlay is never trapped
@@ -332,6 +398,52 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
           </div>
         )}
 
+        {success === 'reset-success' && (
+          <div style={{
+            background: '#f0fff4',
+            border: '1.5px solid #b2dfdb',
+            borderRadius: '10px',
+            padding: '1.25rem',
+            textAlign: 'center',
+            color: '#1e8449',
+          }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>✅</div>
+            <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>
+              Пароль успешно изменён
+            </p>
+            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.82rem', color: '#555' }}>
+              Теперь вы можете войти с новым паролем.
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setSuccess(null)
+                  setMode('login')
+                  setNewPassword('')
+                  setConfirmPassword('')
+                }}
+                style={{ ...secondaryBtnStyle, flex: 1 }}
+              >
+                Войти
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose()
+                  // Navigate to cabinet if desired; minimal reload only if needed
+                  if (window.location.pathname.includes('moy-kabinet')) {
+                    window.location.reload()
+                  }
+                }}
+                style={{ ...btnStyle, flex: 1, marginTop: 0 }}
+              >
+                В личный кабинет
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Login form */}
         {!success && tab === 'login' && mode === 'login' && (
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -423,6 +535,74 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             </button>
             <button type="button" onClick={goBackToLogin} style={secondaryBtnStyle}>
               Назад к входу
+            </button>
+          </form>
+        )}
+
+        {/* Reset password completion form (P0) */}
+        {!success && mode === 'reset' && (
+          <form onSubmit={handleSetNewPassword} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', color: '#666' }}>
+              Установите новый пароль для аккаунта {email ? email : ''}.
+            </p>
+
+            <div>
+              <label style={labelStyle}>Новый пароль</label>
+              <div style={inputWrapStyle}>
+                <span style={iconStyle}>🔒</span>
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  placeholder="Минимум 8 символов"
+                  style={inputStyle}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  aria-label={showNewPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                  style={{ background: 'none', border: 'none', padding: '0 0.75rem', cursor: 'pointer', fontSize: '1rem' }}
+                >
+                  {showNewPassword ? '🙈' : '👁️'}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label style={labelStyle}>Повторите пароль</label>
+              <div style={inputWrapStyle}>
+                <span style={iconStyle}>🔒</span>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  placeholder="Повторите пароль"
+                  style={inputStyle}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                  style={{ background: 'none', border: 'none', padding: '0 0.75rem', cursor: 'pointer', fontSize: '1rem' }}
+                >
+                  {showConfirmPassword ? '🙈' : '👁️'}
+                </button>
+              </div>
+            </div>
+
+            {error && <p style={errorStyle}>{error}</p>}
+            {info && <p style={successTextStyle}>{info}</p>}
+
+            <button type="submit" disabled={resetLoading} style={btnStyle}>
+              {resetLoading ? 'Сохраняем…' : 'Сохранить новый пароль'}
+            </button>
+
+            <button type="button" onClick={goBackToLogin} style={secondaryBtnStyle}>
+              Отмена
             </button>
           </form>
         )}

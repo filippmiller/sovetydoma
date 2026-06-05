@@ -38,7 +38,7 @@ export default function AuthButton() {
       if (u) loadProfile(u.id)
     }).catch(() => {})
 
-    const { data: { subscription } } = sb.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
       if (!alive) return
       const u = session?.user ?? null
       setUser(u)
@@ -46,6 +46,11 @@ export default function AuthButton() {
         loadProfile(u.id)
       } else {
         setProfile(null)
+      }
+
+      // P0: When user follows password reset link, open the auth modal in reset mode
+      if (event === 'PASSWORD_RECOVERY') {
+        setModalOpen(true)
       }
     })
 

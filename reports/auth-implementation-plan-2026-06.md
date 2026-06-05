@@ -28,11 +28,22 @@
 
 ## Phase 0 — Recon & Planning (this document)
 
-**Completed in this session:**
+**Completed in this session (2026-06-05/06):**
 - Read both audit reports.
 - Inspected core auth files, supabase client, Turnstile, migrations (no profiles definition), package.json.
 - Confirmed zero reset/recovery code.
 - Created epic bead `sovetydoma-0h3`.
+- Created detailed implementation plan (this file) + subtasks.
+- **P0 Forgot request slice done**:
+  - Forgot password link + form in AuthModal.
+  - `handleForgotPassword` + `resetPasswordForEmail`.
+  - Non-enumerating success message.
+  - Back to login, hidden tabs during flow.
+  - Updated titles/subtitles.
+  - Registration button text improved.
+  - `reports/auth-supabase-dashboard-checklist.md` created.
+  - Clean commit for the slice.
+- **Next immediate**: P0 completion flow (this is the current vertical slice).
 
 **Next in Phase 0:**
 - Create subtasks under the epic (see below).
@@ -44,12 +55,12 @@
 
 **Goal:** Users can recover accounts and understand email flows. No more "письмо не пришло и непонятно почему".
 
-**Subtasks (to be created as beads):**
-1. Forgot password entry point + request flow (no enumeration).
-2. Supabase recovery token/session detection + new password form (with confirm + visibility + validation).
+**Subtasks (tracked in beads under sovetydoma-0h3):**
+1. ✓ Forgot password entry point + request flow (no enumeration) — DONE (see commit and code in AuthModal).
+2. ✓ Supabase recovery token/session detection + new password form (with confirm + visibility + validation) — implemented in this slice (AuthModal + AuthButton listener). Needs full email link test (see blockers).
 3. Improve existing email confirmation "verify" state (resend with cooldown, change email, clear Russian copy).
-4. Create `reports/auth-supabase-dashboard-checklist.md` with exact owner actions (SMTP, redirect URLs, templates, rate limits, DKIM/DMARC if needed).
-5. Basic error/success states and Russian copy.
+4. ✓ `reports/auth-supabase-dashboard-checklist.md` created.
+5. Basic error/success states and Russian copy (partially in progress with reset form).
 
 **Technical notes:**
 - Use `supabase.auth.resetPasswordForEmail(email, { redirectTo: ... })`
