@@ -47,6 +47,8 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const [tab, setTab] = useState<'login' | 'register'>(initialTab)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [registerEmail, setRegisterEmail] = useState('')
+  const [registerPassword, setRegisterPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
@@ -75,6 +77,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       setSuccess(null)
       setTab(initialTab)
       setMode('login')
+      setEmail('')
+      setPassword('')
+      setRegisterEmail('')
+      setRegisterPassword('')
+      setDisplayName('')
+      setConfirmRegisterPassword('')
       setNewPassword('')
       setConfirmPassword('')
     }, 0)
@@ -169,15 +177,15 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setInfo('')
     setEmailError('')
     if (!displayName.trim()) { setError('Введите имя пользователя'); return }
-    if (!isValidEmail(email)) { setEmailError('Введите корректный email адрес.'); return }
-    if (password.length < 8) { setError('Пароль должен быть не короче 8 символов'); return }
-    if (password !== confirmRegisterPassword) { setError('Пароли не совпадают'); return }
+    if (!isValidEmail(registerEmail)) { setEmailError('Введите корректный email адрес.'); return }
+    if (registerPassword.length < 8) { setError('Пароль должен быть не короче 8 символов'); return }
+    if (registerPassword !== confirmRegisterPassword) { setError('Пароли не совпадают'); return }
     // P1.2 terms checkbox is required (UI enforced below)
     const emailRedirectTo = getAuthRedirectTo()
     setLoading(true)
     const { error: err } = await supabase.auth.signUp({
-      email,
-      password,
+      email: registerEmail.trim(),
+      password: registerPassword,
       options: {
         data: { display_name: displayName },
         emailRedirectTo,
@@ -189,6 +197,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       return
     }
     setSuccess('verify')
+    setRegisterPassword('')
     setConfirmRegisterPassword('')
     // Note: for register path the pending favorite intent (if any) is intentionally left in sessionStorage.
     // It will be processed by AuthButton onAuthStateChange (or next explicit login) *after* the user
@@ -197,14 +206,15 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   }
 
   const resendConfirmation = async () => {
-    if (!email.trim()) { setError('Введите email, чтобы отправить письмо повторно'); return }
+    const targetEmail = (success === 'verify' ? registerEmail : email).trim()
+    if (!targetEmail) { setError('Введите email, чтобы отправить письмо повторно'); return }
     setError('')
     setInfo('')
     const emailRedirectTo = getAuthRedirectTo()
     setResending(true)
     const { error: err } = await supabase.auth.resend({
       type: 'signup',
-      email: email.trim(),
+      email: targetEmail,
       options: { emailRedirectTo },
     })
     setResending(false)
@@ -441,7 +451,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
               Проверьте почту для подтверждения аккаунта
             </p>
             <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.82rem', color: '#555' }}>
-              Мы отправили письмо на <strong>{email}</strong>. Перейдите по ссылке в письме.
+              Мы отправили письмо на <strong>{registerEmail}</strong>. Перейдите по ссылке в письме.
             </p>
             <p style={{ margin: '0.3rem 0 0.6rem 0', fontSize: '0.78rem', color: '#666' }}>
               Если письма нет несколько минут — проверьте папку «Спам».
@@ -561,9 +571,9 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                 <span style={iconStyle}>📧</span>
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
-                  onBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
+                  value={registerEmail}
+                  onChange={(e) => { setRegisterEmail(e.target.value); if (emailError) setEmailError('') }}
+                  onBlur={() => { if (registerEmail && !isValidEmail(registerEmail)) setEmailError('Введите корректный email адрес.') }}
                   required
                   autoComplete="email"
                   placeholder="you@example.com"
@@ -725,8 +735,8 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             <div>
               <label style={labelStyle}>Пароль</label>
               <PasswordInput
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={registerPassword}
+                onChange={(e) => setRegisterPassword(e.target.value)}
                 autoComplete="new-password"
                 placeholder="Минимум 8 символов"
                 minLength={8}
