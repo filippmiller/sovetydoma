@@ -104,10 +104,10 @@
 - Extract `PasswordInput`.
 - Preserve action intent (favorite/comment while logged out → after successful auth, either auto-complete or easy return to the article).
 - Fix profile creation reliably:
-  - Preferred: versioned migration + trigger (or SECURITY DEFINER function).
-  - Fallback: safe repair in `moy-kabinet` and after login.
-- Make `moy-kabinet` and profile loading robust (`maybeSingle`, upsert repair).
-- Improve favorites merge after login (no data loss, predictable).
+  - Preferred: versioned migration + trigger (or SECURITY DEFINER function). ✓ Added 20260606120000_ensure_profile_on_signup.sql with handle_new_user trigger + backfill.
+  - Fallback: safe repair in `moy-kabinet` and after login. ✓ Added in AuthButton loadProfile (upsert + maybeSingle) and moy-kabinet (repair flow).
+- Make `moy-kabinet` and profile loading robust (`maybeSingle`, upsert repair). ✓ Done, replaces brittle .single().
+- Improve favorites merge after login (no data loss, predictable). (next slice)
 
 ---
 
