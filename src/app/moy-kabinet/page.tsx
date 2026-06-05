@@ -40,55 +40,71 @@ export default function MoyKabinetPage() {
   const [editBio, setEditBio] = useState('')
   const [saving, setSaving] = useState(false)
   const [profileSaved, setProfileSaved] = useState(false)
+  const [loadingError, setLoadingError] = useState<string | null>(null)
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
-      const u = data.user
-      if (!u) { router.replace('/'); return }
-      setUserId(u.id)
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { data } = await supabase.auth.getUser()
+        if (cancelled) return
+        const u = data.user
+        if (!u) { router.replace('/'); return }
+        setUserId(u.id)
 
-      // P1 profile reliability: use maybeSingle + repair fallback instead of brittle .single()
-      let { data: p } = await supabase.from('profiles').select('*').eq('id', u.id).maybeSingle()
-      if (!p) {
-        // fallback upsert to guarantee row (idempotent, respects RLS for owner)
-        const display_name = (u as any).user_metadata?.display_name || u.email?.split('@')[0] || 'Пользователь' // eslint-disable-line @typescript-eslint/no-explicit-any
-        await supabase.from('profiles').upsert({
-          id: u.id,
-          display_name,
-          bio: '',
-          avatar_url: '',
-          role: 'user' as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-          articles_count: 0,
-        }, { onConflict: 'id' })
-        const { data: repaired } = await supabase.from('profiles').select('*').eq('id', u.id).maybeSingle()
-        p = repaired
+        // P1 profile reliability: use maybeSingle + repair fallback instead of brittle .single()
+        let { data: p } = await supabase.from('profiles').select('*').eq('id', u.id).maybeSingle()
+        if (!p) {
+          // fallback upsert to guarantee row (idempotent, respects RLS for owner)
+          const display_name = (u as any).user_metadata?.display_name || u.email?.split('@')[0] || 'Пользователь' // eslint-disable-line @typescript-eslint/no-explicit-any
+          await supabase.from('profiles').upsert({
+            id: u.id,
+            display_name,
+            bio: '',
+            avatar_url: '',
+            role: 'user' as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+            articles_count: 0,
+          }, { onConflict: 'id' })
+          const { data: repaired } = await supabase.from('profiles').select('*').eq('id', u.id).maybeSingle()
+          p = repaired
+        }
+        if (p) {
+          setProfile(p as Profile)
+          setEditName((p as Profile).display_name || '')
+          setEditBio((p as Profile).bio || '')
+        } else {
+          // last resort default so UI doesn't break
+          setProfile({ id: u.id, display_name: u.email?.split('@')[0] || 'Пользователь', bio: '', avatar_url: '', role: 'user', articles_count: 0 } as Profile)
+          setEditName(u.email?.split('@')[0] || 'Пользователь')
+        }
+
+        const { data: s } = await supabase
+          .from('saved_articles')
+          .select('*')
+          .eq('user_id', u.id)
+          .order('saved_at', { ascending: false })
+        if (!cancelled) setSaved((s as SavedArticle[]) || [])
+
+        const { data: a } = await supabase
+          .from('user_articles')
+          .select('*')
+          .eq('author_id', u.id)
+          .order('created_at', { ascending: false })
+        if (!cancelled) setArticles((a as UserArticle[]) || [])
+
+        if (!cancelled) {
+          setLoading(false)
+          setLoadingError(null)
+        }
+      } catch (e) {
+        if (!cancelled) {
+          console.error('moy-kabinet load error', e)
+          setLoadingError('Не удалось загрузить данные кабинета. Попробуйте обновить страницу.')
+          setLoading(false)
+        }
       }
-      if (p) {
-        setProfile(p as Profile)
-        setEditName((p as Profile).display_name || '')
-        setEditBio((p as Profile).bio || '')
-      } else {
-        // last resort default so UI doesn't break
-        setProfile({ id: u.id, display_name: u.email?.split('@')[0] || 'Пользователь', bio: '', avatar_url: '', role: 'user', articles_count: 0 } as Profile)
-        setEditName(u.email?.split('@')[0] || 'Пользователь')
-      }
-
-      const { data: s } = await supabase
-        .from('saved_articles')
-        .select('*')
-        .eq('user_id', u.id)
-        .order('saved_at', { ascending: false })
-      setSaved((s as SavedArticle[]) || [])
-
-      const { data: a } = await supabase
-        .from('user_articles')
-        .select('*')
-        .eq('author_id', u.id)
-        .order('created_at', { ascending: false })
-      setArticles((a as UserArticle[]) || [])
-
-      setLoading(false)
-    })
+    })()
+    return () => { cancelled = true }
   }, [router])
 
   const saveProfile = async () => {
@@ -115,6 +131,17 @@ export default function MoyKabinetPage() {
     return (
       <div style={{ maxWidth: '800px', margin: '4rem auto', padding: '0 1rem', textAlign: 'center', color: '#aaa' }}>
         Загрузка…
+      </div>
+    )
+  }
+
+  if (loadingError) {
+    return (
+      <div style={{ maxWidth: '800px', margin: '4rem auto', padding: '0 1rem', textAlign: 'center' }}>
+        <p style={{ color: '#c0392b', marginBottom: '1rem' }}>{loadingError}</p>
+        <button onClick={() => window.location.reload()} style={redBtnStyle as React.CSSProperties}>
+          Обновить страницу
+        </button>
       </div>
     )
   }

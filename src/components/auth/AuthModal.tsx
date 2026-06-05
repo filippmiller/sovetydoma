@@ -6,6 +6,34 @@ import { supabase } from '@/lib/supabase'
 import PasswordInput from './PasswordInput'
 import { migrateLocalFavoritesToServer } from '@/lib/favorites'
 
+function isValidEmail(v: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
+}
+
+function mapAuthError(raw: string | undefined | null): string {
+  const m = (raw || '').toLowerCase()
+  if (m.includes('invalid login') || m.includes('invalid credentials')) {
+    return 'Неверный email или пароль.'
+  }
+  if (m.includes('email not confirmed')) {
+    return 'Email ещё не подтверждён. Проверьте письмо с подтверждением или запросите его повторно.'
+  }
+  if (m.includes('rate limit') || m.includes('too many') || m.includes('email rate')) {
+    return 'Слишком много попыток. Подождите немного и попробуйте позже.'
+  }
+  if (m.includes('password') && (m.includes('at least') || m.includes('weak') || m.includes('short') || m.includes('8'))) {
+    return 'Пароль должен быть не короче 8 символов.'
+  }
+  if (m.includes('already registered') || m.includes('user already registered')) {
+    return 'Аккаунт с таким email уже существует. Войдите или восстановите пароль.'
+  }
+  if (m.includes('invalid email') || m.includes('email address')) {
+    return 'Введите корректный email адрес.'
+  }
+  // Do not leak internal details or enumeration
+  return 'Не удалось выполнить действие. Проверьте данные и попробуйте позже.'
+}
+
 interface Props {
   isOpen: boolean
   onClose: () => void
@@ -30,6 +58,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   // For P1.2 registration confirm password
   // reset confirm is in reset form state if needed; for register:
   const [confirmRegisterPassword, setConfirmRegisterPassword] = useState('')
+  const [emailError, setEmailError] = useState('')
   const overlayRef = useRef<HTMLDivElement>(null)
 
   // P0 reset flow state (kept minimal for this vertical slice)
@@ -42,6 +71,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     const resetId = window.setTimeout(() => {
       setError('')
       setInfo('')
+      setEmailError('')
       setSuccess(null)
       setTab(initialTab)
       setMode('login')
@@ -95,17 +125,16 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     e.preventDefault()
     setError('')
     setInfo('')
+    setEmailError('')
+    if (!isValidEmail(email)) {
+      setEmailError('Введите корректный email адрес.')
+      return
+    }
     setLoading(true)
     const { data, error: err } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (err) {
-      let msg = err.message
-      if (msg === 'Invalid login credentials' || msg.includes('Invalid login')) {
-        msg = 'Неверный email или пароль.'
-      } else if (msg === 'Email not confirmed') {
-        msg = 'Email ещё не подтверждён. Проверьте письмо с подтверждением или запросите его повторно.'
-      }
-      setError(msg)
+      setError(mapAuthError(err.message))
       return
     }
 
@@ -126,7 +155,9 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     e.preventDefault()
     setError('')
     setInfo('')
+    setEmailError('')
     if (!displayName.trim()) { setError('Введите имя пользователя'); return }
+    if (!isValidEmail(email)) { setEmailError('Введите корректный email адрес.'); return }
     if (password.length < 8) { setError('Пароль должен быть не короче 8 символов'); return }
     if (password !== confirmRegisterPassword) { setError('Пароли не совпадают'); return }
     // P1.2 terms checkbox is required (UI enforced below)
@@ -142,16 +173,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     })
     setLoading(false)
     if (err) {
-      // Map common Supabase errors to readable Russian (P1.2)
-      let msg = err.message
-      if (msg.includes('already registered') || msg.includes('User already registered')) {
-        msg = 'Email уже зарегистрирован. Войдите или восстановите пароль.'
-      } else if (msg.includes('Password should be at least')) {
-        msg = 'Пароль должен быть не короче 8 символов.'
-      } else if (msg.includes('Invalid email')) {
-        msg = 'Неверный формат email.'
-      }
-      setError(msg)
+      setError(mapAuthError(err.message))
       return
     }
     setSuccess('verify')
@@ -171,9 +193,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     })
     setResending(false)
     if (err) {
-      setError(err.message === 'email rate limit exceeded'
-        ? 'Лимит писем временно исчерпан. Попробуйте позже или напишите разработчику.'
-        : err.message)
+      setError(mapAuthError(err.message))
       return
     }
     setInfo('Письмо подтверждения отправлено повторно. Проверьте входящие и спам.')
@@ -182,8 +202,9 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) {
-      setError('Введите email')
+    setEmailError('')
+    if (!isValidEmail(email)) {
+      setEmailError('Введите корректный email адрес.')
       return
     }
     setError('')
@@ -210,6 +231,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setMode('login')
     setError('')
     setInfo('')
+    setEmailError('')
     setSuccess(null)
   }
 
@@ -218,6 +240,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setTab('login') // keep last email if user typed it
     setError('')
     setInfo('')
+    setEmailError('')
     setSuccess(null)
   }
 
@@ -225,6 +248,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setMode('login')
     setError('')
     setInfo('')
+    setEmailError('')
     setSuccess(null)
     setNewPassword('')
     setConfirmPassword('')
@@ -249,7 +273,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setResetLoading(false)
 
     if (err) {
-      setError(err.message || 'Не удалось изменить пароль. Ссылка могла истечь.')
+      setError(mapAuthError(err.message) || 'Не удалось изменить пароль. Ссылка могла истечь.')
       return
     }
 
@@ -522,13 +546,15 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
+                  onBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
                   required
                   autoComplete="email"
                   placeholder="you@example.com"
                   style={inputStyle}
                 />
               </div>
+              {emailError && <p style={errorStyle}>{emailError}</p>}
             </div>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
@@ -580,13 +606,15 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
+                  onBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
                   required
                   autoComplete="email"
                   placeholder="you@example.com"
                   style={inputStyle}
                 />
               </div>
+              {emailError && <p style={errorStyle}>{emailError}</p>}
             </div>
             <p style={{ margin: 0, fontSize: '0.82rem', color: '#666', lineHeight: 1.4 }}>
               Введите email, и если аккаунт существует, мы отправим ссылку для восстановления пароля.
@@ -668,13 +696,15 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
+                  onBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
                   required
                   autoComplete="email"
                   placeholder="you@example.com"
                   style={inputStyle}
                 />
               </div>
+              {emailError && <p style={errorStyle}>{emailError}</p>}
             </div>
             <div>
               <label style={labelStyle}>Пароль</label>
