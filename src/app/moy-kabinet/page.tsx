@@ -39,6 +39,7 @@ export default function MoyKabinetPage() {
   const [editName, setEditName] = useState('')
   const [editBio, setEditBio] = useState('')
   const [saving, setSaving] = useState(false)
+  const [profileSaved, setProfileSaved] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -46,11 +47,30 @@ export default function MoyKabinetPage() {
       if (!u) { router.replace('/'); return }
       setUserId(u.id)
 
-      const { data: p } = await supabase.from('profiles').select('*').eq('id', u.id).single()
+      // P1 profile reliability: use maybeSingle + repair fallback instead of brittle .single()
+      let { data: p } = await supabase.from('profiles').select('*').eq('id', u.id).maybeSingle()
+      if (!p) {
+        // fallback upsert to guarantee row (idempotent, respects RLS for owner)
+        const display_name = (u as any).user_metadata?.display_name || u.email?.split('@')[0] || 'Пользователь' // eslint-disable-line @typescript-eslint/no-explicit-any
+        await supabase.from('profiles').upsert({
+          id: u.id,
+          display_name,
+          bio: '',
+          avatar_url: '',
+          role: 'user' as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+          articles_count: 0,
+        }, { onConflict: 'id' })
+        const { data: repaired } = await supabase.from('profiles').select('*').eq('id', u.id).maybeSingle()
+        p = repaired
+      }
       if (p) {
         setProfile(p as Profile)
         setEditName((p as Profile).display_name || '')
         setEditBio((p as Profile).bio || '')
+      } else {
+        // last resort default so UI doesn't break
+        setProfile({ id: u.id, display_name: u.email?.split('@')[0] || 'Пользователь', bio: '', avatar_url: '', role: 'user', articles_count: 0 } as Profile)
+        setEditName(u.email?.split('@')[0] || 'Пользователь')
       }
 
       const { data: s } = await supabase
@@ -81,6 +101,8 @@ export default function MoyKabinetPage() {
     setProfile((prev) => prev ? { ...prev, display_name: editName, bio: editBio } : prev)
     setSaving(false)
     setEditMode(false)
+    setProfileSaved(true)
+    setTimeout(() => setProfileSaved(false), 1800)
   }
 
   const removeSaved = async (slug: string) => {
@@ -164,6 +186,11 @@ export default function MoyKabinetPage() {
                 <button onClick={() => setEditMode(true)} style={outlineBtnStyle}>
                   Редактировать
                 </button>
+                {profileSaved && (
+                  <span style={{ marginLeft: '0.6rem', color: '#27ae60', fontSize: '0.8rem', fontWeight: 600 }}>
+                    Сохранено!
+                  </span>
+                )}
               </div>
             </>
           )}

@@ -20,16 +20,41 @@ export default function AuthButton() {
     let alive = true
     const sb = getSupabase()
 
-    const loadProfile = (userId: string) => {
+    const loadProfile = async (userId: string, user?: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+
       setProfile(null)
-      sb
+      const { data: p } = await sb
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single()
-        .then(({ data: p }) => {
-          if (alive && p) setProfile(p as Profile)
-        }, () => {})
+        .maybeSingle()
+      if (p) {
+        setProfile(p as Profile)
+        return
+      }
+      // P1 profile reliability fallback: create missing profile row after auth
+      if (user) {
+        const display_name = user.user_metadata?.display_name || user.email?.split('@')[0] || 'Пользователь'
+        const { error: upErr } = await sb
+          .from('profiles')
+          .upsert({
+            id: userId,
+            display_name,
+            bio: '',
+            avatar_url: '',
+            role: 'user' as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+
+            articles_count: 0,
+          }, { onConflict: 'id' })
+        if (!upErr) {
+          const { data: newP } = await sb
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .maybeSingle()
+          if (newP && alive) setProfile(newP as Profile)
+        }
+      }
     }
 
     sb.auth.getUser().then(({ data }) => {
@@ -37,7 +62,7 @@ export default function AuthButton() {
       const u = data.user
       setUser(u ?? null)
       if (u) {
-        loadProfile(u.id)
+        loadProfile(u.id, u).catch(() => {})
         // Catch any local favorites from before this page load / previous anon session
         migrateLocalFavoritesToServer(u.id).catch(() => {})
       }
@@ -48,7 +73,7 @@ export default function AuthButton() {
       const u = session?.user ?? null
       setUser(u)
       if (u) {
-        loadProfile(u.id)
+        loadProfile(u.id, u).catch(() => {})
         // Migrate pending local favorites (covers post-login, recovery, cross-tab, etc.)
         migrateLocalFavoritesToServer(u.id).catch(() => {})
       } else {
@@ -111,7 +136,7 @@ export default function AuthButton() {
     )
   }
 
-  const displayName = profile?.display_name || user.email?.split('@')[0] || 'User'
+  const displayName = profile?.display_name || user.email?.split('@')[0] || 'Пользователь'
   const initials = displayName.slice(0, 2).toUpperCase()
 
   return (
