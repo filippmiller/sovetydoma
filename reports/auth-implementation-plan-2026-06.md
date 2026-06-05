@@ -72,7 +72,21 @@
 
 ## Phase 2 — Registration UX Rewrite
 
-**Must haves:**
+**P1.2 completed in this slice (vertical):**
+- Used the new PasswordInput.
+- Added confirm password to registration.
+- Enforce min 8 characters (with handler validation).
+- Added password hint/validation on registration (placeholder, explicit checks for length/mismatch, Russian errors).
+- Added required terms/privacy checkbox (links to /terms and /privacy; follow-up bead for creating the actual pages without inventing legal text).
+- Button text kept "Зарегистрироваться".
+- Mapped common Supabase errors to readable Russian (in handleRegister).
+- Kept email confirmation screen behavior.
+- Updated reports/auth-implementation-plan-2026-06.md and beads.
+- Commit: feat(auth): harden registration form
+- Gates run before commit.
+- No unrelated files touched.
+
+**Must haves (remaining for full P1.2 if more needed):**
 - Name, Email, Password (show/hide), Confirm password.
 - Visible password requirements (min 8, case, number/symbol recommendation, reject very weak).
 - Terms + privacy consent checkbox (required) with links.

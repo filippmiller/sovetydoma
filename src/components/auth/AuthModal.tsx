@@ -26,6 +26,9 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const [success, setSuccess] = useState<'welcome' | 'verify' | 'forgot-sent' | 'reset-success' | null>(null)
   const [mode, setMode] = useState<'login' | 'register' | 'forgot' | 'reset'>('login')
   const [resendCooldown, setResendCooldown] = useState(0)
+  // For P1.2 registration confirm password
+  // reset confirm is in reset form state if needed; for register:
+  const [confirmRegisterPassword, setConfirmRegisterPassword] = useState('')
   const overlayRef = useRef<HTMLDivElement>(null)
 
   // P0 reset flow state (kept minimal for this vertical slice)
@@ -112,6 +115,9 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setError('')
     setInfo('')
     if (!displayName.trim()) { setError('Введите имя пользователя'); return }
+    if (password.length < 8) { setError('Пароль должен быть не короче 8 символов'); return }
+    if (password !== confirmRegisterPassword) { setError('Пароли не совпадают'); return }
+    // P1.2 terms checkbox is required (UI enforced below)
     const emailRedirectTo = getAuthRedirectTo()
     setLoading(true)
     const { error: err } = await supabase.auth.signUp({
@@ -123,8 +129,21 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       },
     })
     setLoading(false)
-    if (err) { setError(err.message); return }
+    if (err) {
+      // Map common Supabase errors to readable Russian (P1.2)
+      let msg = err.message
+      if (msg.includes('already registered') || msg.includes('User already registered')) {
+        msg = 'Email уже зарегистрирован. Войдите или восстановите пароль.'
+      } else if (msg.includes('Password should be at least')) {
+        msg = 'Пароль должен быть не короче 8 символов.'
+      } else if (msg.includes('Invalid email')) {
+        msg = 'Неверный формат email.'
+      }
+      setError(msg)
+      return
+    }
     setSuccess('verify')
+    setConfirmRegisterPassword('')
   }
 
   const resendConfirmation = async () => {
@@ -655,6 +674,29 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                 minLength={8}
                 required
               />
+            </div>
+            <div>
+              <label style={labelStyle}>Повторите пароль</label>
+              <PasswordInput
+                value={confirmRegisterPassword}
+                onChange={(e) => setConfirmRegisterPassword(e.target.value)}
+                autoComplete="new-password"
+                placeholder="Повторите пароль"
+                minLength={8}
+                required
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.82rem', color: '#555' }}>
+              <input
+                type="checkbox"
+                id="terms"
+                required
+                style={{ marginTop: '0.2rem' }}
+                onChange={() => { /* UI required, form submit will have native validation */ }}
+              />
+              <label htmlFor="terms" style={{ lineHeight: 1.3 }}>
+                Я согласен(а) с <a href="/terms" target="_blank" style={{ color: '#c0392b' }}>Условиями использования</a> и <a href="/privacy" target="_blank" style={{ color: '#c0392b' }}>Политикой конфиденциальности</a>.
+              </label>
             </div>
             {error && <p style={errorStyle}>{error}</p>}
             {info && <p style={successTextStyle}>{info}</p>}
