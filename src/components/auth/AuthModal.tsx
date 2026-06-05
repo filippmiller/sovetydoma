@@ -22,7 +22,8 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const [info, setInfo] = useState('')
   const [loading, setLoading] = useState(false)
   const [resending, setResending] = useState(false)
-  const [success, setSuccess] = useState<'welcome' | 'verify' | null>(null)
+  const [success, setSuccess] = useState<'welcome' | 'verify' | 'forgot-sent' | null>(null)
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login')
   const overlayRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       setInfo('')
       setSuccess(null)
       setTab(initialTab)
+      setMode('login')
     }, 0)
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -108,8 +110,49 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setInfo('Письмо подтверждения отправлено повторно. Проверьте входящие и спам.')
   }
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email.trim()) {
+      setError('Введите email')
+      return
+    }
+    setError('')
+    setInfo('')
+    setLoading(true)
+
+    const redirectTo = getAuthRedirectTo() // will land on cabinet; client can pick up recovery session later
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo,
+    })
+
+    setLoading(false)
+    if (err) {
+      // Do not leak whether the email exists
+      setError('Не удалось отправить письмо. Попробуйте позже.')
+      return
+    }
+
+    setSuccess('forgot-sent')
+  }
+
   const switchTab = (t: 'login' | 'register') => {
     setTab(t)
+    setMode('login')
+    setError('')
+    setInfo('')
+    setSuccess(null)
+  }
+
+  const goToForgot = () => {
+    setMode('forgot')
+    setTab('login') // keep last email if user typed it
+    setError('')
+    setInfo('')
+    setSuccess(null)
+  }
+
+  const goBackToLogin = () => {
+    setMode('login')
     setError('')
     setInfo('')
     setSuccess(null)
@@ -180,7 +223,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
         {/* Title */}
         <div style={{ marginBottom: '0.35rem', marginTop: '0.5rem' }}>
           <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a' }}>
-            {tab === 'login' ? 'Вход в СоветыДома' : 'Регистрация'}
+            {mode === 'forgot' ? 'Восстановить пароль' : (tab === 'login' ? 'Вход в СоветыДома' : 'Регистрация')}
           </h2>
         </div>
 
@@ -188,43 +231,47 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
         <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.85rem', color: reason ? '#c0392b' : '#888', fontWeight: reason ? 600 : 400 }}>
           {reason
             ? reason
-            : tab === 'login'
-              ? 'Сохраняйте статьи, оставляйте комментарии'
-              : 'Присоединяйтесь — это бесплатно'}
+            : mode === 'forgot'
+              ? 'Мы отправим ссылку для сброса пароля, если такой аккаунт существует'
+              : tab === 'login'
+                ? 'Сохраняйте статьи, оставляйте комментарии'
+                : 'Присоединяйтесь — это бесплатно'}
         </p>
 
-        {/* Tab switcher — pill style */}
-        <div style={{
-          display: 'flex',
-          background: '#f5f3f0',
-          borderRadius: '10px',
-          padding: '4px',
-          marginBottom: '1.5rem',
-          gap: '4px',
-        }}>
-          {(['login', 'register'] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => switchTab(t)}
-              style={{
-                flex: 1,
-                padding: '0.5rem 0',
-                fontSize: '0.88rem',
-                fontWeight: 700,
-                border: 'none',
-                borderRadius: '7px',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'all 0.2s',
-                background: tab === t ? '#fff' : 'transparent',
-                color: tab === t ? '#c0392b' : '#888',
-                boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-              }}
-            >
-              {t === 'login' ? 'Войти' : 'Зарегистрироваться'}
-            </button>
-          ))}
-        </div>
+        {/* Tab switcher — pill style (hidden during forgot flow) */}
+        {mode !== 'forgot' && (
+          <div style={{
+            display: 'flex',
+            background: '#f5f3f0',
+            borderRadius: '10px',
+            padding: '4px',
+            marginBottom: '1.5rem',
+            gap: '4px',
+          }}>
+            {(['login', 'register'] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => switchTab(t)}
+                style={{
+                  flex: 1,
+                  padding: '0.5rem 0',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  border: 'none',
+                  borderRadius: '7px',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.2s',
+                  background: tab === t ? '#fff' : 'transparent',
+                  color: tab === t ? '#c0392b' : '#888',
+                  boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+                }}
+              >
+                {t === 'login' ? 'Войти' : 'Зарегистрироваться'}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Success states */}
         {success === 'welcome' && (
@@ -263,8 +310,30 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
           </div>
         )}
 
+        {success === 'forgot-sent' && (
+          <div style={{
+            background: '#f0fff4',
+            border: '1.5px solid #b2dfdb',
+            borderRadius: '10px',
+            padding: '1.25rem',
+            textAlign: 'center',
+            color: '#1e8449',
+          }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>📧</div>
+            <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>
+              Если аккаунт с таким email существует, мы отправили инструкции по восстановлению пароля.
+            </p>
+            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.82rem', color: '#555' }}>
+              Проверьте почту (включая папку «Спам»).
+            </p>
+            <button type="button" onClick={goBackToLogin} style={{ ...secondaryBtnStyle, marginTop: '1rem', width: '100%' }}>
+              Вернуться к входу
+            </button>
+          </div>
+        )}
+
         {/* Login form */}
-        {!success && tab === 'login' && (
+        {!success && tab === 'login' && mode === 'login' && (
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <label style={labelStyle}>Email</label>
@@ -282,7 +351,24 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
               </div>
             </div>
             <div>
-              <label style={labelStyle}>Пароль</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <label style={labelStyle}>Пароль</label>
+                <button
+                  type="button"
+                  onClick={goToForgot}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#c0392b',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                >
+                  Забыли пароль?
+                </button>
+              </div>
               <div style={inputWrapStyle}>
                 <span style={iconStyle}>🔒</span>
                 <input
@@ -299,13 +385,45 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             {error && <p style={errorStyle}>{error}</p>}
             {info && <p style={successTextStyle}>{info}</p>}
             <button type="submit" disabled={loading} style={btnStyle}>
-              {loading ? 'Входим…' : 'Продолжить'}
+              {loading ? 'Входим…' : 'Войти'}
             </button>
             {error.includes('Email ещё не подтверждён') && (
               <button type="button" onClick={resendConfirmation} disabled={resending} style={{ ...secondaryBtnStyle }}>
                 {resending ? 'Отправляем...' : 'Отправить письмо подтверждения ещё раз'}
               </button>
             )}
+          </form>
+        )}
+
+        {/* Forgot password request form (P0) */}
+        {!success && tab === 'login' && mode === 'forgot' && (
+          <form onSubmit={handleForgotPassword} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <label style={labelStyle}>Email</label>
+              <div style={inputWrapStyle}>
+                <span style={iconStyle}>📧</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.82rem', color: '#666', lineHeight: 1.4 }}>
+              Введите email, и если аккаунт существует, мы отправим ссылку для восстановления пароля.
+            </p>
+            {error && <p style={errorStyle}>{error}</p>}
+            {info && <p style={successTextStyle}>{info}</p>}
+            <button type="submit" disabled={loading} style={btnStyle}>
+              {loading ? 'Отправляем…' : 'Отправить инструкции'}
+            </button>
+            <button type="button" onClick={goBackToLogin} style={secondaryBtnStyle}>
+              Назад к входу
+            </button>
           </form>
         )}
 
@@ -360,7 +478,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             {error && <p style={errorStyle}>{error}</p>}
             {info && <p style={successTextStyle}>{info}</p>}
             <button type="submit" disabled={loading} style={btnStyle}>
-              {loading ? 'Регистрируем…' : 'Продолжить'}
+              {loading ? 'Регистрируем…' : 'Зарегистрироваться'}
             </button>
           </form>
         )}
