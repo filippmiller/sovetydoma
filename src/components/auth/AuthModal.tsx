@@ -24,6 +24,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const [resending, setResending] = useState(false)
   const [success, setSuccess] = useState<'welcome' | 'verify' | 'forgot-sent' | 'reset-success' | null>(null)
   const [mode, setMode] = useState<'login' | 'register' | 'forgot' | 'reset'>('login')
+  const [resendCooldown, setResendCooldown] = useState(0)
   const overlayRef = useRef<HTMLDivElement>(null)
 
   // P0 reset flow state (kept minimal for this vertical slice)
@@ -77,6 +78,13 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       subscription.unsubscribe()
     }
   }, [isOpen])
+
+  // Cooldown timer for resend (P0.2)
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const t = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000)
+    return () => clearTimeout(t)
+  }, [resendCooldown])
 
   // Portal target — only available in the browser. Combined with the
   // `if (!isOpen) return null` guard below, this never runs during SSR.
@@ -141,6 +149,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       return
     }
     setInfo('Письмо подтверждения отправлено повторно. Проверьте входящие и спам.')
+    setResendCooldown(60) // P0.2 cooldown
   }
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -362,15 +371,48 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
             color: '#1e8449',
           }}>
             <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>📧</div>
-            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>
-              Проверьте почту для подтверждения
+            <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>
+              Проверьте почту для подтверждения аккаунта
             </p>
             <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.82rem', color: '#555' }}>
-              Мы отправили письмо на {email}
+              Мы отправили письмо на <strong>{email}</strong>. Перейдите по ссылке в письме.
             </p>
-            <button type="button" onClick={resendConfirmation} disabled={resending} style={{ ...btnStyle, marginTop: '1rem', width: '100%' }}>
-              {resending ? 'Отправляем...' : 'Отправить письмо ещё раз'}
+            <p style={{ margin: '0.3rem 0 0.6rem 0', fontSize: '0.78rem', color: '#666' }}>
+              Если письма нет несколько минут — проверьте папку «Спам».
+            </p>
+            <button
+              type="button"
+              onClick={resendConfirmation}
+              disabled={resending || resendCooldown > 0}
+              style={{ ...btnStyle, marginTop: '0.5rem', width: '100%', opacity: (resending || resendCooldown > 0) ? 0.6 : 1 }}
+            >
+              {resending ? 'Отправляем...' : (resendCooldown > 0 ? `Отправить ещё раз (${resendCooldown}с)` : 'Отправить письмо ещё раз')}
             </button>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.6rem' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  // Allow editing email: go back to register form with current email
+                  setSuccess(null)
+                  setTab('register')
+                  setMode('login')
+                }}
+                style={{ ...secondaryBtnStyle, flex: 1, fontSize: '0.85rem' }}
+              >
+                Изменить email
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSuccess(null)
+                  setMode('login')
+                  setTab('login')
+                }}
+                style={{ ...secondaryBtnStyle, flex: 1, fontSize: '0.85rem' }}
+              >
+                Назад к входу
+              </button>
+            </div>
             {info && <p style={{ ...successTextStyle, marginTop: '0.7rem' }}>{info}</p>}
             {error && <p style={{ ...errorStyle, marginTop: '0.7rem' }}>{error}</p>}
           </div>
