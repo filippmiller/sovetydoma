@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '@/lib/supabase'
 import PasswordInput from './PasswordInput'
-import { migrateLocalFavoritesToServer, getPendingAuthIntent, clearPendingAuthIntent, processPendingFavoriteIntent } from '@/lib/favorites'
+import { migrateLocalFavoritesToServer, processPendingFavoriteIntent } from '@/lib/favorites'
 
 function isValidEmail(v: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
@@ -147,13 +147,6 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     //   Auth state listeners (AuthButton + FavoriteButton/Card) update header/hearts live.
     const mig = await migrateLocalFavoritesToServer()
     await processPendingFavoriteIntent().catch(() => {})
-
-    const intent = getPendingAuthIntent()
-    if (intent && intent.action === 'favorite') {
-      // Marker is cleared inside processPending on success; if still here, keep for retry.
-      // We do not force navigation here — we are already on the originating page (modal was opened from it).
-    }
-    clearPendingAuthIntent() // safe no-op if already cleared or none
 
     if (mig.failed.length > 0) {
       setInfo(`Не удалось синхронизировать ${mig.failed.length} из избранного. Они сохранены локально и появятся после следующей синхронизации.`)

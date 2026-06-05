@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -41,6 +41,7 @@ export default function MoyKabinetPage() {
   const [saving, setSaving] = useState(false)
   const [profileSaved, setProfileSaved] = useState(false)
   const [loadingError, setLoadingError] = useState<string | null>(null)
+  const profileSavedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -104,7 +105,12 @@ export default function MoyKabinetPage() {
         }
       }
     })()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+      if (profileSavedTimerRef.current) {
+        clearTimeout(profileSavedTimerRef.current)
+      }
+    }
   }, [router])
 
   const saveProfile = async () => {
@@ -118,7 +124,13 @@ export default function MoyKabinetPage() {
     setSaving(false)
     setEditMode(false)
     setProfileSaved(true)
-    setTimeout(() => setProfileSaved(false), 1800)
+    if (profileSavedTimerRef.current) {
+      clearTimeout(profileSavedTimerRef.current)
+    }
+    profileSavedTimerRef.current = setTimeout(() => {
+      setProfileSaved(false)
+      profileSavedTimerRef.current = null
+    }, 1800)
   }
 
   const removeSaved = async (slug: string) => {
@@ -210,14 +222,16 @@ export default function MoyKabinetPage() {
                     {profile?.role === 'admin' ? '🛡 Администратор' : profile?.role === 'moderator' ? '⚡ Модератор' : '👤 Пользователь'}
                   </span>
                 </div>
-                <button onClick={() => setEditMode(true)} style={outlineBtnStyle}>
-                  Редактировать
-                </button>
-                {profileSaved && (
-                  <span style={{ marginLeft: '0.6rem', color: '#27ae60', fontSize: '0.8rem', fontWeight: 600 }}>
-                    Сохранено!
-                  </span>
-                )}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.35rem' }}>
+                  <button onClick={() => setEditMode(true)} style={outlineBtnStyle}>
+                    Редактировать
+                  </button>
+                  {profileSaved && (
+                    <span style={{ color: '#27ae60', fontSize: '0.8rem', fontWeight: 600 }}>
+                      Сохранено!
+                    </span>
+                  )}
+                </div>
               </div>
             </>
           )}
