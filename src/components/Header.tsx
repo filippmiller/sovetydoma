@@ -429,6 +429,11 @@ export default function Header() {
           }
           .header-actions {
             grid-column: 2;
+            gap: 0.3rem;
+            min-width: 0;
+          }
+          .header-icon-link {
+            display: none;
           }
         }
       `}</style>
