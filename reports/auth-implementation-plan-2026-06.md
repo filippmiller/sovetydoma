@@ -109,6 +109,28 @@
 
 ## Phase 5 — Tests
 
+**Verification performed for this P0 completion slice (2026-06):**
+- `pnpm exec tsc --noEmit --skipLibCheck` — clean (no errors on auth files).
+- `pnpm exec eslint src/components/auth/AuthModal.tsx src/components/auth/AuthButton.tsx` — clean.
+- Code review: recovery listener, form, validation, updateUser, success states, no enumeration.
+- Manual code path simulation for reset form (states, handlers).
+- Full browser E2E with real reset email link **not yet possible** in this environment without:
+  1. Sending a real reset email (requires working SMTP + recovery template in Supabase dashboard).
+  2. Clicking the link and landing with tokens.
+
+**Recommended manual browser QA steps (owner/agent with access):**
+1. In dev or prod: open site, click Войти → login tab → "Забыли пароль?" → enter known test/QA email → success non-enumerating message.
+2. (Requires dashboard) Trigger or wait for reset email, click the link.
+3. Should land (on /moy-kabinet/ or wherever), auth modal should open or switch to "Новый пароль" form (two fields + show/hide).
+4. Enter matching passwords >=8 chars → submit → success "Пароль успешно изменён" + buttons.
+5. Check console for no Supabase/auth errors.
+6. Verify old password no longer works, new one does.
+7. Test mismatch / short password errors are shown in Russian.
+
+Record results in `reports/auth-implementation-results-2026-06.md` when done.
+
+## Phase 6 — Verification & Final Report
+
 - Component/unit for new validation + PasswordInput (if test runner allows easy React testing).
 - Focused E2E-style manual + scripted checks (document commands).
 - Update `reports/test-accounts-and-seed-data.md` for any QA accounts created during work (prefix + explicit delete instruction).
