@@ -19,10 +19,10 @@ export default function CardShareButton({ url, title, compact = true }: Props) {
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({ title, url })
-        return
       } catch {
-        // cancelled or not supported
+        // User cancelled or the platform refused the native share.
       }
+      return
     }
 
     // fallback copy

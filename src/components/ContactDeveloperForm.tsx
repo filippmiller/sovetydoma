@@ -18,27 +18,23 @@ const TOPICS = [
   'Предложить тему',
   'Другое',
 ]
+const DEFAULT_TOPIC = TOPICS[0]
+const ADVERTISING_TOPIC = TOPICS[2]
 
 export default function ContactDeveloperForm({ initialTopic }: { initialTopic?: string }) {
+  const searchParams = useSearchParams()
   const [challenge, setChallenge] = useState<Challenge | null>(null)
   const [startedAt] = useState(() => Date.now())
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const [selectedTopic, setSelectedTopic] = useState<string>(() => {
+    const topicParam = searchParams.get('topic')
+    if (topicParam === 'advertising' || topicParam === 'advert') return ADVERTISING_TOPIC
     if (initialTopic && TOPICS.includes(initialTopic)) return initialTopic
-    return 'Вопрос по статье'
+    return DEFAULT_TOPIC
   })
 
   const canUseForm = useMemo(() => endpoint.length > 0, [])
-  const searchParams = useSearchParams()
-
-  // Preselect "Реклама и партнёрство" if ?topic=advertising (client-side for static export)
-  useEffect(() => {
-    const t = searchParams.get('topic')
-    if ((t === 'advertising' || t === 'advert') && selectedTopic !== 'Реклама и партнёрство') {
-      setSelectedTopic('Реклама и партнёрство')
-    }
-  }, [searchParams])
 
   useEffect(() => {
     if (!canUseForm) return

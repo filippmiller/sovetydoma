@@ -33,6 +33,21 @@ describe('category generators', () => {
     }
   })
 
+  it('includes generated article pagination pages in sitemap', () => {
+    const sitemap = fs.readFileSync(path.join(root, 'public', 'sitemap.xml'), 'utf8')
+    const articleDir = path.join(root, 'src', 'content', 'articles')
+    const articleCount = fs.readdirSync(articleDir).filter((file) => file.endsWith('.mdx')).length
+    const totalPages = Math.max(1, Math.ceil(articleCount / 24))
+
+    for (let page = 2; page <= totalPages; page++) {
+      assert.match(
+        sitemap,
+        new RegExp(`<loc>https://1001sovet\\.ru\\/articles\\/page\\/${page}\\/<\\/loc>`),
+        `missing /articles/page/${page}/ in sitemap`,
+      )
+    }
+  })
+
   it('robots.txt allows * and does not blanket-disallow root', () => {
     const robots = fs.readFileSync(path.join(root, 'public', 'robots.txt'), 'utf8')
     assert.match(robots, /User-agent:\s*\*/)
