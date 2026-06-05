@@ -129,6 +129,8 @@ export default function Header() {
           z-index: 100;
         }
         .site-header-inner {
+          box-sizing: border-box;
+          width: 100%;
           max-width: 1200px;
           margin: 0 auto;
           padding: 0.45rem 1rem;
