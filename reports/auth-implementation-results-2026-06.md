@@ -104,3 +104,40 @@ Run full recommended browser QA when possible, then produce/update results repor
 Update HANDOFF if exists.
 
 Do not deploy without owner command.
+
+## Post-audit autonomous fixes (browser QA verification June 2026)
+
+After independent verification of the browser agent + Codex audit against current source + Supabase (see memory qa-audit-2026-06-browser-codex-findings-verified and clq notes):
+
+**Confirmed real & addressed autonomously (code-only, no dashboard dependency):**
+- P1 Favorites pre-login never reach cabinet / "on all devices" promise broken (clq + 0h3.7). Implemented full migration on login success + auth state + clear on logout. See commit fce02e94 + e79dc08b. New src/lib/favorites.ts. Buttons + izbrannoe updated to share reader.
+- English raw Supabase errors (esp. "Invalid login credentials"). Centralized mapAuthError + applied across login/register/resend/reset. Commit e79dc08b.
+- No success feedback after profile save. Added transient "Сохранено!" indicator. Commit 901a4bcd.
+- Logout leaves favorite hearts filled (privacy on shared device). clearLocalFavorites on signOut.
+- Cabinet "Загрузка" hang risk (no catch on getUser promise). Restructured to try/catch + error UI + cancelled guard + finally semantics. Commit e79dc08b.
+- Malformed email only native validation. Added isValidEmail + onBlur/submit guards + inline error under fields. Same commit.
+- /terms and /privacy 404s (broken reg form requirement). Created minimal safe placeholders with disclaimer. Same commit.
+
+**Already handled before this round (by prior slices):**
+- Profile guarantee + client repair (0h3.5 closed, DB trigger migration 20260606120000 + fallbacks in cabinet/AuthButton).
+- PasswordInput extracted, confirm pass, terms checkbox, basic registration hardening (0h3.6).
+- Reset + confirmation UX + cooldown (P0 slices).
+
+**Not autonomous / left for owner:**
+- Real email delivery + recovery link clicking (needs Supabase SMTP/templates + Mailcow + DNS + actual QA account tests).
+- Full browser E2E with the test account (password required, pending comments / test bio / saved articles cleanup in DB).
+- Applying the profile migration to prod Supabase (if not yet).
+- Broader "preserve intent" for comments / other actions (0h3.7 partially satisfied by favorites).
+- RLS version control / server proxies for UGC (separate beads 39y, gx3, xoq).
+- Turnstile on auth forms (0h3.9).
+
+**Commits in this round:**
+- fce02e94: favorites migration core (clq)
+- 901a4bcd: profile save feedback + username fallback
+- e79dc08b: loading harden + error mapper + email validation + legal pages
+
+**Beads closed in this work:** clq, 9k4 (polish), ih6 (cabinet loading), abr (error map), 0uj (email val), 55q (terms/privacy).
+
+See reports/browser-qa-verification-and-autonomous-fixes-2026-06.md for full item-by-item table.
+
+All changes: tsc clean, eslint clean, small focused slices, no unrelated files.
