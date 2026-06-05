@@ -267,7 +267,7 @@ const searchPageBootstrap = String.raw`
   const articles = categoryFilter ? allArticles.filter((article) => article.category === categoryFilter) : allArticles;
   const stops = new Set(['а','без','бы','в','во','для','до','за','и','из','или','как','ко','на','над','не','о','об','от','по','под','при','про','с','со','у','что','это']);
   const suffixes = ['ться','тся','ся','иями','ями','ами','ого','его','ому','ему','ыми','ими','иях','ах','ях','ов','ев','ей','ой','ый','ий','ая','яя','ое','ее','ые','ие','ую','юю','ом','ем','ам','ям','а','я','ы','и','у','ю','е','о'];
-  const colors = { kulinaria: '#e67e22', 'dom-i-uborka': '#27ae60', 'dacha-i-ogorod': '#16a085', layfkhaki: '#8e44ad', ekonomiya: '#2980b9', rybalka: '#555' };
+  const colors = { kulinaria: '#e67e22', 'dom-i-uborka': '#27ae60', 'dacha-i-ogorod': '#16a085', layfkhaki: '#8e44ad', ekonomiya: '#2980b9', rybalka: '#555', 'zdorovie-i-bezopasnost': '#c0392b', 'semya-i-deti': '#8e44ad', 'krasota-i-uhod': '#e91e63', 'otdyh-i-puteshestviya': '#2980b9', 'pokupki-i-tehnika': '#f39c12' };
 
   function norm(value) {
     return String(value || '').toLowerCase().replaceAll('ё', 'е').replace(/[^a-zа-я0-9\s-]+/g, ' ').replace(/\s+/g, ' ').trim();

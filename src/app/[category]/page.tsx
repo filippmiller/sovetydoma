@@ -9,6 +9,7 @@ import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath } from '@/lib/seo'
 const CATEGORY_EMOJI: Record<string, string> = {
   kulinaria: '🍲', 'dom-i-uborka': '🧹', 'dacha-i-ogorod': '🌱', layfkhaki: '💡', ekonomiya: '💰', rybalka: '🎣',
+  'zdorovie-i-bezopasnost': '🛡️', 'semya-i-deti': '👨‍👩‍👧‍👦', 'krasota-i-uhod': '🌸', 'otdyh-i-puteshestviya': '🧳', 'pokupki-i-tehnika': '📦',
 }
 
 interface Props { params: Promise<{ category: string }> }

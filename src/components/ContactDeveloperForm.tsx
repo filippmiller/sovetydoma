@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 type Challenge = {
   token: string
@@ -10,13 +11,34 @@ type Challenge = {
 
 const endpoint = (process.env.NEXT_PUBLIC_CONTACT_WORKER_URL || process.env.NEXT_PUBLIC_PHOTO_WORKER_URL || '').replace(/\/+$/, '')
 
-export default function ContactDeveloperForm() {
+const TOPICS = [
+  'Вопрос по статье',
+  'Ошибка в материале',
+  'Реклама и партнёрство',
+  'Предложить тему',
+  'Другое',
+]
+
+export default function ContactDeveloperForm({ initialTopic }: { initialTopic?: string }) {
   const [challenge, setChallenge] = useState<Challenge | null>(null)
   const [startedAt] = useState(() => Date.now())
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const [selectedTopic, setSelectedTopic] = useState<string>(() => {
+    if (initialTopic && TOPICS.includes(initialTopic)) return initialTopic
+    return 'Вопрос по статье'
+  })
 
   const canUseForm = useMemo(() => endpoint.length > 0, [])
+  const searchParams = useSearchParams()
+
+  // Preselect "Реклама и партнёрство" if ?topic=advertising (client-side for static export)
+  useEffect(() => {
+    const t = searchParams.get('topic')
+    if ((t === 'advertising' || t === 'advert') && selectedTopic !== 'Реклама и партнёрство') {
+      setSelectedTopic('Реклама и партнёрство')
+    }
+  }, [searchParams])
 
   useEffect(() => {
     if (!canUseForm) return
@@ -45,6 +67,10 @@ export default function ContactDeveloperForm() {
     setMessage('')
 
     try {
+      const topic = selectedTopic
+      const rawSubject = String(form.get('subject') || '')
+      const subject = rawSubject ? `[${topic}] ${rawSubject}` : `[${topic}] Без уточнения`
+
       const res = await fetch(`${endpoint}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,9 +79,10 @@ export default function ContactDeveloperForm() {
           startedAt,
           name: String(form.get('name') || ''),
           email: String(form.get('email') || ''),
-          subject: String(form.get('subject') || ''),
+          subject,
           body: String(form.get('body') || ''),
           website: String(form.get('website') || ''),
+          topic, // extra, worker may ignore if not expected
         }),
       })
       const data = await res.json().catch(() => ({}))
@@ -105,12 +132,29 @@ export default function ContactDeveloperForm() {
         </label>
 
         <label style={{ display: 'grid', gap: '0.35rem', fontWeight: 700, color: '#333' }}>
-          Тема
+          Тема обращения
+          <select
+            value={selectedTopic}
+            onChange={(e) => setSelectedTopic(e.target.value)}
+            style={inputStyle}
+            aria-label="Тема обращения"
+          >
+            {TOPICS.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+          <span style={{ fontSize: '0.78rem', color: '#777', fontWeight: 400 }}>
+            При выборе «Реклама и партнёрство» тема подставится автоматически.
+          </span>
+        </label>
+
+        <label style={{ display: 'grid', gap: '0.35rem', fontWeight: 700, color: '#333' }}>
+          Уточнение темы (необязательно)
           <input
             name="subject"
-            required
-            minLength={4}
+            minLength={0}
             maxLength={120}
+            placeholder="Коротко о чём (например: ошибка в расчётах или предложение по кешбэку)"
             style={inputStyle}
           />
         </label>

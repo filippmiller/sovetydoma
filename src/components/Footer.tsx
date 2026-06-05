@@ -69,9 +69,13 @@ export default function Footer() {
 
         <div style={{ borderTop: '1px solid #3a3a3a', paddingTop: '1.1rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.8rem', color: '#777' }}>
           <span>© {year} СоветыДома. Все права защищены.</span>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/about" style={{ color: '#999', textDecoration: 'none' }}>О сайте</Link>
-            <Link href="/contact" style={{ color: '#999', textDecoration: 'none' }}>Связаться с разработчиком</Link>
+            <Link href="/advert/" style={{ color: '#999', textDecoration: 'none' }}>Реклама</Link>
+            <Link href="/contact" style={{ color: '#999', textDecoration: 'none' }}>Контакты</Link>
+            <Link href="/terms/" style={{ color: '#999', textDecoration: 'none' }}>Условия</Link>
+            <Link href="/privacy/" style={{ color: '#999', textDecoration: 'none' }}>Конфиденциальность</Link>
+            <Link href="/cookies/" style={{ color: '#999', textDecoration: 'none' }}>Cookies</Link>
             <Link href="/feed.xml" style={{ color: '#999', textDecoration: 'none' }}>RSS</Link>
           </div>
         </div>

@@ -56,6 +56,11 @@ export const CATEGORY_EMOJI: Record<string, string> = {
   layfkhaki: '💡',
   ekonomiya: '💰',
   rybalka: '🎣',
+  'zdorovie-i-bezopasnost': '🛡️',
+  'semya-i-deti': '👨‍👩‍👧‍👦',
+  'krasota-i-uhod': '🌸',
+  'otdyh-i-puteshestviya': '🧳',
+  'pokupki-i-tehnika': '📦',
 }
 
 // Category color map
@@ -66,4 +71,9 @@ export const CATEGORY_COLOR: Record<string, string> = {
   layfkhaki: '#8e44ad',
   ekonomiya: '#2980b9',
   rybalka: '#2c7da0',
+  'zdorovie-i-bezopasnost': '#c0392b',
+  'semya-i-deti': '#8e44ad',
+  'krasota-i-uhod': '#e91e63',
+  'otdyh-i-puteshestviya': '#2980b9',
+  'pokupki-i-tehnika': '#f39c12',
 }

@@ -16,6 +16,12 @@ const CATEGORY_LABELS: Record<string, string> = {
   'dacha-i-ogorod': 'Дача и огород',
   layfkhaki: 'Лайфхаки',
   ekonomiya: 'Экономия',
+  rybalka: 'Рыбалка',
+  'zdorovie-i-bezopasnost': 'Здоровье и безопасность',
+  'semya-i-deti': 'Семья и дети',
+  'krasota-i-uhod': 'Красота и уход',
+  'otdyh-i-puteshestviya': 'Отдых и путешествия',
+  'pokupki-i-tehnika': 'Покупки и техника',
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -24,6 +30,12 @@ const CATEGORY_COLORS: Record<string, string> = {
   'dacha-i-ogorod': '#16a085',
   layfkhaki: '#8e44ad',
   ekonomiya: '#2980b9',
+  rybalka: '#2c7da0',
+  'zdorovie-i-bezopasnost': '#c0392b',
+  'semya-i-deti': '#8e44ad',
+  'krasota-i-uhod': '#e91e63',
+  'otdyh-i-puteshestviya': '#2980b9',
+  'pokupki-i-tehnika': '#f39c12',
 }
 
 function MetaRow({ label, value }: { label: string; value: React.ReactNode }) {

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getArticle, getAllSlugs, getAllArticles, CATEGORIES } from '@/lib/articles'
+import { getArticle, getAllSlugs, getAllArticles, CATEGORIES, LEGACY_ARTICLE_MOVES } from '@/lib/articles'
 import Breadcrumb from '@/components/Breadcrumb'
 import RelatedArticles from '@/components/RelatedArticles'
 import MoreArticles from '@/components/MoreArticles'
@@ -40,15 +40,36 @@ import { getMoreInterestingArticles, getSimilarArticles } from '@/lib/article-re
 
 interface Props { params: Promise<{ category: string; slug: string }> }
 
-export async function generateStaticParams() { return getAllSlugs() }
+export async function generateStaticParams() {
+  const current = getAllSlugs()
+  // Include legacy paths for moved articles so they can serve soft-redirects instead of hard 404
+  const legacy = Object.entries(LEGACY_ARTICLE_MOVES).map(([slug, m]) => ({ category: m.oldCategory, slug }))
+  // Dedupe just in case
+  const seen = new Set(current.map((s) => `${s.category}/${s.slug}`))
+  const extras = legacy.filter((s) => !seen.has(`${s.category}/${s.slug}`))
+  return [...current, ...extras]
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, slug } = await params
-  const article = getArticle(category, slug)
+  let article = getArticle(category, slug)
+  let isLegacy = false
+  let canonicalOverride: string | null = null
+  if (!article) {
+    const move = LEGACY_ARTICLE_MOVES[slug]
+    if (move && move.oldCategory === category) {
+      const candidate = getArticle(move.newCategory, slug)
+      if (candidate) {
+        article = candidate
+        isLegacy = true
+        canonicalOverride = `${SITE_URL}/${move.newCategory}/${slug}/`
+      }
+    }
+  }
   if (!article) return {}
   const { frontmatter: fm } = article
-  const cat = CATEGORIES[category]
-  const url = articleCanonicalUrl(fm)
+  const cat = CATEGORIES[category] || CATEGORIES[article.frontmatter.category]
+  const url = canonicalOverride || articleCanonicalUrl(fm)
   const imageUrl = articleImageUrl(fm)
   const description = truncateForMeta(fm.description)
   return {
@@ -58,7 +79,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     keywords: fm.tags.join(', '),
     authors: [{ name: SITE_NAME, url: SITE_URL }],
     category: cat?.name || fm.categoryName,
-    robots: {
+    robots: isLegacy ? { index: false, follow: true } : {
       index: true,
       follow: true,
       googleBot: {
@@ -91,8 +112,41 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ArticlePage({ params }: Props) {
   const { category, slug } = await params
-  const article = getArticle(category, slug)
+  let article = getArticle(category, slug)
+  let legacyRedirectTo: string | null = null
+  if (!article) {
+    const move = LEGACY_ARTICLE_MOVES[slug]
+    if (move && move.oldCategory === category) {
+      const candidate = getArticle(move.newCategory, slug)
+      if (candidate) {
+        article = candidate
+        legacyRedirectTo = `/${move.newCategory}/${slug}/`
+      }
+    }
+  }
   if (!article) notFound()
+
+  if (legacyRedirectTo) {
+    const newCatName = CATEGORIES[article.frontmatter.category]?.name || article.frontmatter.categoryName || article.frontmatter.category
+    return (
+      <div style={{ maxWidth: '680px', margin: '4rem auto', padding: '2rem 1rem', textAlign: 'center' }}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔄</div>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>Статья перемещена</h1>
+        <p style={{ color: '#555', marginBottom: '1rem' }}>
+          Этот материал теперь в разделе <strong>«{newCatName}»</strong>.
+        </p>
+        <p style={{ marginBottom: '1.5rem' }}>
+          <a href={legacyRedirectTo} style={{ color: '#c0392b', fontWeight: 700, textDecoration: 'underline' }}>
+            Перейти к актуальной версии статьи →
+          </a>
+        </p>
+        <p style={{ fontSize: '0.85rem', color: '#888' }}>
+          Если пришли по старой ссылке — обновите закладку. Новый адрес: <code>{legacyRedirectTo}</code>
+        </p>
+        <script dangerouslySetInnerHTML={{ __html: `setTimeout(function(){ if (location.pathname !== ${JSON.stringify(legacyRedirectTo)}) location.replace(${JSON.stringify(legacyRedirectTo)}); }, 900);` }} />
+      </div>
+    )
+  }
 
   const { frontmatter: fm, content, wordCount } = article
   const cat = CATEGORIES[category]
@@ -299,6 +353,9 @@ export default async function ArticlePage({ params }: Props) {
                 <FavoriteButton slug={slug} title={fm.title} />
               </div>
             </header>
+
+            {/* Compact share right after meta (before image/lead content) */}
+            <SharePanel url={url} title={fm.title} variant="compact" />
 
             {visibleImageUrl && (
               <figure style={{

@@ -4,7 +4,7 @@
     "title": "Как постелить агроволокно на грядки под клубнику весной"
   },
   "apteka-dlya-dachi": {
-    "category": "dacha-i-ogorod",
+    "category": "zdorovie-i-bezopasnost",
     "title": "Аптечка для дачи: что держать под рукой летом"
   },
   "baklazhany-v-teplitse": {
@@ -12,15 +12,15 @@
     "title": "Баклажаны в теплице: от рассады до сбора урожая за один сезон"
   },
   "bezopasnaya-zaryadka-telefona-nochyu": {
-    "category": "layfkhaki",
+    "category": "zdorovie-i-bezopasnost",
     "title": "Безопасная зарядка телефона ночью: что важно знать дома"
   },
   "bezopasnost-doma-dlya-rebenka": {
-    "category": "layfkhaki",
+    "category": "zdorovie-i-bezopasnost",
     "title": "Безопасность дома для ребёнка: что проверить в первую очередь"
   },
   "bezopasnost-na-ldu-rybalka": {
-    "category": "rybalka",
+    "category": "zdorovie-i-bezopasnost",
     "title": "Безопасность на льду: правила для зимней рыбалки"
   },
   "bliny-na-moloke": {
@@ -140,7 +140,7 @@
     "title": "Домашний творог из молока: простой способ без лишней кислоты"
   },
   "domashnyaya-aptechka-bez-lishnego": {
-    "category": "layfkhaki",
+    "category": "zdorovie-i-bezopasnost",
     "title": "Как быстро собрать тревожную домашнюю аптечку без лишнего"
   },
   "donnaya-snast-svoimi-rukami": {
@@ -148,7 +148,7 @@
     "title": "Донная снасть своими руками: простой рабочий монтаж"
   },
   "dorozhnaya-sumka-za-20-minut": {
-    "category": "layfkhaki",
+    "category": "otdyh-i-puteshestviya",
     "title": "Как собрать дорожную сумку за 20 минут и ничего не забыть"
   },
   "dozhdevaya-voda-dlya-poliva": {
@@ -220,7 +220,7 @@
     "title": "Как экономить на ремонте квартиры и не получить переделки"
   },
   "ekonomiya-na-shkolnyh-tovarah": {
-    "category": "ekonomiya",
+    "category": "semya-i-deti",
     "title": "Как сэкономить на школьных товарах без потери качества"
   },
   "ekonomiya-vody": {
@@ -232,7 +232,7 @@
     "title": "Как платить меньше за ЖКХ: 8 способов снизить коммунальные расходы"
   },
   "ekonomnyy-otpusk": {
-    "category": "ekonomiya",
+    "category": "otdyh-i-puteshestviya",
     "title": "Как подготовиться к отпуску без лишних трат и финансовых сюрпризов"
   },
   "fidernaya-lovlya-dlya-novichkov": {
@@ -316,7 +316,7 @@
     "title": "Как организовать хранение круп, муки и специй: 7 практичных правил"
   },
   "hranenie-lekarstv-doma": {
-    "category": "layfkhaki",
+    "category": "zdorovie-i-bezopasnost",
     "title": "Как хранить лекарства дома безопасно и понятно"
   },
   "hranenie-luka-v-kolgotkah": {
@@ -380,11 +380,11 @@
     "title": "Как быстро найти потерянную вещь дома"
   },
   "kak-hranit-bytovuyu-tehniku": {
-    "category": "dom-i-uborka",
+    "category": "pokupki-i-tehnika",
     "title": "Как хранить бытовую технику, которой пользуются редко"
   },
   "kak-hranit-shkolnye-tetradi": {
-    "category": "dom-i-uborka",
+    "category": "semya-i-deti",
     "title": "Как хранить школьные тетради, грамоты и рисунки без хаоса"
   },
   "kak-hranit-sumki-i-ryukzaki": {
@@ -448,7 +448,7 @@
     "title": "Как сажать луковичные осенью: сроки, глубина и защита"
   },
   "kak-sobrat-rebenka-v-lager": {
-    "category": "layfkhaki",
+    "category": "semya-i-deti",
     "title": "Как собрать ребёнка в лагерь и ничего важного не забыть"
   },
   "kak-sohranit-rybu-svezhey": {
@@ -460,7 +460,7 @@
     "title": "Как солить и вялить рыбу дома: безопасная технология для начинающих"
   },
   "kak-sushit-odezhdu-v-kvartire": {
-    "category": "layfkhaki",
+    "category": "krasota-i-uhod",
     "title": "Как сушить одежду в квартире без запаха сырости"
   },
   "kak-ubrat-nakleyku-bez-sledov": {
@@ -500,15 +500,15 @@
     "title": "Как выбрать спелый арбуз: 7 признаков хорошего арбуза"
   },
   "kak-vybrat-nastolnuyu-lampu": {
-    "category": "ekonomiya",
+    "category": "pokupki-i-tehnika",
     "title": "Как выбрать настольную лампу для учёбы и работы дома"
   },
   "kak-vybrat-shurupovert-dlya-doma": {
-    "category": "ekonomiya",
+    "category": "pokupki-i-tehnika",
     "title": "Как выбрать шуруповёрт для дома без переплаты"
   },
   "kak-vybrat-udlinitel-dlya-doma": {
-    "category": "ekonomiya",
+    "category": "pokupki-i-tehnika",
     "title": "Как выбрать удлинитель для дома и не перегрузить сеть"
   },
   "kak-zadelat-treshchinu-v-shtukaturke": {
@@ -536,7 +536,7 @@
     "title": "Кэшбэк карты в России 2026: как выбрать и не переплачивать"
   },
   "keshbek-bonusy": {
-    "category": "ekonomiya",
+    "category": "pokupki-i-tehnika",
     "title": "Кэшбэк и бонусные программы: как выжать максимум из каждой покупки"
   },
   "khraneniye-ovoshchey-zimoy": {
@@ -544,7 +544,7 @@
     "title": "Как хранить овощи зимой в квартире: лук, картошка, морковь"
   },
   "kleshchi-zashchita": {
-    "category": "layfkhaki",
+    "category": "zdorovie-i-bezopasnost",
     "title": "Как защититься от клещей: одежда, репелленты, осмотр после леса"
   },
   "klubnika-na-podokonnike": {
@@ -592,7 +592,7 @@
     "title": "Как сделать козырек над крыльцом веранды из поликарбоната"
   },
   "krossovki-otmyt": {
-    "category": "dom-i-uborka",
+    "category": "krasota-i-uhod",
     "title": "Как отчистить белые кроссовки дома: 5 способов"
   },
   "kryltso-u-verandy-beton-za-den": {
@@ -620,11 +620,11 @@
     "title": "Как приклеить ленту к поликарбонату теплицы своими руками"
   },
   "les-bezopasnost": {
-    "category": "layfkhaki",
+    "category": "zdorovie-i-bezopasnost",
     "title": "Правила безопасности в лесу: как не заблудиться и что брать с собой"
   },
   "letniy-cheklist-pered-otpuskom": {
-    "category": "layfkhaki",
+    "category": "otdyh-i-puteshestviya",
     "title": "Летний чек-лист перед отпуском: дом, документы и вещи"
   },
   "letniy-dush-iz-bochki-s-podogrevom": {
@@ -700,7 +700,7 @@
     "title": "Маринованный лук к шашлыку: быстрый рецепт за 30 минут"
   },
   "markirovka-provodov-i-zaryadok": {
-    "category": "layfkhaki",
+    "category": "pokupki-i-tehnika",
     "title": "Как подписать провода и зарядки, чтобы не путаться"
   },
   "medvedka-lovushka-banka": {
@@ -720,7 +720,7 @@
     "title": "Меню на неделю за 3000 рублей на двоих: реальный план питания"
   },
   "mini-remont-bez-instrumentov": {
-    "category": "layfkhaki",
+    "category": "zdorovie-i-bezopasnost",
     "title": "Мелкий ремонт без набора инструментов: что можно сделать дома"
   },
   "mnogoletenniki-dlya-nachinayushchih": {
@@ -1016,7 +1016,7 @@
     "title": "Чем покрыть стены в летней кухне, чтобы легко мыть от жира"
   },
   "pokupki-bez-pereplat": {
-    "category": "ekonomiya",
+    "category": "pokupki-i-tehnika",
     "title": "Как делать покупки выгодно: скидки, акции и правила экономного шопинга"
   },
   "pol-v-sare-prognil-zadelat-diry": {
@@ -1064,7 +1064,7 @@
     "title": "Порядок в детских вещах: система без ежедневного хаоса"
   },
   "poryadok-v-igrushkah": {
-    "category": "layfkhaki",
+    "category": "semya-i-deti",
     "title": "Порядок в игрушках: как хранить, менять и не покупать лишнее"
   },
   "poryadok-v-prihozhey": {
@@ -1204,7 +1204,7 @@
     "title": "Салат из свежей капусты как в столовой"
   },
   "sel-telefon": {
-    "category": "layfkhaki",
+    "category": "pokupki-i-tehnika",
     "title": "Телефон сел в дороге: что делать и как остаться на связи"
   },
   "semena-sbor-i-hranenie": {
@@ -1216,7 +1216,7 @@
     "title": "Планирование семейного бюджета: система, которая работает"
   },
   "semeynyy-kalendar-na-holodilnike": {
-    "category": "layfkhaki",
+    "category": "semya-i-deti",
     "title": "Семейный календарь на холодильнике: как перестать всё забывать"
   },
   "sezonnyy-spisok-pokupok": {
@@ -1228,7 +1228,7 @@
     "title": "Простая шарлотка с яблоками: рецепт высокого бисквита"
   },
   "shkolnyy-ugolok-doma": {
-    "category": "layfkhaki",
+    "category": "semya-i-deti",
     "title": "Как организовать школьный уголок дома без отдельной комнаты"
   },
   "shvy-mezhdu-plitkoy": {
@@ -1304,7 +1304,7 @@
     "title": "5 простых соусов к мясу: рецепты на каждый день"
   },
   "spisok-pokupok-dlya-semi": {
-    "category": "ekonomiya",
+    "category": "semya-i-deti",
     "title": "Список покупок для семьи: как покупать на неделю без лишнего"
   },
   "spisok-pokupok": {
@@ -1312,7 +1312,7 @@
     "title": "Как составить список покупок, который реально экономит деньги"
   },
   "sravnenie-tsen-pered-pokupkoy": {
-    "category": "ekonomiya",
+    "category": "pokupki-i-tehnika",
     "title": "Как сравнивать цены перед покупкой и не попасться на скидку"
   },
   "starye-dzhinsy": {
@@ -1320,7 +1320,7 @@
     "title": "10 вещей которые можно сделать из старых джинсов"
   },
   "staticheskoe-elektrichestvo": {
-    "category": "layfkhaki",
+    "category": "krasota-i-uhod",
     "title": "Как избавиться от статического электричества на одежде и в квартире"
   },
   "stellazhi-v-sare-profil-fanera": {
@@ -1368,7 +1368,7 @@
     "title": "Как выбрать таймер для капельного полива на даче"
   },
   "telefon-v-zharkuyu-pogodu": {
-    "category": "layfkhaki",
+    "category": "pokupki-i-tehnika",
     "title": "Как защитить телефон в жаркую погоду и не испортить батарею"
   },
   "teplaya-gryadka-osenyu-ogurcy": {
@@ -1452,7 +1452,7 @@
     "title": "Как быстро убрать ванную комнату до блеска за 20 минут"
   },
   "ubrat-sherst-s-divana-i-kovra": {
-    "category": "dom-i-uborka",
+    "category": "krasota-i-uhod",
     "title": "Как убрать шерсть с дивана, ковра и одежды: все рабочие способы"
   },
   "udalit-nakip-limonkoy": {
@@ -1492,7 +1492,7 @@
     "title": "Уход за холодильником: запах, наледь и чистые полки"
   },
   "uhod-za-kozhanym-divanom": {
-    "category": "dom-i-uborka",
+    "category": "krasota-i-uhod",
     "title": "Уход за кожаным диваном: чистка, защита и частые ошибки"
   },
   "uhod-za-malinoy": {
@@ -1612,7 +1612,7 @@
     "title": "Сладкий урожай арбузов: секреты выращивания в открытом грунте"
   },
   "vysushit-obuv": {
-    "category": "layfkhaki",
+    "category": "krasota-i-uhod",
     "title": "Как быстро высушить мокрую обувь и убрать запах за час"
   },
   "vytiagivaetsya-rassada-ogurcov": {
@@ -1648,7 +1648,7 @@
     "title": "Как заморозить ягоды на зиму, чтобы они не слиплись"
   },
   "zapah-iz-obuvi": {
-    "category": "dom-i-uborka",
+    "category": "krasota-i-uhod",
     "title": "7 надёжных способов вывести неприятный запах из обуви"
   },
   "zapah-v-posudomoyke": {
@@ -1672,7 +1672,7 @@
     "title": "Запечённая курица с хрустящей корочкой: секреты хруста"
   },
   "zaryadka-telefona-layfhaki": {
-    "category": "layfkhaki",
+    "category": "pokupki-i-tehnika",
     "title": "12 лайфхаков для быстрой и безопасной зарядки телефона"
   },
   "zashchita-klubniki-ot-ptits": {

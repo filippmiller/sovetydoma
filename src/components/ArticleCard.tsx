@@ -1,9 +1,13 @@
+'use client'
+
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import { CATEGORIES } from '@/lib/categories'
 import { readingTime, relativeDate, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
 import { resolveArticlePreviewImage } from '@/lib/cloudinary'
 import CardFavoriteButton from '@/components/CardFavoriteButton'
+import CardShareButton from '@/components/CardShareButton'
 import ArticleImage from '@/components/ArticleImage'
 
 interface Props {
@@ -16,32 +20,41 @@ interface Props {
 }
 
 export default function ArticleCard({ article, wordCount, featured = false, viewCount = 0, ratingAverage = null, likeCount = 0 }: Props) {
+  const router = useRouter()
   const cat = CATEGORIES[article.category]
   const color = CATEGORY_COLOR[article.category] || '#888'
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
   const time = wordCount ? readingTime('x '.repeat(wordCount)) : '~3 минуты'
   const imageSrc = resolveArticlePreviewImage(article.image, article.slug, { width: 240, height: 240 })
   const cardImageSrc = imageSrc?.startsWith('/images/') ? `${imageSrc}?v=20260531-previews` : imageSrc
+  const href = `/${article.category}/${article.slug}`
+  const shareUrl = `https://1001sovet.ru/${article.category}/${article.slug}/`
+  const shareTitle = article.title
+
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Let buttons, links and their children handle themselves
+    const target = e.target as HTMLElement
+    if (target.closest('button, a, [role="button"]')) return
+    router.push(href)
+  }
 
   return (
-    <Link
-      href={`/${article.category}/${article.slug}`}
-      style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column' }}
+    <article
+      className="article-card"
+      onClick={handleCardClick}
+      style={{
+        backgroundColor: '#fff',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        boxShadow: featured ? '0 4px 16px rgba(0,0,0,0.12)' : '0 1px 4px rgba(0,0,0,0.08)',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        border: featured ? `2px solid ${color}44` : '1px solid #f0ece7',
+        padding: featured ? '1rem' : '0.9rem',
+        cursor: 'pointer',
+      }}
     >
-      <article
-        className="article-card"
-        style={{
-          backgroundColor: '#fff',
-          borderRadius: '12px',
-          overflow: 'hidden',
-          boxShadow: featured ? '0 4px 16px rgba(0,0,0,0.12)' : '0 1px 4px rgba(0,0,0,0.08)',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          border: featured ? `2px solid ${color}44` : '1px solid #f0ece7',
-          padding: featured ? '1rem' : '0.9rem',
-        }}
-      >
         <div style={{
           display: 'grid',
           gridTemplateColumns: `minmax(0, 1fr) ${featured ? 'clamp(100px, 28%, 124px)' : 'clamp(88px, 27%, 108px)'}`,
@@ -87,7 +100,9 @@ export default function ArticleCard({ article, wordCount, featured = false, view
               color: '#1a1a1a',
               overflowWrap: 'anywhere',
             }}>
-              {article.title}
+              <Link href={href} style={{ color: 'inherit', textDecoration: 'none' }}>
+                {article.title}
+              </Link>
             </h2>
 
             {article.description && (
@@ -117,20 +132,23 @@ export default function ArticleCard({ article, wordCount, featured = false, view
             boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
           }}>
             <CardFavoriteButton slug={article.slug} />
-            {cardImageSrc ? (
-              <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={featured ? '2rem' : '1.65rem'} />
-            ) : (
-              <span aria-hidden="true" style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: featured ? '2rem' : '1.65rem',
-              }}>
-                {emoji}
-              </span>
-            )}
+            <CardShareButton url={shareUrl} title={shareTitle} />
+            <Link href={href} aria-label={article.title} style={{ display: 'block', width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
+              {cardImageSrc ? (
+                <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={featured ? '2rem' : '1.65rem'} />
+              ) : (
+                <span aria-hidden="true" style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: featured ? '2rem' : '1.65rem',
+                }}>
+                  {emoji}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
 
@@ -152,6 +170,5 @@ export default function ArticleCard({ article, wordCount, featured = false, view
           </span>
         </div>
       </article>
-    </Link>
   )
 }

@@ -6,7 +6,7 @@
     <description>Как жить хорошо и тратить меньше</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-ekonomiya.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Thu, 04 Jun 2026 16:09:06 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 05 Jun 2026 16:54:36 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
@@ -22,22 +22,6 @@
     <description>Как создать запас продуктов дома, не покупая лишнего и не выбрасывая просроченное.</description>
   </item>
   <item>
-    <title>Как сравнивать цены перед покупкой и не попасться на скидку</title>
-    <link>https://1001sovet.ru/ekonomiya/sravnenie-tsen-pered-pokupkoy/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/sravnenie-tsen-pered-pokupkoy/</guid>
-    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Методы сравнения цен и распознавания ложных скидок при покупках в интернете и офлайне.</description>
-  </item>
-  <item>
-    <title>Список покупок для семьи: как покупать на неделю без лишнего</title>
-    <link>https://1001sovet.ru/ekonomiya/spisok-pokupok-dlya-semi/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/spisok-pokupok-dlya-semi/</guid>
-    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Как составить семейный список покупок на неделю и не покупать лишнего в магазине.</description>
-  </item>
-  <item>
     <title>Сезонный список покупок: как покупать дешевле и без запасов</title>
     <link>https://1001sovet.ru/ekonomiya/sezonnyy-spisok-pokupok/</link>
     <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/sezonnyy-spisok-pokupok/</guid>
@@ -46,44 +30,12 @@
     <description>Как составить сезонный список покупок, чтобы тратить меньше и не захламлять квартиру ненужными запасами.</description>
   </item>
   <item>
-    <title>Как выбрать удлинитель для дома и не перегрузить сеть</title>
-    <link>https://1001sovet.ru/ekonomiya/kak-vybrat-udlinitel-dlya-doma/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/kak-vybrat-udlinitel-dlya-doma/</guid>
-    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>На что обращать внимание при покупке удлинителя и как правильно им пользоваться без риска для электропроводки.</description>
-  </item>
-  <item>
-    <title>Как выбрать шуруповёрт для дома без переплаты</title>
-    <link>https://1001sovet.ru/ekonomiya/kak-vybrat-shurupovert-dlya-doma/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/kak-vybrat-shurupovert-dlya-doma/</guid>
-    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>На что обращать внимание при покупке шуруповёрта для домашнего использования и как не переплатить.</description>
-  </item>
-  <item>
-    <title>Как выбрать настольную лампу для учёбы и работы дома</title>
-    <link>https://1001sovet.ru/ekonomiya/kak-vybrat-nastolnuyu-lampu/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/kak-vybrat-nastolnuyu-lampu/</guid>
-    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>На что обращать внимание при покупке настольной лампы для комфортной работы и учёбы.</description>
-  </item>
-  <item>
     <title>Как не переплатить за доставку продуктов и вещей</title>
     <link>https://1001sovet.ru/ekonomiya/kak-ne-pereplatit-za-dostavku/</link>
     <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/kak-ne-pereplatit-za-dostavku/</guid>
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
     <description>Способы сэкономить на доставке еды и товаров: бесплатные пороги, подписки и правильное оформление заказа.</description>
-  </item>
-  <item>
-    <title>Как сэкономить на школьных товарах без потери качества</title>
-    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-shkolnyh-tovarah/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-shkolnyh-tovarah/</guid>
-    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Экономия</category>
-    <description>Способы сэкономить на подготовке к школе: где покупать, что можно взять дешевле и на чём не стоит экономить.</description>
   </item>
   <item>
     <title>Как экономить на ремонте квартиры и не получить переделки</title>
@@ -158,20 +110,68 @@
     <description>Пошаговая методика учёта доходов и расходов семьи с распределением по категориям и накоплениями.</description>
   </item>
   <item>
-    <title>Кэшбэк и бонусные программы: как выжать максимум из каждой покупки</title>
-    <link>https://1001sovet.ru/ekonomiya/keshbek-bonusy/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/keshbek-bonusy/</guid>
+    <title>Как сократить расход воды в квартире вдвое без дискомфорта</title>
+    <link>https://1001sovet.ru/ekonomiya/ekonomiya-vody/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-vody/</guid>
     <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
-    <description>Руководство по использованию кэшбэка, бонусов и карт лояльности для реальной экономии на покупках.</description>
+    <description>Практические способы экономии холодной и горячей воды с помощью приборов, привычек и простых доработок.</description>
   </item>
   <item>
-    <title>Как подготовиться к отпуску без лишних трат и финансовых сюрпризов</title>
-    <link>https://1001sovet.ru/ekonomiya/ekonomnyy-otpusk/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomnyy-otpusk/</guid>
+    <title>Как экономить на продуктах до 30% без потери качества питания</title>
+    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-produktah/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-produktah/</guid>
     <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
     <category>Экономия</category>
-    <description>Планирование отпуска с экономией на билетах, жилье, питании и развлечениях без потери качества отдыха.</description>
+    <description>Практические стратегии снижения расходов на продукты питания с сохранением полноценного и вкусного рациона.</description>
+  </item>
+  <item>
+    <title>Как сократить расходы на отопление зимой без замерзания</title>
+    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-otoplenii/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-otoplenii/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Практические меры по утеплению квартиры и снижению трат на отопление без капитального ремонта.</description>
+  </item>
+  <item>
+    <title>Как покупать качественную одежду и экономить до 50% на гардеробе</title>
+    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-odezhde/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-odezhde/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Стратегии выгодных покупок одежды: сезонные распродажи, вторичный рынок и правильный подбор базового гардероба.</description>
+  </item>
+  <item>
+    <title>Как экономить на бытовой химии в 3 раза без вреда для чистоты</title>
+    <link>https://1001sovet.ru/ekonomiya/ekonomiya-na-himii/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-na-himii/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Способы сократить расходы на моющие средства с помощью концентратов, универсальных средств и домашних рецептов.</description>
+  </item>
+  <item>
+    <title>Как снизить счета за электричество на 20–40% без вреда для комфорта</title>
+    <link>https://1001sovet.ru/ekonomiya/ekonomiya-elektrichestva/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-elektrichestva/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Проверенные способы уменьшить потребление электроэнергии в квартире и доме с помощью техники и привычек.</description>
+  </item>
+  <item>
+    <title>Как сократить расходы на бензин на 20–30% без продажи машины</title>
+    <link>https://1001sovet.ru/ekonomiya/ekonomiya-benzina/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/ekonomiya-benzina/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Практические советы по экономии топлива: стиль вождения, техническое состояние и планирование поездок.</description>
+  </item>
+  <item>
+    <title>Дешёвые и полезные продукты: как питаться полноценно на скромный бюджет</title>
+    <link>https://1001sovet.ru/ekonomiya/deshevye-produkty/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/ekonomiya/deshevye-produkty/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Экономия</category>
+    <description>Список доступных по цене продуктов с высокой питательной ценностью для сбалансированного рациона.</description>
   </item>
   </channel>
 </rss>

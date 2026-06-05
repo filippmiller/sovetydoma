@@ -60,6 +60,11 @@ export default function AdminDashboard({ articles, categories }: Props) {
     layfkhaki: '#8e44ad',
     ekonomiya: '#2980b9',
     rybalka: '#2c7da0',
+    'zdorovie-i-bezopasnost': '#c0392b',
+    'semya-i-deti': '#8e44ad',
+    'krasota-i-uhod': '#e91e63',
+    'otdyh-i-puteshestviya': '#2980b9',
+    'pokupki-i-tehnika': '#f39c12',
   }
 
   return (

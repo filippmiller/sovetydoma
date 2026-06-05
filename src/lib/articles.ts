@@ -95,3 +95,52 @@ export function getAllTags(): { tag: string; count: number }[] {
     .map(([tag, count]) => ({ tag, count }))
     .sort((a, b) => b.count - a.count)
 }
+
+/**
+ * Articles that were reclassified into new top-level categories (for URL redirects).
+ * Old /oldcat/slug/ should 301/soft-redirect to /newcat/slug/ to avoid dead links.
+ */
+export const LEGACY_ARTICLE_MOVES: Record<string, { oldCategory: string; newCategory: string }> = {
+  // zdorovie-i-bezopasnost
+  'bezopasnost-doma-dlya-rebenka': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
+  'domashnyaya-aptechka-bez-lishnego': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
+  'bezopasnaya-zaryadka-telefona-nochyu': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
+  'hranenie-lekarstv-doma': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
+  'les-bezopasnost': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
+  'kleshchi-zashchita': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
+  'mini-remont-bez-instrumentov': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
+  'apteka-dlya-dachi': { oldCategory: 'dacha-i-ogorod', newCategory: 'zdorovie-i-bezopasnost' },
+  'bezopasnost-na-ldu-rybalka': { oldCategory: 'rybalka', newCategory: 'zdorovie-i-bezopasnost' },
+  // semya-i-deti
+  'spisok-pokupok-dlya-semi': { oldCategory: 'ekonomiya', newCategory: 'semya-i-deti' },
+  'ekonomiya-na-shkolnyh-tovarah': { oldCategory: 'ekonomiya', newCategory: 'semya-i-deti' },
+  'kak-sobrat-rebenka-v-lager': { oldCategory: 'layfkhaki', newCategory: 'semya-i-deti' },
+  'shkolnyy-ugolok-doma': { oldCategory: 'layfkhaki', newCategory: 'semya-i-deti' },
+  'semeynyy-kalendar-na-holodilnike': { oldCategory: 'layfkhaki', newCategory: 'semya-i-deti' },
+  'poryadok-v-igrushkah': { oldCategory: 'layfkhaki', newCategory: 'semya-i-deti' },
+  'kak-hranit-shkolnye-tetradi': { oldCategory: 'dom-i-uborka', newCategory: 'semya-i-deti' },
+  // otdyh-i-puteshestviya
+  'dorozhnaya-sumka-za-20-minut': { oldCategory: 'layfkhaki', newCategory: 'otdyh-i-puteshestviya' },
+  'ekonomnyy-otpusk': { oldCategory: 'ekonomiya', newCategory: 'otdyh-i-puteshestviya' },
+  'letniy-cheklist-pered-otpuskom': { oldCategory: 'layfkhaki', newCategory: 'otdyh-i-puteshestviya' },
+  // pokupki-i-tehnika
+  'pokupki-bez-pereplat': { oldCategory: 'ekonomiya', newCategory: 'pokupki-i-tehnika' },
+  'sravnenie-tsen-pered-pokupkoy': { oldCategory: 'ekonomiya', newCategory: 'pokupki-i-tehnika' },
+  'telefon-v-zharkuyu-pogodu': { oldCategory: 'layfkhaki', newCategory: 'pokupki-i-tehnika' },
+  'sel-telefon': { oldCategory: 'layfkhaki', newCategory: 'pokupki-i-tehnika' },
+  'zaryadka-telefona-layfhaki': { oldCategory: 'layfkhaki', newCategory: 'pokupki-i-tehnika' },
+  'markirovka-provodov-i-zaryadok': { oldCategory: 'layfkhaki', newCategory: 'pokupki-i-tehnika' },
+  'keshbek-bonusy': { oldCategory: 'ekonomiya', newCategory: 'pokupki-i-tehnika' },
+  'kak-vybrat-udlinitel-dlya-doma': { oldCategory: 'ekonomiya', newCategory: 'pokupki-i-tehnika' },
+  'kak-vybrat-shurupovert-dlya-doma': { oldCategory: 'ekonomiya', newCategory: 'pokupki-i-tehnika' },
+  'kak-hranit-bytovuyu-tehniku': { oldCategory: 'dom-i-uborka', newCategory: 'pokupki-i-tehnika' },
+  'kak-vybrat-nastolnuyu-lampu': { oldCategory: 'ekonomiya', newCategory: 'pokupki-i-tehnika' },
+  // krasota-i-uhod
+  'staticheskoe-elektrichestvo': { oldCategory: 'layfkhaki', newCategory: 'krasota-i-uhod' },
+  'zapah-iz-obuvi': { oldCategory: 'dom-i-uborka', newCategory: 'krasota-i-uhod' },
+  'vysushit-obuv': { oldCategory: 'layfkhaki', newCategory: 'krasota-i-uhod' },
+  'krossovki-otmyt': { oldCategory: 'dom-i-uborka', newCategory: 'krasota-i-uhod' },
+  'uhod-za-kozhanym-divanom': { oldCategory: 'dom-i-uborka', newCategory: 'krasota-i-uhod' },
+  'kak-sushit-odezhdu-v-kvartire': { oldCategory: 'layfkhaki', newCategory: 'krasota-i-uhod' },
+  'ubrat-sherst-s-divana-i-kovra': { oldCategory: 'dom-i-uborka', newCategory: 'krasota-i-uhod' },
+}

@@ -149,6 +149,7 @@ export const LIFE_TAXONOMY: LifeTaxonomyGroup[] = [
   },
   {
     title: 'Здоровье и безопасность',
+    route: '/zdorovie-i-bezopasnost/',
     items: [
       'Домашняя аптечка',
       'Сон и режим',
@@ -166,6 +167,7 @@ export const LIFE_TAXONOMY: LifeTaxonomyGroup[] = [
   },
   {
     title: 'Красота и уход',
+    route: '/krasota-i-uhod/',
     items: [
       'Уход за волосами',
       'Уход за кожей',
@@ -181,6 +183,7 @@ export const LIFE_TAXONOMY: LifeTaxonomyGroup[] = [
   },
   {
     title: 'Семья и дети',
+    route: '/semya-i-deti/',
     items: [
       'Режим дня',
       'Школа и учеба',
@@ -196,6 +199,7 @@ export const LIFE_TAXONOMY: LifeTaxonomyGroup[] = [
   },
   {
     title: 'Техника и гаджеты',
+    route: '/pokupki-i-tehnika/',
     items: [
       'Смартфон',
       'Зарядки и аккумуляторы',
@@ -241,6 +245,7 @@ export const LIFE_TAXONOMY: LifeTaxonomyGroup[] = [
   },
   {
     title: 'Отдых и путешествия',
+    route: '/otdyh-i-puteshestviya/',
     items: [
       'Сборы в дорогу',
       'Дача на выходные',

@@ -30,4 +30,29 @@ export const CATEGORIES = {
     slug: 'rybalka',
     description: 'Снасти, наживки, места и секреты успешной рыбалки',
   },
+  'zdorovie-i-bezopasnost': {
+    name: 'Здоровье и безопасность',
+    slug: 'zdorovie-i-bezopasnost',
+    description: 'Практичные советы по безопасности дома, аптечке и защите от сезонных рисков',
+  },
+  'semya-i-deti': {
+    name: 'Семья и дети',
+    slug: 'semya-i-deti',
+    description: 'Организация быта с детьми, школа, семейные покупки и повседневная безопасность',
+  },
+  'krasota-i-uhod': {
+    name: 'Красота и уход',
+    slug: 'krasota-i-uhod',
+    description: 'Уход за одеждой, обувью, гигиена и простые домашние средства',
+  },
+  'otdyh-i-puteshestviya': {
+    name: 'Отдых и путешествия',
+    slug: 'otdyh-i-puteshestviya',
+    description: 'Сборы в дорогу, экономный отпуск и подготовка к поездкам',
+  },
+  'pokupki-i-tehnika': {
+    name: 'Покупки и техника',
+    slug: 'pokupki-i-tehnika',
+    description: 'Выбор техники и товаров, умные покупки, уход и защита от переплат',
+  },
 }

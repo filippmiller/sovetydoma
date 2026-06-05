@@ -17,7 +17,7 @@ export const PERSONAS: Persona[] = [
     role: 'Редактор разделов «Дом и уборка» и «Кулинария»',
     bio: 'Курирует материалы по дому, уборке, рецептам и заготовкам. Любит порядок, простые рецепты и проверенные бытовые советы.',
     icon: '🏡',
-    categories: ['dom-i-uborka', 'kulinaria'],
+    categories: ['dom-i-uborka', 'kulinaria', 'krasota-i-uhod'],
     contact: 'maryana.sidorova@1001sovet.ru',
   },
   {
@@ -26,7 +26,7 @@ export const PERSONAS: Persona[] = [
     role: 'Редактор раздела «Лайфхаки»',
     bio: 'Отвечает за мелкий ремонт, инструменты и бытовые лайфхаки. Считает, что почти всё можно починить своими руками.',
     icon: '🔧',
-    categories: ['layfkhaki'],
+    categories: ['layfkhaki', 'zdorovie-i-bezopasnost', 'pokupki-i-tehnika'],
     contact: 'petr.pupkin@1001sovet.ru',
   },
   {
@@ -35,7 +35,7 @@ export const PERSONAS: Persona[] = [
     role: 'Редактор разделов «Дача и огород» и «Экономия»',
     bio: 'Пишет про дачу и огород, технику и разумную экономию. Любит считать бюджет и планировать сезонные работы.',
     icon: '🚜',
-    categories: ['dacha-i-ogorod', 'ekonomiya'],
+    categories: ['dacha-i-ogorod', 'ekonomiya', 'semya-i-deti', 'otdyh-i-puteshestviya'],
     contact: 'peter.ivanov@1001sovet.ru',
   },
   {

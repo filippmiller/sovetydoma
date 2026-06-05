@@ -5,6 +5,11 @@ export const SUBSCRIPTION_CATEGORY_SLUGS = [
   'layfkhaki',
   'ekonomiya',
   'rybalka',
+  'zdorovie-i-bezopasnost',
+  'semya-i-deti',
+  'krasota-i-uhod',
+  'otdyh-i-puteshestviya',
+  'pokupki-i-tehnika',
 ]
 
 export const DIRECT_NOTIFICATION_CHANNELS = [

@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react'
 interface Props {
   url: string
   title: string
+  variant?: 'compact' | 'full'
 }
 
-export default function SharePanel({ url, title }: Props) {
+export default function SharePanel({ url, title, variant = 'full' }: Props) {
   const [copied, setCopied] = useState(false)
   const [hasNativeShare, setHasNativeShare] = useState(false)
 
@@ -44,6 +45,45 @@ export default function SharePanel({ url, title }: Props) {
   const vkUrl = `https://vk.com/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`
   const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`
   const waUrl = `https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`
+
+  if (variant === 'compact') {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap', margin: '0.4rem 0 0.6rem' }}>
+        <button
+          onClick={handleCopy}
+          aria-label="Скопировать ссылку"
+          title="Скопировать ссылку"
+          style={{
+            fontSize: '0.78rem',
+            padding: '3px 7px',
+            border: `1px solid ${copied ? '#27ae60' : '#d1ccc6'}`,
+            borderRadius: '5px',
+            background: copied ? '#f0fff4' : '#faf9f7',
+            color: copied ? '#267a3f' : '#555',
+            cursor: 'pointer',
+            fontWeight: 600,
+            fontFamily: 'inherit',
+          }}
+        >
+          {copied ? '✓ Скопировано' : '🔗 Копировать'}
+        </button>
+
+        <a href={tgUrl} target="_blank" rel="noopener noreferrer" aria-label="Поделиться в Telegram" title="Telegram"
+          style={{ fontSize: '0.78rem', padding: '3px 6px', borderRadius: '999px', border: '1px solid #b3ddf5', background: '#e8f6fd', color: '#229ED9', textDecoration: 'none', fontWeight: 600 }}>TG</a>
+
+        <a href={waUrl} target="_blank" rel="noopener noreferrer" aria-label="Поделиться в WhatsApp" title="WhatsApp"
+          style={{ fontSize: '0.78rem', padding: '3px 6px', borderRadius: '999px', border: '1px solid #b3e8c8', background: '#e8faf0', color: '#25D366', textDecoration: 'none', fontWeight: 600 }}>WA</a>
+
+        <a href={vkUrl} target="_blank" rel="noopener noreferrer" aria-label="Поделиться ВКонтакте" title="ВКонтакте"
+          style={{ fontSize: '0.78rem', padding: '3px 6px', borderRadius: '999px', border: '1px solid #c5d9ef', background: '#eef4fb', color: '#4a76a8', textDecoration: 'none', fontWeight: 600 }}>VK</a>
+
+        {hasNativeShare && (
+          <button onClick={handleNativeShare} aria-label="Поделиться через системное меню" title="Системное меню"
+            style={{ fontSize: '0.78rem', padding: '3px 7px', border: '1px solid #e0dbd5', borderRadius: '5px', background: '#f5f3f0', color: '#555', cursor: 'pointer', fontWeight: 600 }}>Ещё</button>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div style={{

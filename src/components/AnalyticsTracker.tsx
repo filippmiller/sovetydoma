@@ -18,6 +18,11 @@ const CATEGORY_SLUGS = new Set([
   'layfkhaki',
   'ekonomiya',
   'rybalka',
+  'zdorovie-i-bezopasnost',
+  'semya-i-deti',
+  'krasota-i-uhod',
+  'otdyh-i-puteshestviya',
+  'pokupki-i-tehnika',
 ])
 
 type ActivePageView = {

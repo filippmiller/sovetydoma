@@ -6,7 +6,7 @@
     <description>Лайфхаки для чистоты и порядка в доме</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed-dom-i-uborka.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Thu, 04 Jun 2026 16:09:06 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 05 Jun 2026 16:54:36 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
@@ -28,14 +28,6 @@
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
     <description>Как содержать посудомоечную машину в чистоте и порядке, используя подручные средства.</description>
-  </item>
-  <item>
-    <title>Уход за кожаным диваном: чистка, защита и частые ошибки</title>
-    <link>https://1001sovet.ru/dom-i-uborka/uhod-za-kozhanym-divanom/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/uhod-za-kozhanym-divanom/</guid>
-    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дом и уборка</category>
-    <description>Как правильно чистить и ухаживать за кожаным диваном, чтобы кожа не трескалась и сохраняла вид.</description>
   </item>
   <item>
     <title>Уход за холодильником: запах, наледь и чистые полки</title>
@@ -172,6 +164,14 @@
     <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
     <category>Дом и уборка</category>
     <description>Техника покраски радиаторов отопления без разводов, подтёков и с минимальным запахом.</description>
+  </item>
+  <item>
+    <title>Как отмыть пластиковые подоконники от желтизны и пятен</title>
+    <link>https://1001sovet.ru/dom-i-uborka/kak-otmyt-plastikovye-podokonniki/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/dom-i-uborka/kak-otmyt-plastikovye-podokonniki/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Дом и уборка</category>
+    <description>Способы очистки пластиковых подоконников от жёлтых пятен, пыли и застарелых загрязнений.</description>
   </item>
   </channel>
 </rss>

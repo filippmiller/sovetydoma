@@ -13,6 +13,11 @@ const CATEGORIES = [
   { value: 'layfkhaki', label: 'Лайфхаки' },
   { value: 'ekonomiya', label: 'Экономия' },
   { value: 'rybalka', label: 'Рыбалка' },
+  { value: 'zdorovie-i-bezopasnost', label: 'Здоровье и безопасность' },
+  { value: 'semya-i-deti', label: 'Семья и дети' },
+  { value: 'krasota-i-uhod', label: 'Красота и уход' },
+  { value: 'otdyh-i-puteshestviya', label: 'Отдых и путешествия' },
+  { value: 'pokupki-i-tehnika', label: 'Покупки и техника' },
 ]
 
 export default function NapisatPage() {

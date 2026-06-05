@@ -1,3 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /moy-kabinet/
+Disallow: /napisat/
+Disallow: /api/
+# search params that are not needed for crawling
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid&fbclid&ref&source /
+
 User-agent: Googlebot
 Allow: /
 
@@ -12,7 +21,7 @@ Allow: /
 
 User-agent: Yandex
 Allow: /
-Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid&fbclid /
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid&fbclid&ref&source /
 
 User-agent: YandexBot
 Allow: /
@@ -25,8 +34,5 @@ Allow: /
 
 User-agent: YandexMedia
 Allow: /
-
-User-agent: *
-Disallow: /
 
 Sitemap: https://1001sovet.ru/sitemap.xml
