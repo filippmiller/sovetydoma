@@ -143,7 +143,8 @@
 
 - reg.ru DNS changed only for web records:
   - `A @`, `A www`, `A api` -> `147.45.146.11`
-  - `AAAA @`, `AAAA www` -> `2a03:6f00:a::2:bbac`
+- `AAAA @` and `AAAA www` were later removed at reg.ru on 2026-06-05 because Chrome/Claude hit `ERR_CONNECTION_TIMED_OUT` while clients with cached IPv6 tried `2a03:6f00:a::2:bbac`.
+- After deleting AAAA records, `ns1.reg.ru` no longer returned apex `AAAA`; some public/local caches and `www` answers could still hold the old IPv6 value for up to the previous `86400` TTL.
 - Mail DNS records were intentionally not changed.
 - Other Timeweb projects were not touched.
 - Pull deploy timer on replacement VPS remains copied but disabled unless explicitly re-enabled later.
@@ -170,8 +171,19 @@
 - Replacement VPS `8264713` (`1001sovet-replacement`) remained present in the server list.
 - Post-delete production check: `https://1001sovet.ru/build.json` still returned SHA `90896cbe63b52152d8e464109df8e5c3620716cc`, and the checked article URL still returned `HTTP/1.1 200 OK`.
 
+### IPv6 Timeout / Claude Chrome Blocker
+
+- Claude reported `ERR_CONNECTION_TIMED_OUT` for `https://1001sovet.ru/` and the known article URL.
+- Root cause found: IPv4 `147.45.146.11` returned `200`, but clients with stale/cached `AAAA` for `2a03:6f00:a::2:bbac` could time out or hang in Chrome.
+- reg.ru UI was used to remove the two AAAA records for `@` and `www`; A/MX/TXT records were not changed.
+- Windows DNS cache was flushed with `Clear-DnsClientCache` and `ipconfig /flushdns`; shell `curl` to apex then returned `HTTP/1.1 200 OK`.
+- Chrome automation could not open `chrome://net-internals/#dns` because that internal URL is blocked by browser automation policy.
+- Local hosts override attempt for `1001sovet.ru` -> `147.45.146.11` failed due lack of administrator permission to edit `C:\Windows\System32\drivers\etc\hosts`.
+- If Chrome still shows `ERR_CONNECTION_TIMED_OUT`, restart Chrome or manually clear Chrome host cache, then retry Claude QA.
+
 ### Do Not Lose
 
 - If production appears stale, check `/build.json` first.
 - If a future static deploy fails, inspect `/opt/deploy/pull-build-deploy.sh` on the replacement VPS before changing DNS or rebuilding the server.
 - Old VPS `8194295` is no longer available as rollback; use git/build artifacts and replacement VPS `8264713` for future recovery.
+- Do not re-add AAAA records until external IPv6 reachability is verified from outside the VPS and Chrome/browser clients load reliably over IPv6.
