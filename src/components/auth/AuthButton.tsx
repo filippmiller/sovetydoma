@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabase'
 import type { Profile } from '@/lib/supabase'
 import AuthModal from './AuthModal'
-import { migrateLocalFavoritesToServer, clearLocalFavorites } from '@/lib/favorites'
+import { migrateLocalFavoritesToServer, clearLocalFavorites, processPendingFavoriteIntent } from '@/lib/favorites'
 
 export default function AuthButton() {
   const authConfigured = isSupabaseConfigured()
@@ -63,8 +63,10 @@ export default function AuthButton() {
       setUser(u ?? null)
       if (u) {
         loadProfile(u.id, u).catch(() => {})
-        // Catch any local favorites from before this page load / previous anon session
-        migrateLocalFavoritesToServer(u.id).catch(() => {})
+        // Catch any local favorites from before this page load / previous anon session.
+        // migrate() no longer takes/ trusts caller id — it reads the real session.
+        migrateLocalFavoritesToServer().catch(() => {})
+        processPendingFavoriteIntent().catch(() => {})
       }
     }).catch(() => {})
 
@@ -75,7 +77,9 @@ export default function AuthButton() {
       if (u) {
         loadProfile(u.id, u).catch(() => {})
         // Migrate pending local favorites (covers post-login, recovery, cross-tab, etc.)
-        migrateLocalFavoritesToServer(u.id).catch(() => {})
+        // Also process explicit auth intent (favorite while logged-out) if present.
+        migrateLocalFavoritesToServer().catch(() => {})
+        processPendingFavoriteIntent().catch(() => {})
       } else {
         setProfile(null)
       }

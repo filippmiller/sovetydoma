@@ -107,7 +107,20 @@
   - Preferred: versioned migration + trigger (or SECURITY DEFINER function). ✓ Added 20260606120000_ensure_profile_on_signup.sql with handle_new_user trigger + backfill.
   - Fallback: safe repair in `moy-kabinet` and after login. ✓ Added in AuthButton loadProfile (upsert + maybeSingle) and moy-kabinet (repair flow).
 - Make `moy-kabinet` and profile loading robust (`maybeSingle`, upsert repair). ✓ Done, replaces brittle .single().
-- Improve favorites merge after login (no data loss, predictable). (next slice)
+- P2 Favorites/auth intent (0h3.7): ✓ Done in this slice.
+  - Inspected all fav entry points (FavoriteButton on article detail, CardFavoriteButton on cards, izbrannoe, moy-kabinet, AuthModal/AuthButton open + migrate paths).
+  - Documented exact old failure: anon click saved to local + auto modal, but migrate cleared unconditionally (even on errors) → loss possible; no explicit intent marker; post-login always reload; register-confirm path landed in cabinet not original context; relied on caller-supplied id.
+  - Added sessionStorage pendingAuthIntent {action, slug, returnTo} set on logged-out heart clicks.
+  - Centralized saveLocalFavorites; made migrate() param-less + always derives uid from sb.auth.getUser() (no trust of supplied user_id; RLS is still enforcer).
+  - Robust merge: only clear local for successfully migrated slugs; return {migrated, failed}; on failure keep local + surface RU message in modal.
+  - Added processPendingFavoriteIntent(); called after login success (modal) and in global AuthButton onAuthStateChange.
+  - Fav buttons now subscribe to SIGNED_IN to update userId + re-validate from DB live → no need for unconditional reload after login success.
+  - Login path from fav-triggered modal: close without reload → user stays on the article/listing; heart already optimistic; DB has it; header updates live.
+  - Register path: intent marker left for post-confirm SIGNED_IN (via AuthButton); explicitly not faked — blocked on real email verification per prompt.
+  - UX: intent click feels like "save + auth to sync" (kept existing auto-open + reason copy, no broad redesign); clear RU error on partial fail; no layout jumps (absolute +1, portal modal, inline info).
+  - Security: uid from validated session only; queries/upserts always filtered by real uid; no cross-user exposure.
+  - Updated plan, results, bead 0h3.7 (notes + status).
+  - Gates + browser smoke (login path) done before commit.
 
 ---
 

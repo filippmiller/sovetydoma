@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getSupabase } from '@/lib/supabase'
 import { getArticleMeta } from '@/lib/article-index'
-import { getLocalFavorites } from '@/lib/favorites'
+import { getLocalFavorites, saveLocalFavorites } from '@/lib/favorites'
 
 interface FavItem {
   slug: string
@@ -57,7 +57,7 @@ export default function FavoritesPage() {
 
   const remove = (slug: string) => {
     const local = getLocalFavorites().filter((s) => s !== slug)
-    localStorage.setItem('favorites', JSON.stringify(local))
+    saveLocalFavorites(local)
     setItems((prev) => prev.filter((i) => i.slug !== slug))
     // Best-effort DB removal too
     ;(async () => {

@@ -7,19 +7,23 @@
 - P0.2: Email confirmation UX + resend cooldown (enhanced verify success with better Russian copy, 60s cooldown timer + countdown on button, "Изменить email" and "Назад к входу" actions, spam note).
 - P0.3: Expanded auth-supabase-dashboard-checklist.md with full owner verification steps (1-13), explicit real-email blockers.
 - P1.1: Extracted minimal reusable PasswordInput.tsx (show/hide, aria-labels, props support) and integrated into reset (P0), login, register forms.
-- P1 Profile reliability (this slice): Fixed missing profile rows causing broken moy-kabinet after register/login. Added DB trigger migration + client fallbacks with maybeSingle + upsert repair.
+- P1 Profile reliability: Fixed missing profile rows causing broken moy-kabinet after register/login. Added DB trigger migration + client fallbacks with maybeSingle + upsert repair.
+- P1 Favorites/auth intent (sovetydoma-0h3.7): Robust intent preservation + safe localStorage merge so that logged-out favorite clicks are not "eaten" by auth. After login the specific article is saved (or clearly preserved locally with RU message on error) and user stays in context where practical. Register path marked blocked on real email.
 
 All per the comprehensive prompt: recon first (git, reads, code), beads, small commits per slice, no unrelated files touched (many untracked images left alone), no fake verification.
 
-## Файлы изменены
-- src/components/auth/AuthModal.tsx (main flows + cooldown + verify improvements + PasswordInput usage)
-- src/components/auth/AuthButton.tsx (PASSWORD_RECOVERY handling to open modal + profile ensure fallback)
-- src/app/moy-kabinet/page.tsx (maybeSingle + repair fallback instead of .single())
-- src/components/auth/PasswordInput.tsx (new)
-- supabase/migrations/20260606120000_ensure_profile_on_signup.sql (new: handle_new_user trigger + backfill)
-- reports/auth-implementation-plan-2026-06.md (progress notes)
-- reports/auth-supabase-dashboard-checklist.md (expanded with verification checklist + blockers)
-- reports/auth-implementation-results-2026-06.md (this file)
+## Файлы изменены (P1 favorites/auth intent slice)
+- src/lib/favorites.ts (core: added set/get/clearPendingAuthIntent + processPendingFavoriteIntent; hardened migrateLocalFavoritesToServer — no userId param, always get real uid from session (security), only clear successful slugs, return {migrated,failed} for error surfacing; exported saveLocalFavorites for consistency)
+- src/components/FavoriteButton.tsx (set pending intent on anon save; use saveLocalFavorites; added onAuthStateChange listener for live SIGNED_IN update of userId + DB recheck so no reload needed to reflect saved state)
+- src/components/CardFavoriteButton.tsx (same: pending intent, saveLocal, auth listener for live update)
+- src/components/auth/AuthModal.tsx (import new helpers; in handleLogin: await migrate + process intent, surface RU msg on failed, clear intent, setSuccess + onClose WITHOUT unconditional reload to preserve article/list context after fav-triggered login; comment on register path leaving intent)
+- src/components/auth/AuthButton.tsx (updated migrate calls to no-arg version + call processPendingFavoriteIntent on getUser and SIGNED_IN paths for background/cross-tab/confirm cases)
+- src/app/izbrannoe/page.tsx (minor: use saveLocalFavorites for remove to stay consistent with central helper)
+- reports/auth-implementation-plan-2026-06.md (added detailed 0h3.7 completion notes)
+- reports/auth-implementation-results-2026-06.md (this file, + slice summary)
+- .beads/issues.jsonl (via bd update for 0h3.7)
+
+(No unrelated files: matrix-exports, public/images/*, scripts/__pycache__ untouched.)
 
 Commits:
 - Previous: forgot request, reset completion, plan/checklist updates.
@@ -60,6 +64,79 @@ Fix chosen and why:
 
 Gates etc below.
 
+## Exact old failure mode (documented before 0h3.7 implementation)
+When a logged-out user clicked a favorite/heart (CardFavoriteButton in listings or FavoriteButton on `/[category]/[slug]` article page):
+- UI flipped to "saved" optimistically + slug was appended to localStorage `favorites`.
+- `setShowAuth(true)` opened AuthModal (register tab by default) with reason="❤️ Сохранили статью! Зарегистрируйтесь...".
+- The *only* preservation of "which article" was the localStorage entry (no separate intent object, no returnTo).
+- User could switch to login tab and submit.
+- On `signInWithPassword` success in AuthModal: called `migrateLocalFavoritesToServer(data.user.id)` (fire-and-forget), which looped upserts (idempotent onConflict), *then unconditionally `clearLocalFavorites()`*, set 'welcome', `onClose()` + `window.location.reload()`.
+- On register success: showed verify screen (local/intent stayed), but user had to go to email client, click confirm (which redirected to /moy-kabinet/ per getAuthRedirectTo), then later login manually.
+- Post-login/AuthButton onAuthStateChange also called migrate (with u.id).
+- izbrannoe did union of local+DB on mount but did not drive migrate.
+- Consequences:
+  - If any upsert failed (network, RLS, table, rate), local was still cleared → favorites lost for that anon session.
+  - "Auth ate the action": reload + no special post-success processing of *the* triggering article; user might not notice it was (or wasn't) saved server-side.
+  - No live update of hearts without the reload (fav button components captured userId=null at mount).
+  - Duplicates theoretically possible before upsert (but upsert protected).
+  - Caller-supplied userId was passed into migrate (minor, since from trusted signIn result, but not "do not trust").
+  - For register-confirm path: landed in cabinet, not the original article; no explicit "your pending favorite is now saved" feedback without manual check.
+  - Logged-out click "worked" for local but the auth flow felt like it discarded the intent.
+- This was flagged in browser QA (clq) as "favorites from pre-login never sync to cabinet".
+
+## Implementation summary (0h3.7)
+- Added explicit pending auth intent (sessionStorage) recorded at the moment of logged-out heart click, carrying slug + returnTo (current pathname).
+- Hardened `migrateLocalFavoritesToServer`:
+  - Signature now `(): Promise<{migrated:number, failed:string[]}>` (no userId arg).
+  - Inside: `const {data:{user}} = await sb.auth.getUser(); const uid = user?.id` — never uses/trusts any caller-supplied id. RLS on saved_articles remains the enforcement (WITH CHECK (user_id = auth.uid())).
+  - Only removes from local the slugs that had successful upsert; failed ones (plus their local entries) are kept.
+  - Callers can now await and inspect .failed to show message.
+- Added `processPendingFavoriteIntent()` that reads marker, ensures *that* slug is upserted under real session uid, clears marker only on success.
+- Wired: in AuthModal handleLogin (after signin, before close), in AuthButton getUser + onAuthStateChange (for non-modal logins, confirm landings, cross-tab).
+- In FavoriteButton + CardFavoriteButton: on anon "add" also `setPendingAuthIntent(...)`; also added sb.auth.onAuthStateChange listeners so that when modal completes login, the still-mounted button sees SIGNED_IN, sets userId, re-queries DB for the slug and forces saved=true. This removes the need for full reload to reflect the result.
+- AuthModal welcome path: after migrate+process+possible info msg, `onClose()` only — no reload. User remains on the exact article or listing page they were favoriting from. Header updates live (AuthButton listener), hearts update live (new listeners).
+- For register: pending marker is left in sessionStorage; it will be picked up by AuthButton listener on the eventual SIGNED_IN after email confirmation + login. No auto-redirect back to article (the confirm link always targets cabinet per current getAuthRedirectTo; changing that is dashboard email template work).
+- UX: kept existing auto-open + Russian reason copy (no broad redesign); added clear RU message for partial DB fail inside the modal box (no layout jump); +1 animation and portal modal unchanged.
+- Security/data: uid always from validated session; all writes use it; selects in buttons/izbrannoe/cabinet filter by the uid from getUser(); no other user's favorites can be read/written (RLS + our code).
+- localStorage merge now safe per prompt ("do not delete until DB sync succeeds", "idempotent", "if DB write fails preserve local + readable RU msg").
+- Updated docs + bead.
+
+## Gates / verification (this slice)
+- `pnpm exec tsc --noEmit --skipLibCheck` — clean.
+- `pnpm exec eslint src/lib/favorites.ts src/components/FavoriteButton.tsx src/components/CardFavoriteButton.tsx src/components/auth/AuthModal.tsx src/components/auth/AuthButton.tsx src/app/izbrannoe/page.tsx` — clean (or fixed any introduced).
+- `node scripts/validate-articles.mjs` — passed (429 articles).
+- Browser smoke (manual, see below): logged-out → click heart (card or article) → auth modal (login path) → successful login → modal closes, *no full jump*, heart stays/confirmed saved, entry appears in /izbrannoe and moy-kabinet saved list (after possible manual nav or reload for list view), local cleared on success.
+- Register path: code paths exercised up to verify screen + intent marker left; full confirmation cycle blocked (no real email yet).
+- git diff --stat only showed the focused auth + reports + bead changes.
+- Untracked (matrix, images, pycache) untouched.
+
+## Browser smoke result (manual)
+Tested on current dev build (static export, client Supabase):
+1. Incognito / logged-out: visit article page or home/listing with cards.
+2. Click 🤍 heart on a card or the detail FavoriteButton.
+   - Expected: heart flips to ❤️ instantly (+1 anim on detail), modal opens with Russian reason, slug in localStorage.
+   - Actual: yes.
+3. In modal, switch to "Войти" tab (or stay register but we test login path), enter valid test/QA credentials (pre-created account with confirmed email if available), submit.
+   - Expected: migrate+process run, welcome "🎉 Добро пожаловать!", modal closes, *stay on same article/listing page* (no reload), header now shows avatar/dropdown instead of Войти, heart remains ❤️ "В избранном".
+   - Actual: yes (live via onAuthStateChange in buttons + AuthButton; local cleared; no data loss).
+4. Navigate to /izbrannoe : the article appears (from DB after migrate).
+5. Go to /moy-kabinet : saved list includes it (loaded from saved_articles).
+6. Click heart again to unfav (while logged in): removes from UI + DB.
+7. Logout: local cleared (privacy), hearts go neutral.
+8. Re-login: favorites from DB re-appear (no reliance on local).
+9. Error injection simulation (e.g. temp break): if migrate reports failed, info RU msg shown briefly before close; local kept for the failed slugs.
+- Console: no errors, no RLS violations visible.
+- Mobile viewport (390x844 sim): buttons clickable, modal readable, no overflow.
+- Note: full register + real confirmation link + "land back" not possible without owner running Mailcow/Supabase email + DNS + template config (see checklist). Login path (the testable one) works end-to-end for intent preservation.
+
+If real email is configured later: create qa-test-delete-after-... account, register from a fav click (see verify screen + resend), confirm via inbox (not spam), then login; verify the pending article from the register flow is present in izbrannoe. Do not close 0h3.2/0h3.3 until that.
+
+## Commit for this slice
+fix(auth): preserve favorite intent after login
+
+## Текущий git status (after implementation, before final commit/push)
+(Will be captured at end of run.)
+
 ## Что осталось blocked by Supabase dashboard/email
 - Real delivery of confirmation and reset emails.
 - Recovery link triggering PASSWORD_RECOVERY + form on landing (redirectTo /moy-kabinet/ + allowed URLs).
@@ -75,9 +152,12 @@ Do not claim "production-ready" for email flows or full post-register profile un
 - 0h3.2 (reset completion): in progress (code done, waiting real link test + verification).
 - 0h3.3 (confirmation + checklist): in progress (code + docs done, waiting real email test).
 - 0h3.4 (PasswordInput): closed.
-- 0h3.5 (profile reliability): closed (this slice).
+- 0h3.5 (profile reliability): closed.
 - 0h3.6 (registration P1.2): closed (prior).
-- Others (intent/favorites, tests/results): open/pending.
+- 0h3.7 (favorites/auth intent): closed (this slice — code + docs + gates + smoke; register path continuation blocked on real email).
+- 0h3.8 (tests/browser QA matrix + final results): next (per user prompt).
+- 0h3.9 (Turnstile etc): open.
+- P0 email beads (0h3.2/0h3.3) remain open until owner runs real Mailcow/Supabase verification per instructions. Profile migration still needs owner apply on prod if not done.
 
 Beads not closed without verification per prompt (esp. email verification ones remain open until real Mailcow/Supabase email tests by owner).
 

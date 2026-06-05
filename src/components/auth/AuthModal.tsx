@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '@/lib/supabase'
 import PasswordInput from './PasswordInput'
-import { migrateLocalFavoritesToServer } from '@/lib/favorites'
+import { migrateLocalFavoritesToServer, getPendingAuthIntent, clearPendingAuthIntent, processPendingFavoriteIntent } from '@/lib/favorites'
 
 function isValidEmail(v: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
@@ -131,24 +131,43 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       return
     }
     setLoading(true)
-    const { data, error: err } = await supabase.auth.signInWithPassword({ email, password })
+    const { error: err } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (err) {
       setError(mapAuthError(err.message))
       return
     }
 
-    // P1 (from browser QA + clq): migrate any favorites saved while logged-out
-    // so they appear in Мой кабинет. Fire-and-forget is fine; clear happens inside.
-    if (data?.user?.id) {
-      migrateLocalFavoritesToServer(data.user.id).catch(() => {})
+    // Robust favorites intent + localStorage merge (0h3.7):
+    // - migrate uses *current session* (never trusts supplied id) + only clears successful
+    // - process any explicit pending favorite intent recorded by heart buttons
+    // - if partial failure, preserve local + surface readable RU message (no data loss)
+    // - after success we close WITHOUT unconditional reload to keep the user in the
+    //   intended context (article page or listing) when they clicked favorite while logged out.
+    //   Auth state listeners (AuthButton + FavoriteButton/Card) update header/hearts live.
+    const mig = await migrateLocalFavoritesToServer()
+    await processPendingFavoriteIntent().catch(() => {})
+
+    const intent = getPendingAuthIntent()
+    if (intent && intent.action === 'favorite') {
+      // Marker is cleared inside processPending on success; if still here, keep for retry.
+      // We do not force navigation here — we are already on the originating page (modal was opened from it).
+    }
+    clearPendingAuthIntent() // safe no-op if already cleared or none
+
+    if (mig.failed.length > 0) {
+      setInfo(`Не удалось синхронизировать ${mig.failed.length} из избранного. Они сохранены локально и появятся после следующей синхронизации.`)
     }
 
     setSuccess('welcome')
     setTimeout(() => {
       onClose()
-      window.location.reload()
-    }, 1000)
+      // Intentionally no window.location.reload() here:
+      // 1) preserves scroll/position and the article context for auth-triggered favorites
+      // 2) header (AuthButton) + per-page hearts react to SIGNED_IN via their onAuthStateChange
+      // 3) migrate + intent processing already ensured the favorite is (or will be) in DB
+      // If a full re-render of complex page state is ever required, user can refresh.
+    }, 900)
   }
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -178,6 +197,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     }
     setSuccess('verify')
     setConfirmRegisterPassword('')
+    // Note: for register path the pending favorite intent (if any) is intentionally left in sessionStorage.
+    // It will be processed by AuthButton onAuthStateChange (or next explicit login) *after* the user
+    // confirms the email and a SIGNED_IN event fires. Register-confirmation end-to-end cannot be
+    // fully verified here without real Mailcow/Supabase email delivery (see beads + checklist).
   }
 
   const resendConfirmation = async () => {

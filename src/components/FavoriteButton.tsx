@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
-import { getLocalFavorites } from '@/lib/favorites'
+import { getLocalFavorites, saveLocalFavorites, setPendingAuthIntent } from '@/lib/favorites'
 
 interface Props {
   slug: string
@@ -12,10 +12,8 @@ interface Props {
 }
 
 // Local writes still happen here for instant UI + cache while logged in.
-// Migration on auth (clq) is what moves anon saves to server.
-function saveFavoritesToStorage(slugs: string[]) {
-  localStorage.setItem('favorites', JSON.stringify(slugs))
-}
+// Migration on auth is what moves anon saves to server (now robust + intent-aware).
+// Use the centralized saveLocalFavorites (re-exported) for consistency with cards.
 
 export default function FavoriteButton({ slug }: Props) {
   const [saved, setSaved] = useState(false)
@@ -57,7 +55,38 @@ export default function FavoriteButton({ slug }: Props) {
       }
     })()
 
-    return () => { cancelled = true }
+    // Live reaction to auth changes (e.g. login inside the modal opened by this button).
+    // This lets us update userId + re-validate from DB and keep the heart state without a full page reload,
+    // preserving the article/list context after auth-triggered favorite.
+    const sb = getSupabase()
+    const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
+      if (cancelled) return
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        const uid = session?.user?.id ?? null
+        setUserId(uid)
+        if (uid) {
+          // Best-effort recheck; ignore errors (table/RLS/network) — UI already optimistic
+          void sb.from('saved_articles')
+            .select('article_slug')
+            .eq('user_id', uid)
+            .eq('article_slug', slug)
+            .maybeSingle()
+            .then(({ data: row }) => {
+              if (!cancelled && row) setSaved(true)
+            })
+          // Also opportunistically process any pending intent for this tab (no-op if none)
+          // (the main processing happens in AuthModal/AuthButton after sign-in)
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUserId(null)
+        setSaved(getLocalFavorites().includes(slug))
+      }
+    })
+
+    return () => {
+      cancelled = true
+      subscription.unsubscribe()
+    }
   }, [slug])
 
   const toggle = async () => {
@@ -67,15 +96,17 @@ export default function FavoriteButton({ slug }: Props) {
     // localStorage (shared helper for read)
     const favs = getLocalFavorites()
     if (nextSaved) {
-      if (!favs.includes(slug)) saveFavoritesToStorage([...favs, slug])
+      if (!favs.includes(slug)) saveLocalFavorites([...favs, slug])
       setShowPlus(true)
       setTimeout(() => setShowPlus(false), 600)
-      // Anonymous user just saved their first favorite — politely invite them
-      // to register/login so it syncs across devices. The favorite is already
-      // kept in localStorage, so nothing is lost if they dismiss.
-      if (!userId) setShowAuth(true)
+      // Anonymous user saved while logged out: store explicit intent so post-login
+      // we ensure this exact article is in DB (idempotent) and can keep context.
+      if (!userId) {
+        setPendingAuthIntent({ action: 'favorite', slug, returnTo: typeof window !== 'undefined' ? window.location.pathname : undefined })
+        setShowAuth(true)
+      }
     } else {
-      saveFavoritesToStorage(favs.filter((s) => s !== slug))
+      saveLocalFavorites(favs.filter((s) => s !== slug))
     }
 
     // Supabase

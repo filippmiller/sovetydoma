@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
-import { getLocalFavorites } from '@/lib/favorites'
+import { getLocalFavorites, saveLocalFavorites, setPendingAuthIntent } from '@/lib/favorites'
 
 interface Props {
   slug: string
@@ -48,7 +48,36 @@ export default function CardFavoriteButton({ slug }: Props) {
         // localStorage-only mode
       }
     })()
-    return () => { cancelled = true }
+
+    // React to SIGNED_IN from modal (or elsewhere) without requiring page reload.
+    // Updates the compact card heart + ensures DB state is reflected after migrate/intent processing.
+    const sb = getSupabase()
+    const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
+      if (cancelled) return
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        const uid = session?.user?.id ?? null
+        setUserId(uid)
+        if (uid) {
+          // Best-effort recheck; ignore errors (table/RLS/network) — UI already optimistic
+          void sb.from('saved_articles')
+            .select('article_slug')
+            .eq('user_id', uid)
+            .eq('article_slug', slug)
+            .maybeSingle()
+            .then(({ data: row }) => {
+              if (!cancelled && row) setSaved(true)
+            })
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUserId(null)
+        setSaved(getLocalFavorites().includes(slug))
+      }
+    })
+
+    return () => {
+      cancelled = true
+      subscription.unsubscribe()
+    }
   }, [slug])
 
   const toggle = async (e: React.MouseEvent) => {
@@ -61,11 +90,16 @@ export default function CardFavoriteButton({ slug }: Props) {
 
     const favs = getLocalFavorites()
     if (next) {
-      if (!favs.includes(slug)) localStorage.setItem('favorites', JSON.stringify([...favs, slug]))
-      // Politely invite anonymous users to register so favorites sync.
-      if (!userId) setShowAuth(true)
+      if (!favs.includes(slug)) saveLocalFavorites([...favs, slug])
+      // Logged-out favorite: record explicit intent so that a subsequent login
+      // (even if not from this exact modal) will ensure the article is saved server-side
+      // and we avoid "eating" the user's action.
+      if (!userId) {
+        setPendingAuthIntent({ action: 'favorite', slug, returnTo: typeof window !== 'undefined' ? window.location.pathname : undefined })
+        setShowAuth(true)
+      }
     } else {
-      localStorage.setItem('favorites', JSON.stringify(favs.filter((s) => s !== slug)))
+      saveLocalFavorites(favs.filter((s) => s !== slug))
     }
 
     if (userId) {
