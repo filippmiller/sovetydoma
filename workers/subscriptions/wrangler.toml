@@ -8,6 +8,8 @@ SUBSCRIPTIONS_API_URL = "https://sovetydoma-subscriptions.filippmiller.workers.d
 PUBLIC_SITE_URL = "https://1001sovet.ru"
 VK_ID_APP_ID = "54625895"
 VK_ID_REDIRECT_URI = "https://1001sovet.ru/api/auth/vk/callback"
+VK_GROUP_ID = "239393062"
+VK_API_VERSION = "5.199"
 MAX_API_BASE_URL = "https://platform-api.max.ru/"
 TURNSTILE_SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 # SUBSCRIPTIONS_ALLOW_UNVERIFIED_TURNSTILE: dev-only Turnstile bypass. Never commit
