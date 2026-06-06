@@ -128,6 +128,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
         const VKID = window.VKIDSDK
         const codeVerifier = createPkceVerifier()
         vkContainerRef.current.dataset.codeVerifier = codeVerifier
+        window.sessionStorage.setItem(VK_ID_CODE_VERIFIER_KEY, codeVerifier)
         VKID.Config.init({
           app: Number(process.env.NEXT_PUBLIC_VK_APP_ID || '54625895'),
           redirectUrl: `${window.location.origin}/api/auth/vk/callback`,
@@ -938,6 +939,8 @@ function getAuthRedirectTo() {
 function isVkAuthEnabled(): boolean {
   return process.env.NEXT_PUBLIC_VK_AUTH_ENABLED === 'true'
 }
+
+const VK_ID_CODE_VERIFIER_KEY = 'sovetydoma_vk_id_code_verifier'
 
 function loadVkIdSdk(): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve()
