@@ -6,6 +6,8 @@ compatibility_date = "2026-06-02"
 ALLOWED_ORIGINS = "https://1001sovet.ru,http://localhost:3000,http://127.0.0.1:3000"
 SUBSCRIPTIONS_API_URL = "https://sovetydoma-subscriptions.filippmiller.workers.dev"
 PUBLIC_SITE_URL = "https://1001sovet.ru"
+VK_ID_APP_ID = "54625895"
+VK_ID_REDIRECT_URI = "https://1001sovet.ru/api/auth/vk/callback"
 MAX_API_BASE_URL = "https://platform-api.max.ru/"
 TURNSTILE_SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 # SUBSCRIPTIONS_ALLOW_UNVERIFIED_TURNSTILE: dev-only Turnstile bypass. Never commit
