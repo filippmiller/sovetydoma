@@ -77,4 +77,38 @@ describe('category generators', () => {
       assert.match(u, /^https:\/\/1001sovet\.ru\/[a-z0-9-]+\/[a-z0-9-]+\/$/)
     }
   })
+
+  it('sitemap contains image:image entries for articles', () => {
+    const sitemap = fs.readFileSync(path.join(root, 'public', 'sitemap.xml'), 'utf8')
+    assert.match(sitemap, /xmlns:image="http:\/\/www\.google\.com\/schemas\/sitemap-image\/1\.1"/)
+    // Verify at least one article has an image block
+    assert.match(sitemap, /<image:image>/)
+    assert.match(sitemap, /<image:loc>https:\/\/1001sovet\.ru\/images\/[a-z0-9-]+\.jpg<\/image:loc>/)
+    assert.match(sitemap, /<image:title>/)
+  })
+
+  it('layout.tsx generates RSS alternate links for all CATEGORIES', () => {
+    const layout = fs.readFileSync(path.join(root, 'src', 'app', 'layout.tsx'), 'utf8')
+    // Must use CATEGORIES map instead of hardcoded links
+    assert.match(layout, /Object\.values\(CATEGORIES\)/)
+    // Must contain the template pattern for per-category feeds
+    assert.match(layout, /feed-\$\{cat\.slug\}\.xml/)
+    // Should not contain the old hardcoded category feed links
+    assert.ok(!layout.includes('feed-kulinaria.xml'), 'layout.tsx still hardcodes feed-kulinaria.xml')
+    assert.ok(!layout.includes('feed-dom-i-uborka.xml'), 'layout.tsx still hardcodes feed-dom-i-uborka.xml')
+    assert.ok(!layout.includes('feed-dacha-i-ogorod.xml'), 'layout.tsx still hardcodes feed-dacha-i-ogorod.xml')
+    assert.ok(!layout.includes('feed-layfkhaki.xml'), 'layout.tsx still hardcodes feed-layfkhaki.xml')
+    assert.ok(!layout.includes('feed-ekonomiya.xml'), 'layout.tsx still hardcodes feed-ekonomiya.xml')
+  })
+
+  it('homepage does not pass full getAllArticles() directly to ArticleCatalogGrid', () => {
+    const page = fs.readFileSync(path.join(root, 'src', 'app', 'page.tsx'), 'utf8')
+    // Must slice/limit articles before passing to the grid
+    assert.match(page, /HOMEPAGE_ARTICLE_LIMIT/)
+    assert.match(page, /\.slice\(/)
+    // Should not pass the unfiltered getAllArticles() result to ArticleCatalogGrid
+    const gridPass = page.match(/ArticleCatalogGrid\s+articles=\{([^}]+)\}/)
+    assert.ok(gridPass, 'could not find ArticleCatalogGrid articles prop')
+    assert.ok(!gridPass[1].includes('getAllArticles()'), 'homepage passes raw getAllArticles() to ArticleCatalogGrid')
+  })
 })

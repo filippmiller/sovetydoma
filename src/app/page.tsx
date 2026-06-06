@@ -42,26 +42,35 @@ const organizationJsonLd = {
   logo: absoluteUrl('/icon-512.png'),
 }
 
+const HOMEPAGE_ARTICLE_LIMIT = 24
+const POPULAR_ARTICLE_LIMIT = 100
+const PERSONALISED_ARTICLE_LIMIT = 100
+
 export default function HomePage() {
-  const articles = getAllArticles()
+  const allArticles = getAllArticles()
+  const articles = allArticles.slice(0, HOMEPAGE_ARTICLE_LIMIT)
 
-  const popularArticleData = articles.map((a) => ({
-    title: a.title,
-    slug: a.slug,
-    category: a.category,
-    categoryName: a.categoryName,
-    date: a.date,
-  }))
+  const popularArticleData = allArticles
+    .slice(0, POPULAR_ARTICLE_LIMIT)
+    .map((a) => ({
+      title: a.title,
+      slug: a.slug,
+      category: a.category,
+      categoryName: a.categoryName,
+      date: a.date,
+    }))
 
-  const articlesForClient = articles.map((a) => ({
-    slug: a.slug,
-    title: a.title,
-    category: a.category,
-    categoryName: a.categoryName,
-    date: a.date,
-    description: a.description,
-    tags: a.tags,
-  }))
+  const articlesForClient = allArticles
+    .slice(0, PERSONALISED_ARTICLE_LIMIT)
+    .map((a) => ({
+      slug: a.slug,
+      title: a.title,
+      category: a.category,
+      categoryName: a.categoryName,
+      date: a.date,
+      description: a.description,
+      tags: a.tags,
+    }))
 
   return (
     <>
@@ -107,15 +116,15 @@ export default function HomePage() {
         {/* FIX 6: "С чего начать" for first-time visitors */}
         <StartHereSection />
 
-        {/* All articles in one grid */}
+        {/* Latest articles */}
         {articles.length > 0 && (
           <section style={{ marginBottom: '2.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>
-                Все статьи
+                Последние статьи
               </h2>
-              <Link href="/search" style={{ fontSize: '0.85rem', color: '#c0392b', textDecoration: 'none', fontWeight: 600 }}>
-                Все разделы →
+              <Link href="/articles" style={{ fontSize: '0.85rem', color: '#c0392b', textDecoration: 'none', fontWeight: 600 }}>
+                Все статьи →
               </Link>
             </div>
             <ArticleCatalogGrid articles={articles} />

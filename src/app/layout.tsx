@@ -7,6 +7,7 @@ import BackToTop from '@/components/BackToTop'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import AnalyticsTracker from '@/components/AnalyticsTracker'
 import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/seo'
+import { CATEGORIES } from '@/lib/categories'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -57,14 +58,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <link rel="alternate" hrefLang="ru" href={SITE_URL} />
         <link rel="alternate" type="application/rss+xml" title="СоветыДома RSS" href={`${SITE_URL}/feed.xml`} />
-        <link rel="alternate" type="application/rss+xml" title="СоветыДома — Кулинария" href={`${SITE_URL}/feed-kulinaria.xml`} />
-        <link rel="alternate" type="application/rss+xml" title="СоветыДома — Дом и уборка" href={`${SITE_URL}/feed-dom-i-uborka.xml`} />
-        <link rel="alternate" type="application/rss+xml" title="СоветыДома — Дача и огород" href={`${SITE_URL}/feed-dacha-i-ogorod.xml`} />
-        <link rel="alternate" type="application/rss+xml" title="СоветыДома — Лайфхаки" href={`${SITE_URL}/feed-layfkhaki.xml`} />
-        <link rel="alternate" type="application/rss+xml" title="СоветыДома — Экономия" href={`${SITE_URL}/feed-ekonomiya.xml`} />
-        <link rel="alternate" type="application/rss+xml" title="СоветыДома Turbo" href="https://1001sovet.ru/turbo.xml" />
+        {Object.values(CATEGORIES).map((cat) => (
+          <link
+            key={cat.slug}
+            rel="alternate"
+            type="application/rss+xml"
+            title={`СоветыДома — ${cat.name}`}
+            href={`${SITE_URL}/feed-${cat.slug}.xml`}
+          />
+        ))}
+        <link rel="alternate" type="application/rss+xml" title="СоветыДома Turbo" href={`${SITE_URL}/turbo.xml`} />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#c0392b" />
+        <meta name="msvalidate.01" content="CDA98D825323138C1BE05C96F85052EB" />
       </head>
       <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', margin: 0 }}>
         <a href="#main-content" className="skip-link">Перейти к содержимому</a>

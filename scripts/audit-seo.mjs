@@ -49,6 +49,15 @@ for (const file of files) {
   if (!/^## /m.test(content)) fail(file, 'expected at least one H2 section')
   if (!fs.existsSync(imagePath)) fail(file, `missing SEO image public/images/${slug}.jpg`)
 
+  // updated validation (optional, but must be valid if present)
+  if (data.updated) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.updated)) {
+      fail(file, `updated must be YYYY-MM-DD, got "${data.updated}"`)
+    } else if (data.date && data.updated < data.date) {
+      fail(file, `updated (${data.updated}) must not be earlier than date (${data.date})`)
+    }
+  }
+
   if (seenSlugs.has(slug)) fail(file, `duplicate slug: ${slug}`)
   seenSlugs.add(slug)
   if (seenTitles.has(title)) fail(file, `duplicate title: ${title}`)

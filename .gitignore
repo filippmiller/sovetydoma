@@ -84,3 +84,5 @@ HANDOFF-RESUME.md
 # content-matrix idea-gen scratch (JSON batches from Kimi)
 .matrix-ideas/
 public/images/_grok-test.jpg
+# IndexNow key file (generated at build time from env)
+public/indexnow-key.txt

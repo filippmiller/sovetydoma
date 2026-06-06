@@ -26,6 +26,15 @@ const articles = files.map(f => {
   return data
 })
 
+function escapeXml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
 const ARTICLE_PAGE_SIZE = 24
 const totalArticlePages = Math.max(1, Math.ceil(articles.length / ARTICLE_PAGE_SIZE))
 const paginatedArticlePages = Array.from(
@@ -46,11 +55,25 @@ const urls = [
   ...STATIC_PAGES.map(p => `<url><loc>${SITE_URL}${p.path}</loc><changefreq>${p.changefreq}</changefreq><priority>${p.priority}</priority></url>`),
   ...paginatedArticlePages.map(p => `<url><loc>${SITE_URL}${p}</loc><changefreq>daily</changefreq><priority>0.5</priority></url>`),
   ...archiveMonths.map(ym => `<url><loc>${SITE_URL}/archive/${ym}/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>`),
-  ...articles.map(a => `<url><loc>${SITE_URL}/${a.category}/${a.slug}/</loc><lastmod>${a.updated || a.date}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>`),
+  ...articles.map(a => {
+    const loc = `${SITE_URL}/${a.category}/${a.slug}/`
+    const lastmod = a.updated || a.date
+    const imageUrl = `${SITE_URL}/images/${a.slug}.jpg`
+    return `<url>
+  <loc>${loc}</loc>
+  <lastmod>${lastmod}</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>${imageUrl}</image:loc>
+    <image:title>${escapeXml(a.title)}</image:title>
+  </image:image>
+</url>`
+  }),
 ]
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls.join('\n')}
 </urlset>`
 

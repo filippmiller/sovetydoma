@@ -25,6 +25,8 @@
     "normalize:images": "python scripts/normalize-article-images.py",
     "generate:previews": "python scripts/generate-image-previews.py",
     "fix:image-frontmatter": "node scripts/fix-image-frontmatter-drifts.mjs",
+    "seo:indexnow:dry": "node scripts/submit-indexnow.mjs --dry-run",
+    "seo:indexnow": "node scripts/submit-indexnow.mjs",
     "matrix:seed": "node scripts/matrix/seed-from-current.mjs"
   },
   "dependencies": {
