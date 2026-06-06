@@ -67,6 +67,8 @@ NEXT_PUBLIC_VK_SCOPE=email
 NEXT_PUBLIC_SUBSCRIPTIONS_API_URL=https://sovetydoma-subscriptions.filippmiller.workers.dev
 ```
 
+The GitHub deploy workflow now reads these public VK values from repository secrets and defaults the feature flag to `false`.
+
 ## Required Worker secrets/env
 
 Server-side only:
