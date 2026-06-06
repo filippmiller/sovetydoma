@@ -53,6 +53,11 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
 
+function fallbackEmailForVkUser(vkUserId: string): string {
+  const safeId = vkUserId.toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 80)
+  return `vk-${safeId}@users.1001sovet.ru`
+}
+
 function vkIdAuthBase(env: Env): string {
   return String(env.VK_ID_AUTH_BASE_URL || DEFAULT_VK_ID_AUTH_BASE).replace(/\/+$/, '')
 }
@@ -151,19 +156,17 @@ export async function createSupabaseVkIdLoginLink(env: Env, input: VkIdExchangeI
 
   const info = await fetchVkIdUserInfo(env, accessToken)
   const user = info.user || {}
-  const email = cleanEmail(info.email || user.email || token.email)
-  if (!isValidEmail(email)) {
-    throw new Error('vk_email_missing')
-  }
-
   const vkUserId = cleanText(user.user_id || user.id || token.user_id, 80)
   if (!vkUserId) throw new Error('vk_user_id_missing')
 
+  const emailFromVk = cleanEmail(info.email || user.email || token.email)
+  const email = isValidEmail(emailFromVk) ? emailFromVk : fallbackEmailForVkUser(vkUserId)
   const displayName = [user.first_name, user.last_name].map((v) => cleanText(v, 80)).filter(Boolean).join(' ').trim() || email.split('@')[0]
   const avatarUrl = cleanText(user.avatar || user.photo_200, 500)
   const actionLink = await generateSupabaseMagicLink(env, email, {
     provider: 'vk_id',
     vk_id: vkUserId,
+    vk_email_missing: !isValidEmail(emailFromVk),
     display_name: displayName,
     avatar_url: avatarUrl || undefined,
   })

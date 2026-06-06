@@ -313,3 +313,54 @@ test('vk id exchange returns Supabase action link after VK verification', async 
     globalThis.fetch = originalFetch
   }
 })
+
+test('vk id exchange falls back to a private email when VK omits email', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+
+    if (url.includes('/rest/v1/rpc/notification_check_rate_limit')) {
+      return new Response(JSON.stringify({ allowed: true, bucket: 'ok' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://id.vk.com/oauth2/auth') {
+      return new Response(JSON.stringify({ access_token: 'vk-access-token', user_id: '123' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://id.vk.com/oauth2/user_info') {
+      return new Response(JSON.stringify({
+        user: { user_id: '123', first_name: 'Ivan', last_name: 'Petrov' },
+      }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://supabase.example/auth/v1/admin/generate_link') {
+      const body = JSON.parse(String(init?.body || '{}'))
+      assert.equal(body.email, 'vk-123@users.1001sovet.ru')
+      assert.equal(body.data.vk_id, '123')
+      assert.equal(body.data.vk_email_missing, true)
+      return new Response(JSON.stringify({ action_link: 'https://supabase.example/auth/v1/verify?token=generated' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    return new Response(JSON.stringify({ error: 'unexpected_fetch', url }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+  }
+
+  try {
+    const response = await worker.fetch(request('/auth/vk/exchange', {
+      method: 'POST',
+      headers: {
+        Origin: 'https://1001sovet.ru',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code: 'vk-code', device_id: 'vk-device', code_verifier: 'vk-verifier' }),
+    }), {
+      ...baseEnv,
+      SUPABASE_URL: 'https://supabase.example',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-role',
+      VK_ID_APP_ID: '54625895',
+    })
+
+    assert.equal(response.status, 200)
+    const body = await response.json()
+    assert.equal(body.ok, true)
+    assert.equal(body.actionLink, 'https://supabase.example/auth/v1/verify?token=generated')
+    assert.equal(body.emailHint, 'vk***@users.1001sovet.ru')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
