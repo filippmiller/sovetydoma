@@ -846,6 +846,7 @@ async function handleVkIdExchange(request: Request, env: Env): Promise<Response>
     })
   } catch (err) {
     const e = err as Error & { missing?: string[] }
+    console.error('vk_id_exchange_failed', e.message)
     if (e.message === 'provider_unconfigured') {
       return json({ ok: false, error: 'provider_unconfigured', missing: e.missing || [] }, 503)
     }
