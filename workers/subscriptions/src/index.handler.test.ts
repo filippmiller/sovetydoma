@@ -120,3 +120,87 @@ test('resend webhook requires svix secret before accepting suppression events', 
   assert.equal(response.status, 503)
   assert.deepEqual(await response.json(), { ok: false, error: 'resend_webhook_secret_not_configured' })
 })
+
+test('vk dry-run requires admin key', async () => {
+  const response = await worker.fetch(request('/admin/social/vk/dry-run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ articleSlug: 'agrovolokno-pod-klubniku-vesnoy' }),
+  }), baseEnv)
+
+  assert.equal(response.status, 503)
+  assert.deepEqual(await response.json(), { ok: false, error: 'admin_api_key_not_configured' })
+})
+
+test('vk dry-run returns provider_unconfigured when VK env missing', async () => {
+  const response = await worker.fetch(request('/admin/social/vk/dry-run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': 'admin-secret' },
+    body: JSON.stringify({ articleSlug: 'agrovolokno-pod-klubniku-vesnoy' }),
+  }), {
+    ...baseEnv,
+    ADMIN_API_KEY: 'admin-secret',
+    SUPABASE_URL: 'https://supabase.example',
+    SUPABASE_SERVICE_ROLE_KEY: 'service-role',
+  })
+
+  assert.equal(response.status, 503)
+  const body = await response.json()
+  assert.equal(body.error, 'provider_unconfigured')
+  assert.ok(Array.isArray(body.missing))
+})
+
+test('vk dry-run returns article_not_found for unknown slug', async () => {
+  const response = await worker.fetch(request('/admin/social/vk/dry-run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': 'admin-secret' },
+    body: JSON.stringify({ articleSlug: 'nonexistent-article-12345' }),
+  }), {
+    ...baseEnv,
+    ADMIN_API_KEY: 'admin-secret',
+    SUPABASE_URL: 'https://supabase.example',
+    SUPABASE_SERVICE_ROLE_KEY: 'service-role',
+    VK_ACCESS_TOKEN: 'vk-token',
+    VK_GROUP_ID: '123456',
+  })
+
+  assert.equal(response.status, 404)
+  assert.deepEqual(await response.json(), { ok: false, error: 'article_not_found' })
+})
+
+test('vk dry-run returns build info for known article', async () => {
+  const response = await worker.fetch(request('/admin/social/vk/dry-run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': 'admin-secret' },
+    body: JSON.stringify({ articleSlug: 'agrovolokno-pod-klubniku-vesnoy' }),
+  }), {
+    ...baseEnv,
+    ADMIN_API_KEY: 'admin-secret',
+    SUPABASE_URL: 'https://supabase.example',
+    SUPABASE_SERVICE_ROLE_KEY: 'service-role',
+    VK_ACCESS_TOKEN: 'vk-token',
+    VK_GROUP_ID: '123456',
+  })
+
+  assert.equal(response.status, 200)
+  const body = await response.json()
+  assert.equal(body.ok, true)
+  assert.equal(body.dryRun, true)
+  assert.equal(body.articleSlug, 'agrovolokno-pod-klubniku-vesnoy')
+  assert.ok(body.title)
+  assert.ok(body.canonicalUrl)
+  assert.ok(body.imageUrl)
+  assert.ok(body.messageLength > 0)
+  assert.ok(body.bodyHash)
+  assert.ok(body.wouldPost)
+})
+
+test('vk post requires admin key', async () => {
+  const response = await worker.fetch(request('/admin/social/vk/post', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ articleSlug: 'agrovolokno-pod-klubniku-vesnoy' }),
+  }), baseEnv)
+
+  assert.equal(response.status, 503)
+})

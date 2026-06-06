@@ -64,6 +64,10 @@ export type Env = {
   PII_HASH_SECRET?: string
   DIGEST_BATCH_SIZE?: string
   SUBSCRIPTIONS_ALLOW_UNVERIFIED_TURNSTILE?: string
+  VK_ACCESS_TOKEN?: string
+  VK_GROUP_ID?: string
+  VK_API_VERSION?: string
+  VK_API_BASE_URL?: string
 }
 
 export type RouteContext = {

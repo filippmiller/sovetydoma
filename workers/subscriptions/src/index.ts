@@ -1,5 +1,5 @@
 import type { Env, SubscriptionStartRequest, DirectChannel } from './types'
-import { buildSubscriptionsDiagnostics, handleDryRun, handleSubscriptionsDiagnostics, handleTestSend } from './admin'
+import { buildSubscriptionsDiagnostics, handleDryRun, handleSubscriptionsDiagnostics, handleTestSend, requireAdmin } from './admin'
 import { processDueDigests } from './delivery'
 import { createConfirmation, createSecureToken, sha256Hex, verifySignedContactToken } from './confirmations'
 import { getProviderReadiness, sendDigestToChannel } from './providers/registry'
@@ -7,6 +7,7 @@ import { checkRateLimit } from './rate-limit'
 import { hmacSha256Hex, requireSecret, timingSafeEqual, verifySvixSignature, verifyWhatsAppSignature } from './security'
 import { hasSupabaseServiceRole, insertRows, selectRows, updateRows } from './supabase'
 import { validateSubscriptionRequest } from '../../../src/lib/subscriptions/validation.mjs'
+import { buildVkArticlePost, findArticleRecord, MAX_VK_MESSAGE_CHARS, publishArticleToVk, sha256Text } from './social/vk'
 
 const CATEGORY_SLUGS = ['kulinaria', 'dom-i-uborka', 'dacha-i-ogorod', 'layfkhaki', 'ekonomiya', 'rybalka']
 const FREQUENCIES = ['daily_one', 'daily_digest_3', 'weekly_digest_3', 'weekly_digest_7']
@@ -808,6 +809,145 @@ async function handleSocialTargets(env: Env): Promise<Response> {
   return json({ ok: true, targets })
 }
 
+async function handleVkDryRun(request: Request, env: Env): Promise<Response> {
+  const adminError = requireAdmin(request, env)
+  if (adminError) return adminError
+
+  if (!hasSupabaseServiceRole(env)) {
+    return json({ ok: false, error: 'supabase_service_role_not_configured' }, 503)
+  }
+
+  const payload = await request.json().catch(() => ({})) as { articleSlug?: string; requirePhoto?: boolean }
+  const articleSlug = String(payload.articleSlug || '').trim()
+  if (!articleSlug) {
+    return json({ ok: false, error: 'article_slug_required' }, 400)
+  }
+
+  // Validate VK config (soft check for dry-run diagnostics)
+  const vkAccessToken = Boolean(env.VK_ACCESS_TOKEN)
+  const vkGroupId = Boolean(env.VK_GROUP_ID)
+  if (!vkAccessToken || !vkGroupId) {
+    return json({ ok: false, error: 'provider_unconfigured', missing: ['VK_ACCESS_TOKEN', 'VK_GROUP_ID'].filter((k) => !env[k as keyof Env]) }, 503)
+  }
+
+  const siteUrl = String(env.PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
+  const record = findArticleRecord(articleSlug)
+  if (!record) {
+    return json({ ok: false, error: 'article_not_found' }, 404)
+  }
+
+  let post: ReturnType<typeof buildVkArticlePost>
+  try {
+    post = buildVkArticlePost({ record, siteUrl })
+  } catch (err) {
+    const code = (err && typeof err === 'object' && 'code' in err) ? String((err as { code?: string }).code) : 'build_failed'
+    return json({ ok: false, error: (err as Error).message, errorCode: code }, 400)
+  }
+
+  const bodyHash = await sha256Text(`${post.message}\n${post.imageUrl}`)
+
+  return json({
+    ok: true,
+    dryRun: true,
+    articleSlug,
+    title: record.title,
+    canonicalUrl: post.canonicalUrl,
+    imageUrl: post.imageUrl,
+    messageLength: post.messageLength,
+    bodyHash,
+    wouldPost: {
+      owner_id: `-${String(env.VK_GROUP_ID)}`,
+      from_group: 1,
+      hasPhoto: true,
+      attachmentPreview: 'photo',
+      maxChars: MAX_VK_MESSAGE_CHARS,
+    },
+  })
+}
+
+async function handleVkPost(request: Request, env: Env): Promise<Response> {
+  const adminError = requireAdmin(request, env)
+  if (adminError) return adminError
+
+  if (!hasSupabaseServiceRole(env)) {
+    return json({ ok: false, error: 'supabase_service_role_not_configured' }, 503)
+  }
+
+  const payload = await request.json().catch(() => ({})) as { articleSlug?: string; requirePhoto?: boolean }
+  const articleSlug = String(payload.articleSlug || '').trim()
+  const requirePhoto = payload.requirePhoto !== false
+  if (!articleSlug) {
+    return json({ ok: false, error: 'article_slug_required' }, 400)
+  }
+
+  // Verify article exists in publication index
+  const articles = await selectRows<{ article_slug: string }>(
+    env,
+    'articles_publication_index',
+    `article_slug=eq.${encodeURIComponent(articleSlug)}&select=article_slug&limit=1`,
+  )
+  if (articles.length === 0) {
+    return json({ ok: false, error: 'article_not_found' }, 404)
+  }
+
+  // Prevent duplicate
+  const existing = await selectRows<{ id: string; provider_post_id: string; status: string }>(
+    env,
+    'social_publications',
+    `platform=eq.vk&article_slug=eq.${encodeURIComponent(articleSlug)}&select=id,provider_post_id,status&limit=1`,
+  )
+  const posted = existing.find((row) => row.status === 'posted')
+  if (posted) {
+    return json({ ok: false, error: 'duplicate_already_posted', providerPostId: posted.provider_post_id }, 409)
+  }
+
+  const result = await publishArticleToVk(env, articleSlug, { dryRun: false, requirePhoto })
+
+  if (!result.ok) {
+    // Insert failed record
+    try {
+      await insertRows(env, 'social_publications', {
+        platform: 'vk',
+        article_slug: articleSlug,
+        body_hash: result.bodyHash || '',
+        status: 'failed',
+        provider_payload: { error: result.error, errorCode: result.errorCode },
+        error_code: result.errorCode || 'unknown',
+        error_message: result.error || 'unknown',
+      }, 'id')
+    } catch {
+      // Ignore DB write failure
+    }
+    return json({ ok: false, error: result.error, errorCode: result.errorCode }, 502)
+  }
+
+  // Upsert success record
+  const upsertPayload = {
+    platform: 'vk',
+    article_slug: articleSlug,
+    body_hash: result.bodyHash,
+    status: 'posted',
+    provider_post_id: result.providerPostId,
+    provider_payload: { postUrl: result.postUrl, messageLength: result.messageLength },
+    posted_at: new Date().toISOString(),
+  }
+
+  if (existing[0]) {
+    await updateRows(env, 'social_publications', `id=eq.${encodeURIComponent(existing[0].id)}`, upsertPayload, 'id')
+  } else {
+    await insertRows(env, 'social_publications', upsertPayload, 'id')
+  }
+
+  return json({
+    ok: true,
+    articleSlug,
+    providerPostId: result.providerPostId,
+    postUrl: result.postUrl,
+    messageLength: result.messageLength,
+    bodyHash: result.bodyHash,
+  })
+}
+
 async function handleSocialTrack(request: Request, env: Env): Promise<Response> {
   const origin = request.headers.get('origin') || ''
   if (origin && !isAllowedOrigin(env, request)) {
@@ -892,6 +1032,14 @@ export async function route(req: Request, env: Env): Promise<Response> {
 
   if (req.method === 'POST' && url.pathname === '/admin/subscriptions/test-send') {
     return handleTestSend(req, env)
+  }
+
+  if (req.method === 'POST' && url.pathname === '/admin/social/vk/dry-run') {
+    return handleVkDryRun(req, env)
+  }
+
+  if (req.method === 'POST' && url.pathname === '/admin/social/vk/post') {
+    return handleVkPost(req, env)
   }
 
   return json({ ok: false, error: 'not_found', path: url.pathname }, 404)
