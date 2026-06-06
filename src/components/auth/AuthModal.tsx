@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { supabase } from '@/lib/supabase'
+import { getSupabase, supabase } from '@/lib/supabase'
 import PasswordInput from './PasswordInput'
 import { migrateLocalFavoritesToServer, processPendingFavoriteIntent } from '@/lib/favorites'
 
@@ -88,6 +88,30 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const [confirmPassword, setConfirmPassword] = useState('')
   const [resetLoading, setResetLoading] = useState(false)
   const [vkLoading, setVkLoading] = useState(false)
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null)
+
+  const handleOAuthSignIn = useCallback(async (provider: 'yandex' | 'google' | 'vk') => {
+    setError('')
+    setOauthLoading(provider)
+    try {
+      const sb = getSupabase()
+      const redirectTo = getOAuthRedirectTo()
+      const { data, error: oauthError } = await sb.auth.signInWithOAuth({
+        provider: provider as unknown as Parameters<typeof sb.auth.signInWithOAuth>[0]['provider'],
+        options: { redirectTo },
+      })
+      if (oauthError) throw oauthError
+      if (data.url) {
+        window.sessionStorage.setItem('auth_redirect_to', getAuthRedirectTo())
+        window.location.href = data.url
+      } else {
+        throw new Error('oauth_url_missing')
+      }
+    } catch (err) {
+      setError(mapOAuthError((err as Error).message))
+      setOauthLoading(null)
+    }
+  }, [])
 
   const handleVkSuccess = useCallback(async (payload: { code?: string; device_id?: string }) => {
     setError('')
@@ -129,9 +153,14 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
         const codeVerifier = createPkceVerifier()
         vkContainerRef.current.dataset.codeVerifier = codeVerifier
         window.sessionStorage.setItem(VK_ID_CODE_VERIFIER_KEY, codeVerifier)
+        const redirectUrl = safeRedirectUrl(`${window.location.origin}/api/auth/vk/callback`)
+        if (!redirectUrl) {
+          if (!cancelled) setError('VK ID временно недоступен (неверный адрес редиректа).')
+          return
+        }
         VKID.Config.init({
           app: Number(process.env.NEXT_PUBLIC_VK_APP_ID || '54625895'),
-          redirectUrl: `${window.location.origin}/api/auth/vk/callback`,
+          redirectUrl,
           responseMode: VKID.ConfigResponseMode.Callback,
           source: VKID.ConfigSource.LOWCODE,
           scope: process.env.NEXT_PUBLIC_VK_SCOPE || 'email',
@@ -693,6 +722,27 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                 <div style={dividerStyle}><span>или</span></div>
               </>
             )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <OAuthButton
+                provider="yandex"
+                label="Войти через Яндекс"
+                loading={oauthLoading === 'yandex'}
+                onClick={() => handleOAuthSignIn('yandex')}
+              />
+              <OAuthButton
+                provider="google"
+                label="Войти через Google"
+                loading={oauthLoading === 'google'}
+                onClick={() => handleOAuthSignIn('google')}
+              />
+              <OAuthButton
+                provider="vk"
+                label="Войти через VK"
+                loading={oauthLoading === 'vk'}
+                onClick={() => handleOAuthSignIn('vk')}
+              />
+            </div>
+            <div style={dividerStyle}><span>или email</span></div>
             <div>
               <label style={labelStyle}>Email</label>
               <div style={inputWrapStyle}>
@@ -936,8 +986,27 @@ function getAuthRedirectTo() {
   return `${siteOrigin}/moy-kabinet/`
 }
 
+function getOAuthRedirectTo(): string {
+  if (typeof window === 'undefined') return 'https://1001sovet.ru/auth/callback/'
+  const origin = window.location.origin
+  const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+  const siteOrigin = isLocal ? origin : 'https://1001sovet.ru'
+  return `${siteOrigin}/auth/callback/`
+}
+
 function isVkAuthEnabled(): boolean {
   return process.env.NEXT_PUBLIC_VK_AUTH_ENABLED === 'true'
+}
+
+function safeRedirectUrl(value: string): string | null {
+  try {
+    const url = new URL(value)
+    // Only allow http: and https: protocols
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null
+    return url.toString()
+  } catch {
+    return null
+  }
 }
 
 const VK_ID_CODE_VERIFIER_KEY = 'sovetydoma_vk_id_code_verifier'
@@ -976,6 +1045,57 @@ function mapVkAuthError(raw: string): string {
   if (raw === 'vk_email_missing') return 'VK ID не вернул email. Попробуйте другой способ входа.'
   if (raw === 'rate_limited') return 'Слишком много попыток входа через VK ID. Попробуйте позже.'
   return 'Не удалось войти через VK ID. Попробуйте позже или войдите по email.'
+}
+
+function mapOAuthError(raw: string): string {
+  const m = raw.toLowerCase()
+  if (m.includes('provider_not_enabled') || m.includes('provider is not enabled')) {
+    return 'Этот способ входа пока не настроен. Попробуйте войти по email.'
+  }
+  if (m.includes('popup') || m.includes('blocked')) {
+    return 'Всплывающее окно заблокировано. Разрешите всплывающие окна для этого сайта.'
+  }
+  if (m.includes('network') || m.includes('fetch')) {
+    return 'Проблема с соединением. Проверьте интернет и попробуйте снова.'
+  }
+  return 'Не удалось войти через соцсеть. Попробуйте другой способ.'
+}
+
+function OAuthButton({ provider, label, loading, onClick }: { provider: string; label: string; loading: boolean; onClick: () => void }) {
+  const colors: Record<string, string> = {
+    yandex: '#fc3f1d',
+    google: '#4285f4',
+    vk: '#0077ff',
+  }
+  const bg = colors[provider] || '#666'
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={loading}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '0.5rem',
+        width: '100%',
+        padding: '0.65rem',
+        background: loading ? '#e0dbd5' : bg,
+        color: '#fff',
+        border: 'none',
+        borderRadius: '8px',
+        fontSize: '0.9rem',
+        fontWeight: 600,
+        cursor: loading ? 'not-allowed' : 'pointer',
+        fontFamily: 'inherit',
+        transition: 'opacity 0.2s',
+        opacity: loading ? 0.7 : 1,
+      }}
+    >
+      {loading ? '…' : provider === 'yandex' ? 'Я' : provider === 'google' ? 'G' : 'VK'}
+      {label}
+    </button>
+  )
 }
 
 // --- Shared styles ---
