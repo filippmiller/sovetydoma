@@ -73,6 +73,7 @@ export type Env = {
   VK_ID_REDIRECT_URI?: string
   VK_ID_API_BASE_URL?: string
   VK_ID_AUTH_BASE_URL?: string
+  VK_AUTOPOST_MAX_DAILY?: string
 }
 
 export type RouteContext = {

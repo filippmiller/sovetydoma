@@ -8,6 +8,7 @@ import { hmacSha256Hex, requireSecret, timingSafeEqual, verifySvixSignature, ver
 import { hasSupabaseServiceRole, insertRows, selectRows, updateRows } from './supabase'
 import { validateSubscriptionRequest } from '../../../src/lib/subscriptions/validation.mjs'
 import { buildVkArticlePost, findArticleRecord, MAX_VK_MESSAGE_CHARS, publishArticleToVk, sha256Text } from './social/vk'
+import { processVkAutopost } from './social/vk-autopost'
 import { createSupabaseVkIdLoginLink } from './auth/vk-id'
 
 const CATEGORY_SLUGS = ['kulinaria', 'dom-i-uborka', 'dacha-i-ogorod', 'layfkhaki', 'ekonomiya', 'rybalka']
@@ -1098,7 +1099,23 @@ export async function route(req: Request, env: Env): Promise<Response> {
 }
 
 export async function scheduled(_event: ScheduledEvent, env: Env): Promise<void> {
-  await processDueDigests(env)
+  try {
+    await processDueDigests(env)
+  } catch (err) {
+    console.error('due_digests_unexpected_error', (err as Error).message)
+  }
+
+  // Run VK autopost independently; log but don't crash digest processing on failure
+  try {
+    const vkResult = await processVkAutopost(env)
+    if (vkResult.ran) {
+      console.log('vk_autopost_result', JSON.stringify(vkResult))
+    } else {
+      console.log('vk_autopost_skipped', vkResult.skippedReason)
+    }
+  } catch (err) {
+    console.error('vk_autopost_unexpected_error', (err as Error).message)
+  }
 }
 
 const worker = {

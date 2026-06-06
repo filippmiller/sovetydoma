@@ -16,6 +16,8 @@ TURNSTILE_SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/sitev
 # (uncommitted) workers/subscriptions/.dev.vars file. In production, set the real
 # TURNSTILE_SECRET_KEY secret instead; with neither set, /subscriptions/start
 # denies by default.
+# VK_AUTOPOST_MAX_DAILY: optional daily cap for automatic VK wall posts.
+# Default is 3. Set via wrangler secret or .dev.vars if you want to override.
 
 [triggers]
 crons = ["0 * * * *"]
