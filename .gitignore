@@ -83,6 +83,12 @@ HANDOFF-RESUME.md
 
 # content-matrix idea-gen scratch (JSON batches from Kimi)
 .matrix-ideas/
+matrix-exports/
 public/images/_grok-test.jpg
 # IndexNow key file (generated at build time from env)
 public/indexnow-key.txt
+
+# Local browser/test artifacts
+.playwright-mcp/
+__pycache__/
+scripts/__pycache__/
