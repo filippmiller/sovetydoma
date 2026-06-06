@@ -19,6 +19,7 @@ const DEFAULT_VK_API_BASE = 'https://api.vk.com/method'
 
 export type VkConfig = {
   accessToken: string
+  photoAccessToken?: string
   groupId: string
   apiVersion: string
   apiBaseUrl: string
@@ -56,6 +57,7 @@ export type VkPublishResult = {
 
 export function validateVkConfig(env: Env): VkConfig {
   const accessToken = String(env.VK_ACCESS_TOKEN || '').trim()
+  const photoAccessToken = String(env.VK_PHOTO_ACCESS_TOKEN || '').trim() || undefined
   const groupId = String(env.VK_GROUP_ID || '').trim()
   const apiVersion = String(env.VK_API_VERSION || '5.199').trim()
   const apiBaseUrl = String(env.VK_API_BASE_URL || DEFAULT_VK_API_BASE).trim()
@@ -63,7 +65,7 @@ export function validateVkConfig(env: Env): VkConfig {
   if (!accessToken) throw new Error('vk_access_token_not_configured')
   if (!groupId) throw new Error('vk_group_id_not_configured')
 
-  return { accessToken, groupId, apiVersion, apiBaseUrl }
+  return { accessToken, photoAccessToken, groupId, apiVersion, apiBaseUrl }
 }
 
 export function findArticleRecord(articleSlug: string): VkArticleRecord | undefined {
@@ -105,7 +107,7 @@ export async function sha256Text(value: string): Promise<string> {
 
 export async function getWallUploadServer(env: Env, config: VkConfig): Promise<string> {
   const url = new URL(`${config.apiBaseUrl}/photos.getWallUploadServer`)
-  url.searchParams.set('access_token', config.accessToken)
+  url.searchParams.set('access_token', config.photoAccessToken || config.accessToken)
   url.searchParams.set('v', config.apiVersion)
   url.searchParams.set('group_id', config.groupId)
 
@@ -135,7 +137,7 @@ export async function uploadWallPhoto(uploadUrl: string, imageBytes: ArrayBuffer
 
 export async function saveWallPhoto(env: Env, config: VkConfig, uploadResult: { server?: string; photo?: string; hash?: string }): Promise<string> {
   const url = new URL(`${config.apiBaseUrl}/photos.saveWallPhoto`)
-  url.searchParams.set('access_token', config.accessToken)
+  url.searchParams.set('access_token', config.photoAccessToken || config.accessToken)
   url.searchParams.set('v', config.apiVersion)
   url.searchParams.set('group_id', config.groupId)
   if (uploadResult.server) url.searchParams.set('server', uploadResult.server)

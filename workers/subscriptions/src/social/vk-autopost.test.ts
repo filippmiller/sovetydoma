@@ -6,6 +6,7 @@ import type { Env } from '../types'
 const baseEnv: Env = {
   PUBLIC_SITE_URL: 'https://1001sovet.ru',
   VK_ACCESS_TOKEN: 'test-token',
+  VK_PHOTO_ACCESS_TOKEN: 'test-photo-token',
   VK_GROUP_ID: '123456',
   VK_API_VERSION: '5.199',
   SUPABASE_URL: 'https://test.supabase.co',
@@ -33,6 +34,18 @@ test('processVkAutopost skips when VK not configured', async () => {
     PUBLIC_SITE_URL: 'https://1001sovet.ru',
     SUPABASE_URL: 'https://test.supabase.co',
     SUPABASE_SERVICE_ROLE_KEY: 'test-key',
+  })
+  assert.equal(result.ran, false)
+  assert.equal(result.skippedReason, 'vk_not_configured')
+})
+
+test('processVkAutopost skips when VK photo token is missing', async () => {
+  const result = await processVkAutopost({
+    PUBLIC_SITE_URL: 'https://1001sovet.ru',
+    SUPABASE_URL: 'https://test.supabase.co',
+    SUPABASE_SERVICE_ROLE_KEY: 'test-key',
+    VK_ACCESS_TOKEN: 'test-token',
+    VK_GROUP_ID: '123456',
   })
   assert.equal(result.ran, false)
   assert.equal(result.skippedReason, 'vk_not_configured')

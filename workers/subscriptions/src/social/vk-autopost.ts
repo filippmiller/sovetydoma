@@ -47,7 +47,7 @@ function isWithinPostingHours(now: Date): boolean {
 }
 
 function vkConfigReady(env: Env): boolean {
-  return Boolean(env.VK_ACCESS_TOKEN && env.VK_GROUP_ID)
+  return Boolean(env.VK_ACCESS_TOKEN && env.VK_GROUP_ID && env.VK_PHOTO_ACCESS_TOKEN)
 }
 
 async function findLatestUnpostedArticle(env: Env): Promise<ArticleRow | null> {

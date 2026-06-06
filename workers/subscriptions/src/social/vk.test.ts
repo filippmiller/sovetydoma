@@ -12,6 +12,7 @@ import type { Env } from '../types'
 const baseEnv: Env = {
   PUBLIC_SITE_URL: 'https://1001sovet.ru',
   VK_ACCESS_TOKEN: 'test-token',
+  VK_PHOTO_ACCESS_TOKEN: 'test-photo-token',
   VK_GROUP_ID: '123456',
   VK_API_VERSION: '5.199',
 }
@@ -27,6 +28,7 @@ test('validateVkConfig throws when group id missing', () => {
 test('validateVkConfig returns config', () => {
   const config = validateVkConfig(baseEnv)
   assert.equal(config.accessToken, 'test-token')
+  assert.equal(config.photoAccessToken, 'test-photo-token')
   assert.equal(config.groupId, '123456')
   assert.equal(config.apiVersion, '5.199')
 })
