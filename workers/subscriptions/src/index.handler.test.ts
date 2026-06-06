@@ -204,3 +204,112 @@ test('vk post requires admin key', async () => {
 
   assert.equal(response.status, 503)
 })
+
+test('vk id exchange rejects disallowed origins', async () => {
+  const response = await worker.fetch(request('/auth/vk/exchange', {
+    method: 'POST',
+    headers: {
+      Origin: 'https://evil.example',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ code: 'code', device_id: 'device', code_verifier: 'verifier' }),
+  }), baseEnv)
+
+  assert.equal(response.status, 403)
+  assert.deepEqual(await response.json(), { ok: false, error: 'origin_not_allowed' })
+})
+
+test('vk id exchange requires code device id and verifier', async () => {
+  const response = await worker.fetch(request('/auth/vk/exchange', {
+    method: 'POST',
+    headers: {
+      Origin: 'https://1001sovet.ru',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ code: 'code' }),
+  }), baseEnv)
+
+  assert.equal(response.status, 400)
+  assert.deepEqual(await response.json(), { ok: false, error: 'vk_code_device_id_and_verifier_required' })
+})
+
+test('vk id exchange requires Supabase service role configuration', async () => {
+  const response = await worker.fetch(request('/auth/vk/exchange', {
+    method: 'POST',
+    headers: {
+      Origin: 'https://1001sovet.ru',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ code: 'code', device_id: 'device', code_verifier: 'verifier' }),
+  }), baseEnv)
+
+  assert.equal(response.status, 503)
+  const body = await response.json()
+  assert.equal(body.error, 'provider_unconfigured')
+  assert.deepEqual(body.missing, ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'])
+})
+
+test('vk id exchange returns Supabase action link after VK verification', async () => {
+  const originalFetch = globalThis.fetch
+  const calls: string[] = []
+  globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    calls.push(url)
+
+    if (url.includes('/rest/v1/rpc/notification_check_rate_limit')) {
+      return new Response(JSON.stringify({ allowed: true, bucket: 'ok' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://id.vk.com/oauth2/auth') {
+      const body = new URLSearchParams(String(init?.body || ''))
+      assert.equal(body.get('code'), 'vk-code')
+      assert.equal(body.get('device_id'), 'vk-device')
+      assert.equal(body.get('code_verifier'), 'vk-verifier')
+      assert.equal(body.get('client_id'), '54625895')
+      return new Response(JSON.stringify({ access_token: 'vk-access-token', user_id: '123' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://id.vk.com/oauth2/user_info') {
+      const body = new URLSearchParams(String(init?.body || ''))
+      assert.equal(body.get('access_token'), 'vk-access-token')
+      assert.equal(body.get('client_id'), '54625895')
+      return new Response(JSON.stringify({
+        user: { user_id: '123', first_name: 'Ivan', last_name: 'Petrov', avatar: 'https://vk.example/avatar.jpg', email: 'ivan@example.com' },
+      }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://supabase.example/auth/v1/admin/generate_link') {
+      const body = JSON.parse(String(init?.body || '{}'))
+      assert.equal(body.type, 'magiclink')
+      assert.equal(body.email, 'ivan@example.com')
+      assert.equal(body.redirect_to, 'https://1001sovet.ru/moy-kabinet/')
+      assert.equal(body.data.provider, 'vk_id')
+      assert.equal(body.data.vk_id, '123')
+      return new Response(JSON.stringify({ action_link: 'https://supabase.example/auth/v1/verify?token=generated' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    return new Response(JSON.stringify({ error: 'unexpected_fetch', url }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+  }
+
+  try {
+    const response = await worker.fetch(request('/auth/vk/exchange', {
+      method: 'POST',
+      headers: {
+        Origin: 'https://1001sovet.ru',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code: 'vk-code', device_id: 'vk-device', code_verifier: 'vk-verifier' }),
+    }), {
+      ...baseEnv,
+      SUPABASE_URL: 'https://supabase.example',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-role',
+      VK_ID_APP_ID: '54625895',
+    })
+
+    assert.equal(response.status, 200)
+    const body = await response.json()
+    assert.equal(body.ok, true)
+    assert.equal(body.actionLink, 'https://supabase.example/auth/v1/verify?token=generated')
+    assert.equal(body.emailHint, 'iv***@example.com')
+    assert.ok(calls.includes('https://id.vk.com/oauth2/auth'))
+    assert.ok(calls.includes('https://id.vk.com/oauth2/user_info'))
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})

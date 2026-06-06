@@ -68,6 +68,11 @@ export type Env = {
   VK_GROUP_ID?: string
   VK_API_VERSION?: string
   VK_API_BASE_URL?: string
+  VK_ID_APP_ID?: string
+  VK_ID_CLIENT_SECRET?: string
+  VK_ID_REDIRECT_URI?: string
+  VK_ID_API_BASE_URL?: string
+  VK_ID_AUTH_BASE_URL?: string
 }
 
 export type RouteContext = {

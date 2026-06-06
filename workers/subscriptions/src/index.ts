@@ -8,6 +8,7 @@ import { hmacSha256Hex, requireSecret, timingSafeEqual, verifySvixSignature, ver
 import { hasSupabaseServiceRole, insertRows, selectRows, updateRows } from './supabase'
 import { validateSubscriptionRequest } from '../../../src/lib/subscriptions/validation.mjs'
 import { buildVkArticlePost, findArticleRecord, MAX_VK_MESSAGE_CHARS, publishArticleToVk, sha256Text } from './social/vk'
+import { createSupabaseVkIdLoginLink } from './auth/vk-id'
 
 const CATEGORY_SLUGS = ['kulinaria', 'dom-i-uborka', 'dacha-i-ogorod', 'layfkhaki', 'ekonomiya', 'rybalka']
 const FREQUENCIES = ['daily_one', 'daily_digest_3', 'weekly_digest_3', 'weekly_digest_7']
@@ -809,6 +810,52 @@ async function handleSocialTargets(env: Env): Promise<Response> {
   return json({ ok: true, targets })
 }
 
+async function handleVkIdExchange(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('origin') || ''
+  if (origin && !isAllowedOrigin(env, request)) {
+    return json({ ok: false, error: 'origin_not_allowed' }, 403)
+  }
+
+  const payload = await request.json().catch(() => ({})) as { code?: string; device_id?: string; deviceId?: string; code_verifier?: string; codeVerifier?: string }
+  const code = String(payload.code || '').trim()
+  const deviceId = String(payload.device_id || payload.deviceId || '').trim()
+  const codeVerifier = String(payload.code_verifier || payload.codeVerifier || '').trim()
+
+  if (!code || !deviceId || !codeVerifier) {
+    return json({ ok: false, error: 'vk_code_device_id_and_verifier_required' }, 400)
+  }
+  if (code.length > 2000 || deviceId.length > 300 || codeVerifier.length > 300) {
+    return json({ ok: false, error: 'invalid_vk_payload' }, 400)
+  }
+  if (!hasSupabaseServiceRole(env)) {
+    return json({ ok: false, error: 'provider_unconfigured', missing: ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'].filter((k) => !env[k as keyof Env]) }, 503)
+  }
+
+  const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || 'unknown'
+  const ipLimit = await checkRateLimit(env, `vkid:exchange:ip:${await sha256Hex(ip)}`, 30, 60 * 60)
+  if (!ipLimit.allowed) {
+    return json({ ok: false, error: 'rate_limited', retryAfterSeconds: ipLimit.retryAfterSeconds }, 429)
+  }
+
+  try {
+    const result = await createSupabaseVkIdLoginLink(env, { code, deviceId, codeVerifier })
+    return json({
+      ok: true,
+      actionLink: result.actionLink,
+      emailHint: result.email.replace(/^(.{2}).*(@.*)$/, '$1***$2'),
+    })
+  } catch (err) {
+    const e = err as Error & { missing?: string[] }
+    if (e.message === 'provider_unconfigured') {
+      return json({ ok: false, error: 'provider_unconfigured', missing: e.missing || [] }, 503)
+    }
+    if (e.message === 'vk_email_missing') {
+      return json({ ok: false, error: 'vk_email_missing', message: 'VK ID не вернул email. Включите scope email в настройках входа.' }, 400)
+    }
+    return json({ ok: false, error: 'vk_auth_failed' }, 502)
+  }
+}
+
 async function handleVkDryRun(request: Request, env: Env): Promise<Response> {
   const adminError = requireAdmin(request, env)
   if (adminError) return adminError
@@ -1004,6 +1051,10 @@ export async function route(req: Request, env: Env): Promise<Response> {
 
   if (req.method === 'GET' && url.pathname === '/social/targets') {
     return handleSocialTargets(env)
+  }
+
+  if (req.method === 'POST' && url.pathname === '/auth/vk/exchange') {
+    return handleVkIdExchange(req, env)
   }
 
   if (req.method === 'POST' && url.pathname === '/social/track') {

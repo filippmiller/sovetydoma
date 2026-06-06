@@ -1,10 +1,29 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '@/lib/supabase'
 import PasswordInput from './PasswordInput'
 import { migrateLocalFavoritesToServer, processPendingFavoriteIntent } from '@/lib/favorites'
+
+declare global {
+  interface Window {
+    VKIDSDK?: {
+      Config: {
+        init(config: Record<string, unknown>): void
+      }
+      ConfigResponseMode: { Callback: string }
+      ConfigSource: { LOWCODE: string }
+      WidgetEvents: { ERROR: string }
+      OneTapInternalEvents: { LOGIN_SUCCESS: string }
+      OneTap: new () => {
+        render(options: Record<string, unknown>): {
+          on(event: string, cb: (payload: { code?: string; device_id?: string } | unknown) => void): unknown
+        }
+      }
+    }
+  }
+}
 
 function isValidEmail(v: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
@@ -62,11 +81,79 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const [confirmRegisterPassword, setConfirmRegisterPassword] = useState('')
   const [emailError, setEmailError] = useState('')
   const overlayRef = useRef<HTMLDivElement>(null)
+  const vkContainerRef = useRef<HTMLDivElement>(null)
 
   // P0 reset flow state (kept minimal for this vertical slice)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [resetLoading, setResetLoading] = useState(false)
+  const [vkLoading, setVkLoading] = useState(false)
+
+  const handleVkSuccess = useCallback(async (payload: { code?: string; device_id?: string }) => {
+    setError('')
+    setInfo('')
+    setVkLoading(true)
+    try {
+      const apiBase = (process.env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL || '').trim().replace(/\/+$/, '')
+      if (!apiBase) throw new Error('vk_api_not_configured')
+      const codeVerifier = vkContainerRef.current?.dataset.codeVerifier || ''
+      if (!payload.code || !payload.device_id || !codeVerifier) throw new Error('vk_payload_missing')
+      const res = await fetch(`${apiBase}/auth/vk/exchange`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: payload.code,
+          device_id: payload.device_id,
+          code_verifier: codeVerifier,
+        }),
+      })
+      const body = await res.json().catch(() => ({})) as { ok?: boolean; actionLink?: string; error?: string; message?: string }
+      if (!res.ok || !body.ok || !body.actionLink) {
+        throw new Error(body.message || body.error || 'vk_exchange_failed')
+      }
+      window.location.href = body.actionLink
+    } catch (err) {
+      setError(mapVkAuthError((err as Error).message))
+      setVkLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isOpen || !isVkAuthEnabled() || tab !== 'login' || mode !== 'login' || success) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        await loadVkIdSdk()
+        if (cancelled || !vkContainerRef.current || !window.VKIDSDK) return
+        const VKID = window.VKIDSDK
+        const codeVerifier = createPkceVerifier()
+        vkContainerRef.current.dataset.codeVerifier = codeVerifier
+        VKID.Config.init({
+          app: Number(process.env.NEXT_PUBLIC_VK_APP_ID || '54625895'),
+          redirectUrl: `${window.location.origin}/api/auth/vk/callback`,
+          responseMode: VKID.ConfigResponseMode.Callback,
+          source: VKID.ConfigSource.LOWCODE,
+          scope: process.env.NEXT_PUBLIC_VK_SCOPE || 'email',
+          codeVerifier,
+        })
+        const oneTap = new VKID.OneTap()
+        const rendered = oneTap.render({
+          container: vkContainerRef.current,
+          showAlternativeLogin: true,
+          oauthList: ['ok_ru', 'mail_ru'],
+        })
+        rendered.on(VKID.WidgetEvents.ERROR, () => {
+          if (!cancelled) setError('Не удалось открыть VK ID. Попробуйте позже.')
+        })
+        rendered.on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, (payload) => {
+          void handleVkSuccess(payload as { code?: string; device_id?: string })
+        })
+      } catch {
+        if (!cancelled) setError('VK ID временно недоступен.')
+      }
+    })()
+    return () => { cancelled = true }
+  }, [isOpen, tab, mode, success, handleVkSuccess])
 
   useEffect(() => {
     if (!isOpen) return
@@ -599,6 +686,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
         {/* Login form */}
         {!success && tab === 'login' && mode === 'login' && (
           <form onSubmit={handleLogin} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {isVkAuthEnabled() && (
+              <>
+                <div ref={vkContainerRef} style={{ opacity: vkLoading ? 0.6 : 1 }} />
+                <div style={dividerStyle}><span>или</span></div>
+              </>
+            )}
             <div>
               <label style={labelStyle}>Email</label>
               <div style={inputWrapStyle}>
@@ -842,6 +935,46 @@ function getAuthRedirectTo() {
   return `${siteOrigin}/moy-kabinet/`
 }
 
+function isVkAuthEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_VK_AUTH_ENABLED === 'true'
+}
+
+function loadVkIdSdk(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve()
+  if (window.VKIDSDK) return Promise.resolve()
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>('script[data-vkid-sdk="true"]')
+    if (existing) {
+      existing.addEventListener('load', () => resolve(), { once: true })
+      existing.addEventListener('error', () => reject(new Error('vk_sdk_load_failed')), { once: true })
+      return
+    }
+    const script = document.createElement('script')
+    script.src = 'https://unpkg.com/@vkid/sdk@2.6.5/dist-sdk/umd/index.js'
+    script.async = true
+    script.dataset.vkidSdk = 'true'
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('vk_sdk_load_failed'))
+    document.head.appendChild(script)
+  })
+}
+
+function createPkceVerifier(): string {
+  const bytes = new Uint8Array(48)
+  window.crypto.getRandomValues(bytes)
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/g, '')
+}
+
+function mapVkAuthError(raw: string): string {
+  if (raw === 'vk_api_not_configured') return 'VK ID пока не настроен на сервере.'
+  if (raw === 'vk_email_missing') return 'VK ID не вернул email. Попробуйте другой способ входа.'
+  if (raw === 'rate_limited') return 'Слишком много попыток входа через VK ID. Попробуйте позже.'
+  return 'Не удалось войти через VK ID. Попробуйте позже или войдите по email.'
+}
+
 // --- Shared styles ---
 const labelStyle: React.CSSProperties = {
   display: 'block',
@@ -923,4 +1056,13 @@ const secondaryBtnStyle: React.CSSProperties = {
   fontWeight: 700,
   cursor: 'pointer',
   fontFamily: 'inherit',
+}
+
+const dividerStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: '#aaa',
+  fontSize: '0.8rem',
+  margin: '-0.25rem 0',
 }
