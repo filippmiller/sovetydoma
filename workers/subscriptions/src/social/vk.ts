@@ -256,7 +256,7 @@ export async function publishArticleToVk(
   }
 
   const publishMode = attachment ? 'photo_upload' : 'text_with_links'
-  const message = attachment ? post.message : `${post.message}\n\nИзображение: ${post.imageUrl}`
+  const message = post.message
   const messageLength = [...message].length
   if (messageLength > MAX_VK_MESSAGE_CHARS) {
     return { ok: false, articleSlug, messageLength, bodyHash, error: 'message_too_long', errorCode: 'message_too_long' }

@@ -116,7 +116,7 @@ test('publishArticleToVk falls back to text links when photo token is missing', 
     assert.equal(result.providerPostId, '42')
     assert.equal(wallPostBody?.get('attachments'), null)
     assert.ok(wallPostBody?.get('message')?.includes('https://1001sovet.ru/dacha-i-ogorod/agrovolokno-pod-klubniku-vesnoy/'))
-    assert.ok(wallPostBody?.get('message')?.includes('https://1001sovet.ru/images/agrovolokno-pod-klubniku-vesnoy.jpg'))
+    assert.equal(wallPostBody?.get('message')?.includes('https://1001sovet.ru/images/agrovolokno-pod-klubniku-vesnoy.jpg'), false)
   } finally {
     globalThis.fetch = originalFetch
   }
