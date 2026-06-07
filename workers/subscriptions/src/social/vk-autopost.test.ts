@@ -39,12 +39,58 @@ test('processVkAutopost skips when VK not configured', async () => {
   assert.equal(result.skippedReason, 'vk_not_configured')
 })
 
-test('processVkAutopost skips when VK photo token is missing', async () => {
+test('processVkAutopost can run link fallback when VK photo token is missing', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async (input: RequestInfo | URL) => {
+    const url = typeof input === 'string' ? input : input.toString()
+    if (url.includes('/rpc/')) {
+      return new Response(JSON.stringify({ allowed: true, bucket: 'test' }), { status: 200, headers: { 'content-type': 'application/json' } })
+    }
+    if (url.includes('social_publications')) {
+      return new Response(JSON.stringify([]), { status: 200, headers: { 'content-type': 'application/json' } })
+    }
+    if (url.includes('articles_publication_index')) {
+      return new Response(JSON.stringify([{
+        article_slug: 'agrovolokno-pod-klubniku-vesnoy',
+        category_slug: 'dacha-i-ogorod',
+        title: 'Агроволокно под клубнику весной',
+        canonical_path: '/dacha-i-ogorod/agrovolokno-pod-klubniku-vesnoy/',
+        description: 'test',
+        published_at: '2026-06-06T00:00:00.000Z',
+        first_seen_at: '2026-06-06T00:00:00.000Z',
+      }]), { status: 200, headers: { 'content-type': 'application/json' } })
+    }
+    if (url.includes('/images/agrovolokno-pod-klubniku-vesnoy.jpg')) {
+      return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { 'content-type': 'image/jpeg' } })
+    }
+    if (url.includes('/wall.post')) {
+      return new Response(JSON.stringify({ response: { post_id: 42 } }), { status: 200, headers: { 'content-type': 'application/json' } })
+    }
+    return new Response(JSON.stringify({ id: 'publication-row' }), { status: 201, headers: { 'content-type': 'application/json' } })
+  }
+
+  try {
+    const result = await processVkAutopost({
+      PUBLIC_SITE_URL: 'https://1001sovet.ru',
+      SUPABASE_URL: 'https://test.supabase.co',
+      SUPABASE_SERVICE_ROLE_KEY: 'test-key',
+      VK_ACCESS_TOKEN: 'test-token',
+      VK_GROUP_ID: '123456',
+      VK_API_BASE_URL: 'https://api.vk.test/method',
+    }, new Date('2026-06-06T09:00:00Z'))
+    assert.equal(result.ran, true)
+    assert.equal(result.posted, true)
+    assert.equal(result.providerPostId, '42')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('processVkAutopost skips when VK access token is missing', async () => {
   const result = await processVkAutopost({
     PUBLIC_SITE_URL: 'https://1001sovet.ru',
     SUPABASE_URL: 'https://test.supabase.co',
     SUPABASE_SERVICE_ROLE_KEY: 'test-key',
-    VK_ACCESS_TOKEN: 'test-token',
     VK_GROUP_ID: '123456',
   })
   assert.equal(result.ran, false)

@@ -922,9 +922,10 @@ async function handleVkPost(request: Request, env: Env): Promise<Response> {
     return json({ ok: false, error: 'supabase_service_role_not_configured' }, 503)
   }
 
-  const payload = await request.json().catch(() => ({})) as { articleSlug?: string; requirePhoto?: boolean }
+  const payload = await request.json().catch(() => ({})) as { articleSlug?: string; requirePhoto?: boolean; allowLinkFallback?: boolean }
   const articleSlug = String(payload.articleSlug || '').trim()
   const requirePhoto = payload.requirePhoto !== false
+  const allowLinkFallback = payload.allowLinkFallback === true || !requirePhoto
   if (!articleSlug) {
     return json({ ok: false, error: 'article_slug_required' }, 400)
   }
@@ -950,7 +951,7 @@ async function handleVkPost(request: Request, env: Env): Promise<Response> {
     return json({ ok: false, error: 'duplicate_already_posted', providerPostId: posted.provider_post_id }, 409)
   }
 
-  const result = await publishArticleToVk(env, articleSlug, { dryRun: false, requirePhoto })
+  const result = await publishArticleToVk(env, articleSlug, { dryRun: false, requirePhoto, allowLinkFallback })
 
   if (!result.ok) {
     // Insert failed record
@@ -977,7 +978,7 @@ async function handleVkPost(request: Request, env: Env): Promise<Response> {
     body_hash: result.bodyHash,
     status: 'posted',
     provider_post_id: result.providerPostId,
-    provider_payload: { postUrl: result.postUrl, messageLength: result.messageLength },
+    provider_payload: { postUrl: result.postUrl, messageLength: result.messageLength, publishMode: result.publishMode },
     posted_at: new Date().toISOString(),
   }
 
@@ -994,6 +995,7 @@ async function handleVkPost(request: Request, env: Env): Promise<Response> {
     postUrl: result.postUrl,
     messageLength: result.messageLength,
     bodyHash: result.bodyHash,
+    publishMode: result.publishMode,
   })
 }
 

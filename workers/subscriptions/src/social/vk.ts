@@ -41,6 +41,7 @@ export type VkPostResult = {
 export type VkPublishOptions = {
   dryRun?: boolean
   requirePhoto?: boolean
+  allowLinkFallback?: boolean
 }
 
 export type VkPublishResult = {
@@ -53,6 +54,7 @@ export type VkPublishResult = {
   bodyHash: string
   error?: string
   errorCode?: string
+  publishMode?: 'photo_upload' | 'text_with_links'
 }
 
 export function validateVkConfig(env: Env): VkConfig {
@@ -157,14 +159,14 @@ export async function saveWallPhoto(env: Env, config: VkConfig, uploadResult: { 
   return `photo${photo.owner_id}_${photo.id}`
 }
 
-export async function postToWall(env: Env, config: VkConfig, message: string, attachment: string): Promise<number> {
+export async function postToWall(env: Env, config: VkConfig, message: string, attachment?: string): Promise<number> {
   const url = new URL(`${config.apiBaseUrl}/wall.post`)
   url.searchParams.set('access_token', config.accessToken)
   url.searchParams.set('v', config.apiVersion)
   url.searchParams.set('owner_id', `-${config.groupId}`)
   url.searchParams.set('from_group', '1')
   url.searchParams.set('message', message)
-  url.searchParams.set('attachments', attachment)
+  if (attachment) url.searchParams.set('attachments', attachment)
 
   const res = await fetch(url.toString())
   if (!res.ok) {
@@ -185,6 +187,7 @@ export async function publishArticleToVk(
   options: VkPublishOptions = {},
 ): Promise<VkPublishResult> {
   const { dryRun = false, requirePhoto = true } = options
+  const allowLinkFallback = options.allowLinkFallback ?? !requirePhoto
 
   let config: VkConfig
   try {
@@ -233,37 +236,45 @@ export async function publishArticleToVk(
     imageBytes = null
   }
 
-  if (!imageBytes && requirePhoto) {
+  if (!imageBytes && requirePhoto && !allowLinkFallback) {
     return { ok: false, articleSlug, messageLength: post.messageLength, bodyHash, error: 'image_fetch_failed', errorCode: 'image_required' }
   }
 
   let attachment = ''
-  if (imageBytes) {
+  if (imageBytes && config.photoAccessToken) {
     try {
       const uploadUrl = await getWallUploadServer(env, config)
       const uploadResult = await uploadWallPhoto(uploadUrl, imageBytes, `${articleSlug}.jpg`) as { server?: string; photo?: string; hash?: string }
       const photoAttachment = await saveWallPhoto(env, config, uploadResult)
       attachment = photoAttachment
     } catch (err) {
-      if (requirePhoto) {
+      if (requirePhoto && !allowLinkFallback) {
         return { ok: false, articleSlug, messageLength: post.messageLength, bodyHash, error: (err as Error).message, errorCode: 'photo_upload_failed' }
       }
       // If photo not required, continue without attachment
     }
   }
 
+  const publishMode = attachment ? 'photo_upload' : 'text_with_links'
+  const message = attachment ? post.message : `${post.message}\n\nИзображение: ${post.imageUrl}`
+  const messageLength = [...message].length
+  if (messageLength > MAX_VK_MESSAGE_CHARS) {
+    return { ok: false, articleSlug, messageLength, bodyHash, error: 'message_too_long', errorCode: 'message_too_long' }
+  }
+
   try {
-    const postId = await postToWall(env, config, post.message, attachment)
+    const postId = await postToWall(env, config, message, attachment || undefined)
     const postUrl = `https://vk.com/wall-${config.groupId}_${postId}`
     return {
       ok: true,
       articleSlug,
       providerPostId: String(postId),
       postUrl,
-      messageLength: post.messageLength,
+      messageLength,
       bodyHash,
+      publishMode,
     }
   } catch (err) {
-    return { ok: false, articleSlug, messageLength: post.messageLength, bodyHash, error: (err as Error).message, errorCode: 'wall_post_failed' }
+    return { ok: false, articleSlug, messageLength, bodyHash, error: (err as Error).message, errorCode: 'wall_post_failed' }
   }
 }

@@ -47,7 +47,7 @@ function isWithinPostingHours(now: Date): boolean {
 }
 
 function vkConfigReady(env: Env): boolean {
-  return Boolean(env.VK_ACCESS_TOKEN && env.VK_GROUP_ID && env.VK_PHOTO_ACCESS_TOKEN)
+  return Boolean(env.VK_ACCESS_TOKEN && env.VK_GROUP_ID)
 }
 
 async function findLatestUnpostedArticle(env: Env): Promise<ArticleRow | null> {
@@ -122,7 +122,7 @@ export async function processVkAutopost(env: Env, now = new Date()): Promise<VkA
     return { ran: false, skippedReason: 'no_unposted_articles' }
   }
 
-  const result = await publishArticleToVk(env, article.article_slug, { dryRun: false, requirePhoto: true })
+  const result = await publishArticleToVk(env, article.article_slug, { dryRun: false, requirePhoto: true, allowLinkFallback: true })
 
   if (!result.ok) {
     // Record failure
@@ -156,7 +156,7 @@ export async function processVkAutopost(env: Env, now = new Date()): Promise<VkA
       body_hash: result.bodyHash,
       status: 'posted',
       provider_post_id: result.providerPostId,
-      provider_payload: { postUrl: result.postUrl, messageLength: result.messageLength, source: 'autopost' },
+        provider_payload: { postUrl: result.postUrl, messageLength: result.messageLength, publishMode: result.publishMode, source: 'autopost' },
       posted_at: now.toISOString(),
     }, 'id')
   } catch (err) {
@@ -171,7 +171,7 @@ export async function processVkAutopost(env: Env, now = new Date()): Promise<VkA
         await updateRows(env, 'social_publications', `id=eq.${encodeURIComponent(existing[0].id)}`, {
           status: 'posted',
           provider_post_id: result.providerPostId,
-          provider_payload: { postUrl: result.postUrl, messageLength: result.messageLength, source: 'autopost' },
+          provider_payload: { postUrl: result.postUrl, messageLength: result.messageLength, publishMode: result.publishMode, source: 'autopost' },
           posted_at: now.toISOString(),
           error_code: null,
           error_message: null,
