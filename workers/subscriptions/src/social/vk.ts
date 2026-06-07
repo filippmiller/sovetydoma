@@ -54,7 +54,7 @@ export type VkPublishResult = {
   bodyHash: string
   error?: string
   errorCode?: string
-  publishMode?: 'photo_upload' | 'text_with_links'
+  publishMode?: 'photo_upload' | 'link_preview' | 'text_with_links'
 }
 
 export function validateVkConfig(env: Env): VkConfig {
@@ -181,6 +181,10 @@ export async function postToWall(env: Env, config: VkConfig, message: string, at
   return postId
 }
 
+function isVkLinkPreviewError(error: Error): boolean {
+  return /vk_100|link_photo_sizing_rule|No photo given|attachments support/i.test(error.message)
+}
+
 export async function publishArticleToVk(
   env: Env,
   articleSlug: string,
@@ -255,7 +259,8 @@ export async function publishArticleToVk(
     }
   }
 
-  const publishMode = attachment ? 'photo_upload' : 'text_with_links'
+  const linkAttachment = `link=${post.canonicalUrl}`
+  let publishMode: NonNullable<VkPublishResult['publishMode']> = attachment ? 'photo_upload' : 'link_preview'
   const message = post.message
   const messageLength = [...message].length
   if (messageLength > MAX_VK_MESSAGE_CHARS) {
@@ -263,7 +268,14 @@ export async function publishArticleToVk(
   }
 
   try {
-    const postId = await postToWall(env, config, message, attachment || undefined)
+    let postId: number
+    try {
+      postId = await postToWall(env, config, message, attachment || linkAttachment)
+    } catch (err) {
+      if (attachment || !allowLinkFallback || !isVkLinkPreviewError(err as Error)) throw err
+      publishMode = 'text_with_links'
+      postId = await postToWall(env, config, message)
+    }
     const postUrl = `https://vk.com/wall-${config.groupId}_${postId}`
     return {
       ok: true,

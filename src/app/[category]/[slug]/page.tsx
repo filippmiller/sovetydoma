@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { existsSync, readFileSync } from 'node:fs'
+import path from 'node:path'
 import { getArticle, getAllSlugs, getAllArticles, CATEGORIES, LEGACY_ARTICLE_MOVES } from '@/lib/articles'
 import Breadcrumb from '@/components/Breadcrumb'
 import RelatedArticles from '@/components/RelatedArticles'
@@ -40,6 +42,30 @@ import { getMoreInterestingArticles, getSimilarArticles } from '@/lib/article-re
 
 interface Props { params: Promise<{ category: string; slug: string }> }
 
+function getLocalJpegDimensions(imagePath: string): { width: number; height: number } | null {
+  const normalized = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath
+  const filePath = path.join(process.cwd(), 'public', normalized)
+  if (!existsSync(filePath)) return null
+
+  const bytes = readFileSync(filePath)
+  let offset = 2
+  while (offset + 9 < bytes.length) {
+    if (bytes[offset] !== 0xff) return null
+    const marker = bytes[offset + 1]
+    const length = bytes.readUInt16BE(offset + 2)
+    if (length < 2) return null
+    if (marker >= 0xc0 && marker <= 0xc3) {
+      return {
+        height: bytes.readUInt16BE(offset + 5),
+        width: bytes.readUInt16BE(offset + 7),
+      }
+    }
+    offset += 2 + length
+  }
+
+  return null
+}
+
 export async function generateStaticParams() {
   const current = getAllSlugs()
   // Include legacy paths for moved articles so they can serve soft-redirects instead of hard 404
@@ -71,6 +97,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cat = CATEGORIES[category] || CATEGORIES[article.frontmatter.category]
   const url = canonicalOverride || articleCanonicalUrl(fm)
   const imageUrl = articleImageUrl(fm)
+  const imageDimensions = getLocalJpegDimensions(`/images/${fm.slug}.jpg`) || { width: 1200, height: 630 }
   const description = truncateForMeta(fm.description)
   return {
     title: fm.title,
@@ -99,13 +126,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       modifiedTime: fm.updated || fm.date,
       section: cat?.name || fm.categoryName,
       tags: fm.tags,
-      images: [{ url: imageUrl, width: 1200, height: 800, alt: fm.title }],
+      images: [{ url: imageUrl, ...imageDimensions, alt: fm.title }],
     },
     twitter: {
       card: 'summary_large_image',
       title: fm.title,
       description,
-      images: [{ url: imageUrl, width: 1200, height: 800 }],
+      images: [{ url: imageUrl, ...imageDimensions }],
     },
   }
 }

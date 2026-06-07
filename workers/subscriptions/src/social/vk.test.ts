@@ -89,7 +89,7 @@ test('publishArticleToVk returns provider_unconfigured when env missing', async 
   assert.ok(result.error?.includes('vk_access_token_not_configured') || result.error?.includes('vk_group_id_not_configured'))
 })
 
-test('publishArticleToVk falls back to text links when photo token is missing', async () => {
+test('publishArticleToVk uses link preview when photo token is missing', async () => {
   const originalFetch = globalThis.fetch
   let wallPostBody: URLSearchParams | null = null
   globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => {
@@ -112,11 +112,48 @@ test('publishArticleToVk falls back to text links when photo token is missing', 
     }, 'agrovolokno-pod-klubniku-vesnoy', { requirePhoto: true, allowLinkFallback: true })
 
     assert.equal(result.ok, true)
-    assert.equal(result.publishMode, 'text_with_links')
+    assert.equal(result.publishMode, 'link_preview')
     assert.equal(result.providerPostId, '42')
-    assert.equal(wallPostBody?.get('attachments'), null)
+    assert.equal(wallPostBody?.get('attachments'), 'link=https://1001sovet.ru/dacha-i-ogorod/agrovolokno-pod-klubniku-vesnoy/')
     assert.ok(wallPostBody?.get('message')?.includes('https://1001sovet.ru/dacha-i-ogorod/agrovolokno-pod-klubniku-vesnoy/'))
     assert.equal(wallPostBody?.get('message')?.includes('https://1001sovet.ru/images/agrovolokno-pod-klubniku-vesnoy.jpg'), false)
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('publishArticleToVk retries text-only when link preview is rejected', async () => {
+  const originalFetch = globalThis.fetch
+  const wallPostBodies: URLSearchParams[] = []
+  globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    if (url.includes('/images/agrovolokno-pod-klubniku-vesnoy.jpg')) {
+      return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { 'Content-Type': 'image/jpeg' } })
+    }
+    if (url.includes('/wall.post')) {
+      const body = new URLSearchParams(String(init?.body || new URL(url).searchParams))
+      wallPostBodies.push(body)
+      if (body.get('attachments')) {
+        return new Response(JSON.stringify({ error: { error_code: 100, error_msg: 'Violated: link_photo_sizing_rule. No photo given' } }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      }
+      return new Response(JSON.stringify({ response: { post_id: 43 } }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    return new Response(JSON.stringify({ error: { error_code: 1, error_msg: 'unexpected' } }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+  }
+
+  try {
+    const result = await publishArticleToVk({
+      ...baseEnv,
+      VK_PHOTO_ACCESS_TOKEN: undefined,
+      VK_API_BASE_URL: 'https://api.vk.test/method',
+    }, 'agrovolokno-pod-klubniku-vesnoy', { requirePhoto: true, allowLinkFallback: true })
+
+    assert.equal(result.ok, true)
+    assert.equal(result.publishMode, 'text_with_links')
+    assert.equal(result.providerPostId, '43')
+    assert.equal(wallPostBodies.length, 2)
+    assert.ok(wallPostBodies[0].get('attachments')?.startsWith('link='))
+    assert.equal(wallPostBodies[1].get('attachments'), null)
   } finally {
     globalThis.fetch = originalFetch
   }
