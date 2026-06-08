@@ -28,7 +28,10 @@
     "fix:image-frontmatter": "node scripts/fix-image-frontmatter-drifts.mjs",
     "seo:indexnow:dry": "node scripts/submit-indexnow.mjs --dry-run",
     "seo:indexnow": "node scripts/submit-indexnow.mjs",
-    "matrix:seed": "node scripts/matrix/seed-from-current.mjs"
+    "matrix:seed": "node scripts/matrix/seed-from-current.mjs",
+    "beads:list": "node scripts/beads/list-active.mjs",
+    "beads:validate": "node scripts/beads/validate-status.mjs",
+    "beads:create": "node scripts/beads/create-bead.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

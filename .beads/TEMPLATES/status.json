@@ -1,0 +1,14 @@
+{
+  "beadId": "BEAD-XXXX",
+  "title": "Short bead title",
+  "status": "todo",
+  "priority": "P2",
+  "branch": "codex/bead-xxxx-short-slug",
+  "worktree": "../sovetydoma-BEAD-XXXX",
+  "owner": "unassigned",
+  "createdAt": "YYYY-MM-DDTHH:mm:ssZ",
+  "updatedAt": "YYYY-MM-DDTHH:mm:ssZ",
+  "dependsOn": [],
+  "blockedBy": [],
+  "summary": "One sentence summary."
+}

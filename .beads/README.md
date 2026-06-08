@@ -1,81 +1,107 @@
-# Beads - AI-Native Issue Tracking
+# Repo Bead Workflow
 
-Welcome to Beads! This repository uses **Beads** for issue tracking - a modern, AI-native tool designed to live directly in your codebase alongside your code.
+This repo uses `.beads/` for task folders that future agents can read, update,
+review, and close without relying on chat history. The existing `bd` data under
+`.beads/` may still exist; this document defines the repo-local folder contract.
 
-## What is Beads?
+## Bead Folder Contract
 
-Beads is issue tracking that lives in your repo, making it perfect for AI coding agents and developers who want their issues close to their code. No web UI required - everything works through the CLI and integrates seamlessly with git.
+One bead is one folder:
 
-**Learn more:** [github.com/steveyegge/beads](https://github.com/steveyegge/beads)
-
-## Quick Start
-
-### Essential Commands
-
-```bash
-# Create new issues
-bd create "Add user authentication"
-
-# View all issues
-bd list
-
-# View issue details
-bd show <issue-id>
-
-# Update issue status
-bd update <issue-id> --claim
-bd update <issue-id> --status done
-
-# Sync with Dolt remote
-bd dolt push
+```text
+.beads/BEAD-XXXX/
+  spec.md
+  status.json
+  result.md
+  review.md
+  handoff.md
 ```
 
-### Working with Issues
+Required files:
 
-Issues in Beads are:
-- **Git-native**: Stored in Dolt database with version control and branching
-- **AI-friendly**: CLI-first design works perfectly with AI coding agents
-- **Branch-aware**: Issues can follow your branch workflow
-- **Always in sync**: Auto-syncs with your commits
+- `spec.md`: objective, scope, constraints, relevant files/modules, verification requirements, final report requirements.
+- `status.json`: machine-readable status. It must include `beadId`, `title`, `status`, `priority`, `branch`, `worktree`, `owner`, `createdAt`, `updatedAt`, `dependsOn`, `blockedBy`, and `summary`.
+- `result.md`: agent execution result: what changed, verification run, remaining gaps, risks/follow-ups.
+- `review.md`: reviewer findings, required fixes, approval/reopen notes.
+- `handoff.md`: short operational context for the next agent.
 
-## Why Beads?
+Allowed `status` values:
 
-✨ **AI-Native Design**
-- Built specifically for AI-assisted development workflows
-- CLI-first interface works seamlessly with AI coding agents
-- No context switching to web UIs
+- `todo`: defined but not started.
+- `running`: someone is actively working it.
+- `blocked`: work cannot continue without a named blocker.
+- `review`: implementation is ready for review, but not closed.
+- `done`: verification passed and no required work remains.
+- `cancelled`: intentionally abandoned.
 
-🚀 **Developer Focused**
-- Issues live in your repo, right next to your code
-- Works offline, syncs when you push
-- Fast, lightweight, and stays out of your way
+## Branch And Worktree Rules
 
-🔧 **Git Integration**
-- Automatic sync with git commits
-- Branch-aware issue tracking
-- Dolt-native three-way merge resolution
+Use one branch and one sibling worktree for every substantial bead.
 
-## Get Started with Beads
+Naming convention:
 
-Try Beads in your own projects:
+- branch: `codex/<bead-id-lowercase>-<slug>`
+- worktree: sibling directory `../sovetydoma-<BEAD-ID>`
 
-```bash
-# Install Beads
-curl -sSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
+Example:
 
-# Initialize in your repo
-bd init
-
-# Create your first issue
-bd create "Try out Beads"
+```text
+bead: .beads/BEAD-OPS-001/
+branch: codex/bead-ops-001-admin-cockpit
+worktree: ../sovetydoma-BEAD-OPS-001
 ```
 
-## Learn More
+Operating rules:
 
-- **Documentation**: [github.com/steveyegge/beads/docs](https://github.com/steveyegge/beads/tree/main/docs)
-- **Quick Start Guide**: Run `bd quickstart`
-- **Examples**: [github.com/steveyegge/beads/examples](https://github.com/steveyegge/beads/tree/main/examples)
+- Do not work in the main checkout for substantial beads unless the user explicitly says so.
+- Create/switch to the bead branch before editing code.
+- Update `status.json` to `running` when work starts.
+- Keep `status.json.updatedAt` current when status changes.
+- Write `result.md` before asking for review or marking done.
+- Do not mark `done` unless verification passed.
+- If blocked, set `status` to `blocked` and write the blocker in `blockedBy`, `result.md`, and `handoff.md`.
+- Reviewers may reopen by changing `status` from `review` or `done` back to `running` or `blocked`.
 
----
+## Agent Workflow
 
-*Beads: Issue tracking that moves at the speed of thought* ⚡
+1. Open `.beads/INDEX.md` and choose a bead.
+2. Read the bead `spec.md`, `status.json`, and `handoff.md`.
+3. Create or enter the bead worktree and branch.
+4. Set `status.json.status` to `running`.
+5. Do the work inside the bead branch/worktree.
+6. Run the verification listed in `spec.md`.
+7. Write `result.md` with exact changes, verification, gaps, and risks.
+8. Set status:
+   - `review` when work is ready but needs human/agent review.
+   - `done` only when verification passed and the bead is complete.
+   - `blocked` when there is a concrete blocker.
+9. Update `handoff.md` with current state and next action.
+
+## Meaning Of Done, Review, Blocked
+
+- `done`: all scoped work is complete, verification passed, and no required follow-up remains for this bead.
+- `review`: implementation is complete enough to inspect, but approval or fixes may still be needed.
+- `blocked`: the agent cannot make meaningful progress without external input, credentials, an unavailable service, or a decision.
+
+## Result Requirements
+
+Every `result.md` must include:
+
+- Files changed.
+- Behavioral changes.
+- Verification commands and outcomes.
+- Remaining gaps.
+- Risks and follow-ups.
+- Commit/deploy references if applicable.
+
+## Templates And Helpers
+
+Templates live in `.beads/TEMPLATES/`.
+
+Optional helpers:
+
+```bash
+node scripts/beads/list-active.mjs
+node scripts/beads/validate-status.mjs
+node scripts/beads/create-bead.mjs BEAD-OPS-001 "Admin cockpit"
+```
