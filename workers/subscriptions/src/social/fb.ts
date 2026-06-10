@@ -1,5 +1,5 @@
 import type { Env } from '../types'
-import { findArticleRecord, sha256Text, type VkArticleRecord } from './vk'
+import { findArticleRecord, isSameOrigin, sha256Text, type VkArticleRecord } from './vk'
 
 // Facebook page feed/photo caption hard limit.
 export const MAX_FB_MESSAGE_CHARS = 63206
@@ -190,12 +190,16 @@ export async function publishArticleToFacebook(
   }
 
   // Fetch the image bytes up front so we can upload them directly (most reliable).
+  // SSRF guard: only fetch images from our own site origin — a malicious absolute
+  // image_path in frontmatter must not make the worker fetch an arbitrary URL.
   let imageBytes: ArrayBuffer | null = null
-  try {
-    const imageRes = await fetch(post.imageUrl)
-    if (imageRes.ok) imageBytes = await imageRes.arrayBuffer()
-  } catch {
-    imageBytes = null
+  if (isSameOrigin(post.imageUrl, siteUrl)) {
+    try {
+      const imageRes = await fetch(post.imageUrl)
+      if (imageRes.ok) imageBytes = await imageRes.arrayBuffer()
+    } catch {
+      imageBytes = null
+    }
   }
 
   try {

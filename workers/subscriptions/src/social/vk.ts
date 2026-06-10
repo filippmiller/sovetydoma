@@ -107,6 +107,17 @@ export async function sha256Text(value: string): Promise<string> {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
+// SSRF guard: true only if `url` is on the same origin as `siteUrl`. Used before
+// fetching article images so a malicious absolute image_path can't redirect the
+// worker to an arbitrary host.
+export function isSameOrigin(url: string, siteUrl: string): boolean {
+  try {
+    return new URL(url).origin === new URL(siteUrl).origin
+  } catch {
+    return false
+  }
+}
+
 export async function getWallUploadServer(env: Env, config: VkConfig): Promise<string> {
   const url = new URL(`${config.apiBaseUrl}/photos.getWallUploadServer`)
   url.searchParams.set('access_token', config.photoAccessToken || config.accessToken)
@@ -235,15 +246,17 @@ export async function publishArticleToVk(
     }
   }
 
-  // Fetch image
+  // Fetch image — SSRF guard: only from our own site origin.
   let imageBytes: ArrayBuffer | null = null
-  try {
-    const imageRes = await fetch(post.imageUrl)
-    if (imageRes.ok) {
-      imageBytes = await imageRes.arrayBuffer()
+  if (isSameOrigin(post.imageUrl, siteUrl)) {
+    try {
+      const imageRes = await fetch(post.imageUrl)
+      if (imageRes.ok) {
+        imageBytes = await imageRes.arrayBuffer()
+      }
+    } catch {
+      imageBytes = null
     }
-  } catch {
-    imageBytes = null
   }
 
   if (!imageBytes && requirePhoto && !allowLinkFallback) {

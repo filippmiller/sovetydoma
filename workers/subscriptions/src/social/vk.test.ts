@@ -3,11 +3,19 @@ import test from 'node:test'
 import {
   buildVkArticlePost,
   findArticleRecord,
+  isSameOrigin,
   MAX_VK_MESSAGE_CHARS,
   publishArticleToVk,
   validateVkConfig,
 } from './vk'
 import type { Env } from '../types'
+
+test('isSameOrigin allows same origin, rejects others', () => {
+  assert.equal(isSameOrigin('https://1001sovet.ru/images/x.jpg', 'https://1001sovet.ru'), true)
+  assert.equal(isSameOrigin('https://evil.com/x.jpg', 'https://1001sovet.ru'), false)
+  assert.equal(isSameOrigin('http://1001sovet.ru/x.jpg', 'https://1001sovet.ru'), false)
+  assert.equal(isSameOrigin('not a url', 'https://1001sovet.ru'), false)
+})
 
 const baseEnv: Env = {
   PUBLIC_SITE_URL: 'https://1001sovet.ru',
