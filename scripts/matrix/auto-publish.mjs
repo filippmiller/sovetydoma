@@ -93,6 +93,20 @@ try {
   process.exit(1)
 }
 
+// Human-tone gate: score the freshly written articles and drop egregiously
+// AI-toned ones so they don't auto-publish. Threshold is generous (corpus avg
+// ~0.02); override with STYLE_FAIL_THRESHOLD. Set to 0 to disable.
+const styleThreshold = Number(process.env.STYLE_FAIL_THRESHOLD ?? 6)
+if (styleThreshold > 0 && writtenFiles.length) {
+  try {
+    run('node', ['scripts/validate-style.mjs', ...writtenFiles, '--fail', String(styleThreshold)])
+  } catch {
+    console.error(`Style gate tripped (threshold ${styleThreshold}) — rolling back this batch; fix the draft and it republishes next run.`)
+    for (const f of writtenFiles) { try { fs.unlinkSync(f) } catch { /* already gone */ } }
+    process.exit(1)
+  }
+}
+
 const relFiles = [
   ...writtenFiles.map((f) => path.relative(ROOT, f)),
   ...picked.map((r) => path.join('public', 'images', r.image_filename)),
