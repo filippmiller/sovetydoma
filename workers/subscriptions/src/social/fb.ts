@@ -96,9 +96,32 @@ async function fbApiPost(config: FbConfig, edge: string, params: Record<string, 
   return data
 }
 
-// Posts the photo by public URL — Facebook fetches the image itself, no upload step needed.
+// Posts the photo by public URL — Facebook fetches the image itself.
+// Kept as a fallback; the byte-upload path below is more reliable.
 export async function postPhotoByUrl(config: FbConfig, imageUrl: string, caption: string): Promise<string> {
   const data = await fbApiPost(config, 'photos', { url: imageUrl, caption })
+  const postId = String(data.post_id || data.id || '')
+  if (!postId) throw new Error('fb_post_id_missing')
+  return postId
+}
+
+// Uploads the image bytes directly as multipart `source`. More reliable than
+// the url method (which fails with error 324 on some Pages even when the image
+// is publicly reachable).
+export async function postPhotoBytes(config: FbConfig, imageBytes: ArrayBuffer, filename: string, caption: string): Promise<string> {
+  const form = new FormData()
+  form.append('access_token', config.pageAccessToken)
+  form.append('caption', caption)
+  form.append('source', new Blob([imageBytes], { type: 'image/jpeg' }), filename)
+
+  const url = `${config.apiBaseUrl}/${config.apiVersion}/${config.pageId}/photos`
+  const res = await fetch(url, { method: 'POST', body: form })
+  const data = await res.json().catch(() => ({})) as Record<string, unknown> & { error?: { message?: string; code?: number } }
+  if (!res.ok || data.error) {
+    const code = data.error?.code ?? res.status
+    const msg = data.error?.message || `http_${res.status}`
+    throw new Error(`fb_${code}: ${msg}`)
+  }
   const postId = String(data.post_id || data.id || '')
   if (!postId) throw new Error('fb_post_id_missing')
   return postId
@@ -147,11 +170,25 @@ export async function publishArticleToFacebook(
     return { ok: true, dryRun: true, articleSlug, messageLength: post.messageLength, bodyHash }
   }
 
+  // Fetch the image bytes up front so we can upload them directly (most reliable).
+  let imageBytes: ArrayBuffer | null = null
+  try {
+    const imageRes = await fetch(post.imageUrl)
+    if (imageRes.ok) imageBytes = await imageRes.arrayBuffer()
+  } catch {
+    imageBytes = null
+  }
+
   try {
     let providerPostId: string
     let publishMode: NonNullable<FbPublishResult['publishMode']> = 'photo_url'
     try {
-      providerPostId = await postPhotoByUrl(config, post.imageUrl, post.message)
+      if (imageBytes) {
+        providerPostId = await postPhotoBytes(config, imageBytes, `${articleSlug}.jpg`, post.message)
+      } else {
+        // No bytes (fetch failed) — let Facebook try to pull the URL itself.
+        providerPostId = await postPhotoByUrl(config, post.imageUrl, post.message)
+      }
     } catch (err) {
       if (requirePhoto && !allowLinkFallback) {
         return { ok: false, articleSlug, messageLength: post.messageLength, bodyHash, error: (err as Error).message, errorCode: 'photo_post_failed' }
