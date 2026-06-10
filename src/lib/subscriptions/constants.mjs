@@ -10,6 +10,7 @@ export const SUBSCRIPTION_CATEGORY_SLUGS = [
   'krasota-i-uhod',
   'otdyh-i-puteshestviya',
   'pokupki-i-tehnika',
+  'avto',
 ]
 
 export const DIRECT_NOTIFICATION_CHANNELS = [

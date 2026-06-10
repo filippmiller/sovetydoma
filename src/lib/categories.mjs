@@ -55,4 +55,9 @@ export const CATEGORIES = {
     slug: 'pokupki-i-tehnika',
     description: 'Выбор техники и товаров, умные покупки, уход и защита от переплат',
   },
+  avto: {
+    name: 'Авто',
+    slug: 'avto',
+    description: 'Уход за автомобилем, экономия на топливе и ремонте, сезонная эксплуатация',
+  },
 }

@@ -61,6 +61,7 @@ export const CATEGORY_EMOJI: Record<string, string> = {
   'krasota-i-uhod': '🌸',
   'otdyh-i-puteshestviya': '🧳',
   'pokupki-i-tehnika': '📦',
+  avto: '🚗',
 }
 
 // Category color map
@@ -76,4 +77,5 @@ export const CATEGORY_COLOR: Record<string, string> = {
   'krasota-i-uhod': '#e91e63',
   'otdyh-i-puteshestviya': '#2980b9',
   'pokupki-i-tehnika': '#f39c12',
+  avto: '#34495e',
 }
