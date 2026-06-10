@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
+import ReactMarkdown from 'react-markdown'
 import bridge from '@vkontakte/vk-bridge'
 import {
   View, Panel, PanelHeader, PanelHeaderBack, Group, Header, SimpleCell,
@@ -9,6 +10,22 @@ import type { Article } from './types'
 
 type PanelId = 'onboarding' | 'home' | 'list' | 'article'
 const ONBOARD_KEY = 'sovetydoma_vk_onboarded'
+
+// Markdown renderers so article bodies keep their structure (headings, lists,
+// paragraphs) instead of collapsing into one unreadable blob.
+const mdComponents = {
+  h1: (p: { children?: ReactNode }) => <h2 style={{ fontSize: 19, fontWeight: 800, margin: '22px 0 8px', lineHeight: 1.3 }}>{p.children}</h2>,
+  h2: (p: { children?: ReactNode }) => <h2 style={{ fontSize: 19, fontWeight: 800, margin: '22px 0 8px', lineHeight: 1.3 }}>{p.children}</h2>,
+  h3: (p: { children?: ReactNode }) => <h3 style={{ fontSize: 17, fontWeight: 700, margin: '18px 0 6px', lineHeight: 1.3 }}>{p.children}</h3>,
+  h4: (p: { children?: ReactNode }) => <h4 style={{ fontSize: 16, fontWeight: 700, margin: '16px 0 6px' }}>{p.children}</h4>,
+  p: (p: { children?: ReactNode }) => <p style={{ fontSize: 16, lineHeight: 1.6, margin: '0 0 14px' }}>{p.children}</p>,
+  ul: (p: { children?: ReactNode }) => <ul style={{ margin: '0 0 14px', paddingLeft: 22, lineHeight: 1.6 }}>{p.children}</ul>,
+  ol: (p: { children?: ReactNode }) => <ol style={{ margin: '0 0 14px', paddingLeft: 22, lineHeight: 1.6 }}>{p.children}</ol>,
+  li: (p: { children?: ReactNode }) => <li style={{ margin: '0 0 6px', fontSize: 16 }}>{p.children}</li>,
+  strong: (p: { children?: ReactNode }) => <strong style={{ fontWeight: 700 }}>{p.children}</strong>,
+  a: (p: { href?: string; children?: ReactNode }) => <a href={p.href} target="_blank" rel="noreferrer" style={{ color: 'var(--vkui--color_text_link, #2688eb)' }}>{p.children}</a>,
+  hr: () => <div style={{ height: 1, background: 'var(--vkui--color_separator_primary, #e3e3e3)', margin: '18px 0' }} />,
+}
 
 export function App() {
   const seen = (() => { try { return localStorage.getItem(ONBOARD_KEY) === '1' } catch { return false } })()
@@ -119,11 +136,12 @@ export function App() {
               />
             )}
             <Div>
-              <h2 style={{ margin: '8px 0 4px', fontSize: 20, fontWeight: 700 }}>{activeArticle.title}</h2>
-              <div style={{ opacity: 0.6, fontSize: 13, marginBottom: 12 }}>{activeArticle.categoryName}</div>
-              <p style={{ fontSize: 16, lineHeight: 1.55, margin: 0 }}>{activeArticle.description}</p>
-              <Spacing size={12} />
-              <p style={{ fontSize: 15, lineHeight: 1.6, opacity: 0.9, margin: 0 }}>{activeArticle.excerpt}</p>
+              <h1 style={{ margin: '8px 0 4px', fontSize: 22, fontWeight: 800, lineHeight: 1.25 }}>{activeArticle.title}</h1>
+              <div style={{ opacity: 0.55, fontSize: 13, marginBottom: 14 }}>{activeArticle.categoryName}</div>
+              <p style={{ fontSize: 16, lineHeight: 1.55, margin: '0 0 16px', fontWeight: 600 }}>{activeArticle.description}</p>
+              <div className="vkapp-article-body">
+                <ReactMarkdown components={mdComponents}>{activeArticle.body}</ReactMarkdown>
+              </div>
             </Div>
             <Banner
               mode="tint"

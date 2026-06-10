@@ -8,7 +8,7 @@ export interface Article {
   date: string
   tags: string[]
   author: string
-  excerpt: string
+  body: string
   url: string
 }
 

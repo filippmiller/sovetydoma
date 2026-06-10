@@ -16,18 +16,23 @@ const { CATEGORIES } = await import(
   'file://' + path.join(REPO, 'src', 'lib', 'categories.mjs').replace(/\\/g, '/')
 )
 
-// Strip MDX/Markdown to a plain-text excerpt (first few paragraphs).
-function toExcerpt(body, maxChars = 600) {
-  const text = body
+// Clean the MDX body into plain Markdown the mini-app can render with structure
+// preserved (headings, paragraphs, lists) — NOT flattened into one blob.
+function toBody(body, maxChars = 2600) {
+  let md = body
     .replace(/^import .*$/gm, '')
     .replace(/^export .*$/gm, '')
-    .replace(/<[^>]+>/g, ' ')          // JSX/HTML tags
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, '') // images
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // links -> text
-    .replace(/[#>*_`~|-]{1,}/g, ' ')   // md punctuation
-    .replace(/\s+/g, ' ')
+    .replace(/<\/?[A-Za-z][^>]*>/g, '')   // strip JSX/HTML tags, keep inner text
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')  // drop images (shown separately)
+    .replace(/\{[^}]*\}/g, '')             // drop stray JSX expressions
+    .replace(/\n{3,}/g, '\n\n')            // collapse extra blank lines
     .trim()
-  return text.length > maxChars ? text.slice(0, maxChars).replace(/\s+\S*$/, '') + '…' : text
+
+  if (md.length <= maxChars) return md
+  // Truncate on a paragraph boundary so we never cut a heading/sentence mid-way.
+  const slice = md.slice(0, maxChars)
+  const lastBreak = slice.lastIndexOf('\n\n')
+  return (lastBreak > maxChars * 0.5 ? slice.slice(0, lastBreak) : slice).trim() + '\n\n…'
 }
 
 const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.endsWith('.mdx'))
@@ -47,7 +52,7 @@ for (const file of files) {
     date: data.date || '',
     tags: Array.isArray(data.tags) ? data.tags.slice(0, 6) : [],
     author: data.author || '',
-    excerpt: toExcerpt(content),
+    body: toBody(content),
     url: `https://1001sovet.ru/${data.category}/${data.slug}/`,
   })
 }
