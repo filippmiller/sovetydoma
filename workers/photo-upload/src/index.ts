@@ -34,9 +34,11 @@ const contactHits = new Map<string, number[]>()
 
 function cors(env: Env): Record<string, string> {
   return {
-    'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*',
+    // Fail closed: never emit a wildcard on authenticated upload/file routes.
+    'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || 'https://1001sovet.ru',
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
     'Access-Control-Allow-Headers': 'authorization, content-type, x-article-slug, x-file-ext',
+    'Vary': 'Origin',
   }
 }
 
@@ -144,6 +146,20 @@ async function sign(secret: string, value: string): Promise<string> {
   return base64Url(new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(value))))
 }
 
+// Constant-time string compare to avoid leaking match progress via timing.
+function timingSafeEqual(a: string, b: string): boolean {
+  const enc = new TextEncoder()
+  const left = enc.encode(a)
+  const right = enc.encode(b)
+  // Compare against a fixed-length buffer so length difference doesn't early-return.
+  const len = Math.max(left.length, right.length)
+  let diff = left.length ^ right.length
+  for (let i = 0; i < len; i++) {
+    diff |= (left[i] ?? 0) ^ (right[i] ?? 0)
+  }
+  return diff === 0
+}
+
 async function createContactToken(env: Env): Promise<{ token: string; expiresAt: number }> {
   const issuedAt = Math.floor(Date.now() / 1000)
   const payload = base64UrlText(JSON.stringify({
@@ -161,7 +177,7 @@ async function validateContactToken(env: Env, token: string): Promise<boolean> {
   const [payload, signature] = token.split('.')
   if (!payload || !signature) return false
   const expected = await sign(env.CONTACT_FORM_SECRET, payload)
-  if (expected !== signature) return false
+  if (!timingSafeEqual(expected, signature)) return false
 
   try {
     const data = JSON.parse(fromBase64Url(payload)) as { iat?: number }

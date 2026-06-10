@@ -1,0 +1,85 @@
+name: Auto-publish matrix articles
+
+# Scheduled content pipeline: exports approved+image-ready rows from the
+# content_matrix into src/content/articles as MDX, commits them to master,
+# and pushes. The push (made with CONTENT_PUBLISH_PAT, not the default
+# GITHUB_TOKEN) triggers deploy.yml, which rebuilds and ships the static site.
+# Net effect: new articles appear on the live site automatically, no human step.
+#
+# Image generation (Grok/xAI) is NOT done here — it runs locally into the matrix
+# ahead of time (image_status=generated). This job only publishes rows that
+# already have both a draft body and a generated image.
+
+on:
+  schedule:
+    # 07:00 and 14:00 UTC = 10:00 and 17:00 Europe/Moscow — two drops per day.
+    - cron: '0 7 * * *'
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max articles to publish this run'
+        required: false
+        default: '2'
+      dry_run:
+        description: 'Dry run (no commit/push)'
+        required: false
+        default: 'false'
+
+concurrency:
+  group: content-autopublish
+  cancel-in-progress: false
+
+permissions:
+  contents: read   # actual push uses the PAT below, not GITHUB_TOKEN
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_URL: ${{ secrets.MATRIX_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.MATRIX_SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Use the PAT so commits this job pushes will trigger deploy.yml.
+          token: ${{ secrets.CONTENT_PUBLISH_PAT }}
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Write .env.local for matrix scripts
+        run: |
+          {
+            echo "SUPABASE_URL=${SUPABASE_URL}"
+            echo "SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}"
+          } > .env.local
+
+      - name: Configure git author
+        run: |
+          git config user.name "content-bot[bot]"
+          git config user.email "content-bot@users.noreply.github.com"
+
+      - name: Auto-publish ready matrix rows
+        run: |
+          LIMIT="${{ github.event.inputs.limit || '2' }}"
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            node scripts/matrix/auto-publish.mjs --limit "$LIMIT" --dry-run
+          else
+            node scripts/matrix/auto-publish.mjs --limit "$LIMIT"
+          fi
+
+      - name: Cleanup secrets file
+        if: always()
+        run: rm -f .env.local

@@ -29,6 +29,10 @@
     "seo:indexnow:dry": "node scripts/submit-indexnow.mjs --dry-run",
     "seo:indexnow": "node scripts/submit-indexnow.mjs",
     "matrix:seed": "node scripts/matrix/seed-from-current.mjs",
+    "matrix:images": "node scripts/matrix/gen-images.mjs",
+    "matrix:drafts": "node scripts/matrix/gen-drafts-grok.mjs",
+    "matrix:publish": "node scripts/matrix/auto-publish.mjs",
+    "matrix:publish:dry": "node scripts/matrix/auto-publish.mjs --dry-run",
     "beads:list": "node scripts/beads/list-active.mjs",
     "beads:validate": "node scripts/beads/validate-status.mjs",
     "beads:create": "node scripts/beads/create-bead.mjs"
