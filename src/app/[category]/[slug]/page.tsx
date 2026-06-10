@@ -200,12 +200,13 @@ export default async function ArticlePage({ params }: Props) {
 
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': ['Article', 'NewsArticle'],
     headline: fm.title,
     description: fm.description,
+    url,
     datePublished: fm.date,
     dateModified: fm.updated || fm.date,
-    image: [imageUrl],
+    image: [{ '@type': 'ImageObject', url: imageUrl, width: 1200, height: 630 }],
     thumbnailUrl: imageUrl,
     author: {
       '@type': 'Person',
