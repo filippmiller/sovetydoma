@@ -53,7 +53,13 @@ export default function UserArticleForm({ userId, onSuccess }: Props) {
     })
 
     setSubmitting(false)
-    if (err) { setError(err.message); return }
+    if (err) {
+      const rateLimited = /rate_limited/i.test(err.message || '')
+      setError(rateLimited
+        ? 'Слишком много статей за короткое время. Подождите немного и попробуйте снова.'
+        : err.message)
+      return
+    }
     onSuccess(status)
   }
 

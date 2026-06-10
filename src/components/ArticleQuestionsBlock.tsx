@@ -77,7 +77,13 @@ export default function ArticleQuestionsBlock({ articleSlug }: Props) {
         author_name: userName,
         status: 'pending',
       })
-      if (err) { setError('Не удалось отправить вопрос. Попробуйте позже.'); setSubmitting(false); return }
+      if (err) {
+        const rateLimited = /rate_limited/i.test(err.message || '')
+        setError(rateLimited
+          ? 'Слишком много вопросов за короткое время. Подождите немного.'
+          : 'Не удалось отправить вопрос. Попробуйте позже.')
+        setSubmitting(false); return
+      }
       setSubmitted(true)
       setOpen(false)
       setTitle(''); setBody('')

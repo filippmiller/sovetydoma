@@ -237,7 +237,14 @@ export default function Comments({ slug }: Props) {
       .select('*, profiles(display_name, avatar_url)')
       .single()
 
-    if (error || !data) { setSubmitting(false); setNotice('Не удалось отправить комментарий.'); return }
+    if (error || !data) {
+      setSubmitting(false)
+      const rateLimited = /rate_limited/i.test(error?.message || '')
+      setNotice(rateLimited
+        ? 'Слишком много комментариев за короткое время. Подождите немного и попробуйте снова.'
+        : 'Не удалось отправить комментарий.')
+      return
+    }
 
     // 3) Fire automated moderation; if it approves, show the comment immediately.
     let approved = false
