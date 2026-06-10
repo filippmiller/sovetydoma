@@ -100,3 +100,5 @@ workers/subscriptions/.vk-user-token.local.json
 workers/subscriptions/.admin-key.local
 .vk-assets/
 .sb-token.tmp
+
+package-lock.json
