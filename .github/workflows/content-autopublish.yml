@@ -43,8 +43,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          # Use the PAT so commits this job pushes will trigger deploy.yml.
-          token: ${{ secrets.CONTENT_PUBLISH_PAT }}
+          # PAT needed so the push triggers deploy.yml (GITHUB_TOKEN commits
+          # don't trigger other workflows). Falls back to github.token when the
+          # secret is absent (dry-run only — a real push will fail without it).
+          token: ${{ secrets.CONTENT_PUBLISH_PAT || github.token }}
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v6

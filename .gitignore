@@ -97,3 +97,6 @@ workers/subscriptions/.fb-test.local.json
 workers/subscriptions/.vk-test.local.json
 workers/subscriptions/.vk-pkce.local.json
 workers/subscriptions/.vk-user-token.local.json
+workers/subscriptions/.admin-key.local
+.vk-assets/
+.sb-token.tmp
