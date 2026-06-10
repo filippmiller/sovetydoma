@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { getArticle, getAllSlugs, getAllArticles, CATEGORIES, LEGACY_ARTICLE_MOVES } from '@/lib/articles'
+import { resolvePersona } from '@/lib/personas'
 import Breadcrumb from '@/components/Breadcrumb'
 import RelatedArticles from '@/components/RelatedArticles'
 import MoreArticles from '@/components/MoreArticles'
@@ -180,6 +181,8 @@ export default async function ArticlePage({ params }: Props) {
   const color = CATEGORY_COLOR[category] || '#888'
   const emoji = CATEGORY_EMOJI[category] || '📄'
   const url = articleCanonicalUrl(fm)
+  const persona = resolvePersona({ author: fm.author, category })
+  const authorUrl = `${SITE_URL}/author/${persona.slug}/`
   const imageUrl = articleImageUrl(fm)
   const visibleImageUrl = resolveArticleImage(fm.image, { width: 900, height: 520 })
   const timeToRead = readingTime('x '.repeat(wordCount))
@@ -204,7 +207,12 @@ export default async function ArticlePage({ params }: Props) {
     dateModified: fm.updated || fm.date,
     image: [imageUrl],
     thumbnailUrl: imageUrl,
-    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    author: {
+      '@type': 'Person',
+      name: persona.name,
+      url: authorUrl,
+      jobTitle: persona.role,
+    },
     publisher: {
       '@type': 'Organization',
       name: SITE_NAME,

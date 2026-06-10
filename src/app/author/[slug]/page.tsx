@@ -45,8 +45,25 @@ export default async function AuthorPage({ params }: Props) {
   // Questions this persona has answered (from the build-time index).
   const answered = QUESTIONS.filter((q) => (q.answers || []).some((ans) => ans.author_persona === slug))
 
+  const authorUrl = `${SITE_URL}/author/${slug}/`
+  const profileJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    mainEntity: {
+      '@type': 'Person',
+      name: persona.name,
+      url: authorUrl,
+      jobTitle: persona.role,
+      description: persona.bio,
+      email: persona.contact,
+      knowsAbout: persona.categories.map((c) => CATEGORIES[c]?.name || c),
+      worksFor: { '@type': 'Organization', name: 'СоветыДома', url: SITE_URL },
+    },
+  }
+
   return (
     <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2rem 1rem 4rem' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(profileJsonLd) }} />
       <Breadcrumb items={[{ name: 'Авторы' }, { name: persona.name }]} />
 
       {/* Header */}
