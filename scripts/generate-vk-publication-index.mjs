@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import matter from 'gray-matter'
+import { renderSocialText } from './lib/social-text.mjs'
 
 const ROOT = process.cwd()
 const ARTICLES_DIR = path.join(ROOT, 'src/content/articles')
@@ -24,34 +25,10 @@ function toIsoMidnight(dateValue) {
   return Number.isNaN(date.getTime()) ? null : date.toISOString()
 }
 
+// Render the Markdown body into readable social-wall text (headings, bullets,
+// blank lines between blocks) instead of a flattened blob with raw "## ".
 function stripMarkdownAndMdx(content) {
-  // Remove import statements
-  let text = content.replace(/^import\s+.+?\s+from\s+['"].+?['"];?\s*$/gim, '')
-  // Remove JSX blocks (simple heuristic: lines starting with < and containing >)
-  text = text.replace(/<([A-Z][A-Za-z0-9]*)[^>]*>[\s\S]*?<\/\1>/g, '')
-  text = text.replace(/<[a-z][^>]*\/>/g, '')
-  text = text.replace(/<[^>]+>/g, '')
-  // Remove frontmatter already stripped by gray-matter
-  // Remove markdown links, keep text
-  text = text.replace(/\[!?([^\]]*)\]\([^)]*\)/g, '$1')
-  text = text.replace(/\[!?([^\]]*)\]\[[^\]]*\]/g, '$1')
-  // Remove bold/italic markers
-  text = text.replace(/(\*{1,2}|_{1,2})(.+?)\1/g, '$2')
-  // Remove code backticks
-  text = text.replace(/`{1,3}([^`]+)`{1,3}/g, '$1')
-  // Remove horizontal rules
-  text = text.replace(/^\s*[-=*]{3,}\s*$/gm, '')
-  // Remove blockquote markers
-  text = text.replace(/^\s*>\s?/gm, '')
-  // Remove list markers
-  text = text.replace(/^(\s*)[-*+\d]+\.\s+/gm, '$1')
-  // Collapse excessive blank lines
-  text = text.replace(/\n{3,}/g, '\n\n')
-  // Trim
-  text = text.trim()
-  // Compact spaces to reduce bundle size
-  text = text.replace(/[ \t]+/g, ' ').replace(/\n /g, '\n').replace(/ \n/g, '\n').trim()
-  return text
+  return renderSocialText(content)
 }
 
 export function buildVkPublicationIndex() {
