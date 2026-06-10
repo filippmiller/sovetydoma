@@ -112,7 +112,12 @@ const relFiles = [
   ...picked.map((r) => path.join('public', 'images', r.image_filename)),
 ]
 run('git', ['add', ...relFiles])
-run('git', ['commit', '-m', `content: auto-publish ${picked.length} article(s)\n\n${picked.map((r) => `- ${r.slug}`).join('\n')}`])
+// Commit message via a file, not -m: with shell:true on Windows the inline
+// message gets re-split by cmd.exe and git treats the words as pathspecs.
+const msgFile = path.join(ROOT, '.git', 'AUTO_PUBLISH_MSG')
+fs.writeFileSync(msgFile, `content: auto-publish ${picked.length} article(s)\n\n${picked.map((r) => `- ${r.slug}`).join('\n')}\n`, 'utf8')
+run('git', ['commit', '-F', msgFile])
+try { fs.unlinkSync(msgFile) } catch { /* ignore */ }
 
 if (!noPush) {
   run('git', ['push'])
