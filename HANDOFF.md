@@ -5,7 +5,25 @@
 > Operational detail with secret-file paths lives in the **gitignored**
 > `DEPLOY-TIMEWEB.md` (project root) and `C:\dev\knowledge\sovetydoma-deploy.md`.
 
-Last updated: 2026-06-10 (added social autoposting — see §2a).
+Last updated: 2026-06-10 (infra consolidation: prod moved to shared-prod-host 89.169.44.37; old VPS deleted — see §0).
+
+---
+
+## 0. ⚠️ 2026-06-10 INFRA CHANGE — single shared prod host
+
+Production now serves from the **Timeweb shared-prod-host `89.169.44.37`**
+(8cpu/16gb, Ubuntu 24.04, **Caddy** — NOT nginx). Static export lives at
+`/srv/apps/1001sovet/current`, deploy webhook on `127.0.0.1:9101`
+(`https://1001sovet.ru/__deploy/health` + `api.1001sovet.ru/__deploy/health` = 200).
+Deploy script on host: `deploy-1001sovet-from-git`.
+
+The old VPSes are **DELETED** (147.45.146.11 "1001sovet-replacement" and the
+earlier 188.225.86.238 id 8194295). §3/§4 below describe the OLD setup — keep
+for history, do not follow. Old-VPS backups (pg dump, nginx/etc, iamcaptain.dump)
+are at `/srv/backups/old-1001sovet/` on the new host.
+
+`pogovorimdoma.ru` redirect is now a Caddy `redir` block on the shared host.
+Cross-project canon: `C:\dev\knowledge\shared-prod-host.md`.
 
 ---
 
