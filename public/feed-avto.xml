@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>СоветыДома — Авто</title>
+    <link>https://1001sovet.ru/avto/</link>
+    <description>Уход за автомобилем, экономия на топливе и ремонте, сезонная эксплуатация</description>
+    <language>ru</language>
+    <atom:link href="https://1001sovet.ru/feed-avto.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 10 Jun 2026 14:23:40 GMT</lastBuildDate>
+    <image>
+      <url>https://1001sovet.ru/og-default.png</url>
+      <title>СоветыДома</title>
+      <link>https://1001sovet.ru/</link>
+    </image>
+    
+  </channel>
+</rss>
