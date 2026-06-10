@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// VK Mini App is served from the root of its host (vk.1001sovet.ru), so base '/'.
+// Served under https://1001sovet.ru/vk-app/ (Caddy handle_path strips the prefix,
+// so assets resolve under /vk-app/...). No new DNS/cert needed.
 export default defineConfig({
   plugins: [react()],
-  base: '/',
+  base: '/vk-app/',
   build: {
     outDir: 'dist',
     target: 'es2020',
