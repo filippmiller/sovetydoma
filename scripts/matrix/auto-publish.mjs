@@ -107,9 +107,21 @@ if (styleThreshold > 0 && writtenFiles.length) {
   }
 }
 
+// Generate the 240px card previews — the CI image audit fails the deploy with
+// --fail-on-missing-previews if a published article has no preview. The Python
+// generator writes only missing/changed files, so this is cheap and idempotent.
+try {
+  run('python', ['scripts/generate-image-previews.py'])
+} catch {
+  console.error('Preview generation failed — rolling back exported files.')
+  for (const f of writtenFiles) { try { fs.unlinkSync(f) } catch { /* already gone */ } }
+  process.exit(1)
+}
+
 const relFiles = [
   ...writtenFiles.map((f) => path.relative(ROOT, f)),
   ...picked.map((r) => path.join('public', 'images', r.image_filename)),
+  ...picked.map((r) => path.join('public', 'images', 'previews', `${r.slug}.jpg`)),
 ]
 run('git', ['add', ...relFiles])
 // Commit message via a file, not -m: with shell:true on Windows the inline

@@ -73,6 +73,14 @@ jobs:
           git config user.name "content-bot[bot]"
           git config user.email "content-bot@users.noreply.github.com"
 
+      - name: Set up Python (card-preview generation)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: pip install Pillow
+
       - name: Auto-publish ready matrix rows
         run: |
           LIMIT="${{ github.event.inputs.limit || '2' }}"
