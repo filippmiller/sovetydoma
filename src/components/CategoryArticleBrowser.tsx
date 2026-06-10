@@ -11,6 +11,10 @@ interface Props {
 
 type SortMode = 'newest' | 'shortest' | 'longest' | 'title'
 
+// Render in windows so a 179-article category doesn't ship 179 cards and a
+// 179-slug Supabase stats query on first paint.
+const PAGE_SIZE = 24
+
 function uniqueTags(articles: (ArticleFrontmatter & { wordCount: number })[]): string[] {
   const counts = new Map<string, number>()
   for (const article of articles) {
@@ -37,6 +41,7 @@ export default function CategoryArticleBrowser({ articles }: Props) {
   const [query, setQuery] = useState('')
   const [tag, setTag] = useState('')
   const [sortMode, setSortMode] = useState<SortMode>('newest')
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const tags = useMemo(() => uniqueTags(articles), [articles])
 
   const filtered = useMemo(() => {
@@ -49,6 +54,17 @@ export default function CategoryArticleBrowser({ articles }: Props) {
       : byTag
     return sortArticles(searched, sortMode)
   }, [articles, query, sortMode, tag])
+
+  // Any change to the filter set collapses back to the first window.
+  // Adjust-state-during-render pattern (no effect, no cascading render).
+  const filterKey = `${query.trim()}|${sortMode}|${tag}`
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey)
+  if (prevFilterKey !== filterKey) {
+    setPrevFilterKey(filterKey)
+    setVisibleCount(PAGE_SIZE)
+  }
+
+  const visible = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount])
 
   return (
     <section aria-label="Подбор статей раздела">
@@ -95,7 +111,19 @@ export default function CategoryArticleBrowser({ articles }: Props) {
           Ничего не найдено. Попробуйте убрать тему или сократить запрос.
         </div>
       ) : (
-        <ArticleCatalogGrid articles={filtered} />
+        <>
+          <ArticleCatalogGrid articles={visible} />
+          {visibleCount < filtered.length && (
+            <div className="category-browser-more">
+              <button
+                type="button"
+                onClick={() => setVisibleCount((current) => current + PAGE_SIZE)}
+              >
+                Показать ещё ({filtered.length - visibleCount})
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       <style jsx>{`
@@ -174,6 +202,26 @@ export default function CategoryArticleBrowser({ articles }: Props) {
         .category-browser-count {
           color: #888;
           font-size: 0.82rem;
+        }
+        .category-browser-more {
+          display: flex;
+          justify-content: center;
+          margin-top: 1.5rem;
+        }
+        .category-browser-more button {
+          border: 1px solid #ded4cc;
+          border-radius: 999px;
+          background: #fff;
+          color: #b73226;
+          font: inherit;
+          font-size: 0.9rem;
+          font-weight: 700;
+          padding: 0.55rem 1.4rem;
+          cursor: pointer;
+        }
+        .category-browser-more button:hover {
+          border-color: #c0392b66;
+          background: #c0392b0a;
         }
         .category-browser-empty {
           border: 1px dashed #dccfc6;
