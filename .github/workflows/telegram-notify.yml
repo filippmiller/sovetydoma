@@ -27,8 +27,10 @@ jobs:
         env:
           TG_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Pass step output via env (not inline ${{ }}) so a malicious filename
+          # cannot break out of the shell script — GitHub-recommended mitigation.
+          FILES: ${{ steps.articles.outputs.files }}
         run: |
-          FILES="${{ steps.articles.outputs.files }}"
           MSG="📝 Новые статьи на СоветыДома!%0A%0A"
           while IFS= read -r file; do
             SLUG=$(basename "$file" .mdx)

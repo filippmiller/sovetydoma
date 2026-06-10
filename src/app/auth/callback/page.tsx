@@ -159,9 +159,24 @@ export default function AuthCallbackPage() {
 }
 
 function redirectToDestination() {
-  // Prefer the intended destination if stored, otherwise go to cabinet
-  const destination = window.sessionStorage.getItem('auth_redirect_to') || '/moy-kabinet/'
+  // Prefer the intended destination if stored, otherwise go to cabinet.
+  // Open-redirect guard: only allow same-origin relative paths ("/...") so a
+  // script that poisoned sessionStorage can't bounce a freshly-authed user to
+  // an external phishing page.
+  const raw = window.sessionStorage.getItem('auth_redirect_to') || '/moy-kabinet/'
   window.sessionStorage.removeItem('auth_redirect_to')
+  let destination = '/moy-kabinet/'
+  if (/^\/(?!\/)/.test(raw)) {
+    // Same-origin relative path.
+    destination = raw
+  } else {
+    try {
+      const u = new URL(raw, window.location.origin)
+      if (u.origin === window.location.origin) destination = u.pathname + u.search + u.hash
+    } catch {
+      // malformed — keep the safe default
+    }
+  }
   window.location.replace(destination)
 }
 
