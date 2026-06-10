@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
+import { promptLogin, useAuthUserId } from '@/lib/auth-gate'
 
 interface Props {
   slug: string
@@ -19,6 +20,8 @@ export default function StarRating({ slug }: Props) {
   const [loading, setLoading] = useState(true)
   const [avg, setAvg] = useState<number | null>(null)
   const [voteCount, setVoteCount] = useState(0)
+  const [needAuth, setNeedAuth] = useState(false)
+  const { userId } = useAuthUserId()
 
   // Pull the public aggregate (everyone can read ratings) so we can show
   // "★ 4.6 · 12 оценок" as social proof regardless of login state.
@@ -86,6 +89,13 @@ export default function StarRating({ slug }: Props) {
   }, [slug, loadAggregate])
 
   const submitRating = async (n: number) => {
+    if (!userId) {
+      // Ratings require login — don't show a fake "Спасибо!", ask to sign in.
+      setNeedAuth(true)
+      promptLogin()
+      return
+    }
+
     setUserRating(n)
     setRated(true)
     setAnimating(n)
@@ -94,20 +104,17 @@ export default function StarRating({ slug }: Props) {
     // Save to localStorage
     localStorage.setItem(getStorageKey(slug), String(n))
 
-    // Try Supabase
+    // Persist to Supabase
     try {
       const sb = getSupabase()
-      const { data: user } = await sb.auth.getUser()
-      if (user.user) {
-        await sb
-          .from('ratings')
-          .upsert(
-            { user_id: user.user.id, article_slug: slug, stars: n },
-            { onConflict: 'article_slug,user_id' }
-          )
-        // Refresh the public average so the user immediately sees their vote counted.
-        loadAggregate()
-      }
+      await sb
+        .from('ratings')
+        .upsert(
+          { user_id: userId, article_slug: slug, stars: n },
+          { onConflict: 'article_slug,user_id' }
+        )
+      // Refresh the public average so the user immediately sees their vote counted.
+      loadAggregate()
     } catch {
       // Table not ready — localStorage fallback already saved
     }
@@ -212,6 +219,17 @@ export default function StarRating({ slug }: Props) {
         </div>
         {avgBadge}
       </div>
+      {needAuth && !userId && (
+        <p style={{ margin: '0.5rem 0 0', fontSize: '0.82rem', color: '#a93226' }}>
+          <button
+            onClick={() => promptLogin()}
+            style={{ background: 'none', border: 'none', color: '#c0392b', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', fontSize: 'inherit', fontFamily: 'inherit', padding: 0 }}
+          >
+            Войдите
+          </button>
+          , чтобы оценить статью.
+        </p>
+      )}
     </div>
   )
 }

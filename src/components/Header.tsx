@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { CATEGORIES } from '@/lib/categories'
 import { LIFE_TAXONOMY } from '@/lib/life-taxonomy'
@@ -16,6 +17,13 @@ const primaryLinks = [
 
 export default function Header() {
   const pathname = usePathname()
+  const sectionsRef = useRef<HTMLDetailsElement>(null)
+
+  // Close the sections mega-menu after a client-side navigation — the native
+  // <details> would otherwise stay open on top of the freshly rendered page.
+  useEffect(() => {
+    if (sectionsRef.current) sectionsRef.current.open = false
+  }, [pathname])
 
   const activeCategory = Object.values(CATEGORIES).find(
     (cat) => pathname === `/${cat.slug}` || pathname.startsWith(`/${cat.slug}/`)
@@ -30,7 +38,7 @@ export default function Header() {
             <span className="site-tagline" aria-hidden="true">советы для дома</span>
           </Link>
 
-          <details className="header-sections">
+          <details className="header-sections" ref={sectionsRef}>
             <summary aria-label="Открыть разделы">
               <span>{activeCategory?.name || 'Разделы'}</span>
             </summary>

@@ -1,6 +1,7 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
+import { promptLogin } from '@/lib/auth-gate'
 
 interface Props {
   slug: string
@@ -17,6 +18,7 @@ export default function ArticleReactions({ slug }: Props) {
   const [counts, setCounts] = useState<number[]>([0, 0, 0, 0])
   const [active, setActive] = useState<boolean[]>([false, false, false, false])
   const [userId, setUserId] = useState<string | null>(null)
+  const [needAuth, setNeedAuth] = useState(false)
 
   // Real aggregate counts per emoji, straight from the reactions table
   // (readable by everyone via RLS). No fabricated seed numbers.
@@ -65,18 +67,20 @@ export default function ArticleReactions({ slug }: Props) {
 
   async function handleClick(index: number) {
     const r = REACTIONS[index]
+
+    if (!userId) {
+      // Reactions require login — don't fake a highlight, ask the visitor to sign in.
+      setNeedAuth(true)
+      promptLogin()
+      return
+    }
+
     const isActive = active[index]
     const next = !isActive
 
-    // Optimistic highlight toggle (works for everyone).
+    // Optimistic highlight toggle.
     setActive((prev) => prev.map((v, i) => (i === index ? next : v)))
     localStorage.setItem(`reactions_${slug}_${r.emoji}_active`, next ? '1' : '0')
-
-    if (!userId) {
-      // Anonymous: cannot persist (RLS requires auth). Keep counts truthful —
-      // only the user's own highlight changes, the real count is untouched.
-      return
-    }
 
     // Optimistic count nudge, then write to DB and reconcile with the truth.
     setCounts((prev) => prev.map((c, i) => (i === index ? Math.max(0, c + (next ? 1 : -1)) : c)))
@@ -135,6 +139,17 @@ export default function ArticleReactions({ slug }: Props) {
           </button>
         ))}
       </div>
+      {needAuth && !userId && (
+        <p style={{ textAlign: 'center', margin: '0.6rem 0 0', fontSize: '0.82rem', color: '#a93226' }}>
+          <button
+            onClick={() => promptLogin()}
+            style={{ background: 'none', border: 'none', color: '#c0392b', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', fontSize: 'inherit', fontFamily: 'inherit', padding: 0 }}
+          >
+            Войдите
+          </button>
+          , чтобы ваша реакция учлась.
+        </p>
+      )}
     </div>
   )
 }

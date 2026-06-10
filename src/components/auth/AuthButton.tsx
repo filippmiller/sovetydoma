@@ -6,6 +6,7 @@ import { getSupabase, isSupabaseConfigured } from '@/lib/supabase'
 import type { Profile } from '@/lib/supabase'
 import AuthModal from './AuthModal'
 import { migrateLocalFavoritesToServer, clearLocalFavorites, processPendingFavoriteIntent } from '@/lib/favorites'
+import { OPEN_AUTH_EVENT } from '@/lib/auth-gate'
 
 export default function AuthButton() {
   const authConfigured = isSupabaseConfigured()
@@ -95,6 +96,13 @@ export default function AuthButton() {
       subscription.unsubscribe()
     }
   }, [authConfigured])
+
+  // Let any widget (reactions, ratings, feedback) request the login modal.
+  useEffect(() => {
+    const open = () => setModalOpen(true)
+    window.addEventListener(OPEN_AUTH_EVENT, open)
+    return () => window.removeEventListener(OPEN_AUTH_EVENT, open)
+  }, [])
 
   useEffect(() => {
     if (!dropdownOpen) return

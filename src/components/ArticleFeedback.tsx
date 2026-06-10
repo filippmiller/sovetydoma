@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
+import { promptLogin, useAuthUserId } from '@/lib/auth-gate'
 
 interface Props {
   slug: string
@@ -27,6 +28,8 @@ export default function ArticleFeedback({ slug }: Props) {
   const [sent, setSent] = useState(false)
   const [showComment, setShowComment] = useState(false)
   const [counts, setCounts] = useState<Counts>({})
+  const [needAuth, setNeedAuth] = useState(false)
+  const { userId } = useAuthUserId()
 
   // Load aggregate counters (public) + restore this visitor's prior choices.
   const loadCounts = useCallback(async () => {
@@ -57,18 +60,25 @@ export default function ArticleFeedback({ slug }: Props) {
     return () => { cancelled = true }
   }, [slug, loadCounts])
 
-  // Record an event to Supabase (anon allowed); optimistic local count bump.
+  // Require login before recording — feedback must be tied to an account.
+  const ensureAuth = (): boolean => {
+    if (userId) return true
+    setNeedAuth(true)
+    promptLogin()
+    return false
+  }
+
+  // Record an event to Supabase; optimistic local count bump.
   const record = async (kind: string, extra: { comment?: string } = {}) => {
     setCounts((prev) => ({ ...prev, [kind]: (prev[kind] || 0) + 1 }))
     try {
       const sb = getSupabase()
-      let userId: string | null = null
-      try { const { data } = await sb.auth.getUser(); userId = data.user?.id ?? null } catch {}
       await sb.from('feedback_events').insert({ article_slug: slug, kind, comment: extra.comment || '', user_id: userId })
     } catch { /* best-effort; optimistic count already shown */ }
   }
 
   const pickSignal = (key: string) => {
+    if (!ensureAuth()) return
     if (signal === key) return // one signal per visitor; don't double-count
     setSignal(key)
     try { localStorage.setItem(`fb_signal_${slug}`, key) } catch {}
@@ -76,12 +86,14 @@ export default function ArticleFeedback({ slug }: Props) {
   }
 
   const pickVerdict = (v: 'yes' | 'no') => {
+    if (!ensureAuth()) return
     setVerdict(v); setShowComment(true)
     try { localStorage.setItem(`fb_verdict_${slug}`, v) } catch {}
     record(v === 'yes' ? 'verdict_yes' : 'verdict_no')
   }
 
   const submit = () => {
+    if (!ensureAuth()) return
     if (comment.trim()) record('verdict_' + (verdict || 'no'), { comment: comment.trim() })
     try { localStorage.setItem(`fb_sent_${slug}`, '1') } catch {}
     setSent(true)
@@ -89,6 +101,17 @@ export default function ArticleFeedback({ slug }: Props) {
 
   return (
     <section style={{ marginTop: '2.5rem', borderTop: '1px solid #f0ece7', paddingTop: '1.75rem' }}>
+      {needAuth && !userId && (
+        <p style={{ margin: '0 0 1rem', fontSize: '0.85rem', color: '#a93226' }}>
+          <button
+            onClick={() => promptLogin()}
+            style={{ background: 'none', border: 'none', color: '#c0392b', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline', fontSize: 'inherit', fontFamily: 'inherit', padding: 0 }}
+          >
+            Войдите
+          </button>
+          , чтобы оставить отзыв.
+        </p>
+      )}
       {/* Practical signals with live aggregate counts */}
       <div style={{ marginBottom: '1.5rem' }}>
         <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '0.6rem' }}>
