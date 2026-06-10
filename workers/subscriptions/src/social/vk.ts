@@ -160,15 +160,21 @@ export async function saveWallPhoto(env: Env, config: VkConfig, uploadResult: { 
 }
 
 export async function postToWall(env: Env, config: VkConfig, message: string, attachment?: string): Promise<number> {
-  const url = new URL(`${config.apiBaseUrl}/wall.post`)
-  url.searchParams.set('access_token', config.accessToken)
-  url.searchParams.set('v', config.apiVersion)
-  url.searchParams.set('owner_id', `-${config.groupId}`)
-  url.searchParams.set('from_group', '1')
-  url.searchParams.set('message', message)
-  if (attachment) url.searchParams.set('attachments', attachment)
+  // POST with a form body — a full article message (4000+ Cyrillic chars) in a
+  // GET query string blows the URL past length limits and the request fails.
+  const body = new URLSearchParams()
+  body.set('access_token', config.accessToken)
+  body.set('v', config.apiVersion)
+  body.set('owner_id', `-${config.groupId}`)
+  body.set('from_group', '1')
+  body.set('message', message)
+  if (attachment) body.set('attachments', attachment)
 
-  const res = await fetch(url.toString())
+  const res = await fetch(`${config.apiBaseUrl}/wall.post`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+  })
   if (!res.ok) {
     throw new Error(`vk_wall_post_http_${res.status}`)
   }

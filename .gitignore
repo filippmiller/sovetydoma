@@ -94,3 +94,4 @@ __pycache__/
 scripts/__pycache__/
 .fb-test.local.json
 workers/subscriptions/.fb-test.local.json
+workers/subscriptions/.vk-test.local.json
