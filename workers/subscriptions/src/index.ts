@@ -12,6 +12,7 @@ import { processVkAutopost } from './social/vk-autopost'
 import { buildFbArticlePost, publishArticleToFacebook, MAX_FB_MESSAGE_CHARS } from './social/fb'
 import { processFbAutopost } from './social/fb-autopost'
 import { createSupabaseVkIdLoginLink } from './auth/vk-id'
+import { createSupabaseYandexLoginLink } from './auth/yandex'
 
 const CATEGORY_SLUGS = ['kulinaria', 'dom-i-uborka', 'dacha-i-ogorod', 'layfkhaki', 'ekonomiya', 'rybalka']
 const FREQUENCIES = ['daily_one', 'daily_digest_3', 'weekly_digest_3', 'weekly_digest_7']
@@ -872,6 +873,49 @@ async function handleVkIdExchange(request: Request, env: Env): Promise<Response>
   }
 }
 
+async function handleYandexExchange(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('origin') || ''
+  if (origin && !isAllowedOrigin(env, request)) {
+    return json({ ok: false, error: 'origin_not_allowed' }, 403)
+  }
+
+  const payload = await request.json().catch(() => ({})) as { code?: string; redirect_uri?: string; redirectUri?: string }
+  const code = String(payload.code || '').trim()
+  const redirectUri = String(payload.redirect_uri || payload.redirectUri || '').trim()
+
+  if (!code) {
+    return json({ ok: false, error: 'yandex_code_required' }, 400)
+  }
+  if (code.length > 2000 || redirectUri.length > 500) {
+    return json({ ok: false, error: 'invalid_yandex_payload' }, 400)
+  }
+  if (!hasSupabaseServiceRole(env)) {
+    return json({ ok: false, error: 'provider_unconfigured', missing: ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'].filter((k) => !env[k as keyof Env]) }, 503)
+  }
+
+  const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() || 'unknown'
+  const ipLimit = await checkRateLimit(env, `yandex:exchange:ip:${await sha256Hex(ip)}`, 30, 60 * 60)
+  if (!ipLimit.allowed) {
+    return json({ ok: false, error: 'rate_limited', retryAfterSeconds: ipLimit.retryAfterSeconds }, 429)
+  }
+
+  try {
+    const result = await createSupabaseYandexLoginLink(env, { code, redirectUri })
+    return json({
+      ok: true,
+      actionLink: result.actionLink,
+      emailHint: result.email.replace(/^(.{2}).*(@.*)$/, '$1***$2'),
+    })
+  } catch (err) {
+    const e = err as Error & { missing?: string[] }
+    console.error('yandex_exchange_failed', e.message)
+    if (e.message === 'provider_unconfigured') {
+      return json({ ok: false, error: 'provider_unconfigured', missing: e.missing || [] }, 503)
+    }
+    return json({ ok: false, error: 'yandex_auth_failed' }, 502)
+  }
+}
+
 async function handleVkDryRun(request: Request, env: Env): Promise<Response> {
   const adminError = requireAdmin(request, env)
   if (adminError) return adminError
@@ -1207,6 +1251,10 @@ export async function route(req: Request, env: Env): Promise<Response> {
 
   if (req.method === 'POST' && url.pathname === '/auth/vk/exchange') {
     return handleVkIdExchange(req, env)
+  }
+
+  if (req.method === 'POST' && url.pathname === '/auth/yandex/exchange') {
+    return handleYandexExchange(req, env)
   }
 
   if (req.method === 'POST' && url.pathname === '/social/track') {

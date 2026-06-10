@@ -113,6 +113,31 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     }
   }, [])
 
+  // Yandex: self-hosted Supabase has no `yandex` provider, so we run a custom
+  // authorization-code flow. Redirect to Yandex with a CSRF `state`; the return
+  // is handled on /auth/callback/ which exchanges the code via the worker.
+  const handleYandexSignIn = useCallback(() => {
+    setError('')
+    const clientId = (process.env.NEXT_PUBLIC_YANDEX_OAUTH_CLIENT_ID || '').trim()
+    if (!clientId) {
+      setError('Этот способ входа пока не настроен. Попробуйте войти по email.')
+      return
+    }
+    setOauthLoading('yandex')
+    const state = createPkceVerifier() // reuse the CSPRNG token helper for state
+    const redirectUri = getOAuthRedirectTo()
+    try {
+      window.sessionStorage.setItem(YANDEX_STATE_KEY, state)
+      window.sessionStorage.setItem('auth_redirect_to', getAuthRedirectTo())
+    } catch { /* sessionStorage unavailable — flow will fail the state check, which is safe */ }
+    const authorizeUrl = `https://oauth.yandex.ru/authorize?response_type=code`
+      + `&client_id=${encodeURIComponent(clientId)}`
+      + `&redirect_uri=${encodeURIComponent(redirectUri)}`
+      + `&state=${encodeURIComponent(state)}`
+      + `&force_confirm=yes`
+    window.location.href = authorizeUrl
+  }, [])
+
   const handleVkSuccess = useCallback(async (payload: { code?: string; device_id?: string }) => {
     setError('')
     setInfo('')
@@ -727,7 +752,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                 provider="yandex"
                 label="Войти через Яндекс"
                 loading={oauthLoading === 'yandex'}
-                onClick={() => handleOAuthSignIn('yandex')}
+                onClick={handleYandexSignIn}
               />
               <OAuthButton
                 provider="google"
@@ -1010,6 +1035,7 @@ function safeRedirectUrl(value: string): string | null {
 }
 
 const VK_ID_CODE_VERIFIER_KEY = 'sovetydoma_vk_id_code_verifier'
+const YANDEX_STATE_KEY = 'sovetydoma_yandex_oauth_state'
 
 function loadVkIdSdk(): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve()

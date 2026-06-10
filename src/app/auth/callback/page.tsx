@@ -10,6 +10,8 @@ import { getSupabase } from '@/lib/supabase'
  * PKCE authorization code for a Supabase session and then redirects the
  * user to their intended destination.
  */
+const YANDEX_STATE_KEY = 'sovetydoma_yandex_oauth_state'
+
 export default function AuthCallbackPage() {
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing')
   const [message, setMessage] = useState('Завершаем вход…')
@@ -26,6 +28,37 @@ export default function AuthCallbackPage() {
 
         if (error) {
           throw new Error(errorDescription || error)
+        }
+
+        // Custom Yandex OAuth flow: we initiated it and stored a CSRF state.
+        // Distinguish from Supabase-native codes by the presence of that state.
+        const returnedState = url.searchParams.get('state')
+        const storedYandexState = (() => {
+          try { return window.sessionStorage.getItem(YANDEX_STATE_KEY) } catch { return null }
+        })()
+        if (storedYandexState) {
+          try { window.sessionStorage.removeItem(YANDEX_STATE_KEY) } catch { /* ignore */ }
+          if (!returnedState || returnedState !== storedYandexState) {
+            throw new Error('state_mismatch')
+          }
+          if (!code) throw new Error('authorization_code_missing')
+          const apiBase = (process.env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL || '').trim().replace(/\/+$/, '')
+          if (!apiBase) throw new Error('yandex_api_not_configured')
+          const res = await fetch(`${apiBase}/auth/yandex/exchange`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, redirect_uri: `${window.location.origin}/auth/callback/` }),
+          })
+          const body = await res.json().catch(() => ({})) as { ok?: boolean; actionLink?: string; error?: string; message?: string }
+          if (!res.ok || !body.ok || !body.actionLink) {
+            throw new Error(body.message || body.error || 'yandex_exchange_failed')
+          }
+          if (!cancelled) {
+            setStatus('success')
+            setMessage('Вход выполнен! Перенаправляем…')
+            window.location.href = body.actionLink
+          }
+          return
         }
 
         if (!code) {
@@ -193,6 +226,12 @@ function mapOAuthError(raw: string): string {
   }
   if (m.includes('authorization_code_missing')) {
     return 'Не получен код авторизации. Попробуйте войти снова.'
+  }
+  if (m.includes('state_mismatch')) {
+    return 'Проверка безопасности входа не пройдена. Попробуйте войти снова.'
+  }
+  if (m.includes('yandex_api_not_configured')) {
+    return 'Вход через Яндекс пока не настроен на сервере. Попробуйте войти по email.'
   }
   return 'Не удалось завершить вход через соцсеть. Попробуйте другой способ.'
 }

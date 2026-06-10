@@ -120,7 +120,7 @@ export async function fetchVkIdUserInfo(env: Env, accessToken: string): Promise<
   return postForm<VkUserInfoResponse>(`${vkIdAuthBase(env)}/oauth2/user_info`, body)
 }
 
-async function generateSupabaseMagicLink(env: Env, email: string, userData: Record<string, unknown>): Promise<string> {
+export async function generateSupabaseMagicLink(env: Env, email: string, userData: Record<string, unknown>): Promise<string> {
   const res = await fetch(`${supabaseBase(env)}/auth/v1/admin/generate_link`, {
     method: 'POST',
     headers: {
