@@ -75,6 +75,11 @@ export type Env = {
   VK_ID_API_BASE_URL?: string
   VK_ID_AUTH_BASE_URL?: string
   VK_AUTOPOST_MAX_DAILY?: string
+  FB_PAGE_ID?: string
+  FB_PAGE_ACCESS_TOKEN?: string
+  FB_API_VERSION?: string
+  FB_API_BASE_URL?: string
+  FB_AUTOPOST_MAX_DAILY?: string
 }
 
 export type RouteContext = {

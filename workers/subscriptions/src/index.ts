@@ -9,6 +9,8 @@ import { hasSupabaseServiceRole, insertRows, selectRows, updateRows } from './su
 import { validateSubscriptionRequest } from '../../../src/lib/subscriptions/validation.mjs'
 import { buildVkArticlePost, findArticleRecord, MAX_VK_MESSAGE_CHARS, publishArticleToVk, sha256Text } from './social/vk'
 import { processVkAutopost } from './social/vk-autopost'
+import { buildFbArticlePost, publishArticleToFacebook, MAX_FB_MESSAGE_CHARS } from './social/fb'
+import { processFbAutopost } from './social/fb-autopost'
 import { createSupabaseVkIdLoginLink } from './auth/vk-id'
 
 const CATEGORY_SLUGS = ['kulinaria', 'dom-i-uborka', 'dacha-i-ogorod', 'layfkhaki', 'ekonomiya', 'rybalka']
@@ -999,6 +1001,140 @@ async function handleVkPost(request: Request, env: Env): Promise<Response> {
   })
 }
 
+async function handleFbDryRun(request: Request, env: Env): Promise<Response> {
+  const adminError = requireAdmin(request, env)
+  if (adminError) return adminError
+
+  if (!hasSupabaseServiceRole(env)) {
+    return json({ ok: false, error: 'supabase_service_role_not_configured' }, 503)
+  }
+
+  const payload = await request.json().catch(() => ({})) as { articleSlug?: string }
+  const articleSlug = String(payload.articleSlug || '').trim()
+  if (!articleSlug) {
+    return json({ ok: false, error: 'article_slug_required' }, 400)
+  }
+
+  const missing = ['FB_PAGE_ID', 'FB_PAGE_ACCESS_TOKEN'].filter((k) => !env[k as keyof Env])
+  if (missing.length > 0) {
+    return json({ ok: false, error: 'provider_unconfigured', missing }, 503)
+  }
+
+  const siteUrl = String(env.PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
+  const record = findArticleRecord(articleSlug)
+  if (!record) {
+    return json({ ok: false, error: 'article_not_found' }, 404)
+  }
+
+  let post: ReturnType<typeof buildFbArticlePost>
+  try {
+    post = buildFbArticlePost(record, siteUrl)
+  } catch (err) {
+    const code = (err && typeof err === 'object' && 'code' in err) ? String((err as { code?: string }).code) : 'build_failed'
+    return json({ ok: false, error: (err as Error).message, errorCode: code }, 400)
+  }
+
+  const bodyHash = await sha256Text(`fb\n${post.message}\n${post.imageUrl}`)
+
+  return json({
+    ok: true,
+    dryRun: true,
+    articleSlug,
+    title: record.title,
+    canonicalUrl: post.canonicalUrl,
+    imageUrl: post.imageUrl,
+    messageLength: post.messageLength,
+    bodyHash,
+    wouldPost: {
+      page_id: String(env.FB_PAGE_ID),
+      edge: 'photos',
+      hasPhoto: true,
+      maxChars: MAX_FB_MESSAGE_CHARS,
+    },
+  })
+}
+
+async function handleFbPost(request: Request, env: Env): Promise<Response> {
+  const adminError = requireAdmin(request, env)
+  if (adminError) return adminError
+
+  if (!hasSupabaseServiceRole(env)) {
+    return json({ ok: false, error: 'supabase_service_role_not_configured' }, 503)
+  }
+
+  const payload = await request.json().catch(() => ({})) as { articleSlug?: string; requirePhoto?: boolean; allowLinkFallback?: boolean }
+  const articleSlug = String(payload.articleSlug || '').trim()
+  const requirePhoto = payload.requirePhoto !== false
+  const allowLinkFallback = payload.allowLinkFallback === true || !requirePhoto
+  if (!articleSlug) {
+    return json({ ok: false, error: 'article_slug_required' }, 400)
+  }
+
+  const articles = await selectRows<{ article_slug: string }>(
+    env,
+    'articles_publication_index',
+    `article_slug=eq.${encodeURIComponent(articleSlug)}&select=article_slug&limit=1`,
+  )
+  if (articles.length === 0) {
+    return json({ ok: false, error: 'article_not_found' }, 404)
+  }
+
+  const existing = await selectRows<{ id: string; provider_post_id: string; status: string }>(
+    env,
+    'social_publications',
+    `platform=eq.fb&article_slug=eq.${encodeURIComponent(articleSlug)}&select=id,provider_post_id,status&limit=1`,
+  )
+  const posted = existing.find((row) => row.status === 'posted')
+  if (posted) {
+    return json({ ok: false, error: 'duplicate_already_posted', providerPostId: posted.provider_post_id }, 409)
+  }
+
+  const result = await publishArticleToFacebook(env, articleSlug, { dryRun: false, requirePhoto, allowLinkFallback })
+
+  if (!result.ok) {
+    try {
+      await insertRows(env, 'social_publications', {
+        platform: 'fb',
+        article_slug: articleSlug,
+        body_hash: result.bodyHash || '',
+        status: 'failed',
+        provider_payload: { error: result.error, errorCode: result.errorCode },
+        error_code: result.errorCode || 'unknown',
+        error_message: result.error || 'unknown',
+      }, 'id')
+    } catch {
+      // Ignore DB write failure
+    }
+    return json({ ok: false, error: result.error, errorCode: result.errorCode }, 502)
+  }
+
+  const upsertPayload = {
+    platform: 'fb',
+    article_slug: articleSlug,
+    body_hash: result.bodyHash,
+    status: 'posted',
+    provider_post_id: result.providerPostId,
+    provider_payload: { postUrl: result.postUrl, messageLength: result.messageLength, publishMode: result.publishMode },
+    posted_at: new Date().toISOString(),
+  }
+
+  if (existing[0]) {
+    await updateRows(env, 'social_publications', `id=eq.${encodeURIComponent(existing[0].id)}`, upsertPayload, 'id')
+  } else {
+    await insertRows(env, 'social_publications', upsertPayload, 'id')
+  }
+
+  return json({
+    ok: true,
+    articleSlug,
+    providerPostId: result.providerPostId,
+    postUrl: result.postUrl,
+    messageLength: result.messageLength,
+    bodyHash: result.bodyHash,
+    publishMode: result.publishMode,
+  })
+}
+
 async function handleSocialTrack(request: Request, env: Env): Promise<Response> {
   const origin = request.headers.get('origin') || ''
   if (origin && !isAllowedOrigin(env, request)) {
@@ -1097,6 +1233,14 @@ export async function route(req: Request, env: Env): Promise<Response> {
     return handleVkPost(req, env)
   }
 
+  if (req.method === 'POST' && url.pathname === '/admin/social/fb/dry-run') {
+    return handleFbDryRun(req, env)
+  }
+
+  if (req.method === 'POST' && url.pathname === '/admin/social/fb/post') {
+    return handleFbPost(req, env)
+  }
+
   return json({ ok: false, error: 'not_found', path: url.pathname }, 404)
 }
 
@@ -1117,6 +1261,18 @@ export async function scheduled(_event: ScheduledEvent, env: Env): Promise<void>
     }
   } catch (err) {
     console.error('vk_autopost_unexpected_error', (err as Error).message)
+  }
+
+  // Run Facebook autopost independently as well
+  try {
+    const fbResult = await processFbAutopost(env)
+    if (fbResult.ran) {
+      console.log('fb_autopost_result', JSON.stringify(fbResult))
+    } else {
+      console.log('fb_autopost_skipped', fbResult.skippedReason)
+    }
+  } catch (err) {
+    console.error('fb_autopost_unexpected_error', (err as Error).message)
   }
 }
 
