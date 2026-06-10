@@ -57,12 +57,18 @@ export function buildPublicationIndex() {
     .filter((fileName) => fileName.endsWith('.mdx'))
     .sort((a, b) => a.localeCompare(b))
 
-  return files.map((fileName) => {
+  const rows = []
+  for (const fileName of files) {
     const filePath = path.join(ARTICLES_DIR, fileName)
     const raw = fs.readFileSync(filePath, 'utf8')
     const { data } = matter(raw)
-    return normalizeArticleRecord(filePath, data)
-  })
+    // Only the six channel categories are syndicated; skip the rest rather
+    // than failing the whole sync (taxonomy has grown beyond these).
+    const categorySlug = String(data?.category || '').trim()
+    if (!CATEGORY_SLUGS.has(categorySlug)) continue
+    rows.push(normalizeArticleRecord(filePath, data))
+  }
+  return rows
 }
 
 const isMainModule = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
