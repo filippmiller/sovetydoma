@@ -1,0 +1,29 @@
+{
+  "name": "sovetydoma-vk-miniapp",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "VK Mini App for 1001sovet.ru — категории, статьи и советы внутри ВКонтакте",
+  "scripts": {
+    "content": "node scripts/build-content.mjs",
+    "dev": "pnpm run content && vite",
+    "build": "pnpm run content && tsc -b && vite build",
+    "preview": "vite preview --port 5174",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "@vkontakte/icons": "^3.10.0",
+    "@vkontakte/vk-bridge": "^2.15.0",
+    "@vkontakte/vkui": "^7.6.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "gray-matter": "^4.0.3",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.5"
+  }
+}

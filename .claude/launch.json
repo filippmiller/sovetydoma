@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--", "--port", "3005"],
       "port": 3005
+    },
+    {
+      "name": "vk-miniapp",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "vk-miniapp", "dev"],
+      "port": 5174
     }
   ]
 }
