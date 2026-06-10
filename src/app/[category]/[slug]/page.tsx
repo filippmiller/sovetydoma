@@ -184,6 +184,10 @@ export default async function ArticlePage({ params }: Props) {
   const persona = resolvePersona({ author: fm.author, category })
   const authorUrl = `${SITE_URL}/author/${persona.slug}/`
   const imageUrl = articleImageUrl(fm)
+  // Report the real on-disk dimensions in JSON-LD (not a hardcoded 1200x630).
+  // Discover/large-preview needs the actual image to be >=1200px wide; claiming
+  // dimensions the file doesn't have is worse than telling the truth.
+  const jsonLdImageDims = getLocalJpegDimensions(`/images/${fm.slug}.jpg`) || { width: 1024, height: 768 }
   const visibleImageUrl = resolveArticleImage(fm.image, { width: 900, height: 520 })
   const timeToRead = readingTime('x '.repeat(wordCount))
 
@@ -206,7 +210,7 @@ export default async function ArticlePage({ params }: Props) {
     url,
     datePublished: fm.date,
     dateModified: fm.updated || fm.date,
-    image: [{ '@type': 'ImageObject', url: imageUrl, width: 1200, height: 630 }],
+    image: [{ '@type': 'ImageObject', url: imageUrl, ...jsonLdImageDims }],
     thumbnailUrl: imageUrl,
     author: {
       '@type': 'Person',

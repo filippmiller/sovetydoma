@@ -18,7 +18,13 @@ const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? proce
 const limit = parseInt(arg('--limit', '10'), 10)
 const concurrency = Math.max(1, parseInt(arg('--concurrency', '4'), 10))
 const model = arg('--model', 'fal-ai/flux/schnell')   // schnell = cheapest/fastest; flux/dev = nicer, pricier
-const imageSize = arg('--size', 'landscape_4_3')        // landscape_4_3 (1024x768), landscape_16_9, square_hd...
+// Default 1280x960: 4:3 like before, but >=1200px wide so images qualify for
+// Google Discover / large image preview (1024x768 presets do NOT — bead -qup).
+// Accepts a preset name (landscape_4_3, square_hd, ...) or explicit "WxH".
+const sizeArg = arg('--size', '1280x960')
+const imageSize = /^\d+x\d+$/.test(sizeArg)
+  ? { width: Number(sizeArg.split('x')[0]), height: Number(sizeArg.split('x')[1]) }
+  : sizeArg
 const steps = parseInt(arg('--steps', '4'), 10)         // schnell is designed for ~4 steps
 const onlySlug = arg('--slug', '')
 const verticals = (arg('--verticals', '') || '').split(',').filter(Boolean)
@@ -104,7 +110,7 @@ async function persist(row, out) {
     image_source: 'fal',
     image_model: model,
     image_generated_at: new Date().toISOString(),
-    image_meta: { bytes: out.bytes, prompt: row.image_prompt || null, image_size: imageSize, steps },
+    image_meta: { bytes: out.bytes, prompt: row.image_prompt || null, image_size: typeof imageSize === 'string' ? imageSize : `${imageSize.width}x${imageSize.height}`, steps },
   }).eq('id', row.id)
   await sb.from('content_matrix_events').insert({
     matrix_id: row.id, axis: 'image', from_value: 'none', to_value: 'generated',
