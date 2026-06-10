@@ -25,6 +25,7 @@ export type FbPublishOptions = {
   dryRun?: boolean
   requirePhoto?: boolean
   allowLinkFallback?: boolean
+  pageOverride?: FbPageOverride
 }
 
 export type FbPublishResult = {
@@ -40,9 +41,11 @@ export type FbPublishResult = {
   publishMode?: 'photo_url' | 'link_post'
 }
 
-export function validateFbConfig(env: Env): FbConfig {
-  const pageId = String(env.FB_PAGE_ID || '').trim()
-  const pageAccessToken = String(env.FB_PAGE_ACCESS_TOKEN || '').trim()
+export type FbPageOverride = { id: string; token: string }
+
+export function validateFbConfig(env: Env, override?: FbPageOverride): FbConfig {
+  const pageId = String(override?.id || env.FB_PAGE_ID || '').trim()
+  const pageAccessToken = String(override?.token || env.FB_PAGE_ACCESS_TOKEN || '').trim()
   const apiVersion = String(env.FB_API_VERSION || DEFAULT_FB_API_VERSION).trim()
   const apiBaseUrl = String(env.FB_API_BASE_URL || DEFAULT_FB_API_BASE).trim().replace(/\/+$/, '')
 
@@ -50,6 +53,22 @@ export function validateFbConfig(env: Env): FbConfig {
   if (!pageAccessToken) throw new Error('fb_page_access_token_not_configured')
 
   return { pageId, pageAccessToken, apiVersion, apiBaseUrl }
+}
+
+// Resolve which Page a category posts to. FB_PAGES_BY_CATEGORY is JSON:
+//   {"dacha-i-ogorod":{"id":"...","token":"..."}, "kulinaria":{...}}
+// Returns undefined → caller falls back to the default FB_PAGE_ID/TOKEN.
+export function resolveFbPageForCategory(env: Env, categorySlug: string): FbPageOverride | undefined {
+  const raw = String(env.FB_PAGES_BY_CATEGORY || '').trim()
+  if (!raw) return undefined
+  try {
+    const map = JSON.parse(raw) as Record<string, { id?: string; token?: string }>
+    const entry = map[categorySlug]
+    if (entry?.id && entry?.token) return { id: entry.id, token: entry.token }
+  } catch {
+    // malformed config — fall back to default page
+  }
+  return undefined
 }
 
 export function buildFbArticlePost(record: VkArticleRecord, siteUrl: string): FbPostResult {
@@ -144,7 +163,7 @@ export async function publishArticleToFacebook(
 
   let config: FbConfig
   try {
-    config = validateFbConfig(env)
+    config = validateFbConfig(env, options.pageOverride)
   } catch (err) {
     return { ok: false, articleSlug, messageLength: 0, bodyHash: '', error: (err as Error).message, errorCode: 'provider_unconfigured' }
   }

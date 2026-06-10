@@ -80,6 +80,7 @@ export type Env = {
   FB_API_VERSION?: string
   FB_API_BASE_URL?: string
   FB_AUTOPOST_MAX_DAILY?: string
+  FB_PAGES_BY_CATEGORY?: string
 }
 
 export type RouteContext = {

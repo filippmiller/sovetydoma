@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { buildFbArticlePost, publishArticleToFacebook, validateFbConfig, MAX_FB_MESSAGE_CHARS } from './fb'
+import { buildFbArticlePost, publishArticleToFacebook, validateFbConfig, resolveFbPageForCategory, MAX_FB_MESSAGE_CHARS } from './fb'
 import { findArticleRecord } from './vk'
 import type { Env } from '../types'
 
@@ -25,6 +25,20 @@ test('validateFbConfig applies defaults', () => {
   const config = validateFbConfig({ FB_PAGE_ID: '1', FB_PAGE_ACCESS_TOKEN: 'x' })
   assert.equal(config.apiBaseUrl, 'https://graph.facebook.com')
   assert.match(config.apiVersion, /^v\d+\.\d+$/)
+})
+
+test('validateFbConfig page override wins over env default', () => {
+  const config = validateFbConfig({ FB_PAGE_ID: '1', FB_PAGE_ACCESS_TOKEN: 'x' }, { id: '999', token: 'ovr' })
+  assert.equal(config.pageId, '999')
+  assert.equal(config.pageAccessToken, 'ovr')
+})
+
+test('resolveFbPageForCategory maps category to its page', () => {
+  const env = { FB_PAGES_BY_CATEGORY: JSON.stringify({ 'dacha-i-ogorod': { id: '10', token: 't10' }, rybalka: { id: '20', token: 't20' } }) }
+  assert.deepEqual(resolveFbPageForCategory(env, 'rybalka'), { id: '20', token: 't20' })
+  assert.equal(resolveFbPageForCategory(env, 'kulinaria'), undefined)
+  assert.equal(resolveFbPageForCategory({}, 'rybalka'), undefined)
+  assert.equal(resolveFbPageForCategory({ FB_PAGES_BY_CATEGORY: 'not json' }, 'rybalka'), undefined)
 })
 
 test('buildFbArticlePost composes message with source link', () => {

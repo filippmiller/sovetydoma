@@ -2,7 +2,7 @@ import type { Env } from '../types'
 import { checkRateLimit } from '../rate-limit'
 import { hasSupabaseServiceRole, insertRows, selectRows, updateRows } from '../supabase'
 import { findArticleRecord } from './vk'
-import { publishArticleToFacebook } from './fb'
+import { publishArticleToFacebook, resolveFbPageForCategory } from './fb'
 
 export type FbAutopostResult = {
   ran: boolean
@@ -48,7 +48,8 @@ function isWithinPostingHours(now: Date): boolean {
 }
 
 function fbConfigReady(env: Env): boolean {
-  return Boolean(env.FB_PAGE_ID && env.FB_PAGE_ACCESS_TOKEN)
+  // Ready if a default page is set, or per-category pages are configured.
+  return Boolean((env.FB_PAGE_ID && env.FB_PAGE_ACCESS_TOKEN) || env.FB_PAGES_BY_CATEGORY)
 }
 
 async function findLatestUnpostedArticle(env: Env): Promise<ArticleRow | null> {
@@ -117,7 +118,10 @@ export async function processFbAutopost(env: Env, now = new Date()): Promise<FbA
     return { ran: false, skippedReason: 'no_unposted_articles' }
   }
 
-  const result = await publishArticleToFacebook(env, article.article_slug, { dryRun: false, requirePhoto: true, allowLinkFallback: true })
+  // Route to the Page for this article's category when multi-page is configured;
+  // otherwise the default FB_PAGE_ID/TOKEN is used.
+  const pageOverride = resolveFbPageForCategory(env, article.category_slug)
+  const result = await publishArticleToFacebook(env, article.article_slug, { dryRun: false, requirePhoto: true, allowLinkFallback: true, pageOverride })
 
   if (!result.ok) {
     try {

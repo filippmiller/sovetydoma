@@ -5,7 +5,7 @@
 > Operational detail with secret-file paths lives in the **gitignored**
 > `DEPLOY-TIMEWEB.md` (project root) and `C:\dev\knowledge\sovetydoma-deploy.md`.
 
-Last updated: 2026-06-01.
+Last updated: 2026-06-10 (added social autoposting — see §2a).
 
 ---
 
@@ -33,6 +33,20 @@ a large SEO content library.
 | Mailboxes | **Mailcow on Hetzner** | Shared human/editor inboxes at `mail.filippmiller.com`; see `docs/mailcow-shared-infra.md`. |
 | Hosting | **nginx on a Timeweb Cloud VPS** (Russia) | Static files only. Replaced Vercel. |
 | CI/CD | **GitHub Actions build gate** + **VPS pull deploy timer** | See §4. SSH remains the manual fallback. |
+
+## 2a. Social autoposting (VK + Facebook)
+
+An hourly Cloudflare Worker cron (`sovetydoma-subscriptions`, `0 * * * *`)
+auto-posts the latest unposted article to VK and Facebook. **Facebook posts WITH
+the article image; VK is text+link only** (VK image upload needs a *verified*
+app — community tokens get `vk_27`). Up to 3/day per platform, 1/hour, 09–21 MSK.
+Tracked in Supabase `social_publications` (dedup per platform+slug).
+
+→ Full architecture, secrets, token howtos, and the VK verification path:
+**`docs/AUTOPOST.md`**. Multi-page-per-category roadmap: `docs/AUTOPOST-MULTIPAGE.md`.
+
+Key code: `workers/subscriptions/src/social/{vk,fb}.ts` + `{vk,fb}-autopost.ts`;
+text rendering `scripts/lib/social-text.mjs`.
 
 Article images: `public/images/<slug>.jpg` (real photos, committed to git, shipped
 by CI). `src/lib/cloudinary.ts > resolveArticleImage()` maps frontmatter `image`
