@@ -131,6 +131,18 @@ function withCors(response: Response, request: Request, env: Env): Response {
   }
   headers.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
   headers.set('Access-Control-Allow-Headers', 'Content-Type,Authorization,x-admin-key')
+  // Baseline security headers on every worker response (bead sovetydoma-e8r).
+  headers.set('X-Content-Type-Options', 'nosniff')
+  headers.set('X-Frame-Options', 'DENY')
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  headers.set('Cross-Origin-Opener-Policy', 'same-origin')
+  headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
+  // CSP only matters for the HTML responses this worker serves (the confirm
+  // page); harmless on JSON. Locked down: no scripts, inline styles only,
+  // forms post to same origin.
+  if ((headers.get('Content-Type') || '').includes('text/html')) {
+    headers.set('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'")
+  }
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers })
 }
 
