@@ -40,6 +40,8 @@
 <url><loc>https://1001sovet.ru/articles/page/17/</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/articles/page/18/</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/articles/page/19/</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://1001sovet.ru/articles/page/20/</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://1001sovet.ru/articles/page/21/</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/archive/2026-05/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/archive/2026-06/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 <url>
@@ -50,6 +52,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/agrovolokno-pod-klubniku-vesnoy.jpg</image:loc>
     <image:title>Как постелить агроволокно на грядки под клубнику весной</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/akkumulyator-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/akkumulyator-letom.jpg</image:loc>
+    <image:title>Как проверить аккумулятор летом и почему жара его убивает</image:title>
   </image:image>
 </url>
 <url>
@@ -70,6 +82,26 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/baklazhany-v-teplitse.jpg</image:loc>
     <image:title>Баклажаны в теплице: от рассады до сбора урожая за один сезон</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/balansirovka-razval-shozhdenie/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/balansirovka-razval-shozhdenie.jpg</image:loc>
+    <image:title>Балансировка и развал-схождение: что и когда проверять летом</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/bazovoe-to-svoimi-rukami/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/bazovoe-to-svoimi-rukami.jpg</image:loc>
+    <image:title>Базовое ТО своими руками: что реально сделать летом в гараже</image:title>
   </image:image>
 </url>
 <url>
@@ -193,6 +225,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/bystro-ostudit-salon/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/bystro-ostudit-salon.jpg</image:loc>
+    <image:title>Как быстро остудить раскалённый салон машины</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/ekonomiya/byudzhet-na-dachu-na-mesyats/</loc>
   <lastmod>2026-06-02</lastmod>
   <changefreq>monthly</changefreq>
@@ -263,6 +305,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/chistka-klemm-akkumulyatora/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/chistka-klemm-akkumulyatora.jpg</image:loc>
+    <image:title>Как очистить клеммы аккумулятора от окисления</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dom-i-uborka/chistka-kovra-doma/</loc>
   <lastmod>2026-05-31</lastmod>
   <changefreq>monthly</changefreq>
@@ -320,6 +372,36 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/chto-posadit-v-teni.jpg</image:loc>
     <image:title>Что посадить в тени на даче: растения которые растут без солнца</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/chto-takoe-antifriz-kogda-menyat/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/chto-takoe-antifriz-kogda-menyat.jpg</image:loc>
+    <image:title>Что такое антифриз и когда его менять</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/chto-vzyat-v-dorogu-avto/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/chto-vzyat-v-dorogu-avto.jpg</image:loc>
+    <image:title>Что обязательно взять в дорогу на дальние расстояния</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/davlenie-v-shinah-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/davlenie-v-shinah-letom.jpg</image:loc>
+    <image:title>Давление в шинах летом: какое держать и как жара его меняет</image:title>
   </image:image>
 </url>
 <url>
@@ -453,6 +535,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/dvigatel-peregrevaetsya-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/dvigatel-peregrevaetsya-letom.jpg</image:loc>
+    <image:title>Почему двигатель перегревается летом и что делать</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/dyni-vyrashchivanie/</loc>
   <lastmod>2026-05-30</lastmod>
   <changefreq>monthly</changefreq>
@@ -460,6 +552,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/dyni-vyrashchivanie.jpg</image:loc>
     <image:title>Выращивание дынь на подоконнике и в теплице: от семечка до аромата</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/ekonomichnaya-ezda-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/ekonomichnaya-ezda-letom.jpg</image:loc>
+    <image:title>Как реже заправляться: экономичная езда в жару</image:title>
   </image:image>
 </url>
 <url>
@@ -703,6 +805,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/gruz-na-kryshe-avto/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/gruz-na-kryshe-avto.jpg</image:loc>
+    <image:title>Как везти груз на крыше и не потерять в расходе</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/gryadki-iz-dosok/</loc>
   <lastmod>2026-05-30</lastmod>
   <changefreq>monthly</changefreq>
@@ -760,6 +872,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/gulyash-iz-govyadiny.jpg</image:loc>
     <image:title>Гуляш из говядины с густой подливкой: рецепт как в садике</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/himchistka-salona-svoimi-rukami/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/himchistka-salona-svoimi-rukami.jpg</image:loc>
+    <image:title>Химчистка салона своими руками летом</image:title>
   </image:image>
 </url>
 <url>
@@ -850,6 +972,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/hranenie-luka-v-kolgotkah.jpg</image:loc>
     <image:title>Как хранить лук в квартире зимой в колготках</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/hranenie-mashiny-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/hranenie-mashiny-letom.jpg</image:loc>
+    <image:title>Как хранить машину летом, если долго не ездишь</image:title>
   </image:image>
 </url>
 <url>
@@ -973,6 +1105,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/iznos-letnih-shin/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/iznos-letnih-shin.jpg</image:loc>
+    <image:title>Как проверить износ летних шин по индикаторам</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/kulinaria/kabachkovye-oladi/</loc>
   <lastmod>2026-06-02</lastmod>
   <changefreq>monthly</changefreq>
@@ -990,6 +1132,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/kak-bystro-nayti-poteryannuyu-veshch.jpg</image:loc>
     <image:title>Как быстро найти потерянную вещь дома</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/kak-chasto-menyat-vozdushnyy-filtr/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/kak-chasto-menyat-vozdushnyy-filtr.jpg</image:loc>
+    <image:title>Как часто менять воздушный фильтр и зачем это летом</image:title>
   </image:image>
 </url>
 <url>
@@ -1050,6 +1202,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/kak-ne-pereplatit-za-dostavku.jpg</image:loc>
     <image:title>Как не переплатить за доставку продуктов и вещей</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/kak-ne-usnut-za-rulem/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/kak-ne-usnut-za-rulem.jpg</image:loc>
+    <image:title>Как не уснуть за рулём в долгой летней поездке</image:title>
   </image:image>
 </url>
 <url>
@@ -1140,6 +1302,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/kak-prodlit-zhizn-stiralnoy-mashiny.jpg</image:loc>
     <image:title>Как продлить жизнь стиральной машине простым уходом</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/kak-proverit-uroven-masla/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/kak-proverit-uroven-masla.jpg</image:loc>
+    <image:title>Как проверить уровень масла на горячем и холодном двигателе</image:title>
   </image:image>
 </url>
 <url>
@@ -1293,6 +1465,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/kak-vybrat-letnie-shiny/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/kak-vybrat-letnie-shiny.jpg</image:loc>
+    <image:title>Как выбрать летние шины: маркировка и индексы</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/pokupki-i-tehnika/kak-vybrat-nastolnuyu-lampu/</loc>
   <lastmod>2026-06-02</lastmod>
   <changefreq>monthly</changefreq>
@@ -1433,6 +1615,36 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/kogda-menyat-maslo-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/kogda-menyat-maslo-letom.jpg</image:loc>
+    <image:title>Когда менять моторное масло летом и почему жара ускоряет износ</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/kogda-menyat-na-letnie-shiny/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/kogda-menyat-na-letnie-shiny.jpg</image:loc>
+    <image:title>Нужно ли менять зимние шины на летние и когда это делать</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/kogda-menyat-shchetki-stekloochistitelya/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/kogda-menyat-shchetki-stekloochistitelya.jpg</image:loc>
+    <image:title>Когда менять щётки стеклоочистителя и как выбрать</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/kogda-sazhat-pomidory-2026/</loc>
   <lastmod>2026-05-28</lastmod>
   <changefreq>monthly</changefreq>
@@ -1440,6 +1652,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/kogda-sazhat-pomidory-2026.jpg</image:loc>
     <image:title>Когда сажать помидоры на рассаду в 2026 году по регионам</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/kogda-zapravlyat-kondicioner/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/kogda-zapravlyat-kondicioner.jpg</image:loc>
+    <image:title>Когда заправлять кондиционер и как понять, что фреон ушёл</image:title>
   </image:image>
 </url>
 <url>
@@ -1510,6 +1732,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/kompoty-na-zimu-bez-sterilizatsii.jpg</image:loc>
     <image:title>Компоты на зиму без стерилизации: что важно соблюдать</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/kondicioner-i-rashod-topliva/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/kondicioner-i-rashod-topliva.jpg</image:loc>
+    <image:title>Влияет ли кондиционер на расход топлива и насколько</image:title>
   </image:image>
 </url>
 <url>
@@ -1803,6 +2035,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/mashina-s-pricepom-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/mashina-s-pricepom-letom.jpg</image:loc>
+    <image:title>Как подготовить машину с прицепом к летней дороге</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/medvedka-lovushka-banka/</loc>
   <lastmod>2026-06-04</lastmod>
   <changefreq>monthly</changefreq>
@@ -1903,6 +2145,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/myt-mashinu-bez-razvodov/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/myt-mashinu-bez-razvodov.jpg</image:loc>
+    <image:title>Чем мыть машину летом, чтобы не было разводов</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dom-i-uborka/nakip-v-chaynike/</loc>
   <lastmod>2026-05-28</lastmod>
   <changefreq>monthly</changefreq>
@@ -1940,6 +2192,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/nedelnoe-menyu-bez-othodov.jpg</image:loc>
     <image:title>Как составить недельное меню и меньше выбрасывать еды</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/neispravnyy-termostat/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/neispravnyy-termostat.jpg</image:loc>
+    <image:title>Признаки неисправного термостата в жару</image:title>
   </image:image>
 </url>
 <url>
@@ -2463,6 +2725,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/podgotovka-k-dalney-poezdke/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/podgotovka-k-dalney-poezdke.jpg</image:loc>
+    <image:title>Как подготовить машину к дальней поездке летом</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/podkormka-klubniki-posle-urozhaya/</loc>
   <lastmod>2026-06-02</lastmod>
   <changefreq>monthly</changefreq>
@@ -2633,6 +2905,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/polirovka-far/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/polirovka-far.jpg</image:loc>
+    <image:title>Как защитить фары от помутнения и вернуть им прозрачность</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/poliv-ogoroda/</loc>
   <lastmod>2026-05-31</lastmod>
   <changefreq>monthly</changefreq>
@@ -2670,6 +2952,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/polki-v-pogrebe-plastikovye-truby.jpg</image:loc>
     <image:title>Как сделать полки в погребе под сараем из пластиковых труб</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/pomenyat-koleso-na-trasse/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/pomenyat-koleso-na-trasse.jpg</image:loc>
+    <image:title>Как поменять колесо на трассе безопасно</image:title>
   </image:image>
 </url>
 <url>
@@ -2873,6 +3165,56 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/priznaki-zameny-maslyanogo-filtra/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/priznaki-zameny-maslyanogo-filtra.jpg</image:loc>
+    <image:title>Признаки, что пора менять масляный фильтр</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/probka-v-zharu-bez-peregreva/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/probka-v-zharu-bez-peregreva.jpg</image:loc>
+    <image:title>Как ездить по жаре в пробке и не перегреть мотор</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/promyt-radiator-snaruzhi/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/promyt-radiator-snaruzhi.jpg</image:loc>
+    <image:title>Как промыть радиатор охлаждения снаружи от пуха и насекомых</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/proverit-vozdushnyy-filtr-sam/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/proverit-vozdushnyy-filtr-sam.jpg</image:loc>
+    <image:title>Как проверить воздушный фильтр самому за 5 минут</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/proverit-vse-zhidkosti-avto/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/proverit-vse-zhidkosti-avto.jpg</image:loc>
+    <image:title>Как проверить и долить все жидкости перед летом</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/ekonomiya/proverka-skidok-v-magazine/</loc>
   <lastmod>2026-06-01</lastmod>
   <changefreq>monthly</changefreq>
@@ -2880,6 +3222,26 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/proverka-skidok-v-magazine.jpg</image:loc>
     <image:title>Как проверить скидку в магазине и не попасться на уловки</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/proverka-sveta-far/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/proverka-sveta-far.jpg</image:loc>
+    <image:title>Как проверить свет фар перед ночными поездками летом</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/proverka-tormozov-pered-sezonom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/proverka-tormozov-pered-sezonom.jpg</image:loc>
+    <image:title>Проверка тормозной жидкости и колодок перед сезоном поездок</image:title>
   </image:image>
 </url>
 <url>
@@ -3073,6 +3435,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/salonnyy-filtr-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/salonnyy-filtr-letom.jpg</image:loc>
+    <image:title>Салонный фильтр летом: почему из печки пахнет и дует слабо</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/saray-iz-sip-paneley-za-nedelyu/</loc>
   <lastmod>2026-06-10</lastmod>
   <changefreq>monthly</changefreq>
@@ -3200,6 +3572,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/skrip-dveri-i-petel.jpg</image:loc>
     <image:title>Скрип двери и петель: простые способы убрать звук</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/skripyat-tormoza-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/skripyat-tormoza-letom.jpg</image:loc>
+    <image:title>Скрипят и свистят тормоза летом: причины и что делать</image:title>
   </image:image>
 </url>
 <url>
@@ -3380,6 +3762,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/staticheskoe-elektrichestvo.jpg</image:loc>
     <image:title>Как избавиться от статического электричества на одежде и в квартире</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/stekloomyvatel-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/stekloomyvatel-letom.jpg</image:loc>
+    <image:title>Стеклоомыватель летом: какой заливать и почему не вода</image:title>
   </image:image>
 </url>
 <url>
@@ -3703,6 +4095,26 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/ubrat-bitum-i-nasekomyh/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/ubrat-bitum-i-nasekomyh.jpg</image:loc>
+    <image:title>Как убрать битум и следы насекомых с кузова после трассы</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/ubrat-carapiny-s-lobovogo/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/ubrat-carapiny-s-lobovogo.jpg</image:loc>
+    <image:title>Как убрать царапины с лобового стекла от дворников</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/krasota-i-uhod/ubrat-sherst-s-divana-i-kovra/</loc>
   <lastmod>2026-06-01</lastmod>
   <changefreq>monthly</changefreq>
@@ -3913,6 +4325,26 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/uroven-ohlazhdayushchey-zhidkosti/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/uroven-ohlazhdayushchey-zhidkosti.jpg</image:loc>
+    <image:title>Как проверить уровень охлаждающей жидкости</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/utechka-masla-pod-mashinoy/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/utechka-masla-pod-mashinoy.jpg</image:loc>
+    <image:title>Признаки утечки масла под машиной и как найти источник</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/uteplenie-bytovki-penopleksom/</loc>
   <lastmod>2026-06-04</lastmod>
   <changefreq>monthly</changefreq>
@@ -3990,6 +4422,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/vodostok-kryshi-saraya-v-bochku.jpg</image:loc>
     <image:title>Как сделать водосток с крыши сарая в бочку своими руками</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/vyazkost-masla-dlya-zhary/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/vyazkost-masla-dlya-zhary.jpg</image:loc>
+    <image:title>Какую вязкость масла выбрать для жаркого лета</image:title>
   </image:image>
 </url>
 <url>
@@ -4213,6 +4655,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/zapah-iz-kondicionera-avto/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zapah-iz-kondicionera-avto.jpg</image:loc>
+    <image:title>Как избавиться от запаха из кондиционера в машине</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/krasota-i-uhod/zapah-iz-obuvi/</loc>
   <lastmod>2026-05-31</lastmod>
   <changefreq>monthly</changefreq>
@@ -4253,6 +4705,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/zapaska-letom-proverka/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zapaska-letom-proverka.jpg</image:loc>
+    <image:title>Запаска летом: как проверить и подкачать докатку</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/ekonomiya/zapasy-produktov-bez-pereplat/</loc>
   <lastmod>2026-06-02</lastmod>
   <changefreq>monthly</changefreq>
@@ -4270,6 +4732,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/zapechennaya-kuritsa.jpg</image:loc>
     <image:title>Запечённая курица с хрустящей корочкой: секреты хруста</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/zapotevanie-stekol-letom/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zapotevanie-stekol-letom.jpg</image:loc>
+    <image:title>Как убрать запотевание стёкол в жару после дождя</image:title>
   </image:image>
 </url>
 <url>
@@ -4293,6 +4765,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/avto/zashchita-kuzova-ot-solnca/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zashchita-kuzova-ot-solnca.jpg</image:loc>
+    <image:title>Как защитить кузов и краску от выгорания на солнце</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/zashchita-rassady-ot-zamorozkov/</loc>
   <lastmod>2026-06-02</lastmod>
   <changefreq>monthly</changefreq>
@@ -4300,6 +4782,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/zashchita-rassady-ot-zamorozkov.jpg</image:loc>
     <image:title>Как защитить рассаду от заморозков весной</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/zashchita-salona-ot-zhary/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zashchita-salona-ot-zhary.jpg</image:loc>
+    <image:title>Как защитить салон от перегрева и выгорания на парковке</image:title>
   </image:image>
 </url>
 <url>
@@ -4390,6 +4882,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/zimnyaya-lovlya-okunya.jpg</image:loc>
     <image:title>Зимняя ловля окуня на мормышку: что работает</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/avto/znachki-na-paneli-priborov/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/znachki-na-paneli-priborov.jpg</image:loc>
+    <image:title>Что означают значки на панели приборов летом</image:title>
   </image:image>
 </url>
 <url>

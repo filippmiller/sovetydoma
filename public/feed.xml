@@ -6,13 +6,21 @@
     <description>Практические советы по кулинарии, уборке, огороду, лайфхаки и экономия для вашего дома.</description>
     <language>ru</language>
     <atom:link href="https://1001sovet.ru/feed.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>Thu, 11 Jun 2026 06:33:49 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 11 Jun 2026 07:10:29 GMT</lastBuildDate>
     <image>
       <url>https://1001sovet.ru/og-default.png</url>
       <title>СоветыДома</title>
       <link>https://1001sovet.ru/</link>
     </image>
     
+  <item>
+    <title>Что означают значки на панели приборов летом</title>
+    <link>https://1001sovet.ru/avto/znachki-na-paneli-priborov/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/znachki-na-paneli-priborov/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Какие лампы загораются от перегрева и низких жидкостей и что делать при каждой.</description>
+  </item>
   <item>
     <title>Как посадить живую изгородь из граба осенью на даче</title>
     <link>https://1001sovet.ru/dacha-i-ogorod/zhivaya-izgorod-iz-graba-osenyu/</link>
@@ -28,6 +36,46 @@
     <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
     <category>Дача и огород</category>
     <description>Защита потолка открытой летней кухни от птиц и ос: сетка, фанера, профнастил.</description>
+  </item>
+  <item>
+    <title>Как защитить салон от перегрева и выгорания на парковке</title>
+    <link>https://1001sovet.ru/avto/zashchita-salona-ot-zhary/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/zashchita-salona-ot-zhary/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Чем закрыть лобовое, как проветрить салон и спасти торпеду и руль от трещин на солнце.</description>
+  </item>
+  <item>
+    <title>Как защитить кузов и краску от выгорания на солнце</title>
+    <link>https://1001sovet.ru/avto/zashchita-kuzova-ot-solnca/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/zashchita-kuzova-ot-solnca/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Что делает ультрафиолет с лаком, как часто наносить воск и нужна ли керамика летом.</description>
+  </item>
+  <item>
+    <title>Как убрать запотевание стёкол в жару после дождя</title>
+    <link>https://1001sovet.ru/avto/zapotevanie-stekol-letom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/zapotevanie-stekol-letom/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Почему стёкла потеют в тёплый дождь и какие настройки климата и средства убирают туман.</description>
+  </item>
+  <item>
+    <title>Запаска летом: как проверить и подкачать докатку</title>
+    <link>https://1001sovet.ru/avto/zapaska-letom-proverka/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/zapaska-letom-proverka/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Где хранится запаска, как проверить её давление и состояние, чтобы не подвела в дороге.</description>
+  </item>
+  <item>
+    <title>Как избавиться от запаха из кондиционера в машине</title>
+    <link>https://1001sovet.ru/avto/zapah-iz-kondicionera-avto/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/zapah-iz-kondicionera-avto/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Откуда берётся неприятный запах из воздуховодов и какие средства его убирают надолго.</description>
   </item>
   <item>
     <title>Как сделать задвижку на окно в сарае от воров и енотов</title>
@@ -46,6 +94,70 @@
     <description>Ремонт трещин в бетонном полу сарая после зимы: зачистка, заполнение, гидроизоляция.</description>
   </item>
   <item>
+    <title>Какую вязкость масла выбрать для жаркого лета</title>
+    <link>https://1001sovet.ru/avto/vyazkost-masla-dlya-zhary/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/vyazkost-masla-dlya-zhary/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Что означают цифры 5W-30 и 5W-40 и какое масло лучше держит плёнку в сильную жару.</description>
+  </item>
+  <item>
+    <title>Признаки утечки масла под машиной и как найти источник</title>
+    <link>https://1001sovet.ru/avto/utechka-masla-pod-mashinoy/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/utechka-masla-pod-mashinoy/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Как по цвету и месту пятна определить, что течёт, и насколько это срочно.</description>
+  </item>
+  <item>
+    <title>Как проверить уровень охлаждающей жидкости</title>
+    <link>https://1001sovet.ru/avto/uroven-ohlazhdayushchey-zhidkosti/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/uroven-ohlazhdayushchey-zhidkosti/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Где находится расширительный бачок, метки min и max и как доливать антифриз правильно.</description>
+  </item>
+  <item>
+    <title>Как убрать царапины с лобового стекла от дворников</title>
+    <link>https://1001sovet.ru/avto/ubrat-carapiny-s-lobovogo/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/ubrat-carapiny-s-lobovogo/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Почему сухие дворники царапают стекло и чем можно отполировать мелкие риски.</description>
+  </item>
+  <item>
+    <title>Как убрать битум и следы насекомых с кузова после трассы</title>
+    <link>https://1001sovet.ru/avto/ubrat-bitum-i-nasekomyh/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/ubrat-bitum-i-nasekomyh/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Чем безопасно оттереть смолу и мошек, не повредив лак, после дальней поездки.</description>
+  </item>
+  <item>
+    <title>Стеклоомыватель летом: какой заливать и почему не вода</title>
+    <link>https://1001sovet.ru/avto/stekloomyvatel-letom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/stekloomyvatel-letom/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Чем летняя незамерзайка лучше воды, как отмывает мошек и что заливать нельзя.</description>
+  </item>
+  <item>
+    <title>Скрипят и свистят тормоза летом: причины и что делать</title>
+    <link>https://1001sovet.ru/avto/skripyat-tormoza-letom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/skripyat-tormoza-letom/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Почему появляется скрип после стоянки и в жару, и когда это безопасно, а когда нет.</description>
+  </item>
+  <item>
+    <title>Салонный фильтр летом: почему из печки пахнет и дует слабо</title>
+    <link>https://1001sovet.ru/avto/salonnyy-filtr-letom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/salonnyy-filtr-letom/</guid>
+    <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Авто</category>
+    <description>Как забитый салонный фильтр портит кондиционер и воздух, и как часто его менять.</description>
+  </item>
+  <item>
     <title>Как вырастить рассаду капусты в кассетах для открытого грунта</title>
     <link>https://1001sovet.ru/dacha-i-ogorod/rassada-kapusty-v-kasetakh/</link>
     <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/rassada-kapusty-v-kasetakh/</guid>
@@ -54,124 +166,12 @@
     <description>Покажем, как заполнить кассеты грунтом, посеять капусту и вырастить крепкую рассаду.</description>
   </item>
   <item>
-    <title>Как сделать откосы на окнах веранды из пеноплекса</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/otkosy-okon-verandy-penopleks/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/otkosy-okon-verandy-penopleks/</guid>
+    <title>Проверка тормозной жидкости и колодок перед сезоном поездок</title>
+    <link>https://1001sovet.ru/avto/proverka-tormozov-pered-sezonom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/avto/proverka-tormozov-pered-sezonom/</guid>
     <pubDate>Thu, 11 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Утепление и отделка откосов окон веранды пеноплексом: вырезание, клей, шпаклевка.</description>
-  </item>
-  <item>
-    <title>Как построить сарай из СИП-панелей своими руками за неделю</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/saray-iz-sip-paneley-za-nedelyu/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/saray-iz-sip-paneley-za-nedelyu/</guid>
-    <pubDate>Wed, 10 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Быстрое строительство теплого сарая из СИП-панелей: фундамент, сборка, крыша за 7 дней.</description>
-  </item>
-  <item>
-    <title>Как приготовить золу как удобрение для картошки при посадке</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/zola-dlya-kartoshki-posadka/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/zola-dlya-kartoshki-posadka/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Узнаете, сколько золы добавить в лунку при посадке картофеля и как она влияет на урожай.</description>
-  </item>
-  <item>
-    <title>Как заточить лопату для копки огорода в домашних условиях</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/zatochka-lopaty-dlya-kopki/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/zatochka-lopaty-dlya-kopki/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Узнаете, под каким углом точить лопату и как закалить режущую кромку для легкой копки.</description>
-  </item>
-  <item>
-    <title>Чем зашить торцы досок на веранде, чтобы не расслаивались</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/zashit-torcy-dosok-verandy-rassloenie/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/zashit-torcy-dosok-verandy-rassloenie/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Защита торцов досок веранды от расслоения: герметики, торцевые заглушки, покраска.</description>
-  </item>
-  <item>
-    <title>Чем зашить фронтон сарая недорого и красиво</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/zashit-fronton-saraya-nedorogo/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/zashit-fronton-saraya-nedorogo/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Обшиваем фронтон сарая сайдингом, вагонкой, профнастилом: бюджетные и эстетичные варианты.</description>
-  </item>
-  <item>
-    <title>Как заморозить кабачки на зиму кубиками без варки</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/zamorozka-kabachkov-kubikami/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/zamorozka-kabachkov-kubikami/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Подскажем, как нарезать, бланшировать быстро и разложить кабачки по пакетам в морозилку.</description>
-  </item>
-  <item>
-    <title>Как замачивать семена свеклы перед посевом на рассаду</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/zamachivanie-semyan-svekly/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/zamachivanie-semyan-svekly/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Узнаете, сколько часов замачивать свекольные семена и в чем, чтобы ускорить всхожесть.</description>
-  </item>
-  <item>
-    <title>Чем заделать щели в полу веранды от мышей и сквозняков</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/zadelat-shcheli-polu-verandy-myshey/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/zadelat-shcheli-polu-verandy-myshey/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Эффективные способы заделки щелей в полу веранды от мышей, сквозняков и пыли.</description>
-  </item>
-  <item>
-    <title>Чем заделать дырки в профнастиле на крыше сарая</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/zadelat-dyrki-profnastil-krysha-saraya/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/zadelat-dyrki-profnastil-krysha-saraya/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Ремонт пробоин в профнастиле крыши сарая: заплаты, герметик, саморезы, битумная лента.</description>
-  </item>
-  <item>
-    <title>Почему вытягивается рассада огурцов и как это остановить</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/vytiagivaetsya-rassada-ogurcov/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/vytiagivaetsya-rassada-ogurcov/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Разберем причины вытянутой рассады огурцов и расскажем, как добавить света и температуры.</description>
-  </item>
-  <item>
-    <title>Как выбрать секатор для дачи: обычный или контактный</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/vybor-sekatora-dlya-dachi/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/vybor-sekatora-dlya-dachi/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Сравним виды секаторов, подскажем, какой лучше для веток яблони, живой изгороди и роз.</description>
-  </item>
-  <item>
-    <title>Как выбрать мотоблок для дачи: бензиновый или электрический</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/vybor-motobloka-dlya-dachi/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/vybor-motobloka-dlya-dachi/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Сравним мощность, вес и удобство бензиновых и электрических мотоблоков для обработки дачного участка.</description>
-  </item>
-  <item>
-    <title>Как сделать водосток с крыши сарая в бочку своими руками</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/vodostok-kryshi-saraya-v-bochku/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/vodostok-kryshi-saraya-v-bochku/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Сбор дождевой воды с крыши сарая: желоб, труба, фильтр, бочка 200 литров.</description>
-  </item>
-  <item>
-    <title>Как защитить виноград от ос осенью на даче</title>
-    <link>https://1001sovet.ru/dacha-i-ogorod/vinograd-ot-os-osenyu/</link>
-    <guid isPermaLink="true">https://1001sovet.ru/dacha-i-ogorod/vinograd-ot-os-osenyu/</guid>
-    <pubDate>Thu, 04 Jun 2026 00:00:00 GMT</pubDate>
-    <category>Дача и огород</category>
-    <description>Узнаете, какие мешочки и ароматные отпугиватели помогут спасти созревающий виноград от ос.</description>
+    <category>Авто</category>
+    <description>Как оценить уровень и состояние тормозной жидкости и износ колодок своими силами.</description>
   </item>
   </channel>
 </rss>

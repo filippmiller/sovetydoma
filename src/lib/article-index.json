@@ -3,6 +3,10 @@
     "category": "dacha-i-ogorod",
     "title": "Как постелить агроволокно на грядки под клубнику весной"
   },
+  "akkumulyator-letom": {
+    "category": "avto",
+    "title": "Как проверить аккумулятор летом и почему жара его убивает"
+  },
   "apteka-dlya-dachi": {
     "category": "zdorovie-i-bezopasnost",
     "title": "Аптечка для дачи: что держать под рукой летом"
@@ -10,6 +14,14 @@
   "baklazhany-v-teplitse": {
     "category": "dacha-i-ogorod",
     "title": "Баклажаны в теплице: от рассады до сбора урожая за один сезон"
+  },
+  "balansirovka-razval-shozhdenie": {
+    "category": "avto",
+    "title": "Балансировка и развал-схождение: что и когда проверять летом"
+  },
+  "bazovoe-to-svoimi-rukami": {
+    "category": "avto",
+    "title": "Базовое ТО своими руками: что реально сделать летом в гараже"
   },
   "bezopasnaya-zaryadka-telefona-nochyu": {
     "category": "zdorovie-i-bezopasnost",
@@ -59,6 +71,10 @@
     "category": "layfkhaki",
     "title": "Уборка за 15 минут: порядок без нервов и усталости"
   },
+  "bystro-ostudit-salon": {
+    "category": "avto",
+    "title": "Как быстро остудить раскалённый салон машины"
+  },
   "byudzhet-na-dachu-na-mesyats": {
     "category": "ekonomiya",
     "title": "Бюджет на дачу на месяц: вода, дорога, семена и мелочи"
@@ -87,6 +103,10 @@
     "category": "dom-i-uborka",
     "title": "Как почистить фильтр кондиционера и не повредить технику"
   },
+  "chistka-klemm-akkumulyatora": {
+    "category": "avto",
+    "title": "Как очистить клеммы аккумулятора от окисления"
+  },
   "chistka-kovra-doma": {
     "category": "dom-i-uborka",
     "title": "Как почистить ковёр в домашних условиях без стиральной машины"
@@ -110,6 +130,18 @@
   "chto-posadit-v-teni": {
     "category": "dacha-i-ogorod",
     "title": "Что посадить в тени на даче: растения которые растут без солнца"
+  },
+  "chto-takoe-antifriz-kogda-menyat": {
+    "category": "avto",
+    "title": "Что такое антифриз и когда его менять"
+  },
+  "chto-vzyat-v-dorogu-avto": {
+    "category": "avto",
+    "title": "Что обязательно взять в дорогу на дальние расстояния"
+  },
+  "davlenie-v-shinah-letom": {
+    "category": "avto",
+    "title": "Давление в шинах летом: какое держать и как жара его меняет"
   },
   "deshevye-produkty": {
     "category": "ekonomiya",
@@ -163,9 +195,17 @@
     "category": "dacha-i-ogorod",
     "title": "Как сделать дверь в сарай из досок без петель скрипа"
   },
+  "dvigatel-peregrevaetsya-letom": {
+    "category": "avto",
+    "title": "Почему двигатель перегревается летом и что делать"
+  },
   "dyni-vyrashchivanie": {
     "category": "dacha-i-ogorod",
     "title": "Выращивание дынь на подоконнике и в теплице: от семечка до аромата"
+  },
+  "ekonomichnaya-ezda-letom": {
+    "category": "avto",
+    "title": "Как реже заправляться: экономичная езда в жару"
   },
   "ekonomiya-benzin": {
     "category": "ekonomiya",
@@ -263,6 +303,10 @@
     "category": "dacha-i-ogorod",
     "title": "Чем обработать грушу от плодожорки после цветения"
   },
+  "gruz-na-kryshe-avto": {
+    "category": "avto",
+    "title": "Как везти груз на крыше и не потерять в расходе"
+  },
   "gryadki-iz-dosok": {
     "category": "dacha-i-ogorod",
     "title": "Грядки из досок своими руками: пошаговая инструкция для начинающих"
@@ -286,6 +330,10 @@
   "gulyash-iz-govyadiny": {
     "category": "kulinaria",
     "title": "Гуляш из говядины с густой подливкой: рецепт как в садике"
+  },
+  "himchistka-salona-svoimi-rukami": {
+    "category": "avto",
+    "title": "Химчистка салона своими руками летом"
   },
   "hleb-v-duhovke": {
     "category": "kulinaria",
@@ -322,6 +370,10 @@
   "hranenie-luka-v-kolgotkah": {
     "category": "dacha-i-ogorod",
     "title": "Как хранить лук в квартире зимой в колготках"
+  },
+  "hranenie-mashiny-letom": {
+    "category": "avto",
+    "title": "Как хранить машину летом, если долго не ездишь"
   },
   "hranenie-morkovi-v-peske": {
     "category": "dacha-i-ogorod",
@@ -371,6 +423,10 @@
     "category": "dom-i-uborka",
     "title": "Как избавиться от пыли в квартире надолго: причины и решения"
   },
+  "iznos-letnih-shin": {
+    "category": "avto",
+    "title": "Как проверить износ летних шин по индикаторам"
+  },
   "kabachkovye-oladi": {
     "category": "kulinaria",
     "title": "Кабачковые оладьи: как сделать нежными и не водянистыми"
@@ -378,6 +434,10 @@
   "kak-bystro-nayti-poteryannuyu-veshch": {
     "category": "layfkhaki",
     "title": "Как быстро найти потерянную вещь дома"
+  },
+  "kak-chasto-menyat-vozdushnyy-filtr": {
+    "category": "avto",
+    "title": "Как часто менять воздушный фильтр и зачем это летом"
   },
   "kak-hranit-bytovuyu-tehniku": {
     "category": "pokupki-i-tehnika",
@@ -402,6 +462,10 @@
   "kak-ne-pereplatit-za-dostavku": {
     "category": "ekonomiya",
     "title": "Как не переплатить за доставку продуктов и вещей"
+  },
+  "kak-ne-usnut-za-rulem": {
+    "category": "avto",
+    "title": "Как не уснуть за рулём в долгой летней поездке"
   },
   "kak-ne-zaputyvat-snasti": {
     "category": "rybalka",
@@ -438,6 +502,10 @@
   "kak-prodlit-zhizn-stiralnoy-mashiny": {
     "category": "dom-i-uborka",
     "title": "Как продлить жизнь стиральной машине простым уходом"
+  },
+  "kak-proverit-uroven-masla": {
+    "category": "avto",
+    "title": "Как проверить уровень масла на горячем и холодном двигателе"
   },
   "kak-razobrat-balkon-bez-stressa": {
     "category": "layfkhaki",
@@ -499,6 +567,10 @@
     "category": "layfkhaki",
     "title": "Как выбрать спелый арбуз: 7 признаков хорошего арбуза"
   },
+  "kak-vybrat-letnie-shiny": {
+    "category": "avto",
+    "title": "Как выбрать летние шины: маркировка и индексы"
+  },
   "kak-vybrat-nastolnuyu-lampu": {
     "category": "pokupki-i-tehnika",
     "title": "Как выбрать настольную лампу для учёбы и работы дома"
@@ -555,9 +627,25 @@
     "category": "dacha-i-ogorod",
     "title": "Клубника в открытом грунте: секреты сладкой ягоды"
   },
+  "kogda-menyat-maslo-letom": {
+    "category": "avto",
+    "title": "Когда менять моторное масло летом и почему жара ускоряет износ"
+  },
+  "kogda-menyat-na-letnie-shiny": {
+    "category": "avto",
+    "title": "Нужно ли менять зимние шины на летние и когда это делать"
+  },
+  "kogda-menyat-shchetki-stekloochistitelya": {
+    "category": "avto",
+    "title": "Когда менять щётки стеклоочистителя и как выбрать"
+  },
   "kogda-sazhat-pomidory-2026": {
     "category": "dacha-i-ogorod",
     "title": "Когда сажать помидоры на рассаду в 2026 году по регионам"
+  },
+  "kogda-zapravlyat-kondicioner": {
+    "category": "avto",
+    "title": "Когда заправлять кондиционер и как понять, что фреон ушёл"
   },
   "koloradskiy-zhuk": {
     "category": "dacha-i-ogorod",
@@ -586,6 +674,10 @@
   "kompoty-na-zimu-bez-sterilizatsii": {
     "category": "kulinaria",
     "title": "Компоты на зиму без стерилизации: что важно соблюдать"
+  },
+  "kondicioner-i-rashod-topliva": {
+    "category": "avto",
+    "title": "Влияет ли кондиционер на расход топлива и насколько"
   },
   "kozyrek-nad-kryltcom-polikarbonat": {
     "category": "dacha-i-ogorod",
@@ -703,6 +795,10 @@
     "category": "pokupki-i-tehnika",
     "title": "Как подписать провода и зарядки, чтобы не путаться"
   },
+  "mashina-s-pricepom-letom": {
+    "category": "avto",
+    "title": "Как подготовить машину с прицепом к летней дороге"
+  },
   "medvedka-lovushka-banka": {
     "category": "dacha-i-ogorod",
     "title": "Как поймать медведку на даче в ловушку из банки"
@@ -743,6 +839,10 @@
     "category": "dacha-i-ogorod",
     "title": "Как избавиться от муравьев на яблоне без химии"
   },
+  "myt-mashinu-bez-razvodov": {
+    "category": "avto",
+    "title": "Чем мыть машину летом, чтобы не было разводов"
+  },
   "nakip-v-chaynike": {
     "category": "dom-i-uborka",
     "title": "Как избавиться от накипи в чайнике за 10 минут"
@@ -758,6 +858,10 @@
   "nedelnoe-menyu-bez-othodov": {
     "category": "ekonomiya",
     "title": "Как составить недельное меню и меньше выбрасывать еды"
+  },
+  "neispravnyy-termostat": {
+    "category": "avto",
+    "title": "Признаки неисправного термостата в жару"
   },
   "nochnaya-rybalka-s-berega": {
     "category": "rybalka",
@@ -967,6 +1071,10 @@
     "category": "dacha-i-ogorod",
     "title": "Как подготовить почву для весенних посадок: пошаговый план"
   },
+  "podgotovka-k-dalney-poezdke": {
+    "category": "avto",
+    "title": "Как подготовить машину к дальней поездке летом"
+  },
   "podkormka-klubniki-posle-urozhaya": {
     "category": "dacha-i-ogorod",
     "title": "Подкормка клубники после урожая для сильных кустов"
@@ -1035,6 +1143,10 @@
     "category": "dacha-i-ogorod",
     "title": "Какой поликарбонат лучше для теплицы: 4 мм или 6 мм"
   },
+  "polirovka-far": {
+    "category": "avto",
+    "title": "Как защитить фары от помутнения и вернуть им прозрачность"
+  },
   "poliv-ogoroda": {
     "category": "dacha-i-ogorod",
     "title": "Полив огорода: сколько воды нужно и как часто поливать"
@@ -1050,6 +1162,10 @@
   "polki-v-pogrebe-plastikovye-truby": {
     "category": "dacha-i-ogorod",
     "title": "Как сделать полки в погребе под сараем из пластиковых труб"
+  },
+  "pomenyat-koleso-na-trasse": {
+    "category": "avto",
+    "title": "Как поменять колесо на трассе безопасно"
   },
   "pomyt-okna-bez-razvodov": {
     "category": "dom-i-uborka",
@@ -1131,9 +1247,37 @@
     "category": "dacha-i-ogorod",
     "title": "Прививка плодовых деревьев для новичков: простые способы"
   },
+  "priznaki-zameny-maslyanogo-filtra": {
+    "category": "avto",
+    "title": "Признаки, что пора менять масляный фильтр"
+  },
+  "probka-v-zharu-bez-peregreva": {
+    "category": "avto",
+    "title": "Как ездить по жаре в пробке и не перегреть мотор"
+  },
+  "promyt-radiator-snaruzhi": {
+    "category": "avto",
+    "title": "Как промыть радиатор охлаждения снаружи от пуха и насекомых"
+  },
+  "proverit-vozdushnyy-filtr-sam": {
+    "category": "avto",
+    "title": "Как проверить воздушный фильтр самому за 5 минут"
+  },
+  "proverit-vse-zhidkosti-avto": {
+    "category": "avto",
+    "title": "Как проверить и долить все жидкости перед летом"
+  },
   "proverka-skidok-v-magazine": {
     "category": "ekonomiya",
     "title": "Как проверить скидку в магазине и не попасться на уловки"
+  },
+  "proverka-sveta-far": {
+    "category": "avto",
+    "title": "Как проверить свет фар перед ночными поездками летом"
+  },
+  "proverka-tormozov-pered-sezonom": {
+    "category": "avto",
+    "title": "Проверка тормозной жидкости и колодок перед сезоном поездок"
   },
   "raskislenie-pochvy-osenyu": {
     "category": "dacha-i-ogorod",
@@ -1211,6 +1355,10 @@
     "category": "kulinaria",
     "title": "Салат из свежей капусты как в столовой"
   },
+  "salonnyy-filtr-letom": {
+    "category": "avto",
+    "title": "Салонный фильтр летом: почему из печки пахнет и дует слабо"
+  },
   "saray-iz-sip-paneley-za-nedelyu": {
     "category": "dacha-i-ogorod",
     "title": "Как построить сарай из СИП-панелей своими руками за неделю"
@@ -1262,6 +1410,10 @@
   "skrip-dveri-i-petel": {
     "category": "dom-i-uborka",
     "title": "Скрип двери и петель: простые способы убрать звук"
+  },
+  "skripyat-tormoza-letom": {
+    "category": "avto",
+    "title": "Скрипят и свистят тормоза летом: причины и что делать"
   },
   "sladkiy-perec": {
     "category": "dacha-i-ogorod",
@@ -1334,6 +1486,10 @@
   "staticheskoe-elektrichestvo": {
     "category": "krasota-i-uhod",
     "title": "Как избавиться от статического электричества на одежде и в квартире"
+  },
+  "stekloomyvatel-letom": {
+    "category": "avto",
+    "title": "Стеклоомыватель летом: какой заливать и почему не вода"
   },
   "stellazhi-v-sare-profil-fanera": {
     "category": "dacha-i-ogorod",
@@ -1463,6 +1619,14 @@
     "category": "dom-i-uborka",
     "title": "Как быстро убрать ванную комнату до блеска за 20 минут"
   },
+  "ubrat-bitum-i-nasekomyh": {
+    "category": "avto",
+    "title": "Как убрать битум и следы насекомых с кузова после трассы"
+  },
+  "ubrat-carapiny-s-lobovogo": {
+    "category": "avto",
+    "title": "Как убрать царапины с лобового стекла от дворников"
+  },
   "ubrat-sherst-s-divana-i-kovra": {
     "category": "krasota-i-uhod",
     "title": "Как убрать шерсть с дивана, ковра и одежды: все рабочие способы"
@@ -1547,6 +1711,14 @@
     "category": "dacha-i-ogorod",
     "title": "Как укрыть теплицу из поликарбоната на зиму пленкой"
   },
+  "uroven-ohlazhdayushchey-zhidkosti": {
+    "category": "avto",
+    "title": "Как проверить уровень охлаждающей жидкости"
+  },
+  "utechka-masla-pod-mashinoy": {
+    "category": "avto",
+    "title": "Признаки утечки масла под машиной и как найти источник"
+  },
   "uteplenie-bytovki-penopleksom": {
     "category": "dacha-i-ogorod",
     "title": "Как утеплить бытовку на зиму пеноплексом снаружи"
@@ -1578,6 +1750,10 @@
   "vodostok-kryshi-saraya-v-bochku": {
     "category": "dacha-i-ogorod",
     "title": "Как сделать водосток с крыши сарая в бочку своими руками"
+  },
+  "vyazkost-masla-dlya-zhary": {
+    "category": "avto",
+    "title": "Какую вязкость масла выбрать для жаркого лета"
   },
   "vybor-bura-dlya-zimney-rybalki": {
     "category": "rybalka",
@@ -1667,6 +1843,10 @@
     "category": "kulinaria",
     "title": "Как заморозить ягоды на зиму, чтобы они не слиплись"
   },
+  "zapah-iz-kondicionera-avto": {
+    "category": "avto",
+    "title": "Как избавиться от запаха из кондиционера в машине"
+  },
   "zapah-iz-obuvi": {
     "category": "krasota-i-uhod",
     "title": "7 надёжных способов вывести неприятный запах из обуви"
@@ -1683,6 +1863,10 @@
     "category": "dom-i-uborka",
     "title": "Как избавиться от запаха в холодильнике навсегда"
   },
+  "zapaska-letom-proverka": {
+    "category": "avto",
+    "title": "Запаска летом: как проверить и подкачать докатку"
+  },
   "zapasy-produktov-bez-pereplat": {
     "category": "ekonomiya",
     "title": "Домашние запасы продуктов без переплаты и просрочки"
@@ -1690,6 +1874,10 @@
   "zapechennaya-kuritsa": {
     "category": "kulinaria",
     "title": "Запечённая курица с хрустящей корочкой: секреты хруста"
+  },
+  "zapotevanie-stekol-letom": {
+    "category": "avto",
+    "title": "Как убрать запотевание стёкол в жару после дождя"
   },
   "zaryadka-telefona-layfhaki": {
     "category": "pokupki-i-tehnika",
@@ -1699,9 +1887,17 @@
     "category": "dacha-i-ogorod",
     "title": "Как защитить клубнику от птиц без вреда для участка"
   },
+  "zashchita-kuzova-ot-solnca": {
+    "category": "avto",
+    "title": "Как защитить кузов и краску от выгорания на солнце"
+  },
   "zashchita-rassady-ot-zamorozkov": {
     "category": "dacha-i-ogorod",
     "title": "Как защитить рассаду от заморозков весной"
+  },
+  "zashchita-salona-ot-zhary": {
+    "category": "avto",
+    "title": "Как защитить салон от перегрева и выгорания на парковке"
   },
   "zashit-fronton-saraya-nedorogo": {
     "category": "dacha-i-ogorod",
@@ -1738,6 +1934,10 @@
   "zimnyaya-lovlya-okunya": {
     "category": "rybalka",
     "title": "Зимняя ловля окуня на мормышку: что работает"
+  },
+  "znachki-na-paneli-priborov": {
+    "category": "avto",
+    "title": "Что означают значки на панели приборов летом"
   },
   "zola-dlya-kartoshki-posadka": {
     "category": "dacha-i-ogorod",
