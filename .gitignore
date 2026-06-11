@@ -102,3 +102,4 @@ workers/subscriptions/.admin-key.local
 .sb-token.tmp
 
 package-lock.json
+node_modules/
