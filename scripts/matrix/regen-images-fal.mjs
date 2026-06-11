@@ -49,9 +49,12 @@ function jpegWidth(buf) {
 async function pickTargets() {
   let q = sb.from('content_matrix')
     .select('id,slug,title,image_prompt,image_filename,category')
-    .eq('domain', DOMAIN).eq('text_status', 'published')
+    .eq('domain', DOMAIN)
     .not('image_filename', 'is', null)
+  // Default to published; with an explicit --slugs/--status, target those instead
+  // (so we can also pre-fix queued/approved articles before they auto-publish).
   if (onlySlugs.length) q = q.in('slug', onlySlugs)
+  else q = q.eq('text_status', arg('--status', 'published'))
   const { data, error } = await q
   if (error) throw new Error(error.message)
   const targets = []
