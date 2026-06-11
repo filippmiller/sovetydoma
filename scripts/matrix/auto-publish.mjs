@@ -118,10 +118,25 @@ try {
   process.exit(1)
 }
 
+// Regenerate the derived indexes/feeds/sitemap so the committed copies match the
+// new article set — otherwise the content audit (which checks the committed
+// sitemap against the live article count) fails when a new article crosses a
+// pagination boundary. These run in `build` too, but tests run before the build.
+for (const gen of ['generate-article-index.mjs', 'generate-questions-index.mjs', 'generate-sitemap.mjs', 'generate-rss.mjs']) {
+  run('node', [path.join('scripts', gen)])
+}
+const generatedFiles = [
+  'src/lib/article-index.json',
+  'public/sitemap.xml',
+  'public/questions-index.json',
+  ...fs.readdirSync(path.join(ROOT, 'public')).filter((f) => /^feed.*\.xml$/.test(f)).map((f) => path.join('public', f)),
+].filter((f) => fs.existsSync(path.join(ROOT, f)))
+
 const relFiles = [
   ...writtenFiles.map((f) => path.relative(ROOT, f)),
   ...picked.map((r) => path.join('public', 'images', r.image_filename)),
   ...picked.map((r) => path.join('public', 'images', 'previews', `${r.slug}.jpg`)),
+  ...generatedFiles,
 ]
 run('git', ['add', ...relFiles])
 // Commit message via a file, not -m: with shell:true on Windows the inline

@@ -883,6 +883,10 @@
     "category": "layfkhaki",
     "title": "Осы и пчёлы на даче: как не дать им устроить гнездо и что делать при укусе"
   },
+  "otkosy-okon-verandy-penopleks": {
+    "category": "dacha-i-ogorod",
+    "title": "Как сделать откосы на окнах веранды из пеноплекса"
+  },
   "otkryt-tuguyu-kryshku": {
     "category": "layfkhaki",
     "title": "Как открыть банку с тугой крышкой: 8 проверенных методов"
@@ -1135,6 +1139,10 @@
     "category": "dacha-i-ogorod",
     "title": "Как раскислить почву на участке осенью под овощи"
   },
+  "rassada-kapusty-v-kasetakh": {
+    "category": "dacha-i-ogorod",
+    "title": "Как вырастить рассаду капусты в кассетах для открытого грунта"
+  },
   "rassada-perca-torfyanye-tabletki-bez-pikirovki": {
     "category": "dacha-i-ogorod",
     "title": "Как вырастить рассаду перца без пикировки в торфяных таблетках"
@@ -1202,6 +1210,10 @@
   "salat-iz-svezhey-kapusty": {
     "category": "kulinaria",
     "title": "Салат из свежей капусты как в столовой"
+  },
+  "saray-iz-sip-paneley-za-nedelyu": {
+    "category": "dacha-i-ogorod",
+    "title": "Как построить сарай из СИП-панелей своими руками за неделю"
   },
   "sel-telefon": {
     "category": "pokupki-i-tehnika",
@@ -1631,6 +1643,14 @@
     "category": "dacha-i-ogorod",
     "title": "Чем заделать щели в полу веранды от мышей и сквозняков"
   },
+  "zadelat-treshchiny-beton-pol-saray": {
+    "category": "dacha-i-ogorod",
+    "title": "Чем заделать трещины в бетонном полу сарая от мороза"
+  },
+  "zadvyzhka-okno-saray-ot-vorov": {
+    "category": "dacha-i-ogorod",
+    "title": "Как сделать задвижку на окно в сарае от воров и енотов"
+  },
   "zamachivanie-semyan-svekly": {
     "category": "dacha-i-ogorod",
     "title": "Как замачивать семена свеклы перед посевом на рассаду"
@@ -1687,6 +1707,10 @@
     "category": "dacha-i-ogorod",
     "title": "Чем зашить фронтон сарая недорого и красиво"
   },
+  "zashit-potolok-letney-kuhni-ot-ptic": {
+    "category": "dacha-i-ogorod",
+    "title": "Чем зашить потолок в летней кухне от птиц и ос"
+  },
   "zashit-torcy-dosok-verandy-rassloenie": {
     "category": "dacha-i-ogorod",
     "title": "Чем зашить торцы досок на веранде, чтобы не расслаивались"
@@ -1702,6 +1726,10 @@
   "zelen-na-podokonnike": {
     "category": "dacha-i-ogorod",
     "title": "Выращивание зелени на подоконнике круглый год в домашних условиях"
+  },
+  "zhivaya-izgorod-iz-graba-osenyu": {
+    "category": "dacha-i-ogorod",
+    "title": "Как посадить живую изгородь из граба осенью на даче"
   },
   "zima-zagotovki": {
     "category": "kulinaria",

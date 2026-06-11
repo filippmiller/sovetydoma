@@ -39,6 +39,7 @@
 <url><loc>https://1001sovet.ru/articles/page/16/</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/articles/page/17/</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/articles/page/18/</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://1001sovet.ru/articles/page/19/</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/archive/2026-05/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/archive/2026-06/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 <url>
@@ -2252,6 +2253,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/dacha-i-ogorod/otkosy-okon-verandy-penopleks/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/otkosy-okon-verandy-penopleks.jpg</image:loc>
+    <image:title>Как сделать откосы на окнах веранды из пеноплекса</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/layfkhaki/otkryt-tuguyu-kryshku/</loc>
   <lastmod>2026-05-31</lastmod>
   <changefreq>monthly</changefreq>
@@ -2882,6 +2893,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/dacha-i-ogorod/rassada-kapusty-v-kasetakh/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/rassada-kapusty-v-kasetakh.jpg</image:loc>
+    <image:title>Как вырастить рассаду капусты в кассетах для открытого грунта</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/rassada-perca-torfyanye-tabletki-bez-pikirovki/</loc>
   <lastmod>2026-06-04</lastmod>
   <changefreq>monthly</changefreq>
@@ -3049,6 +3070,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/salat-iz-svezhey-kapusty.jpg</image:loc>
     <image:title>Салат из свежей капусты как в столовой</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/dacha-i-ogorod/saray-iz-sip-paneley-za-nedelyu/</loc>
+  <lastmod>2026-06-10</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/saray-iz-sip-paneley-za-nedelyu.jpg</image:loc>
+    <image:title>Как построить сарай из СИП-панелей своими руками за неделю</image:title>
   </image:image>
 </url>
 <url>
@@ -4122,6 +4153,26 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/dacha-i-ogorod/zadelat-treshchiny-beton-pol-saray/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zadelat-treshchiny-beton-pol-saray.jpg</image:loc>
+    <image:title>Чем заделать трещины в бетонном полу сарая от мороза</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/dacha-i-ogorod/zadvyzhka-okno-saray-ot-vorov/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zadvyzhka-okno-saray-ot-vorov.jpg</image:loc>
+    <image:title>Как сделать задвижку на окно в сарае от воров и енотов</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/zamachivanie-semyan-svekly/</loc>
   <lastmod>2026-06-04</lastmod>
   <changefreq>monthly</changefreq>
@@ -4262,6 +4313,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/dacha-i-ogorod/zashit-potolok-letney-kuhni-ot-ptic/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zashit-potolok-letney-kuhni-ot-ptic.jpg</image:loc>
+    <image:title>Чем зашить потолок в летней кухне от птиц и ос</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/zashit-torcy-dosok-verandy-rassloenie/</loc>
   <lastmod>2026-06-04</lastmod>
   <changefreq>monthly</changefreq>
@@ -4299,6 +4360,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/zelen-na-podokonnike.jpg</image:loc>
     <image:title>Выращивание зелени на подоконнике круглый год в домашних условиях</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/dacha-i-ogorod/zhivaya-izgorod-iz-graba-osenyu/</loc>
+  <lastmod>2026-06-11</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zhivaya-izgorod-iz-graba-osenyu.jpg</image:loc>
+    <image:title>Как посадить живую изгородь из граба осенью на даче</image:title>
   </image:image>
 </url>
 <url>
