@@ -134,6 +134,7 @@ export function verticalForCategory(cat) {
   if (cat === 'dacha-i-ogorod') return 'dacha'
   if (cat === 'dom-i-uborka') return 'dom'
   if (cat === 'kulinaria') return 'recepty'
+  if (cat === 'avto') return 'avto'
   if (cat === 'layfkhaki' || cat === 'ekonomiya' || cat === 'rybalka') return 'other'
   return 'other'
 }

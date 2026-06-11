@@ -1,4 +1,9 @@
-// auto-publish.mjs — end-to-end: pick ready matrix rows, export MDX into
+// auto-publish.mjs — LEGACY rebuild publish path (commits MDX + pushes → full site
+// rebuild). Per docs/NO-REDEPLOY-PUBLISHING.md + bead sovetydoma-289, publishing an
+// article must NOT rebuild the site; this is being replaced by a dynamic DB+R2 path
+// (renderer worker + Caddy fallback). Keep using this only until that lands.
+//
+// end-to-end: pick ready matrix rows, export MDX into
 // src/content/articles, validate, commit + push (deploy workflow takes it from there),
 // then mark rows published in the matrix.
 // Usage: node scripts/matrix/auto-publish.mjs [--limit 2] [--status approved]
@@ -15,6 +20,7 @@ const has = (k) => process.argv.includes(k)
 
 const limit = parseInt(arg('--limit', '2'), 10)
 const statuses = (arg('--status', 'approved')).split(',')
+const category = arg('--category', '')
 const dryRun = has('--dry-run')
 const noPush = has('--no-push')
 const agent = arg('--agent', 'auto-publish')
@@ -22,7 +28,7 @@ const DOMAIN = '1001sovet.ru'
 const PERSONA = {
   kulinaria: 'maryana-sidorova', 'dom-i-uborka': 'maryana-sidorova',
   'dacha-i-ogorod': 'petr-ivanov', ekonomiya: 'petr-ivanov',
-  layfkhaki: 'petr-pupkin', rybalka: 'andrey-rybak',
+  layfkhaki: 'petr-pupkin', rybalka: 'andrey-rybak', avto: 'petr-ivanov',
 }
 
 const ROOT = process.cwd()
@@ -32,11 +38,13 @@ const TODAY = new Date().toISOString().slice(0, 10)
 
 const sb = helpers.getServiceClient()
 
-const { data, error } = await sb.from('content_matrix')
+let query = sb.from('content_matrix')
   .select('*').eq('domain', DOMAIN).eq('disposition', 'active')
   .in('text_status', statuses)
   .in('image_status', ['generated', 'approved'])
   .not('body_md', 'is', null).not('image_filename', 'is', null)
+if (category) query = query.eq('category', category)
+const { data, error } = await query
   .order('updated_at', { ascending: true })
   .limit(limit * 3) // overfetch: some rows get skipped below
 if (error) { console.error('matrix query error:', error.message); process.exit(1) }

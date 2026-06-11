@@ -12,7 +12,7 @@ import helpers from './lib.mjs'
 const DOMAIN = '1001sovet.ru'
 const KB = 'sovetydoma-home-core'
 const SIM_THRESHOLD = 0.5
-const ALLOWED_CATEGORIES = ['kulinaria', 'dom-i-uborka', 'dacha-i-ogorod', 'layfkhaki', 'ekonomiya', 'rybalka']
+const ALLOWED_CATEGORIES = ['kulinaria', 'dom-i-uborka', 'dacha-i-ogorod', 'layfkhaki', 'ekonomiya', 'rybalka', 'avto']
 
 function sanitizeSlug(s) {
   return String(s || '')

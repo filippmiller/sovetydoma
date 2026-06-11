@@ -1,5 +1,12 @@
 name: Build & publish static site to dist
 
+# POLICY: this full rebuild is for CODE / TEMPLATE / DESIGN changes ONLY.
+# Publishing an ARTICLE must NOT rebuild — routine content goes live via the
+# dynamic renderer (DB -> Cloudflare worker -> Caddy fallback). See
+# docs/NO-REDEPLOY-PUBLISHING.md and bead sovetydoma-289. The tar-all-of-out/
+# webhook below 413s once the corpus grows; that's a symptom of using rebuild
+# for content. Do not "fix" it by re-uploading the whole site per article.
+#
 # New deploy model (2026-06-04 incident fix): the VPS NEVER builds.
 # GitHub Actions builds the static export and publishes it to the `dist` branch.
 # The VPS pulls the PREBUILT `dist` and atomically swaps the symlink (no pnpm/next build on prod).
