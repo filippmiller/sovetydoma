@@ -36,3 +36,4 @@ User-agent: YandexMedia
 Allow: /
 
 Sitemap: https://1001sovet.ru/sitemap.xml
+Sitemap: https://1001sovet.ru/sitemap-dynamic.xml

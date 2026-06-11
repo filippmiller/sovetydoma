@@ -1,0 +1,673 @@
+// NO-REDEPLOY publishing: this worker makes article publishing rebuild-free.
+// See docs/NO-REDEPLOY-PUBLISHING.md
+
+/**
+ * sovetydoma-renderer — Cloudflare Worker
+ *
+ * Dynamically renders article pages for the static-export Next.js site 1001sovet.ru.
+ * Caddy reverse-proxies requests for articles not present as static files to this worker.
+ *
+ * Routes:
+ *   GET /:category/:slug/         → full SEO HTML for a published DB article
+ *   GET /images/<filename>        → stream article image from R2
+ *   GET /sitemap-dynamic.xml      → sitemap for dynamically-published articles
+ */
+
+import { mdToHtml } from './md'
+import { buildJsonLd, CATEGORY_NAMES, resolvePersona, type ArticleRow } from './jsonld'
+import { fetchTemplate } from './template'
+
+// ---------------------------------------------------------------------------
+// Environment
+// ---------------------------------------------------------------------------
+
+interface Env {
+  ARTICLE_IMAGES: R2Bucket
+  SUPABASE_URL: string          // e.g. https://api.1001sovet.ru (REST proxy)
+  SUPABASE_SERVICE_ROLE_KEY: string // wrangler secret bulk
+  TEMPLATE_URL: string          // e.g. https://1001sovet.ru/ekonomiya/ekonomiya-vody/
+  SITE_URL: string              // https://1001sovet.ru
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function slugParam(raw: string): string {
+  return raw.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 120)
+}
+
+function categoryParam(raw: string): string {
+  return raw.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 80)
+}
+
+const ARTICLE_RESPONSE_CACHE_TTL = 300 // seconds
+
+// ---------------------------------------------------------------------------
+// Supabase REST fetch
+// ---------------------------------------------------------------------------
+
+const DB_TIMEOUT_MS = 5000
+
+async function fetchArticle(env: Env, category: string, slug: string): Promise<ArticleRow | null> {
+  const base = env.SUPABASE_URL.replace(/\/+$/, '')
+  const select = 'slug,category,title,description,body_md,tags,image_filename,frontmatter,published_at,updated_at,word_count'
+  const params = new URLSearchParams({
+    slug: `eq.${slug}`,
+    category: `eq.${category}`,
+    text_status: 'eq.published',
+    domain: 'eq.1001sovet.ru',
+    select,
+    limit: '1',
+  })
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
+  let resp: Response
+  try {
+    resp = await fetch(`${base}/rest/v1/content_matrix?${params.toString()}`, {
+      signal: controller.signal,
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        Accept: 'application/json',
+      },
+    })
+  } catch (err) {
+    clearTimeout(timer)
+    throw new Error(`db_fetch_failed: ${String(err)}`) // 503 upstream, NOT 404
+  }
+  clearTimeout(timer)
+
+  if (!resp.ok) throw new Error(`db_fetch_${resp.status}`)
+
+  const rows = await resp.json() as ArticleRow[]
+  return rows[0] ?? null
+}
+
+// ---------------------------------------------------------------------------
+// Format helpers (mirrors src/lib/utils.ts)
+// ---------------------------------------------------------------------------
+
+function formatDateRu(dateStr: string): string {
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function relativeDate(dateStr: string): string {
+  const now = Date.now()
+  const ms = now - new Date(dateStr).getTime()
+  if (ms < 0) return 'сегодня'
+  const days = Math.floor(ms / 86400000)
+  if (days === 0) return 'сегодня'
+  if (days === 1) return 'вчера'
+  if (days < 7) return `${days} дн. назад`
+  if (days < 28) return `${Math.floor(days / 7)} нед. назад`
+  if (days < 365) return `${Math.floor(days / 30)} мес. назад`
+  return `${Math.floor(days / 365)} г. назад`
+}
+
+function readingTimeStr(wordCount: number): string {
+  const m = Math.max(1, Math.round(wordCount / 180))
+  if (m === 1) return '1 минута'
+  if (m < 5) return `${m} минуты`
+  return `${m} минут`
+}
+
+// ---------------------------------------------------------------------------
+// 404 page
+// ---------------------------------------------------------------------------
+
+function notFoundHtml(siteUrl: string): string {
+  return `<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Страница не найдена — СоветыДома</title>
+<style>body{font-family:system-ui,sans-serif;max-width:640px;margin:4rem auto;padding:1rem;text-align:center;color:#333}
+a{color:#c0392b}</style>
+</head>
+<body>
+<h1>Страница не найдена</h1>
+<p>Эта статья пока недоступна или не существует.</p>
+<p><a href="${escapeHtml(siteUrl)}/">← На главную</a></p>
+</body>
+</html>`
+}
+
+// ---------------------------------------------------------------------------
+// HTMLRewriter-based template transform
+// ---------------------------------------------------------------------------
+
+/**
+ * Known HTML structure of the template page (ekonomiya/ekonomiya-vody/).
+ * Selectors are stable — they target elements present in the compiled Next.js output.
+ *
+ * Template HTML snippets we match against (verified from live site fetch):
+ *
+ * <title>…</title>
+ *
+ * <nav aria-label="Путь к странице" …>
+ *   <ol …>
+ *     <li><a href="/">Главная</a></li>
+ *     <li …><span>›</span><a href="/ekonomiya/">Экономия</a></li>
+ *     <li …><span>›</span><span aria-current="page">Как сократить…</span></li>
+ *   </ol>
+ * </nav>
+ *
+ * <h1 style="font-size:2rem;font-weight:800;…">…title…</h1>
+ *
+ * <figure style="position:relative;…">
+ *   <img src="/images/ekonomiya-vody.jpg" alt="…" …/>
+ * </figure>
+ *
+ * <time dateTime="2026-05-31" title="31 мая 2026 г." …>…</time>
+ *
+ * Category badge: <span style="display:inline-block;background-color:#…18;…">Экономия</span>
+ *   (first span inside the header's first div)
+ *
+ * Tags: <a style="padding:4px 10px;border-radius:4px;background-color:#f0ede8;…" href="/tag/…">…</a>
+ *
+ * <article class="prose">…body…</article>
+ *
+ * JSON-LD: <script type="application/ld+json">…</script>  (multiple)
+ *
+ * Related articles block: left as-is from template (v1 decision — it carries the
+ * template article's related links; acceptable since it doesn't claim a category label
+ * in a way that breaks SEO. Hiding it would require extra selector work for minimal gain.)
+ */
+
+function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, schemas: { article: object; breadcrumb: object }) {
+  const categoryName = CATEGORY_NAMES[row.category] ?? row.category
+  const canonicalUrl = `${siteUrl}/${row.category}/${row.slug}/`
+  const imageUrl = `${siteUrl}/images/${row.image_filename ?? row.slug + '.jpg'}`
+  const pageTitle = `${row.title} — СоветыДома`
+  const description = row.description
+  const dateIso = row.published_at.slice(0, 10)
+  const dateFormatted = formatDateRu(dateIso)
+  const dateRelative = relativeDate(dateIso)
+  const timeToRead = readingTimeStr(row.word_count ?? 0)
+  const wordCount = row.word_count ?? 0
+
+  // Build tag links HTML
+  const tagLinksHtml = (Array.isArray(row.tags) ? row.tags : [])
+    .map((tag) => `<a style="padding:4px 10px;border-radius:4px;background-color:#f0ede8;color:#666;font-size:0.8rem;text-decoration:none" href="/tag/${encodeURIComponent(tag)}/">#${escapeHtml(tag)}</a>`)
+    .join('')
+
+  // Date/time inner HTML
+  const timeInnerHtml = `<span>📅 ${escapeHtml(dateFormatted)} <span style="opacity:0.7">(${escapeHtml(dateRelative)})</span></span>`
+
+  // Breadcrumb inner HTML (we replace the whole <ol> content)
+  const breadcrumbOlHtml = `<li><a style="color:#888;text-decoration:none" href="/">Главная</a></li>`
+    + `<li style="display:flex;align-items:center;gap:0.3rem"><span style="color:#ccc">›</span><a style="color:#888;text-decoration:none" href="/${escapeHtml(row.category)}/">${escapeHtml(categoryName)}</a></li>`
+    + `<li style="display:flex;align-items:center;gap:0.3rem"><span style="color:#ccc">›</span><span style="color:#444" aria-current="page">${escapeHtml(row.title)}</span></li>`
+
+  // JSON-LD scripts to inject (we remove existing ones first then append)
+  const jsonLdHtml = `<script type="application/ld+json">${JSON.stringify(schemas.article)}</script>`
+    + `<script type="application/ld+json">${JSON.stringify(schemas.breadcrumb)}</script>`
+
+  // State flags for HTMLRewriter handlers
+  let inJsonLdScript = false
+  let jsonLdAppended = false
+  let breadcrumbNavDepth = 0
+  let inBreadcrumbOl = false
+  let inH1 = false
+  let h1Done = false
+  let inFigure = false
+  let figureDepth = 0
+  let inFigureImg = false
+  let inTime = false
+  let timeDone = false
+  // For category badge: first <span> inside header > div
+  let inHeaderFirstDiv = false
+  let headerFirstDivDepth = 0
+  let categorySpanDone = false
+  // For tags container: div containing the tag <a> links (identified by first tag href pattern)
+  // We track a div that contains /tag/ links and replace its contents
+  let tagsDivDepth = 0
+  let inTagsDiv = false
+  let tagsDone = false
+  // For article.prose body replacement
+  let inProse = false
+
+  return new HTMLRewriter()
+    // ── <title> ──────────────────────────────────────────────────────────
+    .on('title', {
+      text(chunk) {
+        if (chunk.lastInTextNode) {
+          chunk.replace(escapeHtml(pageTitle))
+        } else {
+          chunk.remove()
+        }
+      },
+    })
+    // ── <meta> and <link> in <head> ──────────────────────────────────────
+    .on('meta[name="description"]', {
+      element(el) {
+        el.setAttribute('content', description)
+      },
+    })
+    .on('link[rel="canonical"]', {
+      element(el) {
+        el.setAttribute('href', canonicalUrl)
+      },
+    })
+    .on('meta[property^="og:"]', {
+      element(el) {
+        const prop = el.getAttribute('property') ?? ''
+        if (prop === 'og:title') el.setAttribute('content', row.title)
+        else if (prop === 'og:description') el.setAttribute('content', description)
+        else if (prop === 'og:url') el.setAttribute('content', canonicalUrl)
+        else if (prop === 'og:image') el.setAttribute('content', imageUrl)
+        else if (prop === 'og:image:alt') el.setAttribute('content', row.title)
+        else if (prop === 'og:type') el.setAttribute('content', 'article')
+      },
+    })
+    .on('meta[name^="twitter:"]', {
+      element(el) {
+        const name = el.getAttribute('name') ?? ''
+        if (name === 'twitter:title') el.setAttribute('content', row.title)
+        else if (name === 'twitter:description') el.setAttribute('content', description)
+        else if (name === 'twitter:image') el.setAttribute('content', imageUrl)
+      },
+    })
+    // ── JSON-LD: remove existing, inject fresh after last one ─────────────
+    .on('script[type="application/ld+json"]', {
+      element(el) {
+        inJsonLdScript = true
+        el.remove()
+        // After the LAST ld+json script we inject ours (we do it in text handler;
+        // since el.remove() removes the element including its children, we instead
+        // inject after the element using onEndTag isn't available in CF HTMLRewriter,
+        // so we append to <head> via the head handler below)
+      },
+      text(chunk) {
+        chunk.remove()
+      },
+    })
+    // ── Strip ALL Next.js scripts (chunks + inline Flight payload) ────────
+    // The template's RSC/Flight payload describes the TEMPLATE article; if we
+    // left it, React hydration would client-re-render the page back into the
+    // template article. Dynamic pages are therefore served as pure static HTML
+    // (no hydration → no ratings/comments widgets until the nightly fold-in).
+    .on('script', {
+      element(el) {
+        const src = el.getAttribute('src')
+        const type = el.getAttribute('type')
+        if (src && src.startsWith('/_next/')) el.remove()
+        else if (!src && !type) el.remove() // inline self.__next_f Flight chunks
+      },
+    })
+    .on('link[rel="preload"][as="script"]', {
+      element(el) {
+        el.remove()
+      },
+    })
+    // Append fresh JSON-LD to end of <head>
+    .on('head', {
+      element(el) {
+        el.onEndTag((tag) => {
+          if (!jsonLdAppended) {
+            jsonLdAppended = true
+            tag.before(jsonLdHtml, { html: true })
+          }
+        })
+      },
+    })
+    // ── Breadcrumb nav → replace <ol> content ────────────────────────────
+    // nav[aria-label="Путь к странице"] ol
+    .on('nav[aria-label="Путь к странице"]', {
+      element() {
+        breadcrumbNavDepth = 1
+      },
+    })
+    .on('nav[aria-label="Путь к странице"] ol', {
+      element(el) {
+        inBreadcrumbOl = true
+        el.setInnerContent(breadcrumbOlHtml, { html: true })
+      },
+    })
+    // ── <h1> — first one inside article-main (the article title) ─────────
+    .on('h1', {
+      element(el) {
+        if (!h1Done) {
+          inH1 = true
+          h1Done = true
+        }
+      },
+      text(chunk) {
+        if (inH1) {
+          if (chunk.lastInTextNode) {
+            chunk.replace(escapeHtml(row.title))
+            inH1 = false
+          } else {
+            chunk.remove()
+          }
+        }
+      },
+    })
+    // ── <figure> hero image — replace img src + alt ───────────────────────
+    // The figure has inline style "position:relative;aspect-ratio:16 / 9;..."
+    // We match the first figure on the page (the article hero).
+    .on('figure', {
+      element(el) {
+        if (!inFigure) {
+          inFigure = true
+          figureDepth = 1
+        }
+      },
+    })
+    .on('figure img', {
+      element(el) {
+        if (inFigure && !inFigureImg) {
+          inFigureImg = true
+          el.setAttribute('src', `/images/${row.image_filename ?? row.slug + '.jpg'}`)
+          el.setAttribute('alt', row.title)
+        }
+      },
+    })
+    // ── <time> element — replace dateTime + inner text ────────────────────
+    .on('time', {
+      element(el) {
+        if (!timeDone) {
+          timeDone = true
+          inTime = true
+          el.setAttribute('dateTime', dateIso)
+          el.setAttribute('title', dateFormatted)
+          el.setInnerContent(timeInnerHtml, { html: true })
+        }
+      },
+    })
+    // ── Category badge span (first span in header's category div) ─────────
+    // Identified by inline style containing "text-transform:uppercase" and "font-weight:700"
+    // which is the category label span in the article header.
+    // Selector: header span[style*="text-transform:uppercase"]
+    .on('header span[style*="text-transform:uppercase"]', {
+      element(el) {
+        if (!categorySpanDone) {
+          categorySpanDone = true
+          el.setInnerContent(escapeHtml(categoryName), { html: false })
+        }
+      },
+    })
+    // ── Tags div — replace inner content ─────────────────────────────────
+    // The tags container is a div with style containing "flexWrap" and children are
+    // <a style="padding:4px 10px;border-radius:4px;background-color:#f0ede8;...">
+    // We identify it by the first <a href="/tag/"> inside a div after the article.prose.
+    // Strategy: replace all tag <a> links that match the tag link style.
+    // We do this by targeting links whose href starts with /tag/ and have the tag style.
+    .on('a[href^="/tag/"]', {
+      element(el) {
+        const style = el.getAttribute('style') ?? ''
+        if (style.includes('#f0ede8') && !tagsDone) {
+          // Remove all existing tag links — we'll replace the first with our set,
+          // then remove subsequent ones.
+          if (!inTagsDiv) {
+            inTagsDiv = true
+            // Replace entire content of parent — we can't do that here, so instead
+            // we replace the first tag link with all our tag links, and remove the rest.
+            el.replace(tagLinksHtml, { html: true })
+          } else {
+            el.remove()
+          }
+        }
+      },
+      text(chunk) {
+        // Suppress text of subsequent tag links (they are removed via el.remove())
+      },
+    })
+    // ── <article class="prose"> — replace body content ───────────────────
+    .on('article.prose', {
+      element(el) {
+        el.setInnerContent(bodyHtml, { html: true })
+      },
+    })
+}
+
+// ---------------------------------------------------------------------------
+// Route: GET /:category/:slug/
+// ---------------------------------------------------------------------------
+
+async function handleArticle(req: Request, env: Env, category: string, slug: string): Promise<Response> {
+  const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
+  const reqUrl = new URL(req.url)
+  const cacheKey = new Request(`${siteUrl}/${category}/${slug}/`, { method: 'GET' })
+  const cache = caches.default
+
+  // Check article response cache first
+  const cached = await cache.match(cacheKey)
+  if (cached) return cached
+
+  // Fetch article from DB (with timeout)
+  let row: ArticleRow | null
+  try {
+    row = await fetchArticle(env, category, slug)
+  } catch {
+    return new Response('Service temporarily unavailable — DB timeout', {
+      status: 503,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Retry-After': '10',
+      },
+    })
+  }
+
+  if (!row) {
+    return new Response(notFoundHtml(siteUrl), {
+      status: 404,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    })
+  }
+
+  // word_count can be null in DB — JSON-LD must not claim 0 words
+  if (!row.word_count) {
+    row.word_count = (row.body_md ?? '').split(/\s+/).filter(Boolean).length
+  }
+
+  // Render markdown body
+  const bodyHtml = mdToHtml(row.body_md ?? '')
+
+  // Build JSON-LD schemas
+  const schemas = buildJsonLd(row)
+
+  // Fetch template HTML (cached 10 min)
+  const templateUrl = (env.TEMPLATE_URL || `${siteUrl}/ekonomiya/ekonomiya-vody/`).replace(/\/+$/, '') + '/'
+  let templateHtml: string
+  try {
+    templateHtml = await fetchTemplate(templateUrl)
+  } catch (err) {
+    return new Response(`Service temporarily unavailable — template fetch failed: ${String(err)}`, {
+      status: 503,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Retry-After': '15',
+      },
+    })
+  }
+
+  // Apply HTMLRewriter transforms
+  const transformer = buildTransformer(row, siteUrl, bodyHtml, schemas)
+  const templateResp = new Response(templateHtml, {
+    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+  })
+  const transformed = transformer.transform(templateResp)
+  const finalHtml = await transformed.text()
+
+  const response = new Response(finalHtml, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': `public, max-age=${ARTICLE_RESPONSE_CACHE_TTL}, s-maxage=${ARTICLE_RESPONSE_CACHE_TTL * 2}`,
+    },
+  })
+
+  // Cache the rendered page (non-blocking)
+  const toCache = response.clone()
+  cache.put(cacheKey, toCache).catch(() => {/* ignore */})
+
+  return response
+}
+
+// ---------------------------------------------------------------------------
+// Route: GET /images/<filename>
+// ---------------------------------------------------------------------------
+
+function mimeByExt(filename: string): string {
+  const ext = filename.split('.').pop()?.toLowerCase() ?? ''
+  const map: Record<string, string> = {
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    webp: 'image/webp',
+    gif: 'image/gif',
+    avif: 'image/avif',
+    svg: 'image/svg+xml',
+  }
+  return map[ext] ?? 'application/octet-stream'
+}
+
+async function handleImage(env: Env, filename: string): Promise<Response> {
+  // Key matches the URL path after /images/ (incl. the previews/ prefix when present)
+  const candidates = filename.startsWith('previews/') ? [filename] : [filename, `previews/${filename}`]
+  for (const key of candidates) {
+    const obj = await env.ARTICLE_IMAGES.get(key)
+    if (obj) {
+      const headers = new Headers()
+      obj.writeHttpMetadata(headers)
+      headers.set('Content-Type', mimeByExt(filename))
+      headers.set('Cache-Control', 'public, max-age=86400, immutable')
+      headers.set('ETag', obj.httpEtag)
+      return new Response(obj.body, { status: 200, headers })
+    }
+  }
+  return new Response('Image not found', { status: 404 })
+}
+
+// ---------------------------------------------------------------------------
+// Route: GET /sitemap-dynamic.xml
+// ---------------------------------------------------------------------------
+
+interface SitemapRow {
+  slug: string
+  category: string
+  published_at: string
+  updated_at: string | null
+}
+
+async function handleSitemap(env: Env): Promise<Response> {
+  const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
+  const cacheKey = new Request(`${siteUrl}/sitemap-dynamic.xml`)
+  const cache = caches.default
+
+  const cached = await cache.match(cacheKey)
+  if (cached) return cached
+
+  const base = env.SUPABASE_URL.replace(/\/+$/, '')
+  const params = new URLSearchParams({
+    text_status: 'eq.published',
+    'frontmatter->>published_via': 'eq.dynamic',
+    domain: 'eq.1001sovet.ru',
+    select: 'slug,category,published_at,updated_at',
+    order: 'published_at.desc',
+    limit: '5000',
+  })
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
+  let resp: Response
+  try {
+    resp = await fetch(`${base}/rest/v1/content_matrix?${params.toString()}`, {
+      signal: controller.signal,
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        Accept: 'application/json',
+      },
+    })
+  } catch {
+    clearTimeout(timer)
+    return new Response('Sitemap unavailable', {
+      status: 503,
+      headers: { 'Retry-After': '30' },
+    })
+  }
+  clearTimeout(timer)
+
+  if (!resp.ok) {
+    return new Response('Sitemap DB error', { status: 503, headers: { 'Retry-After': '30' } })
+  }
+
+  const rows = await resp.json() as SitemapRow[]
+
+  const urls = rows.map((r) => {
+    const loc = `${siteUrl}/${escapeHtml(r.category)}/${escapeHtml(r.slug)}/`
+    const lastmod = (r.updated_at ?? r.published_at).slice(0, 10)
+    return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`
+  }).join('\n')
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`
+
+  const response = new Response(xml, {
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+    },
+  })
+
+  cache.put(cacheKey, response.clone()).catch(() => {/* ignore */})
+  return response
+}
+
+// ---------------------------------------------------------------------------
+// Main fetch handler
+// ---------------------------------------------------------------------------
+
+const worker = {
+  async fetch(req: Request, env: Env): Promise<Response> {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      return new Response('Method Not Allowed', { status: 405 })
+    }
+
+    const url = new URL(req.url)
+    const { pathname } = url
+
+    // /sitemap-dynamic.xml
+    if (pathname === '/sitemap-dynamic.xml') {
+      return handleSitemap(env)
+    }
+
+    // /images/<filename> and /images/previews/<filename>
+    const imagesMatch = pathname.match(/^\/images\/((?:previews\/)?[^/]+\.[a-z]{2,5})$/i)
+    if (imagesMatch) {
+      const filename = decodeURIComponent(imagesMatch[1])
+      return handleImage(env, filename)
+    }
+
+    // /:category/:slug/  — canonical URLs have a trailing slash; redirect bare ones
+    const articleMatch = pathname.match(/^\/([a-z0-9-]+)\/([a-z0-9-]+)(\/?)$/)
+    if (articleMatch) {
+      const category = categoryParam(articleMatch[1])
+      const slug = slugParam(articleMatch[2])
+      if (category && slug) {
+        if (articleMatch[3] !== '/') {
+          return Response.redirect(`${(env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')}/${category}/${slug}/`, 301)
+        }
+        return handleArticle(req, env, category, slug)
+      }
+    }
+
+    return new Response('Not found', { status: 404 })
+  },
+}
+
+export default worker

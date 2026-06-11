@@ -84,9 +84,32 @@ def main() -> None:
         action="store_true",
         help="Generate only previews that do not already exist.",
     )
+    parser.add_argument(
+        "--slug",
+        help="Generate one preview directly from public/images/<slug>.jpg (no MDX needed; used by the dynamic publish path).",
+    )
     args = parser.parse_args()
 
     sources = read_sources()
+
+    if args.slug:
+        slug = args.slug
+        source = IMAGES_DIR / f"{slug}.jpg"
+        target = PREVIEWS_DIR / f"{slug}.jpg"
+        if not make_preview(source, target):
+            raise SystemExit(f"source image missing: {source}")
+        sources[f"previews/{slug}"] = {
+            "provider": "local-preview",
+            "source": source.name,
+            "width": SIZE,
+            "height": SIZE,
+            "quality": QUALITY,
+            "generatedAt": datetime.now(timezone.utc).isoformat(),
+        }
+        write_sources(sources)
+        print(f"Generated preview for {slug}")
+        return
+
     generated = 0
     skipped = 0
     missing = []

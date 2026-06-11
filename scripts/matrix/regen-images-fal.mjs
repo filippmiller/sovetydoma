@@ -60,7 +60,9 @@ async function pickTargets() {
   const targets = []
   for (const r of data || []) {
     const file = path.join(IMG_DIR, r.image_filename)
-    if (!fs.existsSync(file)) continue
+    // With explicit --slugs we also generate images that never existed on disk
+    // (pre-publish fill for the dynamic publish path); default mode only fixes existing.
+    if (!fs.existsSync(file) && !onlySlugs.length) continue
     const hasPeople = PEOPLE_RE.test(r.image_prompt || '')
     let small = false
     try { small = jpegWidth(fs.readFileSync(file)) < minWidth } catch { small = true }

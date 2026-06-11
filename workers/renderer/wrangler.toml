@@ -1,0 +1,15 @@
+name = "sovetydoma-renderer"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+
+[[r2_buckets]]
+binding = "ARTICLE_IMAGES"
+bucket_name = "sovetydoma-article-images"
+
+[vars]
+SUPABASE_URL = "https://api.1001sovet.ru"
+TEMPLATE_URL = "https://1001sovet.ru/ekonomiya/ekonomiya-vody/"
+SITE_URL = "https://1001sovet.ru"
+
+# Secret (set via `wrangler secret bulk` — NOT `secret put`, PowerShell BOM corrupts it):
+#   SUPABASE_SERVICE_ROLE_KEY
