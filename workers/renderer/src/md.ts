@@ -23,7 +23,7 @@
  * the site's global CSS targeting .prose descendants.
  */
 
-function slugify(text: string): string {
+export function slugify(text: string): string {
   return text
     .normalize('NFKD')
     .toLowerCase()

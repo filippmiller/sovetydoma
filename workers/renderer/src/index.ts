@@ -13,9 +13,13 @@
  *   GET /sitemap-dynamic.xml      → sitemap for dynamically-published articles
  */
 
-import { mdToHtml } from './md'
+import { mdToHtml, slugify } from './md'
 import { buildJsonLd, CATEGORY_NAMES, resolvePersona, type ArticleRow } from './jsonld'
 import { fetchTemplate } from './template'
+import { BAKED_CSS } from './bakedCss'
+
+// Bump to invalidate cached rendered pages after a worker change.
+const RENDER_VERSION = '4'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -189,6 +193,7 @@ a{color:#c0392b}</style>
 
 function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, schemas: { article: object; breadcrumb: object }) {
   const categoryName = CATEGORY_NAMES[row.category] ?? row.category
+  const persona = resolvePersona((row.frontmatter as Record<string, string | undefined>)?.author, row.category)
   const canonicalUrl = `${siteUrl}/${row.category}/${row.slug}/`
   const imageUrl = `${siteUrl}/images/${row.image_filename ?? row.slug + '.jpg'}`
   const pageTitle = `${row.title} — СоветыДома`
@@ -212,9 +217,20 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
     + `<li style="display:flex;align-items:center;gap:0.3rem"><span style="color:#ccc">›</span><a style="color:#888;text-decoration:none" href="/${escapeHtml(row.category)}/">${escapeHtml(categoryName)}</a></li>`
     + `<li style="display:flex;align-items:center;gap:0.3rem"><span style="color:#ccc">›</span><span style="color:#444" aria-current="page">${escapeHtml(row.title)}</span></li>`
 
-  // JSON-LD scripts to inject (we remove existing ones first then append)
+  // JSON-LD scripts to inject (we remove existing ones first then append),
+  // plus the baked styled-jsx CSS (header etc.) that normally arrives via JS.
   const jsonLdHtml = `<script type="application/ld+json">${JSON.stringify(schemas.article)}</script>`
     + `<script type="application/ld+json">${JSON.stringify(schemas.breadcrumb)}</script>`
+    + `<style>${BAKED_CSS}</style>`
+
+  // TOC entries from our h2 headings (ids must match md.ts renderBlock)
+  const tocLinks = (row.body_md ?? '')
+    .split('\n')
+    .filter((l) => /^## /.test(l))
+    .map((l) => l.replace(/^## /, '').replace(/[*_`]/g, '').trim())
+    .map((text) => `<a href="#${escapeHtml(slugify(text))}">${escapeHtml(text)}</a>`)
+    .join('')
+  const tocHtml = `<div class="toc-title">Содержание</div>${tocLinks}`
 
   // State flags for HTMLRewriter handlers
   let inJsonLdScript = false
@@ -426,6 +442,57 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
         // Suppress text of subsequent tag links (they are removed via el.remove())
       },
     })
+    // ── Lead paragraph under <h1> (article description) ──────────────────
+    .on('p[style*="font-size:1.05rem"]', {
+      element(el) {
+        el.setInnerContent(escapeHtml(description), { html: true })
+      },
+    })
+    // ── «Краткий ответ» box — its text is the article description ────────
+    .on('aside[aria-label="Краткий ответ"] p', {
+      element(el) {
+        el.setInnerContent(escapeHtml(description), { html: true })
+      },
+    })
+    // ── TOC (both nav.toc instances: sidebar + inline) ────────────────────
+    .on('nav.toc', {
+      element(el) {
+        el.setInnerContent(tocHtml, { html: true })
+      },
+    })
+    // ── Related articles (template's, wrong category) — drop ─────────────
+    .on('section.related-articles', {
+      element(el) {
+        el.remove()
+      },
+    })
+    // ── «С чего начать» summary (template's steps, wrong article) — drop ──
+    .on('aside.article-action-summary', {
+      element(el) {
+        el.remove()
+      },
+    })
+    // ── Author card: name link + role (persona must match the category) ──
+    .on('a[href^="/author/"]', {
+      element(el) {
+        const style = el.getAttribute('style') ?? ''
+        if (style.includes('color:#1a1a1a')) {
+          el.setAttribute('href', `/author/${persona.slug}/`)
+          el.setInnerContent(escapeHtml(persona.name), { html: true })
+        }
+      },
+    })
+    .on('div[style*="color:#777"]', {
+      element(el) {
+        el.setInnerContent(escapeHtml(persona.role), { html: true })
+      },
+    })
+    // ── «Обновлено: …» in the author box ──────────────────────────────────
+    .on('div[style*="color:#aaa"]', {
+      element(el) {
+        el.setInnerContent(`Обновлено: ${escapeHtml(dateFormatted)}`, { html: true })
+      },
+    })
     // ── <article class="prose"> — replace body content ───────────────────
     .on('article.prose', {
       element(el) {
@@ -441,7 +508,7 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
 async function handleArticle(req: Request, env: Env, category: string, slug: string): Promise<Response> {
   const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
   const reqUrl = new URL(req.url)
-  const cacheKey = new Request(`${siteUrl}/${category}/${slug}/`, { method: 'GET' })
+  const cacheKey = new Request(`${siteUrl}/${category}/${slug}/?render=${RENDER_VERSION}`, { method: 'GET' })
   const cache = caches.default
 
   // Check article response cache first
