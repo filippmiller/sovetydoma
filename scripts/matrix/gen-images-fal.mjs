@@ -41,10 +41,8 @@ if (!FAL_KEY) {
 }
 const sb = helpers.getServiceClient()
 
-// Flux loves to render gibberish text; steer it away for clean photo previews.
-const STYLE_SUFFIX =
-  ' Photorealistic, natural soft lighting, clean realistic composition, shallow depth of field. ' +
-  'No text, no captions, no letters, no words, no watermark, no logo.'
+// Prompt cleanup (drop people/hands → object focus) + anti-goblin style lives in
+// lib.buildImagePrompt so every generator path stays consistent.
 
 async function pick() {
   if (onlySlug) {
@@ -66,7 +64,7 @@ async function pick() {
 }
 
 async function generateOne(row, attempt = 1) {
-  const prompt = `${(row.image_prompt || row.title)}.${STYLE_SUFFIX}`
+  const prompt = helpers.buildImagePrompt(row.image_prompt, row.title)
   const res = await fetch(`https://fal.run/${model}`, {
     method: 'POST',
     headers: { Authorization: `Key ${FAL_KEY}`, 'Content-Type': 'application/json' },
