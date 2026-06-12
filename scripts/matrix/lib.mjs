@@ -64,16 +64,10 @@ export function hasMojibake(s) {
 // Flux (esp. schnell at low steps) mangles hands and faces into "goblins".
 // Most home-tips images read better as clean object/scene shots anyway, so we
 // (1) reframe person/hands subjects toward the object/result, and (2) append a
-// strong no-people/no-hands/anti-deformity style. The reframe matters: removing
-// the human SUBJECT avoids the contradiction of a positive "hands" + "no hands".
+// short, focused no-people/no-hands negative. Short suffix = stronger signal for Flux.
 export const IMAGE_STYLE_SUFFIX =
-  ' Professional photorealistic stock photo, object-focused still life or real scene, ' +
-  'natural soft daylight, sharp focus, realistic textures and accurate proportions, ' +
-  'clean uncluttered composition, shallow depth of field. ' +
-  'No people, no faces, no hands, no human figures, no body parts. ' +
-  'No figurines, statues, dolls, toys, characters, mascots or anthropomorphic / face-like shapes. ' +
-  'No text, letters, captions, watermark or logo. ' +
-  'Avoid deformed, distorted, mutated, surreal, creepy or grotesque shapes.'
+  '. Photorealistic photograph, sharp focus, natural daylight, clean composition. ' +
+  'No people, no hands, no fingers, no faces, no body parts, no figurines, no text.'
 
 // A concrete, on-topic scene per category so that thin prompts (e.g. after a
 // person was stripped out) still render something relevant instead of Flux
@@ -106,11 +100,16 @@ export function sanitizeImagePrompt(raw) {
   //  "A/An <age> <person|woman|man|child|gardener|cook|angler...> <verb>ing <the> X" -> "X"
   p = p.replace(/^\s*(a\s+|an\s+)?(young\s+|elderly\s+|middle-aged\s+|senior\s+)?(person|people|woman|man|girl|boy|child|kid|gardener|cook|chef|angler|fisherman|housewife|worker|homeowner)\s+\w+?(ing)?\s+(a\s+|an\s+|the\s+)?/i,
     '')
+  // Mid-sentence hand action: "...with hand applying X" / "..., a hand wiping X"
+  p = p.replace(/,?\s+with\s+(?:a\s+)?(?:gloved\s+)?hands?\s+\w+ing\b[^,.]*/gi, '')
+  p = p.replace(/,\s+(?:a\s+)?(?:gloved\s+)?hands?\s+\w+ing\b[^,.]*/gi, '')
   // Stragglers anywhere in the text.
   p = p.replace(/^\s*(pressing|placing|holding|a|the)?\s*fingers?\s+(into|onto|on|in|against|to)\s+/i, '')
   p = p.replace(/\b(with|using)\s+(her|his|their|a|the)?\s*(bare\s+)?(hands?|fingers?)\b/gi, '')
   p = p.replace(/\bby a (person|woman|man|gardener|cook)\b/gi, '')
   p = p.replace(/\b(human )?(hands?|fingers?)\b/gi, '')
+  // Clean up punctuation left after removals.
+  p = p.replace(/,\s*,/g, ',').replace(/\bwith\s*,/gi, '').replace(/,\s*$/g, '')
   // Tidy punctuation/whitespace and capitalize.
   p = p.replace(/\s{2,}/g, ' ').replace(/^[\s,.;-]+/, '').trim()
   if (!p) return ''

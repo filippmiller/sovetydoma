@@ -23,6 +23,7 @@ const imageSize = { width: Number(size.split('x')[0]), height: Number(size.split
 const onlySlugs = (arg('--slugs', '') || '').split(',').map((s) => s.trim()).filter(Boolean)
 const peopleOnly = has('--people-only')
 const skipPeople = has('--skip-people')
+const includeMissing = has('--include-missing')  // also generate images missing on disk
 const dryRun = has('--dry-run')
 
 const REPO = process.cwd()
@@ -60,9 +61,8 @@ async function pickTargets() {
   const targets = []
   for (const r of data || []) {
     const file = path.join(IMG_DIR, r.image_filename)
-    // With explicit --slugs we also generate images that never existed on disk
-    // (pre-publish fill for the dynamic publish path); default mode only fixes existing.
-    if (!fs.existsSync(file) && !onlySlugs.length) continue
+    // With explicit --slugs or --include-missing we also generate images missing on disk.
+    if (!fs.existsSync(file) && !onlySlugs.length && !includeMissing) continue
     const hasPeople = PEOPLE_RE.test(r.image_prompt || '')
     let small = false
     try { small = jpegWidth(fs.readFileSync(file)) < minWidth } catch { small = true }
