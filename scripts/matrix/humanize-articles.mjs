@@ -139,6 +139,8 @@ async function main() {
         failed++
         console.log(`  ✗ ${row.slug}: ${e.message}`)
       }
+      // Brief pause between requests to avoid Kimi rate limits
+      await new Promise(r => setTimeout(r, 2000))
     }
   })
   await Promise.all(workers)
