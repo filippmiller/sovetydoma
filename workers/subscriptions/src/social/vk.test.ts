@@ -6,9 +6,38 @@ import {
   isSameOrigin,
   MAX_VK_MESSAGE_CHARS,
   publishArticleToVk,
+  resolveVkGroupForCategory,
   validateVkConfig,
 } from './vk'
 import type { Env } from '../types'
+
+// ── resolveVkGroupForCategory ─────────────────────────────────────────────────
+
+test('resolveVkGroupForCategory maps category to its group', () => {
+  const env = { VK_GROUPS_BY_CATEGORY: JSON.stringify({ 'dacha-i-ogorod': { groupId: '111' }, rybalka: { groupId: '222' } }) }
+  assert.deepEqual(resolveVkGroupForCategory(env, 'dacha-i-ogorod'), { groupId: '111' })
+  assert.deepEqual(resolveVkGroupForCategory(env, 'rybalka'), { groupId: '222' })
+})
+
+test('resolveVkGroupForCategory returns undefined for unmapped category', () => {
+  const env = { VK_GROUPS_BY_CATEGORY: JSON.stringify({ 'dacha-i-ogorod': { groupId: '111' } }) }
+  assert.equal(resolveVkGroupForCategory(env, 'kulinaria'), undefined)
+})
+
+test('resolveVkGroupForCategory returns undefined when env is empty', () => {
+  assert.equal(resolveVkGroupForCategory({}, 'dacha-i-ogorod'), undefined)
+})
+
+test('resolveVkGroupForCategory returns undefined on malformed JSON (graceful fallback)', () => {
+  assert.equal(resolveVkGroupForCategory({ VK_GROUPS_BY_CATEGORY: 'not valid json' }, 'dacha-i-ogorod'), undefined)
+})
+
+test('resolveVkGroupForCategory returns undefined when groupId is absent in entry', () => {
+  const env = { VK_GROUPS_BY_CATEGORY: JSON.stringify({ 'dacha-i-ogorod': {} }) }
+  assert.equal(resolveVkGroupForCategory(env, 'dacha-i-ogorod'), undefined)
+})
+
+// ── isSameOrigin ──────────────────────────────────────────────────────────────
 
 test('isSameOrigin allows same origin, rejects others', () => {
   assert.equal(isSameOrigin('https://1001sovet.ru/images/x.jpg', 'https://1001sovet.ru'), true)
@@ -125,6 +154,43 @@ test('publishArticleToVk uses link preview when photo token is missing', async (
     assert.equal(wallPostBody?.get('attachments'), 'link=https://1001sovet.ru/dacha-i-ogorod/agrovolokno-pod-klubniku-vesnoy/')
     assert.ok(wallPostBody?.get('message')?.includes('https://1001sovet.ru/dacha-i-ogorod/agrovolokno-pod-klubniku-vesnoy/'))
     assert.equal(wallPostBody?.get('message')?.includes('https://1001sovet.ru/images/agrovolokno-pod-klubniku-vesnoy.jpg'), false)
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('publishArticleToVk uses groupOverride groupId in wall.post owner_id and postUrl', async () => {
+  const originalFetch = globalThis.fetch
+  let capturedBody: URLSearchParams | null = null
+  globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    if (url.includes('/images/agrovolokno-pod-klubniku-vesnoy.jpg')) {
+      return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { 'Content-Type': 'image/jpeg' } })
+    }
+    if (url.includes('/wall.post')) {
+      capturedBody = new URLSearchParams(String(init?.body || ''))
+      return new Response(JSON.stringify({ response: { post_id: 77 } }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    return new Response(JSON.stringify({ error: { error_code: 1, error_msg: 'unexpected' } }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+  }
+
+  try {
+    const result = await publishArticleToVk({
+      ...baseEnv,
+      VK_PHOTO_ACCESS_TOKEN: undefined,
+      VK_API_BASE_URL: 'https://api.vk.test/method',
+    }, 'agrovolokno-pod-klubniku-vesnoy', {
+      requirePhoto: true,
+      allowLinkFallback: true,
+      groupOverride: { groupId: '999888' },
+    })
+
+    assert.equal(result.ok, true)
+    assert.equal(result.providerPostId, '77')
+    // owner_id must use the override group id
+    assert.equal(capturedBody?.get('owner_id'), '-999888')
+    // postUrl must reflect override group id
+    assert.equal(result.postUrl, 'https://vk.com/wall-999888_77')
   } finally {
     globalThis.fetch = originalFetch
   }

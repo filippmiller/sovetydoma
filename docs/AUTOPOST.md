@@ -70,18 +70,24 @@ Both need `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`.
 3. `GET /me/accounts?fields=name,id,access_token&access_token=<USER_TOKEN>` → the page `access_token` is then **non-expiring** (`debug_token` shows `expires_at:0`).
 4. `wrangler secret bulk` with `FB_PAGE_ID` + `FB_PAGE_ACCESS_TOKEN`.
 
-## VK image limitation (why VK is text-only)
+## VK images — SOLVED 2026-06-12 (was text-only)
 
-Proven empirically 2026-06-10:
-- Community token + `photos.getWallUploadServer` → `vk_27: method unavailable with group auth`.
-- Community token + link card → `vk_100: link_photo_sizing_rule. No photo given`.
-- VK removed the Standalone app type + classic implicit OAuth; VK ID OAuth 2.1
-  (PKCE) works (`scripts/vk-id-pkce.mjs`) but an **unverified** app is granted
-  only `vkid.personal_info` — `wall`/`photos` need app verification.
+The old findings still hold (2026-06-10): community token can't upload wall
+photos (`vk_27`) or link cards (`vk_100`); our mini-app's OAuth gives
+`invalid scope`; Standalone apps can no longer be created.
 
-→ Full VK images require submitting the VK app for verification, then re-running
-`vk-id-pkce.mjs` to mint a user token with `photos,wall` and setting
-`VK_PHOTO_ACCESS_TOKEN`. Tracked in bead `sovetydoma-500`.
+**Working solution (live since 2026-06-12):** a USER token minted via the
+Kate Mobile implicit flow (`client_id=2685278`, `scope=photos,wall,offline`,
+`expires_in=0`). The token is set as BOTH `VK_ACCESS_TOKEN` (wall.post with
+`from_group=1`) and `VK_PHOTO_ACCESS_TOKEN` (upload/saveWallPhoto) on the
+subscriptions worker. Verified end-to-end with a real post:
+https://vk.com/wall-239393062_14 (photo 1280×960, from group).
+
+- Token backup + re-mint URL: `C:\Users\filip\.secrets\1001sovet-vk-tokens.env`
+- The token dies if the owner changes their VK password — re-mint via the same
+  flow, or switch to a VK ID token once mini-app 54626241 passes moderation.
+- Gotcha: never pass Cyrillic to the VK API from a Windows shell variable —
+  use `--data-urlencode "message@utf8file"` (mojibake otherwise).
 
 ## Testing / verifying
 

@@ -89,6 +89,54 @@ matrix draft → content-autopublish cron → index sync → social cron. To mak
 truly hands-off, schedule steps 1–3 (matrix gen + index sync) alongside the
 existing content-autopublish workflow.
 
+---
+
+## VK multi-community routing
+
+### How it works
+
+`workers/subscriptions/src/social/vk.ts` + `vk-autopost.ts`:
+
+- Env `VK_GROUPS_BY_CATEGORY` is an optional JSON map of category → community:
+  ```json
+  {
+    "dacha-i-ogorod": { "groupId": "123456789" },
+    "dom-i-uborka":   { "groupId": "987654321" },
+    "kulinaria":      { "groupId": "111222333" }
+  }
+  ```
+- **One-token model**: only `groupId` is per-community. The owner tokens
+  (`VK_ACCESS_TOKEN` / `VK_PHOTO_ACCESS_TOKEN`) stay global — a VK user token
+  is valid for all communities the user admins, so no per-community token is
+  required.
+- Each cron tick: pick the latest unposted article → `resolveVkGroupForCategory()`
+  returns the `groupId` for `article.category_slug` → that groupId is used for
+  `getWallUploadServer(group_id)`, `saveWallPhoto(group_id)`, `wall.post
+  owner_id=-<groupId>`, and the resulting `postUrl`
+  `https://vk.com/wall-<groupId>_<postId>`.
+- **Fallback**: if a category is not in the map, or the env var is absent, or
+  the JSON is malformed (logs a warning), the default `VK_GROUP_ID` is used.
+- **Dedup** stays per `(platform='vk', article_slug)` — same as FB: one post
+  per article, routed to exactly one community.
+
+### What the operator must do
+
+1. Make sure the VK user behind `VK_ACCESS_TOKEN` is a community admin for each
+   community you want to target.
+2. Build the map: find your community IDs in the VK admin panel (or from the
+   community page URL `vk.com/public<id>`).
+3. Set the secret (avoid PowerShell echo — use a secrets file to prevent BOM):
+   ```bash
+   # secrets.json: { "VK_GROUPS_BY_CATEGORY": "{...}", "VK_AUTOPOST_MAX_DAILY": "5" }
+   cd workers/subscriptions
+   npx wrangler secret bulk secrets.json
+   ```
+
+No code change or redeploy is needed — routing activates as soon as the env var
+is set.
+
+---
+
 ## Open follow-ups (beads)
 - `sovetydoma-ovx` — multi-page routing (this doc; code shipped, needs Pages+tokens).
 - Per-page daily cap (optional) — make rate-limit bucket page-scoped.

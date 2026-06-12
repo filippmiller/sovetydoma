@@ -42,6 +42,7 @@ export type VkPublishOptions = {
   dryRun?: boolean
   requirePhoto?: boolean
   allowLinkFallback?: boolean
+  groupOverride?: VkGroupOverride
 }
 
 export type VkPublishResult = {
@@ -55,6 +56,27 @@ export type VkPublishResult = {
   error?: string
   errorCode?: string
   publishMode?: 'photo_upload' | 'link_preview' | 'text_with_links'
+}
+
+// Resolve which VK community group a category posts to. VK_GROUPS_BY_CATEGORY
+// is a JSON map:  { "<category_slug>": { "groupId": "123" }, ... }
+// Only groupId is per-group — the owner token (VK_ACCESS_TOKEN /
+// VK_PHOTO_ACCESS_TOKEN) works for all groups the user admins, so no per-group
+// token is needed. Returns undefined → caller uses default VK_GROUP_ID.
+export type VkGroupOverride = { groupId: string }
+
+export function resolveVkGroupForCategory(env: Env, categorySlug: string): VkGroupOverride | undefined {
+  const raw = String(env.VK_GROUPS_BY_CATEGORY || '').trim()
+  if (!raw) return undefined
+  try {
+    const map = JSON.parse(raw) as Record<string, { groupId?: string }>
+    const entry = map[categorySlug]
+    if (entry?.groupId) return { groupId: entry.groupId }
+  } catch {
+    // malformed JSON — log and fall back to default group
+    console.warn('[vk] VK_GROUPS_BY_CATEGORY is not valid JSON — falling back to default group')
+  }
+  return undefined
 }
 
 export function validateVkConfig(env: Env): VkConfig {
@@ -215,6 +237,12 @@ export async function publishArticleToVk(
     config = validateVkConfig(env)
   } catch (err) {
     return { ok: false, articleSlug, messageLength: 0, bodyHash: '', error: (err as Error).message, errorCode: 'provider_unconfigured' }
+  }
+
+  // Apply per-category group override (tokens stay the same — one user token
+  // works for all groups the owner admins).
+  if (options.groupOverride?.groupId) {
+    config = { ...config, groupId: options.groupOverride.groupId }
   }
 
   const siteUrl = String(env.PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')

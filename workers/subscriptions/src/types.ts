@@ -77,6 +77,7 @@ export type Env = {
   YANDEX_OAUTH_CLIENT_ID?: string
   YANDEX_OAUTH_CLIENT_SECRET?: string
   VK_AUTOPOST_MAX_DAILY?: string
+  VK_GROUPS_BY_CATEGORY?: string
   FB_PAGE_ID?: string
   FB_PAGE_ACCESS_TOKEN?: string
   FB_API_VERSION?: string

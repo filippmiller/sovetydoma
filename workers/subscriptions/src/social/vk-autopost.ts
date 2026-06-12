@@ -1,7 +1,7 @@
 import type { Env } from '../types'
 import { checkRateLimit } from '../rate-limit'
 import { hasSupabaseServiceRole, insertRows, selectRows, updateRows } from '../supabase'
-import { findArticleRecord, publishArticleToVk } from './vk'
+import { findArticleRecord, publishArticleToVk, resolveVkGroupForCategory } from './vk'
 
 export type VkAutopostResult = {
   ran: boolean
@@ -122,7 +122,10 @@ export async function processVkAutopost(env: Env, now = new Date()): Promise<VkA
     return { ran: false, skippedReason: 'no_unposted_articles' }
   }
 
-  const result = await publishArticleToVk(env, article.article_slug, { dryRun: false, requirePhoto: true, allowLinkFallback: true })
+  // Route to the community for this article's category when multi-group is
+  // configured; otherwise the default VK_GROUP_ID is used.
+  const groupOverride = resolveVkGroupForCategory(env, article.category_slug)
+  const result = await publishArticleToVk(env, article.article_slug, { dryRun: false, requirePhoto: true, allowLinkFallback: true, groupOverride })
 
   if (!result.ok) {
     // Record failure
