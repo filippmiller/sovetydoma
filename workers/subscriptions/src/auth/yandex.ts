@@ -1,5 +1,6 @@
 import type { Env } from '../types'
 import { generateSupabaseMagicLink } from './vk-id'
+import { fetchWithTimeout } from '../http'
 
 // Custom Yandex OAuth flow (bead sovetydoma-gsk). Self-hosted Supabase Auth does
 // not support a `yandex` provider, so we run the authorization-code exchange here
@@ -74,7 +75,7 @@ async function exchangeYandexCode(env: Env, input: YandexExchangeInput): Promise
   // it must match. Include it so a mismatch fails fast and explicitly.
   if (input.redirectUri) body.set('redirect_uri', input.redirectUri)
 
-  const res = await fetch(YANDEX_OAUTH_TOKEN_URL, {
+  const res = await fetchWithTimeout(YANDEX_OAUTH_TOKEN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body,
@@ -87,7 +88,7 @@ async function exchangeYandexCode(env: Env, input: YandexExchangeInput): Promise
 }
 
 async function fetchYandexUserInfo(accessToken: string): Promise<YandexUserInfoResponse> {
-  const res = await fetch(YANDEX_USER_INFO_URL, {
+  const res = await fetchWithTimeout(YANDEX_USER_INFO_URL, {
     headers: { Authorization: `OAuth ${accessToken}` },
   })
   const data = await res.json().catch(() => ({})) as YandexUserInfoResponse

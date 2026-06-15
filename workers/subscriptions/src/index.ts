@@ -13,6 +13,8 @@ import { buildFbArticlePost, publishArticleToFacebook, MAX_FB_MESSAGE_CHARS } fr
 import { processFbAutopost } from './social/fb-autopost'
 import { createSupabaseVkIdLoginLink } from './auth/vk-id'
 import { createSupabaseYandexLoginLink } from './auth/yandex'
+import { cleanPath, cleanTimezone, normalizeList, normalizePhone } from './utils'
+import { renderConfirmPage } from './templates/confirm-page'
 
 const CATEGORY_SLUGS = ['kulinaria', 'dom-i-uborka', 'dacha-i-ogorod', 'layfkhaki', 'ekonomiya', 'rybalka']
 const FREQUENCIES = ['daily_one', 'daily_digest_3', 'weekly_digest_3', 'weekly_digest_7']
@@ -29,23 +31,6 @@ function json(data: unknown, status = 200): Response {
     status,
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
   })
-}
-
-function normalizeList(value: unknown): string[] {
-  return Array.isArray(value) ? value.map((item) => String(item).trim()).filter(Boolean) : []
-}
-
-function cleanPath(value: unknown): string {
-  const path = String(value || '/').trim().replace(/[\r\n]/g, '').slice(0, 500)
-  return path.startsWith('/') ? path : '/'
-}
-
-function cleanTimezone(value: unknown): string {
-  return String(value || 'Europe/Moscow').trim().replace(/[^A-Za-z0-9_+\-/]/g, '').slice(0, 80) || 'Europe/Moscow'
-}
-
-function normalizePhone(value: unknown): string {
-  return String(value || '').replace(/[^\d+]/g, '').slice(0, 32)
 }
 
 function normalizeContactValue(channel: DirectChannel, requestJson: SubscriptionStartRequest, fallbackToken: string): string {
@@ -482,26 +467,6 @@ async function findSuppressedChannels(env: Env, channels: DirectChannel[], reque
   return suppressed
 }
 
-function renderConfirmPage(token: string): Response {
-  return new Response(`<!doctype html>
-<html lang="ru">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Подтверждение подписки</title></head>
-<body style="font-family:Arial,sans-serif;margin:0;padding:32px;background:#f7f3ef;color:#1a1a1a">
-  <main style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e8e4df;border-radius:8px;padding:24px">
-    <h1 style="font-size:24px;margin:0 0 12px">Подтвердите подписку</h1>
-    <p style="line-height:1.6">Нажмите кнопку, чтобы включить уведомления по выбранным категориям.</p>
-    <form method="post" action="/subscriptions/confirm">
-      <input type="hidden" name="token" value="${escapeHtml(token)}">
-      <button type="submit" style="background:#c0392b;color:#fff;border:0;border-radius:6px;padding:12px 16px;font-weight:700;cursor:pointer">Подтвердить</button>
-    </form>
-  </main>
-</body>
-</html>`, {
-    status: 200,
-    headers: { 'Content-Type': 'text/html; charset=utf-8' },
-  })
-}
-
 async function handleConfirm(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url)
   if (request.method === 'GET') {
@@ -534,16 +499,6 @@ async function handleConfirm(request: Request, env: Env): Promise<Response> {
   await updateRows(env, 'notification_confirmations', `id=eq.${encodeURIComponent(confirmation.id)}`, { consumed_at: new Date().toISOString() }, 'id')
 
   return Response.redirect(`${siteUrl(env)}/podpiski/?confirmed=1`, 302)
-}
-
-function escapeHtml(value: string): string {
-  return value.replace(/[&<>"']/g, (char) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  }[char] || char))
 }
 
 async function readRequestPayload(request: Request): Promise<Record<string, unknown>> {

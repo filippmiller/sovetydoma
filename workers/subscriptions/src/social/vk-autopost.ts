@@ -1,7 +1,9 @@
 import type { Env } from '../types'
 import { checkRateLimit } from '../rate-limit'
-import { hasSupabaseServiceRole, insertRows, selectRows, updateRows } from '../supabase'
-import { findArticleRecord, publishArticleToVk, resolveVkGroupForCategory } from './vk'
+import { hasSupabaseServiceRole } from '../supabase'
+import { publishArticleToVk, resolveVkGroupForCategory } from './vk'
+import { isWithinPostingHours } from './time-utils'
+import { findLatestUnpostedArticle, findUnpostedArticleForCategory, recordPublication } from './social-db'
 
 export type VkCategoryResult = {
   categorySlug: string
@@ -29,37 +31,7 @@ export type VkAutopostResult = {
   categoryResults?: VkCategoryResult[]
 }
 
-type ArticleRow = {
-  article_slug: string
-  category_slug: string
-  title: string
-  canonical_path: string
-  description: string
-  published_at: string | null
-  first_seen_at: string
-}
-
-const MOSCOW_DAY_START = 9
-const MOSCOW_DAY_END = 21
 const DEFAULT_MAX_DAILY = 3
-
-function getMoscowHour(now: Date): number {
-  try {
-    const hour = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Europe/Moscow',
-      hour: '2-digit',
-      hour12: false,
-    }).formatToParts(now).find((part) => part.type === 'hour')?.value
-    return Number(hour)
-  } catch {
-    return now.getUTCHours() + 3 // rough Moscow fallback
-  }
-}
-
-function isWithinPostingHours(now: Date): boolean {
-  const hour = getMoscowHour(now)
-  return hour >= MOSCOW_DAY_START && hour < MOSCOW_DAY_END
-}
 
 function vkConfigReady(env: Env): boolean {
   return Boolean(env.VK_ACCESS_TOKEN && env.VK_GROUP_ID)
@@ -82,142 +54,6 @@ function parseCategoryGroupMap(env: Env): Map<string, string> | null {
   } catch {
     console.warn('[vk] VK_GROUPS_BY_CATEGORY is not valid JSON — falling back to single-group mode')
     return null
-  }
-}
-
-async function findLatestUnpostedArticle(env: Env): Promise<ArticleRow | null> {
-  // Fetch the most recent published articles (up to 20) — we scan backwards
-  // to skip any that might not be in the local VK publication index yet.
-  const recentArticles = await selectRows<ArticleRow>(
-    env,
-    'articles_publication_index',
-    [
-      'published_at=not.is.null',
-      'select=article_slug,category_slug,title,canonical_path,description,published_at,first_seen_at',
-      'order=published_at.desc',
-      'limit=20',
-    ].join('&'),
-  )
-
-  if (recentArticles.length === 0) return null
-
-  // Fetch already-posted VK slugs
-  const posted = await selectRows<{ article_slug: string }>(
-    env,
-    'social_publications',
-    [
-      "platform=eq.vk",
-      "status=eq.posted",
-      'select=article_slug',
-      'limit=1000',
-    ].join('&'),
-  )
-  const postedSlugs = new Set(posted.map((p) => p.article_slug))
-
-  // Return the first recent article that is not yet posted and exists in the local index
-  for (const article of recentArticles) {
-    if (postedSlugs.has(article.article_slug)) continue
-    if (!findArticleRecord(article.article_slug)) continue
-    return article
-  }
-
-  return null
-}
-
-/**
- * Find the oldest unpublished article for a specific category.
- * Filters by category_slug and excludes articles already posted to VK.
- */
-async function findUnpostedArticleForCategory(env: Env, categorySlug: string): Promise<ArticleRow | null> {
-  const recentArticles = await selectRows<ArticleRow>(
-    env,
-    'articles_publication_index',
-    [
-      'published_at=not.is.null',
-      `category_slug=eq.${encodeURIComponent(categorySlug)}`,
-      'select=article_slug,category_slug,title,canonical_path,description,published_at,first_seen_at',
-      'order=published_at.asc',
-      'limit=20',
-    ].join('&'),
-  )
-
-  if (recentArticles.length === 0) return null
-
-  // Fetch already-posted VK slugs
-  const posted = await selectRows<{ article_slug: string }>(
-    env,
-    'social_publications',
-    [
-      "platform=eq.vk",
-      "status=eq.posted",
-      'select=article_slug',
-      'limit=1000',
-    ].join('&'),
-  )
-  const postedSlugs = new Set(posted.map((p) => p.article_slug))
-
-  for (const article of recentArticles) {
-    if (postedSlugs.has(article.article_slug)) continue
-    if (!findArticleRecord(article.article_slug)) continue
-    return article
-  }
-
-  return null
-}
-
-async function recordPublication(
-  env: Env,
-  now: Date,
-  articleSlug: string,
-  ok: boolean,
-  result: { bodyHash?: string; providerPostId?: string; postUrl?: string; messageLength?: number; publishMode?: string; error?: string; errorCode?: string },
-): Promise<void> {
-  if (!ok) {
-    try {
-      await insertRows(env, 'social_publications', {
-        platform: 'vk',
-        article_slug: articleSlug,
-        body_hash: result.bodyHash || '',
-        status: 'failed',
-        provider_payload: { error: result.error, errorCode: result.errorCode, source: 'autopost' },
-        error_code: result.errorCode || 'unknown',
-        error_message: result.error || 'unknown',
-      }, 'id')
-    } catch {
-      // Ignore DB write failure
-    }
-    return
-  }
-
-  try {
-    await insertRows(env, 'social_publications', {
-      platform: 'vk',
-      article_slug: articleSlug,
-      body_hash: result.bodyHash,
-      status: 'posted',
-      provider_post_id: result.providerPostId,
-      provider_payload: { postUrl: result.postUrl, messageLength: result.messageLength, publishMode: result.publishMode, source: 'autopost' },
-      posted_at: now.toISOString(),
-    }, 'id')
-  } catch (err) {
-    // If insert fails due to race/duplicate, try to update existing
-    if (String(err).includes('23505') || String(err).includes('duplicate')) {
-      const existing = await selectRows<{ id: string }>(
-        env,
-        'social_publications',
-        `platform=eq.vk&article_slug=eq.${encodeURIComponent(articleSlug)}&select=id&limit=1`,
-      )
-      if (existing[0]) {
-        await updateRows(env, 'social_publications', `id=eq.${encodeURIComponent(existing[0].id)}`, {
-          status: 'posted',
-          provider_post_id: result.providerPostId,
-          provider_payload: { postUrl: result.postUrl, messageLength: result.messageLength, publishMode: result.publishMode, source: 'autopost' },
-          posted_at: now.toISOString(),
-          error_code: null,
-          error_message: null,
-        }, 'id')
-      }
-    }
   }
 }
 
@@ -251,7 +87,7 @@ async function processCategoryAutopost(
     return { categorySlug, groupId, ran: false, skippedReason: 'hourly_limit_reached' }
   }
 
-  const article = await findUnpostedArticleForCategory(env, categorySlug)
+  const article = await findUnpostedArticleForCategory(env, 'vk', categorySlug)
   if (!article) {
     console.log(`[vk] category=${categorySlug} group=${groupId} skip=no_unposted_articles`)
     return { categorySlug, groupId, ran: false, skippedReason: 'no_unposted_articles' }
@@ -264,7 +100,7 @@ async function processCategoryAutopost(
     groupOverride: { groupId },
   })
 
-  await recordPublication(env, now, article.article_slug, publishResult.ok, publishResult)
+  await recordPublication(env, 'vk', now, article.article_slug, publishResult.ok, publishResult)
 
   if (!publishResult.ok) {
     console.log(`[vk] category=${categorySlug} group=${groupId} article=${article.article_slug} error=${publishResult.error}`)
@@ -343,7 +179,7 @@ export async function processVkAutopost(env: Env, now = new Date()): Promise<VkA
     return { ran: false, skippedReason: 'hourly_limit_reached' }
   }
 
-  const article = await findLatestUnpostedArticle(env)
+  const article = await findLatestUnpostedArticle(env, 'vk')
   if (!article) {
     return { ran: false, skippedReason: 'no_unposted_articles' }
   }
@@ -353,7 +189,7 @@ export async function processVkAutopost(env: Env, now = new Date()): Promise<VkA
   const groupOverride = resolveVkGroupForCategory(env, article.category_slug)
   const result = await publishArticleToVk(env, article.article_slug, { dryRun: false, requirePhoto: true, allowLinkFallback: true, groupOverride })
 
-  await recordPublication(env, now, article.article_slug, result.ok, result)
+  await recordPublication(env, 'vk', now, article.article_slug, result.ok, result)
 
   if (!result.ok) {
     return {

@@ -3,8 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { getSupabase, supabase } from '@/lib/supabase'
-import PasswordInput from './PasswordInput'
 import { migrateLocalFavoritesToServer, processPendingFavoriteIntent } from '@/lib/favorites'
+import { mapAuthError, mapVkAuthError, mapOAuthError } from '@/lib/auth/error-messages'
+import { safeAssign } from '@/lib/auth/safe-redirect'
+import LoginForm from './LoginForm'
+import RegisterForm from './RegisterForm'
+import ForgotPasswordForm from './ForgotPasswordForm'
+import ResetPasswordForm from './ResetPasswordForm'
 
 declare global {
   interface Window {
@@ -27,30 +32,6 @@ declare global {
 
 function isValidEmail(v: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
-}
-
-function mapAuthError(raw: string | undefined | null): string {
-  const m = (raw || '').toLowerCase()
-  if (m.includes('invalid login') || m.includes('invalid credentials')) {
-    return 'Неверный email или пароль.'
-  }
-  if (m.includes('email not confirmed')) {
-    return 'Email ещё не подтверждён. Проверьте письмо с подтверждением или запросите его повторно.'
-  }
-  if (m.includes('rate limit') || m.includes('too many') || m.includes('email rate')) {
-    return 'Слишком много попыток. Подождите немного и попробуйте позже.'
-  }
-  if (m.includes('password') && (m.includes('at least') || m.includes('weak') || m.includes('short') || m.includes('8'))) {
-    return 'Пароль должен быть не короче 8 символов.'
-  }
-  if (m.includes('already registered') || m.includes('user already registered')) {
-    return 'Аккаунт с таким email уже существует. Войдите или восстановите пароль.'
-  }
-  if (m.includes('invalid email') || m.includes('email address')) {
-    return 'Введите корректный email адрес.'
-  }
-  // Do not leak internal details or enumeration
-  return 'Не удалось выполнить действие. Проверьте данные и попробуйте позже.'
 }
 
 interface Props {
@@ -160,7 +141,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       if (!res.ok || !body.ok || !body.actionLink) {
         throw new Error(body.message || body.error || 'vk_exchange_failed')
       }
-      window.location.href = body.actionLink
+      // C1: guard against open-redirect via server-supplied actionLink
+      if (!safeAssign(body.actionLink)) {
+        throw new Error('vk_invalid_action_link')
+      }
     } catch (err) {
       setError(mapVkAuthError((err as Error).message))
       setVkLoading(false)
@@ -740,252 +724,79 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
 
         {/* Login form */}
         {!success && tab === 'login' && mode === 'login' && (
-          <form onSubmit={handleLogin} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {isVkAuthEnabled() && (
-              <>
-                <div ref={vkContainerRef} style={{ opacity: vkLoading ? 0.6 : 1 }} />
-                <div style={dividerStyle}><span>или</span></div>
-              </>
-            )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <OAuthButton
-                provider="yandex"
-                label="Войти через Яндекс"
-                loading={oauthLoading === 'yandex'}
-                onClick={handleYandexSignIn}
-              />
-              <OAuthButton
-                provider="google"
-                label="Войти через Google"
-                loading={oauthLoading === 'google'}
-                onClick={() => handleOAuthSignIn('google')}
-              />
-              <OAuthButton
-                provider="vk"
-                label="Войти через VK"
-                loading={oauthLoading === 'vk'}
-                onClick={() => handleOAuthSignIn('vk')}
-              />
-            </div>
-            <div style={dividerStyle}><span>или email</span></div>
-            <div>
-              <label style={labelStyle}>Email</label>
-              <div style={inputWrapStyle}>
-                <span style={iconStyle}>📧</span>
-                <input
-                  name="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
-                  onBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
-                  required
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  style={inputStyle}
-                />
-              </div>
-              {emailError && <p style={errorStyle}>{emailError}</p>}
-            </div>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <label style={labelStyle}>Пароль</label>
-                <button
-                  type="button"
-                  onClick={goToForgot}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#c0392b',
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    padding: 0,
-                  }}
-                >
-                  Забыли пароль?
-                </button>
-              </div>
-              <PasswordInput
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            {error && <p style={errorStyle}>{error}</p>}
-            {info && <p style={successTextStyle}>{info}</p>}
-            <button type="submit" disabled={loading} style={btnStyle}>
-              {loading ? 'Входим…' : 'Войти'}
-            </button>
-            {error.includes('Email ещё не подтверждён') && (
-              <button type="button" onClick={resendConfirmation} disabled={resending} style={{ ...secondaryBtnStyle }}>
-                {resending ? 'Отправляем...' : 'Отправить письмо подтверждения ещё раз'}
-              </button>
-            )}
-          </form>
+          <LoginForm
+            email={email}
+            password={password}
+            error={error}
+            info={info}
+            emailError={emailError}
+            loading={loading}
+            vkAuthEnabled={isVkAuthEnabled()}
+            vkLoading={vkLoading}
+            vkContainerRef={vkContainerRef}
+            oauthLoading={oauthLoading}
+            onSubmit={handleLogin}
+            onEmailChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
+            onEmailBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
+            onPasswordChange={(e) => setPassword(e.target.value)}
+            onGoToForgot={goToForgot}
+            onResendConfirmation={resendConfirmation}
+            onResending={resending}
+            onYandexSignIn={handleYandexSignIn}
+            onOAuthSignIn={handleOAuthSignIn}
+          />
         )}
 
         {/* Forgot password request form (P0) */}
         {!success && tab === 'login' && mode === 'forgot' && (
-          <form onSubmit={handleForgotPassword} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div>
-              <label style={labelStyle}>Email</label>
-              <div style={inputWrapStyle}>
-                <span style={iconStyle}>📧</span>
-                <input
-                  name="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
-                  onBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
-                  required
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  style={inputStyle}
-                />
-              </div>
-              {emailError && <p style={errorStyle}>{emailError}</p>}
-            </div>
-            <p style={{ margin: 0, fontSize: '0.82rem', color: '#666', lineHeight: 1.4 }}>
-              Введите email, и если аккаунт существует, мы отправим ссылку для восстановления пароля.
-            </p>
-            {error && <p style={errorStyle}>{error}</p>}
-            {info && <p style={successTextStyle}>{info}</p>}
-            <button type="submit" disabled={loading} style={btnStyle}>
-              {loading ? 'Отправляем…' : 'Отправить инструкции'}
-            </button>
-            <button type="button" onClick={goBackToLogin} style={secondaryBtnStyle}>
-              Назад к входу
-            </button>
-          </form>
+          <ForgotPasswordForm
+            email={email}
+            emailError={emailError}
+            error={error}
+            info={info}
+            loading={loading}
+            onSubmit={handleForgotPassword}
+            onEmailChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
+            onEmailBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
+            onGoBack={goBackToLogin}
+          />
         )}
 
         {/* Reset password completion form (P0) */}
         {!success && mode === 'reset' && (
-          <form onSubmit={handleSetNewPassword} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', color: '#666' }}>
-              Установите новый пароль для аккаунта {email ? email : ''}.
-            </p>
-
-            <div>
-              <label style={labelStyle}>Новый пароль</label>
-              <PasswordInput
-                name="newPassword"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                autoComplete="new-password"
-                placeholder="Минимум 8 символов"
-                required
-              />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Повторите пароль</label>
-              <PasswordInput
-                name="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                autoComplete="new-password"
-                placeholder="Повторите пароль"
-                required
-              />
-            </div>
-
-            {error && <p style={errorStyle}>{error}</p>}
-            {info && <p style={successTextStyle}>{info}</p>}
-
-            <button type="submit" disabled={resetLoading} style={btnStyle}>
-              {resetLoading ? 'Сохраняем…' : 'Сохранить новый пароль'}
-            </button>
-
-            <button type="button" onClick={goBackToLogin} style={secondaryBtnStyle}>
-              Отмена
-            </button>
-          </form>
+          <ResetPasswordForm
+            email={email}
+            newPassword={newPassword}
+            confirmPassword={confirmPassword}
+            error={error}
+            info={info}
+            resetLoading={resetLoading}
+            onSubmit={handleSetNewPassword}
+            onNewPasswordChange={(e) => setNewPassword(e.target.value)}
+            onConfirmPasswordChange={(e) => setConfirmPassword(e.target.value)}
+            onCancel={goBackToLogin}
+          />
         )}
 
         {/* Register form */}
         {!success && tab === 'register' && (
-          <form onSubmit={handleRegister} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div>
-              <label style={labelStyle}>Имя пользователя</label>
-              <div style={inputWrapStyle}>
-                <span style={iconStyle}>👤</span>
-                <input
-                  name="displayName"
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  required
-                  placeholder="Ваше имя"
-                  style={inputStyle}
-                />
-              </div>
-            </div>
-            <div>
-              <label style={labelStyle}>Email</label>
-              <div style={inputWrapStyle}>
-                <span style={iconStyle}>📧</span>
-                <input
-                  name="email"
-                  type="email"
-                  value={registerEmail}
-                  onChange={(e) => { setRegisterEmail(e.target.value); if (emailError) setEmailError('') }}
-                  onBlur={() => { if (registerEmail && !isValidEmail(registerEmail)) setEmailError('Введите корректный email адрес.') }}
-                  required
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  style={inputStyle}
-                />
-              </div>
-              {emailError && <p style={errorStyle}>{emailError}</p>}
-            </div>
-            <div>
-              <label style={labelStyle}>Пароль</label>
-              <PasswordInput
-                name="password"
-                value={registerPassword}
-                onChange={(e) => setRegisterPassword(e.target.value)}
-                autoComplete="new-password"
-                placeholder="Минимум 8 символов"
-                minLength={8}
-                required
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Повторите пароль</label>
-              <PasswordInput
-                name="confirmPassword"
-                value={confirmRegisterPassword}
-                onChange={(e) => setConfirmRegisterPassword(e.target.value)}
-                autoComplete="new-password"
-                placeholder="Повторите пароль"
-                minLength={8}
-                required
-              />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.82rem', color: '#555' }}>
-              <input
-                type="checkbox"
-                id="terms"
-                name="terms"
-                value="accepted"
-                required
-                style={{ marginTop: '0.2rem' }}
-                onChange={() => { if (error) setError('') }}
-              />
-              <label htmlFor="terms" style={{ lineHeight: 1.3 }}>
-                Я согласен(а) с <a href="/terms" target="_blank" style={{ color: '#c0392b' }}>Условиями использования</a> и <a href="/privacy" target="_blank" style={{ color: '#c0392b' }}>Политикой конфиденциальности</a>.
-              </label>
-            </div>
-            {error && <p style={errorStyle}>{error}</p>}
-            {info && <p style={successTextStyle}>{info}</p>}
-            <button type="submit" disabled={loading} style={btnStyle}>
-              {loading ? 'Регистрируем…' : 'Зарегистрироваться'}
-            </button>
-          </form>
+          <RegisterForm
+            displayName={displayName}
+            registerEmail={registerEmail}
+            registerPassword={registerPassword}
+            confirmRegisterPassword={confirmRegisterPassword}
+            emailError={emailError}
+            error={error}
+            info={info}
+            loading={loading}
+            onSubmit={handleRegister}
+            onDisplayNameChange={(e) => setDisplayName(e.target.value)}
+            onEmailChange={(e) => { setRegisterEmail(e.target.value); if (emailError) setEmailError('') }}
+            onEmailBlur={() => { if (registerEmail && !isValidEmail(registerEmail)) setEmailError('Введите корректный email адрес.') }}
+            onPasswordChange={(e) => setRegisterPassword(e.target.value)}
+            onConfirmPasswordChange={(e) => setConfirmRegisterPassword(e.target.value)}
+            onTermsChange={() => { if (error) setError('') }}
+          />
         )}
 
         {/* Social proof footer */}
@@ -1066,101 +877,7 @@ function createPkceVerifier(): string {
     .replace(/=+$/g, '')
 }
 
-function mapVkAuthError(raw: string): string {
-  if (raw === 'vk_api_not_configured') return 'VK ID пока не настроен на сервере.'
-  if (raw === 'vk_email_missing') return 'VK ID не вернул email. Попробуйте другой способ входа.'
-  if (raw === 'rate_limited') return 'Слишком много попыток входа через VK ID. Попробуйте позже.'
-  return 'Не удалось войти через VK ID. Попробуйте позже или войдите по email.'
-}
-
-function mapOAuthError(raw: string): string {
-  const m = raw.toLowerCase()
-  if (m.includes('provider_not_enabled') || m.includes('provider is not enabled')) {
-    return 'Этот способ входа пока не настроен. Попробуйте войти по email.'
-  }
-  if (m.includes('popup') || m.includes('blocked')) {
-    return 'Всплывающее окно заблокировано. Разрешите всплывающие окна для этого сайта.'
-  }
-  if (m.includes('network') || m.includes('fetch')) {
-    return 'Проблема с соединением. Проверьте интернет и попробуйте снова.'
-  }
-  return 'Не удалось войти через соцсеть. Попробуйте другой способ.'
-}
-
-function OAuthButton({ provider, label, loading, onClick }: { provider: string; label: string; loading: boolean; onClick: () => void }) {
-  const colors: Record<string, string> = {
-    yandex: '#fc3f1d',
-    google: '#4285f4',
-    vk: '#0077ff',
-  }
-  const bg = colors[provider] || '#666'
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={loading}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '0.5rem',
-        width: '100%',
-        padding: '0.65rem',
-        background: loading ? '#e0dbd5' : bg,
-        color: '#fff',
-        border: 'none',
-        borderRadius: '8px',
-        fontSize: '0.9rem',
-        fontWeight: 600,
-        cursor: loading ? 'not-allowed' : 'pointer',
-        fontFamily: 'inherit',
-        transition: 'opacity 0.2s',
-        opacity: loading ? 0.7 : 1,
-      }}
-    >
-      {loading ? '…' : provider === 'yandex' ? 'Я' : provider === 'google' ? 'G' : 'VK'}
-      {label}
-    </button>
-  )
-}
-
-// --- Shared styles ---
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: '0.82rem',
-  fontWeight: 600,
-  color: '#555',
-  marginBottom: '0.35rem',
-}
-
-const inputWrapStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  border: '1.5px solid #e0dbd5',
-  borderRadius: '8px',
-  overflow: 'hidden',
-  background: '#faf9f7',
-  transition: 'border-color 0.2s',
-}
-
-const iconStyle: React.CSSProperties = {
-  padding: '0 0.5rem 0 0.75rem',
-  fontSize: '1rem',
-  userSelect: 'none',
-  flexShrink: 0,
-}
-
-const inputStyle: React.CSSProperties = {
-  flex: 1,
-  padding: '0.65rem 0.75rem 0.65rem 0.25rem',
-  border: 'none',
-  background: 'transparent',
-  fontSize: '0.95rem',
-  outline: 'none',
-  width: '100%',
-  fontFamily: 'inherit',
-}
-
+// --- Shared styles (kept here for success-state JSX that remains inline) ---
 const errorStyle: React.CSSProperties = {
   color: '#c0392b',
   fontSize: '0.85rem',
@@ -1205,13 +922,4 @@ const secondaryBtnStyle: React.CSSProperties = {
   fontWeight: 700,
   cursor: 'pointer',
   fontFamily: 'inherit',
-}
-
-const dividerStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: '#aaa',
-  fontSize: '0.8rem',
-  margin: '-0.25rem 0',
 }

@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { existsSync, readFileSync } from 'node:fs'
-import path from 'node:path'
 import { getArticle, getAllSlugs, getAllArticles, CATEGORIES, LEGACY_ARTICLE_MOVES } from '@/lib/articles'
+import { getLocalJpegDimensions } from '@/lib/jpeg-dimensions'
+import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildFaqSchema, buildAdditionalSchema } from '@/lib/article-schemas'
 import { resolvePersona } from '@/lib/personas'
 import Breadcrumb from '@/components/Breadcrumb'
 import RelatedArticles from '@/components/RelatedArticles'
@@ -38,34 +38,10 @@ import { MDXRemote } from 'next-mdx-remote/rsc'
 import type { Metadata } from 'next'
 import { readingTime, formatDate, relativeDate, CATEGORY_COLOR, CATEGORY_EMOJI } from '@/lib/utils'
 import { resolveArticleImage } from '@/lib/cloudinary'
-import { SITE_NAME, SITE_URL, articleCanonicalUrl, articleImageUrl, absoluteUrl, truncateForMeta } from '@/lib/seo'
+import { SITE_NAME, SITE_URL, articleCanonicalUrl, articleImageUrl, truncateForMeta } from '@/lib/seo'
 import { getMoreInterestingArticles, getSimilarArticles } from '@/lib/article-recommendations'
 
 interface Props { params: Promise<{ category: string; slug: string }> }
-
-function getLocalJpegDimensions(imagePath: string): { width: number; height: number } | null {
-  const normalized = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath
-  const filePath = path.join(process.cwd(), 'public', normalized)
-  if (!existsSync(filePath)) return null
-
-  const bytes = readFileSync(filePath)
-  let offset = 2
-  while (offset + 9 < bytes.length) {
-    if (bytes[offset] !== 0xff) return null
-    const marker = bytes[offset + 1]
-    const length = bytes.readUInt16BE(offset + 2)
-    if (length < 2) return null
-    if (marker >= 0xc0 && marker <= 0xc3) {
-      return {
-        height: bytes.readUInt16BE(offset + 5),
-        width: bytes.readUInt16BE(offset + 7),
-      }
-    }
-    offset += 2 + length
-  }
-
-  return null
-}
 
 export async function generateStaticParams() {
   const current = getAllSlugs()
@@ -202,113 +178,15 @@ export default async function ArticlePage({ params }: Props) {
     6,
   )
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': ['Article', 'NewsArticle'],
-    headline: fm.title,
-    description: fm.description,
-    url,
-    datePublished: fm.date,
-    dateModified: fm.updated || fm.date,
-    image: [{ '@type': 'ImageObject', url: imageUrl, ...jsonLdImageDims }],
-    thumbnailUrl: imageUrl,
-    author: {
-      '@type': 'Person',
-      name: persona.name,
-      url: authorUrl,
-      jobTitle: persona.role,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: SITE_NAME,
-      url: SITE_URL,
-      logo: { '@type': 'ImageObject', url: absoluteUrl('/icon-512.png'), width: 512, height: 512 },
-    },
-    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-    keywords: fm.tags.join(', '),
-    articleSection: cat?.name || fm.categoryName,
-    inLanguage: 'ru-RU',
-    isAccessibleForFree: true,
-    wordCount,
-    timeRequired: `PT${Math.max(1, Math.round(wordCount / 180))}M`,
-  }
+  const jsonLd = buildArticleJsonLd(fm, url, imageUrl, jsonLdImageDims, cat, persona, authorUrl, wordCount)
 
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Главная', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: cat?.name || fm.categoryName, item: `${SITE_URL}/${category}/` },
-      { '@type': 'ListItem', position: 3, name: fm.title, item: url },
-    ],
-  }
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd(category, cat, fm, url)
 
   // FAQ schema — detect H2/H3 headings ending with "?"
-  const faqEntities: { '@type': string; name: string; acceptedAnswer: { '@type': string; text: string } }[] = []
-  const contentLines = content.split('\n')
-  for (let i = 0; i < contentLines.length; i++) {
-    const line = contentLines[i]
-    const headingMatch = line.match(/^#{2,3} (.+)$/)
-    if (headingMatch) {
-      const headingText = headingMatch[1].trim()
-      if (headingText.endsWith('?')) {
-        const bodyLines: string[] = []
-        for (let j = i + 1; j < contentLines.length; j++) {
-          if (/^#{1,6} /.test(contentLines[j])) break
-          bodyLines.push(contentLines[j])
-        }
-        const answerText = bodyLines
-          .join('\n').split('\n\n')
-          .map((p) => p.replace(/^#+\s/, '').replace(/[*_`]/g, '').trim())
-          .find((p) => p.length > 0) || ''
-        if (answerText) {
-          faqEntities.push({
-            '@type': 'Question',
-            name: headingText,
-            acceptedAnswer: { '@type': 'Answer', text: answerText },
-          })
-        }
-      }
-    }
-  }
-  const faqSchema = faqEntities.length >= 2
-    ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqEntities }
-    : null
+  const faqSchema = buildFaqSchema(content)
 
   // Additional structured data: Recipe or HowTo
-  let additionalSchema: object | null = null
-  if (fm.schemaType === 'Recipe') {
-    additionalSchema = {
-      '@context': 'https://schema.org',
-      '@type': 'Recipe',
-      name: fm.title,
-      description: fm.description,
-      author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
-      datePublished: fm.date,
-      image: imageUrl,
-      prepTime: fm.prepTime,
-      cookTime: fm.cookTime,
-      recipeYield: fm.recipeYield,
-      recipeIngredient: fm.recipeIngredient || [],
-      keywords: fm.tags.join(', '),
-      inLanguage: 'ru-RU',
-    }
-  } else if (fm.schemaType === 'HowTo') {
-    const steps = [...content.matchAll(/^## (.+)$/gm)].map((m, i) => ({
-      '@type': 'HowToStep',
-      position: i + 1,
-      name: m[1].trim(),
-    }))
-    additionalSchema = {
-      '@context': 'https://schema.org',
-      '@type': 'HowTo',
-      name: fm.title,
-      description: fm.description,
-      image: imageUrl,
-      step: steps,
-      inLanguage: 'ru-RU',
-    }
-  }
+  const additionalSchema = buildAdditionalSchema(fm, imageUrl, content)
 
   return (
     <>

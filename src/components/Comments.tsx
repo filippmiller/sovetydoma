@@ -4,66 +4,14 @@ import { useEffect, useRef, useState } from 'react'
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabase'
 import type { Comment } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
-import { uploadToR2, photoPublicUrl } from '@/lib/photos'
+import { uploadToR2 } from '@/lib/photos'
+import CommentItem from '@/components/comments/CommentItem'
+import SkeletonCard from '@/components/comments/CommentSkeleton'
 
 const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/\/+$/, '')
 
 interface Props {
   slug: string
-}
-
-// --- Helpers ---
-
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'только что'
-  if (mins < 60) return `${mins} мин. назад`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours} ч. назад`
-  const days = Math.floor(hours / 24)
-  if (days < 30) return `${days} дн. назад`
-  const months = Math.floor(days / 30)
-  return `${months} мес. назад`
-}
-
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map((w) => w[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
-}
-
-// Deterministic color per user name
-const AVATAR_COLORS: [string, string][] = [
-  ['#fde8e8', '#c0392b'],
-  ['#e8f0fe', '#1a56db'],
-  ['#e8faf0', '#1e8449'],
-  ['#fef3e8', '#d35400'],
-  ['#f3e8fe', '#7d3c98'],
-  ['#e8f8fe', '#117a8b'],
-]
-function avatarColor(name: string): [string, string] {
-  let h = 0
-  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff
-  return AVATAR_COLORS[h % AVATAR_COLORS.length]
-}
-
-// --- Skeleton placeholder ---
-function SkeletonCard() {
-  return (
-    <div style={{ display: 'flex', gap: '0.75rem', padding: '1rem 0' }}>
-      <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#f0ede8', flexShrink: 0 }} />
-      <div style={{ flex: 1 }}>
-        <div style={{ width: '30%', height: 12, background: '#f0ede8', borderRadius: 4, marginBottom: 8 }} />
-        <div style={{ width: '85%', height: 10, background: '#f5f3f0', borderRadius: 4, marginBottom: 6 }} />
-        <div style={{ width: '70%', height: 10, background: '#f5f3f0', borderRadius: 4 }} />
-      </div>
-    </div>
-  )
 }
 
 // --- Auto-resize textarea hook ---
@@ -76,92 +24,6 @@ function useAutoResize(value: string) {
     el.style.height = Math.min(Math.max(el.scrollHeight, 100), 400) + 'px'
   }, [value])
   return ref
-}
-
-// --- Single comment card ---
-interface CommentItemProps {
-  comment: Comment
-  depth: number
-  onReply: (parentId: string) => void
-}
-
-function CommentItem({ comment, depth, onReply }: CommentItemProps) {
-  const name = comment.profiles?.display_name || 'Пользователь'
-  const initials = getInitials(name)
-  const [bg, fg] = avatarColor(name)
-
-  return (
-    <div style={{
-      display: 'flex',
-      gap: '0.75rem',
-      marginLeft: depth > 0 ? '1rem' : 0,
-      paddingLeft: depth > 0 ? '1rem' : 0,
-      borderLeft: depth > 0 ? '3px solid #f0ede8' : 'none',
-    }}>
-      {/* Avatar */}
-      <div style={{
-        width: 38,
-        height: 38,
-        borderRadius: '50%',
-        backgroundColor: bg,
-        color: fg,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '0.8rem',
-        fontWeight: 800,
-        flexShrink: 0,
-        userSelect: 'none',
-      }}>
-        {initials}
-      </div>
-
-      {/* Body */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'baseline', flexWrap: 'wrap', marginBottom: '0.3rem' }}>
-          <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#1a1a1a' }}>{name}</span>
-          <span style={{ fontSize: '0.78rem', color: '#bbb' }}>{timeAgo(comment.created_at)}</span>
-        </div>
-        <p style={{
-          margin: 0,
-          fontSize: '0.93rem',
-          lineHeight: 1.65,
-          color: '#333',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
-        }}>
-          {comment.content}
-        </p>
-        {comment.photo_path && (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={photoPublicUrl(comment.photo_path)}
-            alt="Фото к комментарию"
-            loading="lazy"
-            style={{ marginTop: '0.5rem', maxWidth: '240px', width: '100%', borderRadius: '8px', display: 'block' }}
-          />
-        )}
-        <button
-          onClick={() => onReply(comment.id)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: '0.78rem',
-            color: '#aaa',
-            padding: '0.3rem 0',
-            marginTop: '0.15rem',
-            fontFamily: 'inherit',
-            transition: 'color 0.15s',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#c0392b')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#aaa')}
-        >
-          Ответить
-        </button>
-      </div>
-    </div>
-  )
 }
 
 // --- Main component ---

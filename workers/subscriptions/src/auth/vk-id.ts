@@ -1,4 +1,5 @@
 import type { Env } from '../types'
+import { fetchWithTimeout } from '../http'
 
 const DEFAULT_VK_ID_AUTH_BASE = 'https://id.vk.com'
 
@@ -83,7 +84,7 @@ function requireVkIdConfig(env: Env): string[] {
 }
 
 async function postForm<T>(url: string, body: URLSearchParams): Promise<T> {
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body,
@@ -121,7 +122,7 @@ export async function fetchVkIdUserInfo(env: Env, accessToken: string): Promise<
 }
 
 export async function generateSupabaseMagicLink(env: Env, email: string, userData: Record<string, unknown>): Promise<string> {
-  const res = await fetch(`${supabaseBase(env)}/auth/v1/admin/generate_link`, {
+  const res = await fetchWithTimeout(`${supabaseBase(env)}/auth/v1/admin/generate_link`, {
     method: 'POST',
     headers: {
       apikey: env.SUPABASE_SERVICE_ROLE_KEY || '',

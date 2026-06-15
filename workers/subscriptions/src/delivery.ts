@@ -1,9 +1,11 @@
 import type { DirectChannel, Env } from './types'
+import type { ArticleRow } from './social/types'
 import { getDeliveryPeriod, planDigestArticles } from './delivery-planner.mjs'
 import { renderDigestMessage } from './render-message.mjs'
 import { sendDigestToChannel } from './providers/registry'
 import { createSignedContactToken } from './confirmations'
 import { getSupabaseBaseUrl, hasSupabaseServiceRole, insertRows, selectRows, updateRows } from './supabase'
+import { fetchWithTimeout } from './http'
 
 type RecipientRef = {
   id: string
@@ -23,16 +25,6 @@ type ContactForDelivery = {
   confirmed_at: string | null
   unsubscribe_token_hash: string
   recipient: RecipientRef
-}
-
-type ArticleRow = {
-  article_slug: string
-  category_slug: string
-  title: string
-  canonical_path: string
-  description: string
-  published_at: string | null
-  first_seen_at: string
 }
 
 type DeliveryRow = {
@@ -164,7 +156,7 @@ export async function sendOneDigest(env: Env, input: SendOneDigestInput): Promis
         error_code: null,
         error_message: null,
       }, 'id')
-      await fetch(`${getSupabaseBaseUrl(env)}/rest/v1/notification_delivery_items?delivery_id=eq.${encodeURIComponent(deliveryId)}`, {
+      await fetchWithTimeout(`${getSupabaseBaseUrl(env)}/rest/v1/notification_delivery_items?delivery_id=eq.${encodeURIComponent(deliveryId)}`, {
         method: 'DELETE',
         headers: {
           apikey: env.SUPABASE_SERVICE_ROLE_KEY || '',

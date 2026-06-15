@@ -2,35 +2,28 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 
+// The per-mode form JSX lives in dedicated presentational components
+// (LoginForm/RegisterForm), while the submit handlers + cross-cutting state
+// (FormData parsing, termsAccepted) remain in the AuthModal parent.
 const authModalSource = readFileSync('src/components/auth/AuthModal.tsx', 'utf8')
+const loginFormSource = readFileSync('src/components/auth/LoginForm.tsx', 'utf8')
+const registerFormSource = readFileSync('src/components/auth/RegisterForm.tsx', 'utf8')
 const passwordInputSource = readFileSync('src/components/auth/PasswordInput.tsx', 'utf8')
 
-function between(source, start, end) {
-  const startIndex = source.indexOf(start)
-  assert.notEqual(startIndex, -1, `Missing marker: ${start}`)
-  const endIndex = source.indexOf(end, startIndex)
-  assert.notEqual(endIndex, -1, `Missing marker: ${end}`)
-  return source.slice(startIndex, endIndex)
-}
-
 test('login form submits the same fields that the user edits', () => {
-  const loginBlock = between(authModalSource, '{/* Login form */}', '{/* Forgot password request form')
-
-  assert.match(loginBlock, /name="email"/)
-  assert.match(loginBlock, /value=\{email\}/)
-  assert.doesNotMatch(loginBlock, /value=\{registerEmail\}/)
-  assert.match(loginBlock, /name="password"/)
+  assert.match(loginFormSource, /name="email"/)
+  assert.match(loginFormSource, /value=\{email\}/)
+  assert.doesNotMatch(loginFormSource, /value=\{registerEmail\}/)
+  assert.match(loginFormSource, /name="password"/)
+  // Submit handlers (which read the edited fields) stay in the parent.
   assert.match(authModalSource, /new FormData\(e\.currentTarget\)/)
 })
 
 test('auth forms use custom Russian validation instead of native browser messages', () => {
-  const loginBlock = between(authModalSource, '{/* Login form */}', '{/* Forgot password request form')
-  const registerBlock = between(authModalSource, '{/* Register form */}', '{/* Social proof footer */}')
-
-  assert.match(loginBlock, /<form[^>]+noValidate/)
-  assert.match(registerBlock, /<form[^>]+noValidate/)
-  assert.match(registerBlock, /name="terms"/)
-  assert.match(registerBlock, /required/)
+  assert.match(loginFormSource, /<form[^>]+noValidate/)
+  assert.match(registerFormSource, /<form[^>]+noValidate/)
+  assert.match(registerFormSource, /name="terms"/)
+  assert.match(registerFormSource, /required/)
   assert.match(authModalSource, /termsAccepted/)
   assert.match(passwordInputSource, /name\?: string/)
   assert.match(passwordInputSource, /name=\{name\}/)

@@ -8,16 +8,13 @@ import SocialFollowTargets from '@/components/subscriptions/SocialFollowTargets'
 import TurnstileWidget, { turnstileConfigured } from '@/components/TurnstileWidget'
 import { saveManageToken } from '@/lib/subscriptions/manage-token'
 import { validateSubscriptionRequest } from '@/lib/subscriptions/validation.mjs'
+import { bannerColors } from './theme'
+import type { ChannelResult } from './theme'
+import ChannelPicker from './ChannelPicker'
+import ChannelStatusBanner from './ChannelStatusBanner'
 
 type Tone = 'light' | 'dark'
 type SubmitStatus = 'idle' | 'success' | 'warning' | 'error'
-
-type ChannelResult = {
-  status?: string
-  action?: string
-  url?: string
-  message?: string
-}
 
 type SubmitResponse = {
   recipientId?: string
@@ -42,14 +39,6 @@ type Props = {
   className?: string
 }
 
-const DIRECT_CHANNELS = [
-  { key: 'email', label: 'Email', helper: 'Письмо с подборкой' },
-  { key: 'telegram', label: 'Telegram', helper: 'Откроем бота для подтверждения' },
-  { key: 'max', label: 'MAX', helper: 'Подтверждение через бот' },
-  { key: 'whatsapp', label: 'WhatsApp', helper: 'Нужен номер телефона' },
-  { key: 'sms', label: 'SMS', helper: 'Нужен номер телефона' },
-] as const
-
 const FREQUENCIES = [
   { key: 'daily_one', label: '1 статья в день' },
   { key: 'daily_digest_3', label: '3 статьи в день' },
@@ -63,49 +52,6 @@ function getPathCategorySlug(pathname: string | null) {
   if (!pathname) return null
   const [firstSegment] = pathname.split('/').filter(Boolean)
   return firstSegment && CATEGORIES[firstSegment] ? firstSegment : null
-}
-
-function formatChannelLabel(channel: string) {
-  const entry = DIRECT_CHANNELS.find((item) => item.key === channel)
-  return entry?.label ?? channel
-}
-
-function bannerColors(tone: Tone, status: SubmitStatus) {
-  const palette = tone === 'dark'
-    ? {
-        baseBg: '#303030',
-        baseBorder: '#454545',
-        baseText: '#f0ede8',
-        baseMuted: '#c0bdb8',
-        fieldBg: '#3a3a3a',
-        fieldBorder: '#555',
-        fieldText: '#eee',
-        chipBg: '#3a3a3a',
-        chipBorder: '#555',
-        chipText: '#eee',
-      }
-    : {
-        baseBg: '#fff',
-        baseBorder: '#e8e4df',
-        baseText: '#1a1a1a',
-        baseMuted: '#666',
-        fieldBg: '#fff',
-        fieldBorder: '#ddd',
-        fieldText: '#1a1a1a',
-        chipBg: '#f5f3f0',
-        chipBorder: '#ddd',
-        chipText: '#2c2c2c',
-      }
-
-  const accent = status === 'success'
-    ? { bg: tone === 'dark' ? '#12331f' : '#e9f7ef', border: tone === 'dark' ? '#1f5f37' : '#a9dfbf', text: tone === 'dark' ? '#bff0cd' : '#1e7b44' }
-    : status === 'warning'
-      ? { bg: tone === 'dark' ? '#3d2f15' : '#fff5dd', border: tone === 'dark' ? '#7a5c20' : '#f0d89a', text: tone === 'dark' ? '#ffdf99' : '#8f5f00' }
-      : status === 'error'
-        ? { bg: tone === 'dark' ? '#3a1e1e' : '#fdecea', border: tone === 'dark' ? '#7a3a3a' : '#f5c2c7', text: tone === 'dark' ? '#ffb3b3' : '#a12c2c' }
-        : null
-
-  return { ...palette, accent }
 }
 
 export default function SubscriptionPanel({
@@ -382,40 +328,14 @@ export default function SubscriptionPanel({
           {!isManageMode && (
           <div>
             <div style={sectionLabelStyle(colors.baseMuted, compact)}>Каналы</div>
-            <div style={{ display: 'grid', gridTemplateColumns: compact ? '1fr' : 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.45rem' }}>
-              {DIRECT_CHANNELS.map((channel) => {
-                const checked = selectedChannels.includes(channel.key)
-                return (
-                  <label
-                    key={channel.key}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '0.5rem',
-                      border: `1px solid ${checked ? '#c0392b' : colors.baseBorder}`,
-                      background: checked ? (isDark ? '#3b2424' : '#fdf3f1') : colors.baseBg,
-                      color: colors.baseText,
-                      borderRadius: cardRadius,
-                      padding: compact ? '0.6rem 0.7rem' : '0.7rem 0.8rem',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleChannel(channel.key)}
-                      style={{ marginTop: '0.15rem', accentColor: '#c0392b', flexShrink: 0 }}
-                    />
-                    <span style={{ display: 'grid', gap: '0.12rem', minWidth: 0 }}>
-                      <span style={{ fontWeight: 700, fontSize: compact ? '0.84rem' : '0.9rem' }}>{channel.label}</span>
-                      <span style={{ fontSize: compact ? '0.74rem' : '0.78rem', color: colors.baseMuted, lineHeight: 1.35 }}>
-                        {channel.helper}
-                      </span>
-                    </span>
-                  </label>
-                )
-              })}
-            </div>
+            <ChannelPicker
+              selectedChannels={selectedChannels}
+              onToggle={toggleChannel}
+              colors={colors}
+              cardRadius={cardRadius}
+              compact={compact}
+              isDark={isDark}
+            />
           </div>
           )}
 
@@ -575,47 +495,13 @@ export default function SubscriptionPanel({
           )}
 
           {response?.channels && (
-            <div style={{ display: 'grid', gap: '0.55rem' }}>
-              <div style={sectionLabelStyle(colors.baseMuted, compact)}>Следующие шаги</div>
-              <div style={{ display: 'grid', gridTemplateColumns: compact ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem' }}>
-                {Object.entries(response.channels).map(([channel, details]) => (
-                  <div
-                    key={channel}
-                    style={{
-                      border: `1px solid ${colors.baseBorder}`,
-                      borderRadius: cardRadius,
-                      padding: compact ? '0.7rem' : '0.8rem',
-                      background: isDark ? '#2a2a2a' : '#faf9f7',
-                      color: colors.baseText,
-                    }}
-                  >
-                    <div style={{ fontWeight: 700, fontSize: compact ? '0.84rem' : '0.9rem', marginBottom: '0.25rem' }}>
-                      {formatChannelLabel(channel)}
-                    </div>
-                    <div style={{ fontSize: compact ? '0.75rem' : '0.8rem', color: colors.baseMuted, lineHeight: 1.45 }}>
-                      {details.message || details.action || details.status || 'Заявка принята'}
-                    </div>
-                    {details.url && (
-                      <a
-                        href={details.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          display: 'inline-block',
-                          marginTop: '0.45rem',
-                          color: '#c0392b',
-                          fontWeight: 700,
-                          fontSize: compact ? '0.75rem' : '0.8rem',
-                          textDecoration: 'none',
-                        }}
-                      >
-                        Открыть
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ChannelStatusBanner
+              channels={response.channels}
+              colors={colors}
+              cardRadius={cardRadius}
+              compact={compact}
+              isDark={isDark}
+            />
           )}
         </div>
       </form>

@@ -120,13 +120,6 @@ function relativeDate(dateStr: string): string {
   return `${Math.floor(days / 365)} г. назад`
 }
 
-function readingTimeStr(wordCount: number): string {
-  const m = Math.max(1, Math.round(wordCount / 180))
-  if (m === 1) return '1 минута'
-  if (m < 5) return `${m} минуты`
-  return `${m} минут`
-}
-
 // ---------------------------------------------------------------------------
 // 404 page
 // ---------------------------------------------------------------------------
@@ -201,9 +194,6 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
   const dateIso = row.published_at.slice(0, 10)
   const dateFormatted = formatDateRu(dateIso)
   const dateRelative = relativeDate(dateIso)
-  const timeToRead = readingTimeStr(row.word_count ?? 0)
-  const wordCount = row.word_count ?? 0
-
   // Build tag links HTML
   const tagLinksHtml = (Array.isArray(row.tags) ? row.tags : [])
     .map((tag) => `<a style="padding:4px 10px;border-radius:4px;background-color:#f0ede8;color:#666;font-size:0.8rem;text-decoration:none" href="/tag/${encodeURIComponent(tag)}/">#${escapeHtml(tag)}</a>`)
@@ -233,28 +223,17 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
   const tocHtml = `<div class="toc-title">Содержание</div>${tocLinks}`
 
   // State flags for HTMLRewriter handlers
-  let inJsonLdScript = false
   let jsonLdAppended = false
-  let breadcrumbNavDepth = 0
-  let inBreadcrumbOl = false
   let inH1 = false
   let h1Done = false
   let inFigure = false
-  let figureDepth = 0
   let inFigureImg = false
-  let inTime = false
   let timeDone = false
-  // For category badge: first <span> inside header > div
-  let inHeaderFirstDiv = false
-  let headerFirstDivDepth = 0
   let categorySpanDone = false
   // For tags container: div containing the tag <a> links (identified by first tag href pattern)
   // We track a div that contains /tag/ links and replace its contents
-  let tagsDivDepth = 0
   let inTagsDiv = false
-  let tagsDone = false
-  // For article.prose body replacement
-  let inProse = false
+  const tagsDone = false
 
   return new HTMLRewriter()
     // ── <title> ──────────────────────────────────────────────────────────
@@ -355,7 +334,7 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
     })
     // ── <h1> — first one inside article-main (the article title) ─────────
     .on('h1', {
-      element(el) {
+      element() {
         if (!h1Done) {
           inH1 = true
           h1Done = true
@@ -376,10 +355,9 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
     // The figure has inline style "position:relative;aspect-ratio:16 / 9;..."
     // We match the first figure on the page (the article hero).
     .on('figure', {
-      element(el) {
+      element() {
         if (!inFigure) {
           inFigure = true
-          figureDepth = 1
         }
       },
     })
@@ -438,7 +416,7 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
           }
         }
       },
-      text(chunk) {
+      text() {
         // Suppress text of subsequent tag links (they are removed via el.remove())
       },
     })
@@ -507,7 +485,6 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
 
 async function handleArticle(req: Request, env: Env, category: string, slug: string): Promise<Response> {
   const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const reqUrl = new URL(req.url)
   const cacheKey = new Request(`${siteUrl}/${category}/${slug}/?render=${RENDER_VERSION}`, { method: 'GET' })
   const cache = caches.default
 

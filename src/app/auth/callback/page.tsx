@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
+import { safeAssign } from '@/lib/auth/safe-redirect'
 
 /**
  * OAuth callback page for Supabase Auth providers (Yandex, VK, Google, etc.).
@@ -56,7 +57,10 @@ export default function AuthCallbackPage() {
           if (!cancelled) {
             setStatus('success')
             setMessage('Вход выполнен! Перенаправляем…')
-            window.location.href = body.actionLink
+            // C1: guard against open-redirect via server-supplied actionLink
+            if (!safeAssign(body.actionLink)) {
+              throw new Error('yandex_invalid_action_link')
+            }
           }
           return
         }
