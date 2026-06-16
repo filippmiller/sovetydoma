@@ -3,6 +3,7 @@ import path from 'path'
 import matter from 'gray-matter'
 import { fileURLToPath } from 'url'
 import { CATEGORIES } from '../src/lib/categories.mjs'
+import { generateComparisonPairs } from '../src/lib/comparison-pairs.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const articlesDir = path.join(__dirname, '../src/content/articles')
@@ -49,12 +50,18 @@ const archiveMonths = [...new Set(
     .filter(ym => /^\d{4}-\d{2}$/.test(ym))
 )].sort()
 
+const seasonalPages = Array.from({ length: 12 }, (_, i) => `/sezon/${i + 1}/`)
+const comparisonPairs = generateComparisonPairs(articles, 200, 20)
+const comparisonPages = comparisonPairs.map((p) => `/${p.category}/sravnenie/${p.a}-ili-${p.b}/`)
+
 const urls = [
   `<url><loc>${SITE_URL}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
   ...Object.values(CATEGORIES).map(c => `<url><loc>${SITE_URL}/${c.slug}/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`),
   ...STATIC_PAGES.map(p => `<url><loc>${SITE_URL}${p.path}</loc><changefreq>${p.changefreq}</changefreq><priority>${p.priority}</priority></url>`),
   ...paginatedArticlePages.map(p => `<url><loc>${SITE_URL}${p}</loc><changefreq>daily</changefreq><priority>0.5</priority></url>`),
   ...archiveMonths.map(ym => `<url><loc>${SITE_URL}/archive/${ym}/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>`),
+  ...seasonalPages.map(p => `<url><loc>${SITE_URL}${p}</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>`),
+  ...comparisonPages.map(p => `<url><loc>${SITE_URL}${p}</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>`),
   ...articles.map(a => {
     const loc = `${SITE_URL}/${a.category}/${a.slug}/`
     const lastmod = a.updated || a.date

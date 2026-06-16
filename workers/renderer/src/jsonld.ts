@@ -72,16 +72,89 @@ export const CATEGORY_NAMES: Record<string, string> = {
   avto:                    'Авто',
 }
 
-export function buildJsonLd(row: ArticleRow): { article: object; breadcrumb: object } {
+function stripMarkdownInline(text: string): string {
+  return text
+    .replace(/!\[.*?\]\(.*?\)/g, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[#*`>_~]/g, '')
+    .replace(/\n+/g, ' ')
+    .trim()
+}
+
+function extractAnswerText(content: string, startLine: number): string {
+  const lines = content.split('\n')
+  const bodyLines: string[] = []
+  for (let j = startLine + 1; j < lines.length; j++) {
+    if (/^#{1,6} /.test(lines[j])) break
+    bodyLines.push(lines[j])
+  }
+  return bodyLines
+    .join('\n')
+    .split(/\n\s*\n/)
+    .map((p) => stripMarkdownInline(p))
+    .filter((p) => p.length > 0)
+    .join(' ')
+}
+
+function buildFaqSchema(body: string): object | null {
+  const entities: { '@type': string; name: string; acceptedAnswer: { '@type': string; text: string } }[] = []
+  const lines = body.split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    const match = lines[i].match(/^#{2,3} (.+)$/)
+    if (!match) continue
+    const heading = match[1].trim()
+    if (!heading.endsWith('?')) continue
+    const answer = extractAnswerText(body, i)
+    if (answer) {
+      entities.push({ '@type': 'Question', name: heading, acceptedAnswer: { '@type': 'Answer', text: answer } })
+    }
+  }
+  return entities.length >= 2 ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: entities } : null
+}
+
+function readStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((v): v is string => typeof v === 'string')
+  return []
+}
+
+function looksLikeInstructional(content: string): boolean {
+  const h2s = [...content.matchAll(/^## (.+)$/gm)]
+  if (h2s.length >= 3) return true
+  const numbered = [...content.matchAll(/^## \d+[\.)]?\s+/gm)]
+  if (numbered.length >= 2) return true
+  return false
+}
+
+function buildHowToSteps(body: string, recipeSteps?: string[]): Array<{ '@type': string; position: number; name: string }> {
+  if (recipeSteps && recipeSteps.length > 0) {
+    return recipeSteps.map((step, i) => ({ '@type': 'HowToStep', position: i + 1, name: step.trim() }))
+  }
+  const headings = [...body.matchAll(/^## (.+)$/gm)].map((m) => m[1].trim())
+  if (headings.length === 0) return []
+  return headings.map((name, i) => ({ '@type': 'HowToStep', position: i + 1, name }))
+}
+
+function isoDurationFromHuman(time?: string): string | undefined {
+  if (!time) return undefined
+  const minutes = /(\d+)\s*мин/i.exec(time)
+  const hours = /(\d+)\s*ч/i.exec(time)
+  if (!minutes && !hours) return undefined
+  let iso = 'PT'
+  if (hours) iso += `${hours[1]}H`
+  if (minutes) iso += `${minutes[1]}M`
+  return iso
+}
+
+export function buildJsonLd(row: ArticleRow): { article: object; breadcrumb: object; extra: object[] } {
   const url = `${SITE_URL}/${row.category}/${row.slug}/`
   const imageUrl = `${SITE_URL}/images/${row.image_filename ?? row.slug + '.jpg'}`
   const datePublished = row.published_at.slice(0, 10) // ISO date
   const dateModified = (row.updated_at ?? row.published_at).slice(0, 10)
 
-  const fm = row.frontmatter as Record<string, string | undefined>
-  const persona = resolvePersona(fm.author, row.category)
+  const fm = row.frontmatter as Record<string, unknown>
+  const persona = resolvePersona(typeof fm.author === 'string' ? fm.author : undefined, row.category)
   const authorUrl = `${SITE_URL}/author/${persona.slug}/`
-  const categoryName = CATEGORY_NAMES[row.category] ?? fm.categoryName ?? row.category
+  const categoryName = CATEGORY_NAMES[row.category] ?? (typeof fm.categoryName === 'string' ? fm.categoryName : row.category)
   const wordCount = row.word_count ?? 0
 
   const article = {
@@ -125,5 +198,50 @@ export function buildJsonLd(row: ArticleRow): { article: object; breadcrumb: obj
     ],
   }
 
-  return { article, breadcrumb }
+  const extra: object[] = []
+  const body = row.body_md ?? ''
+  const schemaType = typeof fm.schemaType === 'string' ? fm.schemaType : undefined
+  const recipeSteps = readStringArray(fm.recipeSteps)
+  const howToSteps = buildHowToSteps(body, recipeSteps)
+
+  if (schemaType === 'Recipe') {
+    const ingredients = readStringArray(fm.recipeIngredient)
+    extra.push({
+      '@context': 'https://schema.org',
+      '@type': 'Recipe',
+      name: row.title,
+      description: row.description,
+      author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+      datePublished,
+      image: imageUrl,
+      prepTime: typeof fm.prepTime === 'string' ? fm.prepTime : undefined,
+      cookTime: typeof fm.cookTime === 'string' ? fm.cookTime : undefined,
+      recipeYield: typeof fm.recipeYield === 'string' ? fm.recipeYield : undefined,
+      recipeIngredient: ingredients,
+      recipeInstructions: howToSteps,
+      keywords: row.tags.join(', '),
+      inLanguage: 'ru-RU',
+    })
+  }
+
+  if (schemaType === 'HowTo' || (howToSteps.length >= 3 && looksLikeInstructional(body))) {
+    const time = typeof fm.time === 'string' ? fm.time : undefined
+    const howTo: Record<string, unknown> = {
+      '@context': 'https://schema.org',
+      '@type': 'HowTo',
+      name: row.title,
+      description: row.description,
+      image: imageUrl,
+      step: howToSteps,
+      inLanguage: 'ru-RU',
+    }
+    const totalTime = isoDurationFromHuman(time)
+    if (totalTime) howTo.totalTime = totalTime
+    extra.push(howTo)
+  }
+
+  const faq = buildFaqSchema(body)
+  if (faq) extra.push(faq)
+
+  return { article, breadcrumb, extra }
 }

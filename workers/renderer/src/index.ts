@@ -19,7 +19,7 @@ import { fetchTemplate } from './template'
 import { BAKED_CSS } from './bakedCss'
 
 // Bump to invalidate cached rendered pages after a worker change.
-const RENDER_VERSION = '4'
+const RENDER_VERSION = '5'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -127,6 +127,63 @@ function readingTimeStr(wordCount: number): string {
   return `${m} минут`
 }
 
+const DIFFICULTY_STARS: Record<string, number> = {
+  'Легко': 1,
+  'Средне': 3,
+  'Сложно': 5,
+}
+
+function readFrontmatterArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((v): v is string => typeof v === 'string')
+  return []
+}
+
+function buildMetaBadgesHtml(fm: Record<string, unknown>): string {
+  const badges: string[] = []
+  const difficulty = typeof fm.difficulty === 'string' ? fm.difficulty.trim() : ''
+  const time = typeof fm.time === 'string' ? fm.time.trim() : ''
+  const cost = typeof fm.cost === 'string' ? fm.cost.trim() : ''
+  const difficultyStars: Record<string, number> = { 'Легко': 1, 'Средне': 3, 'Сложно': 5 }
+  const stars = difficultyStars[difficulty]
+  if (stars) {
+    badges.push(`<span style="display:inline-flex;align-items:center;gap:0.2rem;font-size:0.78rem;font-weight:700;color:#555;background:#f5f2ed;border:1px solid #e9e3db;border-radius:999px;padding:0.2rem 0.65rem" aria-label="Сложность ${escapeHtml(difficulty)}"><span style="color:#f39c12">${'★'.repeat(stars)}</span><span style="color:#c1b8ad">${'☆'.repeat(5 - stars)}</span></span>`)
+  }
+  if (time) {
+    badges.push(`<span style="display:inline-flex;align-items:center;gap:0.2rem;font-size:0.78rem;font-weight:700;color:#555;background:#f5f2ed;border:1px solid #e9e3db;border-radius:999px;padding:0.2rem 0.65rem">⏱ ${escapeHtml(time)}</span>`)
+  }
+  if (cost) {
+    badges.push(`<span style="display:inline-flex;align-items:center;gap:0.2rem;font-size:0.78rem;font-weight:700;color:#555;background:#f5f2ed;border:1px solid #e9e3db;border-radius:999px;padding:0.2rem 0.65rem">💰 ${escapeHtml(cost)}</span>`)
+  }
+  return badges.join('')
+}
+
+function buildQuickAnswerHtml(fm: Record<string, unknown>): string | null {
+  const quickAnswer = typeof fm.quickAnswer === 'string' ? fm.quickAnswer.trim() : ''
+  if (!quickAnswer) return null
+  const time = typeof fm.time === 'string' ? fm.time.trim() : ''
+  const difficulty = typeof fm.difficulty === 'string' ? fm.difficulty.trim() : ''
+  const forWhom = typeof fm.forWhom === 'string' ? fm.forWhom.trim() : ''
+  const needs = readFrontmatterArray(fm.needs)
+  const stars = difficulty ? DIFFICULTY_STARS[difficulty] : undefined
+  const meta: string[] = []
+  if (time) {
+    meta.push(`<div><div style="font-size:0.72rem;font-weight:700;color:#8a8378;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem">⏱ Время</div><div style="font-size:0.92rem;color:#2a2a2a;line-height:1.45">${escapeHtml(time)}</div></div>`)
+  }
+  if (stars) {
+    meta.push(`<div><div style="font-size:0.72rem;font-weight:700;color:#8a8378;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem">📊 Сложность</div><div style="font-size:0.92rem;color:#2a2a2a;line-height:1.45" aria-label="Сложность ${escapeHtml(difficulty)}"><span style="color:#f39c12">${'★'.repeat(stars)}</span><span style="color:#ddd">${'☆'.repeat(5 - stars)}</span></div></div>`)
+  }
+  if (needs.length > 0) {
+    meta.push(`<div style="grid-column:1 / -1"><div style="font-size:0.72rem;font-weight:700;color:#8a8378;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem">🧰 Что понадобится</div><div style="font-size:0.92rem;color:#2a2a2a;line-height:1.45">${escapeHtml(needs.join(', '))}</div></div>`)
+  }
+  if (forWhom) {
+    meta.push(`<div style="grid-column:1 / -1"><div style="font-size:0.72rem;font-weight:700;color:#8a8378;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem">👤 Для кого подходит</div><div style="font-size:0.92rem;color:#2a2a2a;line-height:1.45">${escapeHtml(forWhom)}</div></div>`)
+  }
+  const metaHtml = meta.length
+    ? `<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:0.75rem;margin-top:1rem">${meta.join('')}</div>`
+    : ''
+  return `<div style="font-size:0.72rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:#c0392b;margin-bottom:0.5rem">⚡ Краткий ответ</div><p style="margin:0;font-size:1rem;line-height:1.6;color:#2a2a2a">${escapeHtml(quickAnswer)}</p>${metaHtml}`
+}
+
 // ---------------------------------------------------------------------------
 // 404 page
 // ---------------------------------------------------------------------------
@@ -191,13 +248,16 @@ a{color:#c0392b}</style>
  * in a way that breaks SEO. Hiding it would require extra selector work for minimal gain.)
  */
 
-function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, schemas: { article: object; breadcrumb: object }) {
+function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, schemas: { article: object; breadcrumb: object; extra: object[] }) {
   const categoryName = CATEGORY_NAMES[row.category] ?? row.category
   const persona = resolvePersona((row.frontmatter as Record<string, string | undefined>)?.author, row.category)
   const canonicalUrl = `${siteUrl}/${row.category}/${row.slug}/`
   const imageUrl = `${siteUrl}/images/${row.image_filename ?? row.slug + '.jpg'}`
   const pageTitle = `${row.title} — СоветыДома`
   const description = row.description
+  const fm = row.frontmatter as Record<string, unknown>
+  const quickAnswerHtml = buildQuickAnswerHtml(fm)
+  const metaBadgesHtml = buildMetaBadgesHtml(fm)
   const dateIso = row.published_at.slice(0, 10)
   const dateFormatted = formatDateRu(dateIso)
   const dateRelative = relativeDate(dateIso)
@@ -219,8 +279,10 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
 
   // JSON-LD scripts to inject (we remove existing ones first then append),
   // plus the baked styled-jsx CSS (header etc.) that normally arrives via JS.
+  const extraScripts = schemas.extra.map((schema) => `<script type="application/ld+json">${JSON.stringify(schema)}</script>`).join('')
   const jsonLdHtml = `<script type="application/ld+json">${JSON.stringify(schemas.article)}</script>`
     + `<script type="application/ld+json">${JSON.stringify(schemas.breadcrumb)}</script>`
+    + extraScripts
     + `<style>${BAKED_CSS}</style>`
 
   // TOC entries from our h2 headings (ids must match md.ts renderBlock)
@@ -448,10 +510,20 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
         el.setInnerContent(escapeHtml(description), { html: true })
       },
     })
-    // ── «Краткий ответ» box — its text is the article description ────────
-    .on('aside[aria-label="Краткий ответ"] p', {
+    // ── «Краткий ответ» box — use frontmatter.quickAnswer when present ────
+    .on('aside[aria-label="Краткий ответ"]', {
       element(el) {
-        el.setInnerContent(escapeHtml(description), { html: true })
+        if (quickAnswerHtml) {
+          el.setInnerContent(quickAnswerHtml, { html: true })
+        } else {
+          el.remove()
+        }
+      },
+    })
+    // ── Effort badges under the article description ───────────────────────
+    .on('.article-meta-badges', {
+      element(el) {
+        el.setInnerContent(metaBadgesHtml, { html: true })
       },
     })
     // ── TOC (both nav.toc instances: sidebar + inline) ────────────────────

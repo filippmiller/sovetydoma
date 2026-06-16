@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import { searchArticles } from '@/lib/search'
 import ArticleCatalogGrid from '@/components/ArticleCatalogGrid'
+import { matchesDifficulty, matchesTime, matchesCost } from '@/lib/article-filters.mjs'
 
 interface Props {
   articles: (ArticleFrontmatter & { wordCount: number })[]
@@ -41,23 +42,32 @@ export default function CategoryArticleBrowser({ articles }: Props) {
   const [query, setQuery] = useState('')
   const [tag, setTag] = useState('')
   const [sortMode, setSortMode] = useState<SortMode>('newest')
+  const [difficulty, setDifficulty] = useState('')
+  const [timeFilter, setTimeFilter] = useState('')
+  const [costFilter, setCostFilter] = useState('')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const tags = useMemo(() => uniqueTags(articles), [articles])
 
   const filtered = useMemo(() => {
     const byTag = tag ? articles.filter((article) => article.tags?.includes(tag)) : articles
-    const bySlug = new Map(byTag.map((article) => [article.slug, article]))
+    const byFilters = byTag.filter(
+      (article) =>
+        matchesDifficulty(article, difficulty) &&
+        matchesTime(article, timeFilter) &&
+        matchesCost(article, costFilter),
+    )
+    const bySlug = new Map(byFilters.map((article) => [article.slug, article]))
     const searched = query.trim()
-      ? searchArticles(byTag, query)
+      ? searchArticles(byFilters, query)
         .map((result) => bySlug.get(result.slug))
         .filter((article): article is ArticleFrontmatter & { wordCount: number } => Boolean(article))
-      : byTag
+      : byFilters
     return sortArticles(searched, sortMode)
-  }, [articles, query, sortMode, tag])
+  }, [articles, query, sortMode, tag, difficulty, timeFilter, costFilter])
 
   // Any change to the filter set collapses back to the first window.
   // Adjust-state-during-render pattern (no effect, no cascading render).
-  const filterKey = `${query.trim()}|${sortMode}|${tag}`
+  const filterKey = `${query.trim()}|${sortMode}|${tag}|${difficulty}|${timeFilter}|${costFilter}`
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey)
   if (prevFilterKey !== filterKey) {
     setPrevFilterKey(filterKey)
@@ -87,6 +97,29 @@ export default function CategoryArticleBrowser({ articles }: Props) {
             <option value="title">По названию</option>
           </select>
         </form>
+
+        <div className="category-browser-filters" aria-label="Фильтры">
+          <select value={difficulty} onChange={(event) => setDifficulty(event.target.value)} aria-label="Сложность">
+            <option value="">Любая сложность</option>
+            <option value="Легко">Легко ★</option>
+            <option value="Средне">Средне ★★★</option>
+            <option value="Сложно">Сложно ★★★★★</option>
+          </select>
+          <select value={timeFilter} onChange={(event) => setTimeFilter(event.target.value)} aria-label="Время">
+            <option value="">Любое время</option>
+            <option value="short">До 15 минут</option>
+            <option value="medium">15–60 минут</option>
+            <option value="long">1–3 часа</option>
+            <option value="verylong">Больше 3 часов</option>
+          </select>
+          <select value={costFilter} onChange={(event) => setCostFilter(event.target.value)} aria-label="Бюджет">
+            <option value="">Любой бюджет</option>
+            <option value="free">Бесплатно</option>
+            <option value="cheap">До 500 ₽</option>
+            <option value="medium">500–1500 ₽</option>
+            <option value="expensive">Больше 1500 ₽</option>
+          </select>
+        </div>
 
         {tags.length > 0 && (
           <div className="category-browser-tags" aria-label="Популярные темы раздела">
@@ -173,9 +206,32 @@ export default function CategoryArticleBrowser({ articles }: Props) {
           padding: 0 0.65rem;
         }
         .category-browser-search input:focus,
-        .category-browser-search select:focus {
+        .category-browser-search select:focus,
+        .category-browser-filters select:focus {
           border-color: #c0392b;
           box-shadow: 0 0 0 3px #c0392b14;
+        }
+        .category-browser-filters {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 0.6rem;
+        }
+        .category-browser-filters select {
+          width: 100%;
+          height: 38px;
+          border: 1px solid #ded4cc;
+          border-radius: 7px;
+          background: #fff;
+          color: #222;
+          font: inherit;
+          font-size: 0.9rem;
+          padding: 0 0.65rem;
+          outline: none;
+        }
+        @media (max-width: 680px) {
+          .category-browser-filters {
+            grid-template-columns: 1fr;
+          }
         }
         .category-browser-tags {
           display: flex;

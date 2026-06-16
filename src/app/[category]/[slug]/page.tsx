@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { getArticle, getAllSlugs, getAllArticles, CATEGORIES, LEGACY_ARTICLE_MOVES } from '@/lib/articles'
 import { getLocalJpegDimensions } from '@/lib/jpeg-dimensions'
-import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildFaqSchema, buildAdditionalSchema } from '@/lib/article-schemas'
+import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildAdditionalSchema } from '@/lib/article-schemas'
 import { resolvePersona } from '@/lib/personas'
 import Breadcrumb from '@/components/Breadcrumb'
 import RelatedArticles from '@/components/RelatedArticles'
@@ -24,14 +24,17 @@ import AffiliateLink from '@/components/AffiliateLink'
 import RecipeCard from '@/components/RecipeCard'
 import ArticleSeries from '@/components/ArticleSeries'
 import ArticleQuickAnswer from '@/components/ArticleQuickAnswer'
+import ArticleMetaBadges from '@/components/ArticleMetaBadges'
 import ArticleActionSummary from '@/components/ArticleActionSummary'
 import ArticlePersonaCard from '@/components/ArticlePersonaCard'
 import ArticleFeedback from '@/components/ArticleFeedback'
 import ArticlePhotoSubmissionCTA from '@/components/ArticlePhotoSubmissionCTA'
 import ArticleQuestionsBlock from '@/components/ArticleQuestionsBlock'
+import ArticleInternalLinks from '@/components/ArticleInternalLinks'
 import ArticleViewCount from '@/components/ArticleViewCount'
 import ArticleImage from '@/components/ArticleImage'
 import CategorySubscriptionCta from '@/components/subscriptions/CategorySubscriptionCta'
+import ArticleSeasonalBadge from '@/components/ArticleSeasonalBadge'
 import { ArticleH2, ArticleH3 } from '@/components/ArticleHeading'
 import { notFound } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
@@ -182,11 +185,8 @@ export default async function ArticlePage({ params }: Props) {
 
   const breadcrumbJsonLd = buildBreadcrumbJsonLd(category, cat, fm, url)
 
-  // FAQ schema — detect H2/H3 headings ending with "?"
-  const faqSchema = buildFaqSchema(content)
-
-  // Additional structured data: Recipe or HowTo
-  const additionalSchema = buildAdditionalSchema(fm, imageUrl, content)
+  // Additional structured data: Recipe, HowTo and/or FAQPage
+  const additionalSchemas = buildAdditionalSchema(fm, imageUrl, content)
 
   return (
     <>
@@ -201,11 +201,14 @@ export default async function ArticlePage({ params }: Props) {
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      {additionalSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(additionalSchema) }} />
-      )}
-      {faqSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      {additionalSchemas && (
+        Array.isArray(additionalSchemas) ? (
+          additionalSchemas.map((schema, idx) => (
+            <script key={idx} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+          ))
+        ) : (
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(additionalSchemas) }} />
+        )
       )}
 
       {/* Category color stripe */}
@@ -241,6 +244,7 @@ export default async function ArticlePage({ params }: Props) {
                 }}>
                   {cat?.name || fm.categoryName}
                 </span>
+                <ArticleSeasonalBadge seasonalMonths={fm.seasonalMonths} />
                 <CategorySubscriptionCta
                   categorySlug={category}
                   categoryName={cat?.name || fm.categoryName}
@@ -255,6 +259,8 @@ export default async function ArticlePage({ params }: Props) {
               <p style={{ fontSize: '1.05rem', color: '#666', lineHeight: 1.65, marginBottom: '0.9rem' }}>
                 {fm.description}
               </p>
+
+              <ArticleMetaBadges fm={fm} />
 
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', fontSize: '0.83rem', color: '#767676', flexWrap: 'wrap' }}>
                 <time dateTime={fm.date} title={formatDate(fm.date)} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -293,7 +299,7 @@ export default async function ArticlePage({ params }: Props) {
             {/* Editorial attribution */}
             <ArticlePersonaCard author={fm.author} category={category} updated={fm.updated || fm.date} />
 
-            {/* Fast-answer block — renders only when an answer is available/derivable */}
+            {/* Quick-answer block — renders only when an explicit quickAnswer is present */}
             <ArticleQuickAnswer fm={fm} />
 
             <ArticleActionSummary fm={fm} content={content} />
@@ -329,6 +335,9 @@ export default async function ArticlePage({ params }: Props) {
                 ))}
               </div>
             )}
+
+            {/* Contextual internal link mesh */}
+            <ArticleInternalLinks source={fm} allArticles={allArticles} />
 
             {/* Article reactions */}
             <ArticleReactions slug={slug} />

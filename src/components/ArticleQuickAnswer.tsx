@@ -10,24 +10,13 @@ const DIFFICULTY_STARS: Record<string, number> = {
   'Сложно': 5,
 }
 
-function firstSentences(text: string, max = 2): string {
-  if (!text) return ''
-  const parts = text.split(/(?<=[.!?])\s+/).slice(0, max)
-  return parts.join(' ')
-}
-
 /**
  * "Краткий ответ" block shown near the top of an article.
- * Data-driven with safe fallbacks:
- *  - answer: fm.quickAnswer, else first 2 sentences of the description
- *  - time:   fm.time, else derived nothing (hidden)
- *  - difficulty: fm.difficulty → stars
- *  - needs:  fm.needs, else fm.recipeIngredient
- *  - forWhom: fm.forWhom (hidden if absent)
- * Renders nothing if there is no answer text at all.
+ * Renders only when an explicit `quickAnswer` frontmatter value is present.
+ * Yandex / search snippets benefit from a focused 40–60 word answer.
  */
 export default function ArticleQuickAnswer({ fm }: Props) {
-  const answer = (fm.quickAnswer && fm.quickAnswer.trim()) || firstSentences(fm.description || '')
+  const answer = fm.quickAnswer?.trim()
   if (!answer) return null
 
   const stars = fm.difficulty ? DIFFICULTY_STARS[fm.difficulty] : undefined
