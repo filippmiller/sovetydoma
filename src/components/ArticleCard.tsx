@@ -1,7 +1,4 @@
-'use client'
-
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import { CATEGORIES } from '@/lib/categories'
 import { readingTime, relativeDate, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
@@ -20,7 +17,6 @@ interface Props {
 }
 
 export default function ArticleCard({ article, wordCount, featured = false, viewCount = 0, ratingAverage = null, likeCount = 0 }: Props) {
-  const router = useRouter()
   const cat = CATEGORIES[article.category]
   const color = CATEGORY_COLOR[article.category] || '#888'
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
@@ -31,17 +27,10 @@ export default function ArticleCard({ article, wordCount, featured = false, view
   const shareUrl = `https://1001sovet.ru/${article.category}/${article.slug}/`
   const shareTitle = article.title
 
-  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Let buttons, links and their children handle themselves
-    const target = e.target as HTMLElement
-    if (target.closest('button, a, [role="button"]')) return
-    router.push(href)
-  }
-
   return (
+    <Link href={href} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
     <article
       className="article-card"
-      onClick={handleCardClick}
       style={{
         backgroundColor: '#fff',
         borderRadius: '12px',
@@ -100,9 +89,7 @@ export default function ArticleCard({ article, wordCount, featured = false, view
               color: '#1a1a1a',
               overflowWrap: 'anywhere',
             }}>
-              <Link href={href} style={{ color: 'inherit', textDecoration: 'none' }}>
-                {article.title}
-              </Link>
+              {article.title}
             </h2>
 
             {article.description && (
@@ -133,7 +120,7 @@ export default function ArticleCard({ article, wordCount, featured = false, view
           }}>
             <CardFavoriteButton slug={article.slug} />
             <CardShareButton url={shareUrl} title={shareTitle} />
-            <Link href={href} aria-label={article.title} style={{ display: 'block', width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
+            <div style={{ display: 'block', width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
               {cardImageSrc ? (
                 <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={featured ? '2rem' : '1.65rem'} />
               ) : (
@@ -148,7 +135,7 @@ export default function ArticleCard({ article, wordCount, featured = false, view
                   {emoji}
                 </span>
               )}
-            </Link>
+            </div>
           </div>
         </div>
 
@@ -170,5 +157,6 @@ export default function ArticleCard({ article, wordCount, featured = false, view
           </span>
         </div>
       </article>
+    </Link>
   )
 }

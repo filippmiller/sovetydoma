@@ -314,6 +314,125 @@ test('vk id exchange returns Supabase action link after VK verification', async 
   }
 })
 
+// L3: OPTIONS preflight must return CORS headers (not a bare 204)
+test('OPTIONS preflight returns CORS headers and 204', async () => {
+  const response = await worker.fetch(request('/subscriptions/start', {
+    method: 'OPTIONS',
+    headers: { Origin: 'https://1001sovet.ru' },
+  }), baseEnv)
+
+  assert.equal(response.status, 204)
+  assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://1001sovet.ru')
+  assert.ok(response.headers.get('Access-Control-Allow-Methods'))
+  assert.ok(response.headers.get('Access-Control-Allow-Headers'))
+  assert.equal(response.headers.get('Vary'), 'Origin')
+})
+
+test('OPTIONS preflight does not set ACAO for disallowed origins', async () => {
+  const response = await worker.fetch(request('/subscriptions/start', {
+    method: 'OPTIONS',
+    headers: { Origin: 'https://evil.example' },
+  }), baseEnv)
+
+  assert.equal(response.status, 204)
+  assert.equal(response.headers.get('Access-Control-Allow-Origin'), null)
+})
+
+// M2: Yandex exchange must ignore client-supplied redirect_uri
+test('yandex exchange ignores client redirect_uri and uses server-derived one', async () => {
+  const originalFetch = globalThis.fetch
+  const capturedRedirectUri: string[] = []
+  globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+
+    if (url.includes('/rest/v1/rpc/notification_check_rate_limit')) {
+      return new Response(JSON.stringify({ allowed: true, bucket: 'ok' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://oauth.yandex.ru/token') {
+      const body = new URLSearchParams(String(init?.body || ''))
+      capturedRedirectUri.push(body.get('redirect_uri') || '')
+      return new Response(JSON.stringify({ access_token: 'ya-access-token' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://login.yandex.ru/info?format=json') {
+      return new Response(JSON.stringify({ id: 'ya123', default_email: 'user@yandex.ru' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://supabase.example/auth/v1/admin/generate_link') {
+      return new Response(JSON.stringify({ action_link: 'https://supabase.example/auth/v1/verify?token=ya' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    return new Response(JSON.stringify({ error: 'unexpected_fetch', url }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+  }
+
+  try {
+    const response = await worker.fetch(request('/auth/yandex/exchange', {
+      method: 'POST',
+      headers: { Origin: 'https://1001sovet.ru', 'Content-Type': 'application/json' },
+      // Client sends a malicious redirect_uri — must be ignored
+      body: JSON.stringify({ code: 'ya-code', redirect_uri: 'https://evil.example/steal', redirectUri: 'https://evil.example/steal' }),
+    }), {
+      ...baseEnv,
+      SUPABASE_URL: 'https://supabase.example',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-role',
+      YANDEX_OAUTH_CLIENT_ID: 'ya-client-id',
+      YANDEX_OAUTH_CLIENT_SECRET: 'ya-secret',
+      YANDEX_OAUTH_REDIRECT_URI: 'https://1001sovet.ru/auth/callback/',
+    })
+
+    assert.equal(response.status, 200)
+    const body = await response.json()
+    assert.equal(body.ok, true)
+    // Verify the redirect_uri sent to Yandex was the server value, not the client one
+    assert.equal(capturedRedirectUri[0], 'https://1001sovet.ru/auth/callback/')
+    assert.notEqual(capturedRedirectUri[0], 'https://evil.example/steal')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('yandex exchange falls back to PUBLIC_SITE_URL when YANDEX_OAUTH_REDIRECT_URI is unset', async () => {
+  const originalFetch = globalThis.fetch
+  const capturedRedirectUri: string[] = []
+  globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+
+    if (url.includes('/rest/v1/rpc/notification_check_rate_limit')) {
+      return new Response(JSON.stringify({ allowed: true, bucket: 'ok' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://oauth.yandex.ru/token') {
+      const body = new URLSearchParams(String(init?.body || ''))
+      capturedRedirectUri.push(body.get('redirect_uri') || '')
+      return new Response(JSON.stringify({ access_token: 'ya-access-token' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://login.yandex.ru/info?format=json') {
+      return new Response(JSON.stringify({ id: 'ya456', default_email: 'user2@yandex.ru' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url === 'https://supabase.example/auth/v1/admin/generate_link') {
+      return new Response(JSON.stringify({ action_link: 'https://supabase.example/auth/v1/verify?token=ya2' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    return new Response(JSON.stringify({ error: 'unexpected_fetch', url }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+  }
+
+  try {
+    const response = await worker.fetch(request('/auth/yandex/exchange', {
+      method: 'POST',
+      headers: { Origin: 'https://1001sovet.ru', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: 'ya-code2' }),
+    }), {
+      ...baseEnv,
+      SUPABASE_URL: 'https://supabase.example',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-role',
+      YANDEX_OAUTH_CLIENT_ID: 'ya-client-id',
+      YANDEX_OAUTH_CLIENT_SECRET: 'ya-secret',
+      // YANDEX_OAUTH_REDIRECT_URI intentionally omitted — should fall back
+    })
+
+    assert.equal(response.status, 200)
+    // redirect_uri should be derived from PUBLIC_SITE_URL
+    assert.equal(capturedRedirectUri[0], 'https://1001sovet.ru/auth/callback/')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
 test('vk id exchange falls back to a private email when VK omits email', async () => {
   const originalFetch = globalThis.fetch
   globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => {

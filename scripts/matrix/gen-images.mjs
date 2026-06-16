@@ -45,7 +45,7 @@ Generate the image directly — do NOT search the web for how to do it. Do NOT r
   fs.writeFileSync(pf, prompt, 'utf8')
   const wslPf = `${WSL_REPO}/.matrix-ideas/imgprompts/${row.slug}.txt`
   const cmd = `export PATH="$HOME/.grok/bin:$PATH"; cd ${WSL_REPO}; grok --prompt-file "${wslPf}" --cwd ${WSL_REPO} --permission-mode bypassPermissions --no-subagents --max-turns 10 --output-format plain`
-  const r = spawnSync('wsl.exe', ['-d', 'Ubuntu-24.04', '-u', 'root', '--', 'bash', '-lc', cmd], { timeout: 300000, encoding: 'utf8', maxBuffer: 1024 * 1024 * 64 })
+  spawnSync('wsl.exe', ['-d', 'Ubuntu-24.04', '-u', 'root', '--', 'bash', '-lc', cmd], { timeout: 300000, encoding: 'utf8', maxBuffer: 1024 * 1024 * 64 })
   return fs.existsSync(full) ? full : null
 }
 

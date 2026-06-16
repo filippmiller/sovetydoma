@@ -8,6 +8,9 @@ SUBSCRIPTIONS_API_URL = "https://sovetydoma-subscriptions.filippmiller.workers.d
 PUBLIC_SITE_URL = "https://1001sovet.ru"
 VK_ID_APP_ID = "54626241"
 VK_ID_REDIRECT_URI = "https://1001sovet.ru/api/auth/vk/callback"
+# Yandex OAuth redirect_uri — must match exactly what is registered in the Yandex app.
+# Derived server-side; never accepted from the client (security: prevents redirect_uri injection).
+YANDEX_OAUTH_REDIRECT_URI = "https://1001sovet.ru/auth/callback/"
 VK_GROUP_ID = "239393062"
 VK_API_VERSION = "5.199"
 MAX_API_BASE_URL = "https://platform-api.max.ru/"

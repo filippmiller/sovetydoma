@@ -124,7 +124,7 @@ export default function RelatedArticles({ articles, compact = false }: Props) {
                   boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
                 }}>
                   {cardImageSrc ? (
-                    <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={compact ? '1.1rem' : '1.5rem'} loading="eager" />
+                    <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={compact ? '1.1rem' : '1.5rem'} loading="lazy" />
                   ) : (
                     <span aria-hidden="true" style={{
                       position: 'absolute',

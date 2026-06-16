@@ -6,6 +6,19 @@ compatibility_date = "2026-05-01"
 binding = "PHOTOS"
 bucket_name = "sovetydoma-photos"
 
+# ─────────────────────────────────────────────────────────────────────────────
+# KV namespace for persistent contact-form rate limiting (cross-PoP / cross-
+# isolate).  Before deploying, run:
+#
+#   npx wrangler kv namespace create RATE_LIMIT_KV
+#
+# Copy the printed `id` value and paste it below in place of
+# "REPLACE_WITH_REAL_KV_NAMESPACE_ID".
+# ─────────────────────────────────────────────────────────────────────────────
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "c8ca9c98bcc34fce936764aa02a39d83"
+
 [vars]
 SUPABASE_URL = "https://plwkjdpuxjkmpkqiqzkk.supabase.co"
 ALLOWED_ORIGIN = "*"

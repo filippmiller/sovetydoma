@@ -13,7 +13,6 @@ const YANDEX_USER_INFO_URL = 'https://login.yandex.ru/info?format=json'
 
 export type YandexExchangeInput = {
   code: string
-  redirectUri: string
 }
 
 type YandexTokenResponse = {
@@ -65,6 +64,15 @@ export function requireYandexConfig(env: Env): string[] {
   return missing
 }
 
+function yandexRedirectUri(env: Env): string {
+  // Server-side derivation: use the explicit env var if set, else construct from
+  // PUBLIC_SITE_URL. Never accept this value from the client (M2 fix).
+  const explicit = String(env.YANDEX_OAUTH_REDIRECT_URI || '').trim()
+  if (explicit) return explicit
+  const siteOrigin = String(env.PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
+  return `${siteOrigin}/auth/callback/`
+}
+
 async function exchangeYandexCode(env: Env, input: YandexExchangeInput): Promise<YandexTokenResponse> {
   const body = new URLSearchParams()
   body.set('grant_type', 'authorization_code')
@@ -72,8 +80,9 @@ async function exchangeYandexCode(env: Env, input: YandexExchangeInput): Promise
   body.set('client_id', cleanText(env.YANDEX_OAUTH_CLIENT_ID, 200))
   body.set('client_secret', cleanText(env.YANDEX_OAUTH_CLIENT_SECRET, 200))
   // redirect_uri is optional for Yandex but, when the app is configured with one,
-  // it must match. Include it so a mismatch fails fast and explicitly.
-  if (input.redirectUri) body.set('redirect_uri', input.redirectUri)
+  // it must match. Derived server-side from env — never from the client request.
+  const redirectUri = yandexRedirectUri(env)
+  if (redirectUri) body.set('redirect_uri', redirectUri)
 
   const res = await fetchWithTimeout(YANDEX_OAUTH_TOKEN_URL, {
     method: 'POST',

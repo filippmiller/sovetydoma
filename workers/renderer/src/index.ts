@@ -19,7 +19,7 @@ import { fetchTemplate } from './template'
 import { BAKED_CSS } from './bakedCss'
 
 // Bump to invalidate cached rendered pages after a worker change.
-const RENDER_VERSION = '5'
+const RENDER_VERSION = '6'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -120,12 +120,6 @@ function relativeDate(dateStr: string): string {
   return `${Math.floor(days / 365)} г. назад`
 }
 
-function readingTimeStr(wordCount: number): string {
-  const m = Math.max(1, Math.round(wordCount / 180))
-  if (m === 1) return '1 минута'
-  if (m < 5) return `${m} минуты`
-  return `${m} минут`
-}
 
 const DIFFICULTY_STARS: Record<string, number> = {
   'Легко': 1,
@@ -261,8 +255,6 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
   const dateIso = row.published_at.slice(0, 10)
   const dateFormatted = formatDateRu(dateIso)
   const dateRelative = relativeDate(dateIso)
-  const timeToRead = readingTimeStr(row.word_count ?? 0)
-  const wordCount = row.word_count ?? 0
 
   // Build tag links HTML
   const tagLinksHtml = (Array.isArray(row.tags) ? row.tags : [])
@@ -295,28 +287,16 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
   const tocHtml = `<div class="toc-title">Содержание</div>${tocLinks}`
 
   // State flags for HTMLRewriter handlers
-  let inJsonLdScript = false
   let jsonLdAppended = false
-  let breadcrumbNavDepth = 0
-  let inBreadcrumbOl = false
   let inH1 = false
   let h1Done = false
   let inFigure = false
-  let figureDepth = 0
   let inFigureImg = false
-  let inTime = false
   let timeDone = false
-  // For category badge: first <span> inside header > div
-  const inHeaderFirstDiv = false
-  const headerFirstDivDepth = 0
   let categorySpanDone = false
-  // For tags container: div containing the tag <a> links (identified by first tag href pattern)
-  // We track a div that contains /tag/ links and replace its contents
-  const tagsDivDepth = 0
+  // For tags container: div containing the tag <a> links
   let inTagsDiv = false
   const tagsDone = false
-  // For article.prose body replacement
-  const inProse = false
 
   return new HTMLRewriter()
     // ── <title> ──────────────────────────────────────────────────────────
@@ -362,7 +342,6 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
     // ── JSON-LD: remove existing, inject fresh after last one ─────────────
     .on('script[type="application/ld+json"]', {
       element(el) {
-        inJsonLdScript = true
         el.remove()
         // After the LAST ld+json script we inject ours (we do it in text handler;
         // since el.remove() removes the element including its children, we instead
@@ -403,21 +382,14 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
       },
     })
     // ── Breadcrumb nav → replace <ol> content ────────────────────────────
-    // nav[aria-label="Путь к странице"] ol
-    .on('nav[aria-label="Путь к странице"]', {
-      element() {
-        breadcrumbNavDepth = 1
-      },
-    })
     .on('nav[aria-label="Путь к странице"] ol', {
       element(el) {
-        inBreadcrumbOl = true
         el.setInnerContent(breadcrumbOlHtml, { html: true })
       },
     })
     // ── <h1> — first one inside article-main (the article title) ─────────
     .on('h1', {
-      element(el) {
+      element() {
         if (!h1Done) {
           inH1 = true
           h1Done = true
@@ -438,10 +410,9 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
     // The figure has inline style "position:relative;aspect-ratio:16 / 9;..."
     // We match the first figure on the page (the article hero).
     .on('figure', {
-      element(el) {
+      element() {
         if (!inFigure) {
           inFigure = true
-          figureDepth = 1
         }
       },
     })
@@ -459,7 +430,6 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
       element(el) {
         if (!timeDone) {
           timeDone = true
-          inTime = true
           el.setAttribute('dateTime', dateIso)
           el.setAttribute('title', dateFormatted)
           el.setInnerContent(timeInnerHtml, { html: true })
@@ -500,7 +470,7 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
           }
         }
       },
-      text(chunk) {
+      text() {
         // Suppress text of subsequent tag links (they are removed via el.remove())
       },
     })
@@ -579,7 +549,6 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
 
 async function handleArticle(req: Request, env: Env, category: string, slug: string): Promise<Response> {
   const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const reqUrl = new URL(req.url)
   const cacheKey = new Request(`${siteUrl}/${category}/${slug}/?render=${RENDER_VERSION}`, { method: 'GET' })
   const cache = caches.default
 

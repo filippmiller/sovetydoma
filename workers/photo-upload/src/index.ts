@@ -38,6 +38,7 @@ interface Env {
     send(message: import('cloudflare:email').EmailMessage): Promise<unknown>
   }
   RESEND_API_KEY?: string
+  RATE_LIMIT_KV?: KVNamespace
 }
 
 const MAX_BYTES = 5 * 1024 * 1024
@@ -200,7 +201,7 @@ const worker = {
       if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, contactHeaders)
 
       const ip = getClientIp(req)
-      if (!rateLimitContact(ip)) return json({ error: 'rate_limited' }, 429, contactHeaders)
+      if (!(await rateLimitContact(env, ip))) return json({ error: 'rate_limited' }, 429, contactHeaders)
 
       const payload = await req.json().catch(() => null) as null | {
         token?: string

@@ -9,7 +9,9 @@
  * The cached entry is keyed by the TEMPLATE_URL (or default).
  */
 
-const TEMPLATE_CACHE_TTL = 600 // seconds (10 min)
+const TEMPLATE_CACHE_TTL = 3600 // seconds (1 hour) — the template only changes on
+// site deploy, so a longer TTL cuts edge cache-stampede latency. RENDER_VERSION
+// + a worker redeploy still force a fresh fetch when the shell actually changes.
 const FETCH_TIMEOUT_MS = 7000
 
 export async function fetchTemplate(templateUrl: string): Promise<string> {

@@ -138,7 +138,7 @@ export function verticalForCategory(cat) {
   return 'other'
 }
 
-export default {
+const matrixLib = {
   loadEnv,
   getServiceClient,
   wordCount,
@@ -148,3 +148,4 @@ export default {
   buildImagePrompt,
   IMAGE_STYLE_SUFFIX,
 }
+export default matrixLib

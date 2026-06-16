@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { getArticle, getAllSlugs, getAllArticles, CATEGORIES, LEGACY_ARTICLE_MOVES } from '@/lib/articles'
-import { getLocalJpegDimensions } from '@/lib/jpeg-dimensions'
+import imageDimensions from '@/lib/image-dimensions.json'
 import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildAdditionalSchema } from '@/lib/article-schemas'
 import { resolvePersona } from '@/lib/personas'
 import Breadcrumb from '@/components/Breadcrumb'
@@ -77,7 +77,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cat = CATEGORIES[category] || CATEGORIES[article.frontmatter.category]
   const url = canonicalOverride || articleCanonicalUrl(fm)
   const imageUrl = articleImageUrl(fm)
-  const imageDimensions = getLocalJpegDimensions(`/images/${fm.slug}.jpg`) || { width: 1200, height: 630 }
+  const _metaDims = imageDimensions[`${fm.slug}.jpg` as keyof typeof imageDimensions] as { w: number; h: number } | undefined
+  const heroImageDimensions = _metaDims ? { width: _metaDims.w, height: _metaDims.h } : { width: 1200, height: 630 }
   const description = truncateForMeta(fm.description)
   return {
     title: fm.title,
@@ -106,13 +107,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       modifiedTime: fm.updated || fm.date,
       section: cat?.name || fm.categoryName,
       tags: fm.tags,
-      images: [{ url: imageUrl, ...imageDimensions, alt: fm.title }],
+      images: [{ url: imageUrl, ...heroImageDimensions, alt: fm.title }],
     },
     twitter: {
       card: 'summary_large_image',
       title: fm.title,
       description,
-      images: [{ url: imageUrl, ...imageDimensions }],
+      images: [{ url: imageUrl, ...heroImageDimensions }],
     },
   }
 }
@@ -166,7 +167,8 @@ export default async function ArticlePage({ params }: Props) {
   // Report the real on-disk dimensions in JSON-LD (not a hardcoded 1200x630).
   // Discover/large-preview needs the actual image to be >=1200px wide; claiming
   // dimensions the file doesn't have is worse than telling the truth.
-  const jsonLdImageDims = getLocalJpegDimensions(`/images/${fm.slug}.jpg`) || { width: 1024, height: 768 }
+  const _bodyDims = imageDimensions[`${fm.slug}.jpg` as keyof typeof imageDimensions] as { w: number; h: number } | undefined
+  const jsonLdImageDims = _bodyDims ? { width: _bodyDims.w, height: _bodyDims.h } : { width: 1024, height: 768 }
   const visibleImageUrl = resolveArticleImage(fm.image, { width: 900, height: 520 })
   const timeToRead = readingTime('x '.repeat(wordCount))
 

@@ -96,7 +96,7 @@ export default function MoreArticles({ articles }: Props) {
                   boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
                 }}>
                   {cardImageSrc ? (
-                    <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize="1.35rem" loading="eager" />
+                    <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize="1.35rem" loading="lazy" />
                   ) : (
                     <span aria-hidden="true" style={{
                       position: 'absolute',

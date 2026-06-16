@@ -125,7 +125,7 @@ if (dryRun) {
 // Helper to run wrangler r2 upload
 const uploadToR2 = (filePath, r2Key) => {
   try {
-    const result = execFileSync('npx', [
+    execFileSync('npx', [
       'wrangler', 'r2', 'object', 'put',
       `${R2_BUCKET}/${r2Key}`,
       '--file', filePath,

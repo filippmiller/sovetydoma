@@ -115,6 +115,7 @@ function withCors(response: Response, request: Request, env: Env): Response {
   if (origin && isAllowedOrigin(env, request)) {
     headers.set('Access-Control-Allow-Origin', origin)
   }
+  headers.set('Vary', 'Origin')
   headers.set('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
   headers.set('Access-Control-Allow-Headers', 'Content-Type,Authorization,x-admin-key')
   // Baseline security headers on every worker response (bead sovetydoma-e8r).
@@ -834,14 +835,13 @@ async function handleYandexExchange(request: Request, env: Env): Promise<Respons
     return json({ ok: false, error: 'origin_not_allowed' }, 403)
   }
 
-  const payload = await request.json().catch(() => ({})) as { code?: string; redirect_uri?: string; redirectUri?: string }
+  const payload = await request.json().catch(() => ({})) as { code?: string }
   const code = String(payload.code || '').trim()
-  const redirectUri = String(payload.redirect_uri || payload.redirectUri || '').trim()
 
   if (!code) {
     return json({ ok: false, error: 'yandex_code_required' }, 400)
   }
-  if (code.length > 2000 || redirectUri.length > 500) {
+  if (code.length > 2000) {
     return json({ ok: false, error: 'invalid_yandex_payload' }, 400)
   }
   if (!hasSupabaseServiceRole(env)) {
@@ -855,7 +855,7 @@ async function handleYandexExchange(request: Request, env: Env): Promise<Respons
   }
 
   try {
-    const result = await createSupabaseYandexLoginLink(env, { code, redirectUri })
+    const result = await createSupabaseYandexLoginLink(env, { code })
     return json({
       ok: true,
       actionLink: result.actionLink,
@@ -1177,7 +1177,7 @@ export async function route(req: Request, env: Env): Promise<Response> {
   const url = new URL(req.url)
 
   if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204 })
+    return withCors(new Response(null, { status: 204 }), req, env)
   }
 
   if (req.method === 'POST' && url.pathname === '/subscriptions/start') {

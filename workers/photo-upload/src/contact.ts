@@ -10,9 +10,6 @@ const CONTACT_FROM_EMAIL_DEFAULT = 'noreply@vsedomatut.com'
 export const CONTACT_MIN_SECONDS = 3
 export const CONTACT_MAX_SECONDS = 30 * 60
 
-// In-process rate-limit map (survives for the Worker instance lifetime).
-export const contactHits = new Map<string, number[]>()
-
 interface ContactEnv {
   CONTACT_FORM_SECRET: string
   CONTACT_TO_EMAIL?: string
@@ -21,6 +18,10 @@ interface ContactEnv {
     send(message: EmailMessage): Promise<unknown>
   }
   RESEND_API_KEY?: string
+  /** Cloudflare Workers KV namespace for persistent rate-limit counters.
+   *  Optional: if absent (e.g. in unit tests), rate limiting is skipped
+   *  (fail-open) so tests pass without a real KV namespace. */
+  RATE_LIMIT_KV?: KVNamespace
 }
 
 // ---------------------------------------------------------------------------
@@ -112,17 +113,63 @@ export async function validateContactToken(env: ContactEnv, token: string): Prom
   }
 }
 
-export function rateLimitContact(ip: string): boolean {
-  const now = Date.now()
-  const recent = (contactHits.get(ip) || []).filter((time) => now - time < 60 * 60 * 1000)
-  const perMinute = recent.filter((time) => now - time < 60 * 1000).length
-  if (perMinute >= 2 || recent.length >= 6) {
-    contactHits.set(ip, recent)
-    return false
+// ---------------------------------------------------------------------------
+// Contact-form rate limit — thresholds (preserved from previous in-memory impl)
+// ---------------------------------------------------------------------------
+const CONTACT_RATE_PER_MINUTE = 2  // max submissions per IP per 60-second window
+const CONTACT_RATE_PER_HOUR = 6    // max submissions per IP per 60-minute window
+
+/**
+ * Persistent KV-backed rate limiter for the contact form.
+ *
+ * Uses two counters per IP:
+ *   contact-rl:<ip>:min  — incremented every submission, TTL = 60 s
+ *   contact-rl:<ip>:hr   — incremented every submission, TTL = 3600 s
+ *
+ * Returns true  → request is allowed (counters updated).
+ * Returns false → rate limit exceeded (request should be rejected with 429).
+ *
+ * Fail-open: if RATE_LIMIT_KV is absent or throws, the call is ALLOWED so a
+ * transient KV outage does not make the contact form unusable.  This matches
+ * the previous in-memory behavior (a fresh isolate with no stored state always
+ * allowed the first N requests).
+ */
+export async function rateLimitContact(env: ContactEnv, ip: string): Promise<boolean> {
+  const kv = env.RATE_LIMIT_KV
+  if (!kv) {
+    // No KV binding present (e.g. unit-test environment) — skip limiting.
+    return true
   }
-  recent.push(now)
-  contactHits.set(ip, recent)
-  return true
+
+  const safeIp = ip.replace(/[^a-zA-Z0-9.:_-]/g, '_').slice(0, 64)
+  const minKey = `contact-rl:${safeIp}:min`
+  const hrKey  = `contact-rl:${safeIp}:hr`
+
+  try {
+    const [minStr, hrStr] = await Promise.all([
+      kv.get(minKey),
+      kv.get(hrKey),
+    ])
+
+    const minCount = Number(minStr ?? '0')
+    const hrCount  = Number(hrStr  ?? '0')
+
+    if (minCount >= CONTACT_RATE_PER_MINUTE || hrCount >= CONTACT_RATE_PER_HOUR) {
+      return false
+    }
+
+    // Increment both counters.  TTL ensures they auto-expire with the window.
+    await Promise.all([
+      kv.put(minKey, String(minCount + 1), { expirationTtl: 60 }),
+      kv.put(hrKey,  String(hrCount  + 1), { expirationTtl: 60 * 60 }),
+    ])
+
+    return true
+  } catch (err) {
+    // Fail-open: log and allow so a KV hiccup doesn't break the contact form.
+    console.error('[rateLimitContact] KV error — failing open:', err)
+    return true
+  }
 }
 
 export function buildMimeMessage(data: {
