@@ -88,6 +88,16 @@ export type Env = {
   VAPID_PUBLIC_KEY?: string
   VAPID_PRIVATE_KEY?: string
   VAPID_SUBJECT?: string
+  // Social responder (draft-review)
+  RESPONDER_ENABLED?: string
+  RESPONDER_MODEL?: string
+  ANTHROPIC_API_KEY?: string
+  ANTHROPIC_BASE_URL?: string
+  ANTHROPIC_RELAY_TOKEN?: string
+  VK_CALLBACK_SECRET?: string
+  VK_CONFIRMATION_TOKEN?: string
+  FB_VERIFY_TOKEN?: string
+  FB_APP_SECRET?: string
 }
 
 export type RouteContext = {

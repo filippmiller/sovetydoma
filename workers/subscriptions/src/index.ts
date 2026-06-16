@@ -15,6 +15,7 @@ import { createSupabaseVkIdLoginLink } from './auth/vk-id'
 import { createSupabaseYandexLoginLink } from './auth/yandex'
 import { cleanPath, cleanTimezone, normalizeList, normalizePhone } from './utils'
 import { renderConfirmPage } from './templates/confirm-page'
+import { handleVkCallback, handleFbVerify, handleFbWebhook, draftPendingResponderItems } from './responder'
 
 import { sendWebPush } from './push-send'
 
@@ -1395,6 +1396,17 @@ export async function route(req: Request, env: Env): Promise<Response> {
     return handlePushFanOut(req, env)
   }
 
+  // ── Social responder webhooks (draft-review; never auto-sends) ──────────────
+  if (url.pathname === '/vk/callback' && req.method === 'POST') {
+    return handleVkCallback(req, env)
+  }
+  if (url.pathname === '/fb/webhook' && req.method === 'GET') {
+    return handleFbVerify(url, env)
+  }
+  if (url.pathname === '/fb/webhook' && req.method === 'POST') {
+    return handleFbWebhook(req, env)
+  }
+
   return json({ ok: false, error: 'not_found', path: url.pathname }, 404)
 }
 
@@ -1403,6 +1415,14 @@ export async function scheduled(_event: ScheduledEvent, env: Env): Promise<void>
     await processDueDigests(env)
   } catch (err) {
     console.error('due_digests_unexpected_error', (err as Error).message)
+  }
+
+  // Draft replies for any pending responder items (held for human review).
+  try {
+    const r = await draftPendingResponderItems(env)
+    if (r.drafted || r.skipped) console.log('responder_drafts', JSON.stringify(r))
+  } catch (err) {
+    console.error('responder_draft_unexpected_error', (err as Error).message)
   }
 
   // Run VK autopost independently; log but don't crash digest processing on failure

@@ -16,6 +16,9 @@ VK_API_VERSION = "5.199"
 MAX_API_BASE_URL = "https://platform-api.max.ru/"
 VAPID_SUBJECT = "mailto:admin@1001sovet.ru"
 TURNSTILE_SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+# Social responder (draft-review; never auto-sends). Drafting via the Anthropic relay.
+RESPONDER_ENABLED = "true"
+ANTHROPIC_BASE_URL = "https://anthropic.vsedomatut.com"
 # SUBSCRIPTIONS_ALLOW_UNVERIFIED_TURNSTILE: dev-only Turnstile bypass. Never commit
 # it here — a plain `wrangler deploy` would then ship the bypass to production.
 # For local testing put `SUBSCRIPTIONS_ALLOW_UNVERIFIED_TURNSTILE = "true"` in an
