@@ -28,13 +28,15 @@ export function loadEnv() {
 
 export function getServiceClient() {
   const env = loadEnv()
-  const url = env.SUPABASE_URL
-  const key = env.SUPABASE_SERVICE_ROLE_KEY
+  // .env.local for local runs; fall back to process.env so CI/cron (which inject
+  // real env vars, no file) works too.
+  const url = env.SUPABASE_URL || process.env.SUPABASE_URL
+  const key = env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url) {
-    throw new Error('Missing SUPABASE_URL (checked in loadEnv from .env.local)')
+    throw new Error('Missing SUPABASE_URL (checked .env.local and process.env)')
   }
   if (!key) {
-    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY (checked in loadEnv from .env.local)')
+    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY (checked .env.local and process.env)')
   }
   return createClient(url, key, { auth: { persistSession: false } })
 }
