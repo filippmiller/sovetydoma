@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/validate-articles.mjs && node scripts/generate-build-metadata.mjs && node scripts/generate-article-index.mjs && node scripts/generate-questions-index.mjs && node scripts/generate-sitemap.mjs && node scripts/generate-rss.mjs && next build",
+    "build": "node scripts/validate-articles.mjs && node scripts/generate-build-metadata.mjs && node scripts/generate-article-index.mjs && node scripts/generate-questions-index.mjs && node scripts/generate-sitemap.mjs && node scripts/generate-rss.mjs && node scripts/generate-webp.mjs && next build",
+    "generate:webp": "node scripts/generate-webp.mjs",
     "start": "next start",
     "lint": "eslint src scripts workers eslint.config.mjs next.config.ts postcss.config.mjs",
     "test": "node --test scripts/__tests__/*.test.mjs src/lib/*.test.mjs && pnpm run test:photo-worker && pnpm run test:subscriptions && node scripts/audit-seo.mjs",
@@ -52,12 +53,14 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "sharp": "^0.35.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
