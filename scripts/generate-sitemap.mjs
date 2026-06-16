@@ -3,7 +3,6 @@ import path from 'path'
 import matter from 'gray-matter'
 import { fileURLToPath } from 'url'
 import { CATEGORIES } from '../src/lib/categories.mjs'
-import { generateComparisonPairs } from '../src/lib/comparison-pairs.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const articlesDir = path.join(__dirname, '../src/content/articles')
@@ -51,8 +50,8 @@ const archiveMonths = [...new Set(
 )].sort()
 
 const seasonalPages = Array.from({ length: 12 }, (_, i) => `/sezon/${i + 1}/`)
-const comparisonPairs = generateComparisonPairs(articles, 200, 20)
-const comparisonPages = comparisonPairs.map((p) => `/${p.category}/sravnenie/${p.a}-ili-${p.b}/`)
+// Comparison pages (/sravnenie/) are intentionally excluded: they are noindex
+// (thin auto-derived content), so they must not appear in the sitemap.
 
 const urls = [
   `<url><loc>${SITE_URL}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
@@ -61,7 +60,6 @@ const urls = [
   ...paginatedArticlePages.map(p => `<url><loc>${SITE_URL}${p}</loc><changefreq>daily</changefreq><priority>0.5</priority></url>`),
   ...archiveMonths.map(ym => `<url><loc>${SITE_URL}/archive/${ym}/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>`),
   ...seasonalPages.map(p => `<url><loc>${SITE_URL}${p}</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>`),
-  ...comparisonPages.map(p => `<url><loc>${SITE_URL}${p}</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>`),
   ...articles.map(a => {
     const loc = `${SITE_URL}/${a.category}/${a.slug}/`
     const lastmod = a.updated || a.date

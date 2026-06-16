@@ -45,6 +45,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     alternates: { canonical: url },
     openGraph: { title, description, url, type: 'article' },
+    // Programmatic comparison pages are intentionally thin (auto-derived from two
+    // articles). Keep them out of the index to avoid a thin/doorway-content
+    // penalty, but follow links so the source articles still get crawl signal.
+    // Flip to index:true once these pages carry substantial unique content.
+    robots: { index: false, follow: true },
   }
 }
 

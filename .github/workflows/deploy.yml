@@ -68,6 +68,10 @@ jobs:
 
       - name: Build static export
         run: pnpm run build
+        env:
+          # ~1750 static pages (incl. comparison/seasonal) push peak heap past
+          # Node's default; raise it so the build worker doesn't OOM.
+          NODE_OPTIONS: --max-old-space-size=6144
 
       - name: Sanity check output
         run: |

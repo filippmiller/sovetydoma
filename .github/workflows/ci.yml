@@ -23,5 +23,7 @@ jobs:
       - name: Subscriptions worker dry-run
         run: npx wrangler deploy --dry-run --config workers/subscriptions/wrangler.toml
       - run: pnpm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
       - name: TypeScript check
         run: pnpm exec tsc --noEmit
