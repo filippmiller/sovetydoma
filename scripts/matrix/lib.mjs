@@ -30,8 +30,11 @@ export function getServiceClient() {
   const env = loadEnv()
   // .env.local for local runs; fall back to process.env so CI/cron (which inject
   // real env vars, no file) works too.
-  const url = env.SUPABASE_URL || process.env.SUPABASE_URL
-  const key = env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+  // Strip a leading BOM/whitespace — secrets set via PowerShell/files can carry a
+  // 0xFEFF BOM that breaks HTTP header (ByteString) construction.
+  const clean = (v) => (v == null ? v : String(v).replace(/^﻿/, '').trim())
+  const url = clean(env.SUPABASE_URL || process.env.SUPABASE_URL)
+  const key = clean(env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)
   if (!url) {
     throw new Error('Missing SUPABASE_URL (checked .env.local and process.env)')
   }
