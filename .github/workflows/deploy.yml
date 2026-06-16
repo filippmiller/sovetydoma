@@ -96,15 +96,21 @@ jobs:
           git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" dist
           echo "Published dist for ${GITHUB_SHA}"
 
-      - name: Activate production via deploy webhook
-        env:
-          DEPLOY_WEBHOOK_TOKEN: ${{ secrets.DEPLOY_WEBHOOK_TOKEN }}
+      - name: Verify production activation (pulled by VPS timer)
+        # The VPS runs `1001sovet-pull-deploy.timer` every minute, which pulls the
+        # freshly-published `dist` branch and atomically activates it (healthcheck +
+        # rollback). No tarball upload — the old /__deploy/upload webhook 413'd on the
+        # full out/ payload. This step just polls until production reports our SHA.
+        # Non-fatal: a slow timer tick should not mark the build red.
         run: |
-          set -euo pipefail
-          tar -C out -czf /tmp/1001sovet-release.tgz .
-          curl --fail --show-error --silent \
-            -H "Authorization: Bearer ${DEPLOY_WEBHOOK_TOKEN}" \
-            -H "X-Release: gha-${GITHUB_SHA:0:8}-$(date -u +%Y%m%d%H%M%S)" \
-            --data-binary @/tmp/1001sovet-release.tgz \
-            https://1001sovet.ru/__deploy/upload
-          echo "Activated production for ${GITHUB_SHA}"
+          set -uo pipefail
+          for i in $(seq 1 20); do
+            LIVE=$(curl -s --max-time 10 https://1001sovet.ru/build.json | python3 -c "import sys,json; print(json.load(sys.stdin).get('sha',''))" 2>/dev/null || echo "")
+            if [ "$LIVE" = "${GITHUB_SHA}" ]; then
+              echo "Production active on ${GITHUB_SHA}"
+              exit 0
+            fi
+            echo "waiting for VPS pull-deploy timer ($i/20)… live=${LIVE:-none}"
+            sleep 15
+          done
+          echo "::warning::Production not yet on ${GITHUB_SHA} after ~5min; VPS timer will catch up. Check 1001sovet-pull-deploy.timer on the host."
