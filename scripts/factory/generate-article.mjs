@@ -23,6 +23,11 @@ import helpers from '../matrix/lib.mjs'
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
 const has = (k) => process.argv.includes(k)
 
+// Local runs read .env.local; CI provides real env vars which take priority.
+for (const [k, v] of Object.entries(helpers.loadEnv())) {
+  if (process.env[k] === undefined) process.env[k] = v
+}
+
 const DOMAIN = '1001sovet.ru'
 const ROOT = process.cwd()
 const IMAGES_DIR = path.join(ROOT, 'public', 'images')
@@ -61,7 +66,15 @@ if (categories.length === 0) fail('Specify --category <slug> or --all.')
 for (const c of categories) if (!CATEGORIES[c]) fail(`Unknown category: ${c}`)
 
 const sb = dryRun ? null : helpers.getServiceClient()
-const anthropic = dryRun ? null : new Anthropic({ apiKey: ANTHROPIC_API_KEY })
+// Relay-aware: if ANTHROPIC_BASE_URL points at an egress relay (the prod/CI IP
+// may be geo-blocked by Anthropic), route through it with the shared
+// X-Relay-Token header; the real key still rides in x-api-key. Falls back to a
+// direct api.anthropic.com call when no base URL/relay token is set.
+const anthropic = dryRun ? null : new Anthropic({
+  apiKey: ANTHROPIC_API_KEY,
+  ...(process.env.ANTHROPIC_BASE_URL ? { baseURL: process.env.ANTHROPIC_BASE_URL } : {}),
+  ...(process.env.ANTHROPIC_RELAY_TOKEN ? { defaultHeaders: { 'X-Relay-Token': process.env.ANTHROPIC_RELAY_TOKEN } } : {}),
+})
 
 // Pull recent titles/slugs in this category so Claude picks a genuinely NEW topic.
 async function recentForCategory(category) {

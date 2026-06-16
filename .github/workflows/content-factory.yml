@@ -38,6 +38,9 @@ jobs:
     timeout-minutes: 30
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      # Egress relay (Anthropic geo-blocks some IPs). Host is non-secret; token is.
+      ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL || 'https://anthropic.vsedomatut.com' }}
+      ANTHROPIC_RELAY_TOKEN: ${{ secrets.ANTHROPIC_RELAY_TOKEN }}
       FAL_KEY: ${{ secrets.FAL_KEY }}
       SUPABASE_URL: ${{ secrets.MATRIX_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.MATRIX_SUPABASE_SERVICE_ROLE_KEY }}
