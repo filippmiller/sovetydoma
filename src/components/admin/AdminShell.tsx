@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { key: 'photos', label: 'Фото на модерации', href: '/admin/photos/', icon: '📷' },
   { key: 'questions', label: 'Вопросы по статьям', href: '/admin/questions/', icon: '💬' },
   { key: 'push', label: 'Push-уведомления', href: '/admin/push/', icon: '📲' },
+  { key: 'responder', label: 'Ответчик VK/FB', href: '/admin/responder/', icon: '💬' },
   { key: 'categories', label: 'Категории', href: '#', icon: '🗂️' },
   { key: 'tags', label: 'Теги', href: '#', icon: '🏷️' },
   { key: 'settings', label: 'Настройки', href: '#', icon: '⚙️' },

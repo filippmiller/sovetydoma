@@ -233,3 +233,24 @@ export async function publishArticleToFacebook(
     return { ok: false, articleSlug, messageLength: post.messageLength, bodyHash, error: (err as Error).message, errorCode: 'feed_post_failed' }
   }
 }
+
+// ── Responder reply primitives ───────────────────────────────────────────────
+export async function fbReplyToComment(config: FbConfig, commentId: string, message: string): Promise<string> {
+  const url = `${config.apiBaseUrl}/${config.apiVersion}/${commentId}/comments`
+  const body = new URLSearchParams({ message, access_token: config.pageAccessToken })
+  const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: body.toString() })
+  const data = await res.json().catch(() => ({})) as Record<string, unknown> & FbApiError
+  if (!res.ok || data.error) throw new Error(`fb_${data.error?.code ?? res.status}: ${data.error?.message || 'http_' + res.status}`)
+  return String(data.id ?? '')
+}
+
+export async function fbSendMessage(config: FbConfig, recipientId: string, text: string): Promise<string> {
+  const url = `${config.apiBaseUrl}/${config.apiVersion}/${config.pageId}/messages?access_token=${encodeURIComponent(config.pageAccessToken)}`
+  const res = await fetch(url, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ recipient: { id: recipientId }, message: { text }, messaging_type: 'RESPONSE' }),
+  })
+  const data = await res.json().catch(() => ({})) as Record<string, unknown> & FbApiError
+  if (!res.ok || data.error) throw new Error(`fb_${data.error?.code ?? res.status}: ${data.error?.message || 'http_' + res.status}`)
+  return String(data.message_id ?? '')
+}

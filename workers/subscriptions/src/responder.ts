@@ -5,6 +5,9 @@
 import type { Env } from './types'
 import { insertRows, selectRows, updateRows } from './supabase'
 import { hmacSha256Hex, timingSafeEqual } from './security'
+import { requireAdmin } from './admin'
+import { validateVkConfig, vkReplyToComment, vkSendMessage } from './social/vk'
+import { validateFbConfig, fbReplyToComment, fbSendMessage } from './social/fb'
 
 export interface ResponderItem {
   platform: 'vk' | 'fb'
@@ -198,4 +201,70 @@ export async function handleFbWebhook(req: Request, env: Env): Promise<Response>
     }
   } catch (err) { console.error('fb webhook handler:', String(err)) }
   return new Response('EVENT_RECEIVED')
+}
+
+// ── Admin: review queue + approve→post (nothing posts without this call) ─────
+interface QueueRow {
+  id: string; platform: 'vk' | 'fb'; event_type: 'comment' | 'message'
+  group_ref: string | null; thread_ref: string | null; external_id: string
+  from_ref: string | null; incoming_text: string | null; draft_reply: string | null
+  sent_reply: string | null; status: string; error: string | null; created_at: string
+}
+
+function adminJson(data: unknown, status = 200): Response {
+  return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
+}
+
+export async function handleResponderList(req: Request, env: Env): Promise<Response> {
+  const adminErr = requireAdmin(req, env); if (adminErr) return adminErr
+  const status = new URL(req.url).searchParams.get('status') || 'pending_review'
+  const rows = await selectRows<QueueRow>(env, 'social_responder_queue',
+    `status=eq.${encodeURIComponent(status)}&select=*&order=created_at.desc&limit=100`)
+  return adminJson({ ok: true, items: rows })
+}
+
+export async function handleResponderSkip(req: Request, env: Env): Promise<Response> {
+  const adminErr = requireAdmin(req, env); if (adminErr) return adminErr
+  const { id } = await req.json().catch(() => ({})) as { id?: string }
+  if (!id) return adminJson({ ok: false, error: 'id_required' }, 400)
+  await updateRows(env, 'social_responder_queue', `id=eq.${id}`, { status: 'skipped', updated_at: new Date().toISOString() }, 'id')
+  return adminJson({ ok: true })
+}
+
+// Approve + POST the reply to VK/FB. Edited text overrides the draft.
+export async function handleResponderSend(req: Request, env: Env): Promise<Response> {
+  const adminErr = requireAdmin(req, env); if (adminErr) return adminErr
+  const { id, text } = await req.json().catch(() => ({})) as { id?: string; text?: string }
+  if (!id) return adminJson({ ok: false, error: 'id_required' }, 400)
+  const rows = await selectRows<QueueRow>(env, 'social_responder_queue', `id=eq.${id}&select=*&limit=1`)
+  const row = rows[0]
+  if (!row) return adminJson({ ok: false, error: 'not_found' }, 404)
+  if (row.status === 'sent') return adminJson({ ok: false, error: 'already_sent' }, 409)
+
+  const reply = (text || row.draft_reply || '').trim()
+  if (!reply) return adminJson({ ok: false, error: 'no_reply_text' }, 400)
+  const idTail = String(row.external_id).split(':').pop() || ''
+
+  try {
+    let result = ''
+    if (row.platform === 'vk') {
+      const cfg = validateVkConfig(env)
+      if (row.group_ref) cfg.groupId = String(row.group_ref).replace('-', '')
+      result = row.event_type === 'comment'
+        ? await vkReplyToComment(cfg, String(row.thread_ref || ''), reply, idTail)
+        : await vkSendMessage(cfg, String(row.thread_ref || ''), reply)
+    } else {
+      const cfg = validateFbConfig(env)
+      result = row.event_type === 'comment'
+        ? await fbReplyToComment(cfg, idTail, reply)
+        : await fbSendMessage(cfg, String(row.thread_ref || ''), reply)
+    }
+    await updateRows(env, 'social_responder_queue', `id=eq.${id}`,
+      { status: 'sent', sent_reply: reply, error: null, updated_at: new Date().toISOString() }, 'id')
+    return adminJson({ ok: true, result })
+  } catch (err) {
+    await updateRows(env, 'social_responder_queue', `id=eq.${id}`,
+      { status: 'failed', error: String(err).slice(0, 300), updated_at: new Date().toISOString() }, 'id')
+    return adminJson({ ok: false, error: String(err).slice(0, 300) }, 502)
+  }
 }

@@ -337,3 +337,29 @@ export async function publishArticleToVk(
     return { ok: false, articleSlug, messageLength, bodyHash, error: (err as Error).message, errorCode: 'wall_post_failed' }
   }
 }
+
+// ── Responder reply primitives ───────────────────────────────────────────────
+async function vkApiCall(config: VkConfig, method: string, params: Record<string, string>): Promise<Record<string, unknown>> {
+  const body = new URLSearchParams({ ...params, access_token: config.accessToken, v: config.apiVersion })
+  const res = await fetch(`${config.apiBaseUrl}/${method}`, {
+    method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: body.toString(),
+  })
+  const data = await res.json() as { response?: Record<string, unknown> | number; error?: { error_code?: number; error_msg?: string } }
+  if (data.error) throw new Error(`vk_${data.error.error_code || 'unknown'}: ${data.error.error_msg || 'unknown'}`)
+  return typeof data.response === 'object' && data.response ? data.response : { value: data.response }
+}
+
+export async function vkReplyToComment(config: VkConfig, postId: string, message: string, replyToComment?: string): Promise<string> {
+  const params: Record<string, string> = { owner_id: `-${config.groupId}`, post_id: String(postId), from_group: '1', message }
+  if (replyToComment) params.reply_to_comment = String(replyToComment)
+  const r = await vkApiCall(config, 'wall.createComment', params)
+  return String(r.comment_id ?? '')
+}
+
+export async function vkSendMessage(config: VkConfig, peerId: string, message: string): Promise<string> {
+  const r = await vkApiCall(config, 'messages.send', {
+    peer_id: String(peerId), message, group_id: String(config.groupId),
+    random_id: String(Math.floor(Math.random() * 1e9)),
+  })
+  return String(r.value ?? '')
+}

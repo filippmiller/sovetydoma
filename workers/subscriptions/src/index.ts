@@ -15,7 +15,7 @@ import { createSupabaseVkIdLoginLink } from './auth/vk-id'
 import { createSupabaseYandexLoginLink } from './auth/yandex'
 import { cleanPath, cleanTimezone, normalizeList, normalizePhone } from './utils'
 import { renderConfirmPage } from './templates/confirm-page'
-import { handleVkCallback, handleFbVerify, handleFbWebhook, draftPendingResponderItems } from './responder'
+import { handleVkCallback, handleFbVerify, handleFbWebhook, draftPendingResponderItems, handleResponderList, handleResponderSend, handleResponderSkip } from './responder'
 
 import { sendWebPush } from './push-send'
 
@@ -1405,6 +1405,15 @@ export async function route(req: Request, env: Env): Promise<Response> {
   }
   if (url.pathname === '/fb/webhook' && req.method === 'POST') {
     return handleFbWebhook(req, env)
+  }
+  if (url.pathname === '/admin/responder/list' && req.method === 'GET') {
+    return handleResponderList(req, env)
+  }
+  if (url.pathname === '/admin/responder/send' && req.method === 'POST') {
+    return handleResponderSend(req, env)
+  }
+  if (url.pathname === '/admin/responder/skip' && req.method === 'POST') {
+    return handleResponderSkip(req, env)
   }
 
   return json({ ok: false, error: 'not_found', path: url.pathname }, 404)
