@@ -1,9 +1,9 @@
-name: Content factory (daily — 1 article per category)
+name: Content factory (every 5h — 1 article, rotating category)
 
-# Safe cadence: once a day, generate ONE article per category (Claude text +
-# fal.ai photo), publish them live with no rebuild (DB+R2), and let the
-# subscriptions worker's hourly cron autopost them to the per-category VK/FB
-# groups (with its own daily caps spreading the posts across the day).
+# Cadence: every 5 hours, generate ONE article in ONE category (rotating through
+# all categories over time), Claude text + fal.ai photo, publish live with no
+# rebuild (DB+R2). The subscriptions worker's hourly cron then autoposts it to
+# that category's VK/FB groups (with its own daily caps), with a photo.
 #
 # Required secrets (Settings → Secrets and variables → Actions):
 #   ANTHROPIC_API_KEY              — Claude text generation
@@ -16,13 +16,13 @@ name: Content factory (daily — 1 article per category)
 
 on:
   schedule:
-    - cron: '0 * * * *'   # hourly — 1 article per category every hour
+    - cron: '0 */5 * * *'   # every 5 hours — 1 article in one rotating category
   workflow_dispatch:
     inputs:
       categories:
-        description: 'Comma categories, or "all"'
+        description: 'Comma categories, "all", or "auto" (rotate one)'
         required: false
-        default: 'all'
+        default: 'auto'
       dry_run:
         description: 'Dry run (no API cost / no writes)'
         required: false
@@ -57,17 +57,25 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pip install pillow
 
-      - name: Generate (1 article per category)
+      - name: Generate (1 article, rotating category)
         run: |
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then DRY=--dry-run; else DRY=; fi
-          if [ "${{ github.event.inputs.categories }}" = "" ] || [ "${{ github.event.inputs.categories }}" = "all" ]; then
+          SEL="${{ github.event.inputs.categories }}"
+          CATS=(kulinaria dom-i-uborka dacha-i-ogorod layfkhaki ekonomiya rybalka zdorovie-i-bezopasnost semya-i-deti krasota-i-uhod otdyh-i-puteshestviya pokupki-i-tehnika avto)
+          if [ -z "$SEL" ] || [ "$SEL" = "auto" ]; then
+            # Rotate one category every 5h (epoch / 18000 mod 12) — covers all over ~60h.
+            IDX=$(( ($(date +%s) / 18000) % ${#CATS[@]} ))
+            CAT=${CATS[$IDX]}
+            echo "Rotating category -> $CAT"
+            node scripts/factory/generate-article.mjs --category "$CAT" $DRY
+          elif [ "$SEL" = "all" ]; then
             node scripts/factory/generate-article.mjs --all $DRY
           else
-            for c in $(echo "${{ github.event.inputs.categories }}" | tr ',' ' '); do
+            for c in $(echo "$SEL" | tr ',' ' '); do
               node scripts/factory/generate-article.mjs --category "$c" $DRY || true
             done
           fi
 
       - name: Publish live (no rebuild — DB + R2)
         if: ${{ github.event.inputs.dry_run != 'true' }}
-        run: node scripts/matrix/publish-dynamic.mjs --limit 12
+        run: node scripts/matrix/publish-dynamic.mjs --limit 3
