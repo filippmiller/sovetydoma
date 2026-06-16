@@ -10,6 +10,8 @@ export interface Article {
   author: string
   body: string
   url: string
+  schemaType?: string
+  recipeSteps?: string[]
 }
 
 export interface Category {

@@ -54,6 +54,8 @@ for (const file of files) {
     author: data.author || '',
     body: toBody(content),
     url: `https://1001sovet.ru/${data.category}/${data.slug}/`,
+    schemaType: data.schemaType || undefined,
+    recipeSteps: Array.isArray(data.recipeSteps) ? data.recipeSteps : undefined,
   })
 }
 

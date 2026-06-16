@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
+import CollectionDropdown from '@/components/CollectionDropdown'
 import { getLocalFavorites, saveLocalFavorites, setPendingAuthIntent } from '@/lib/favorites'
 
 interface Props {
@@ -19,6 +20,7 @@ export default function CardFavoriteButton({ slug }: Props) {
   const [userId, setUserId] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -50,7 +52,6 @@ export default function CardFavoriteButton({ slug }: Props) {
     })()
 
     // React to SIGNED_IN from modal (or elsewhere) without requiring page reload.
-    // Updates the compact card heart + ensures DB state is reflected after migrate/intent processing.
     const sb = getSupabase()
     const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
       if (cancelled) return
@@ -58,8 +59,8 @@ export default function CardFavoriteButton({ slug }: Props) {
         const uid = session?.user?.id ?? null
         setUserId(uid)
         if (uid) {
-          // Best-effort recheck; ignore errors (table/RLS/network) — UI already optimistic
-          void sb.from('saved_articles')
+          void sb
+            .from('saved_articles')
             .select('article_slug')
             .eq('user_id', uid)
             .eq('article_slug', slug)
@@ -71,6 +72,7 @@ export default function CardFavoriteButton({ slug }: Props) {
       } else if (event === 'SIGNED_OUT') {
         setUserId(null)
         setSaved(getLocalFavorites().includes(slug))
+        setShowDropdown(false)
       }
     })
 
@@ -80,22 +82,19 @@ export default function CardFavoriteButton({ slug }: Props) {
     }
   }, [slug])
 
-  const toggle = async (e: React.MouseEvent) => {
-    // Card is wrapped in a <Link> — don't navigate when tapping the heart.
-    e.preventDefault()
-    e.stopPropagation()
-
+  const doToggleSaved = async () => {
     const next = !saved
     setSaved(next)
 
     const favs = getLocalFavorites()
     if (next) {
       if (!favs.includes(slug)) saveLocalFavorites([...favs, slug])
-      // Logged-out favorite: record explicit intent so that a subsequent login
-      // (even if not from this exact modal) will ensure the article is saved server-side
-      // and we avoid "eating" the user's action.
       if (!userId) {
-        setPendingAuthIntent({ action: 'favorite', slug, returnTo: typeof window !== 'undefined' ? window.location.pathname : undefined })
+        setPendingAuthIntent({
+          action: 'favorite',
+          slug,
+          returnTo: typeof window !== 'undefined' ? window.location.pathname : undefined,
+        })
         setShowAuth(true)
       }
     } else {
@@ -110,7 +109,11 @@ export default function CardFavoriteButton({ slug }: Props) {
             .from('saved_articles')
             .upsert({ user_id: userId, article_slug: slug }, { onConflict: 'user_id,article_slug' })
         } else {
-          await sb.from('saved_articles').delete().eq('user_id', userId).eq('article_slug', slug)
+          await sb
+            .from('saved_articles')
+            .delete()
+            .eq('user_id', userId)
+            .eq('article_slug', slug)
         }
       } catch {
         // localStorage already updated
@@ -118,19 +121,32 @@ export default function CardFavoriteButton({ slug }: Props) {
     }
   }
 
-  // Render a neutral placeholder until mounted so SSR markup matches.
+  const handleClick = (e: React.MouseEvent) => {
+    // Card is wrapped in a <Link> — don't navigate when tapping the heart.
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!userId) {
+      // Anonymous: legacy toggle
+      doToggleSaved()
+    } else {
+      // Authenticated: open collection dropdown
+      setShowDropdown((prev) => !prev)
+    }
+  }
+
   const label = saved ? 'Убрать из избранного' : 'В избранное'
 
   return (
-    <>
+    <div
+      style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', zIndex: 2 }}
+      onClick={(e) => e.stopPropagation()}
+    >
       <button
-        onClick={toggle}
+        onClick={handleClick}
         aria-label={label}
         title={label}
         style={{
-          position: 'absolute',
-          top: '0.75rem',
-          right: '0.75rem',
           width: '36px',
           height: '36px',
           borderRadius: '50%',
@@ -147,11 +163,26 @@ export default function CardFavoriteButton({ slug }: Props) {
           zIndex: 2,
           transition: 'transform 0.15s ease, background 0.15s ease',
         }}
-        onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.12)' }}
-        onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.12)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)'
+        }}
       >
         <span aria-hidden="true">{mounted && saved ? '❤️' : '🤍'}</span>
       </button>
+
+      {showDropdown && userId && (
+        <CollectionDropdown
+          slug={slug}
+          userId={userId}
+          isSaved={saved}
+          onToggleSaved={doToggleSaved}
+          onClose={() => setShowDropdown(false)}
+          position="right"
+        />
+      )}
 
       {showAuth && (
         <AuthModal
@@ -161,6 +192,6 @@ export default function CardFavoriteButton({ slug }: Props) {
           reason="❤️ Сохранили статью! Зарегистрируйтесь, чтобы избранное было на всех устройствах."
         />
       )}
-    </>
+    </div>
   )
 }

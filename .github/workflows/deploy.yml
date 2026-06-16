@@ -39,6 +39,10 @@ jobs:
       NEXT_PUBLIC_YANDEX_OAUTH_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_YANDEX_OAUTH_CLIENT_ID }}
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
       NEXT_PUBLIC_YM_ID: '109804586'
+      # Web Push VAPID public key (public by design — it is the browser-facing
+      # applicationServerKey; the matching private key is a wrangler secret on
+      # the subscriptions worker). Safe to inline.
+      NEXT_PUBLIC_VAPID_PUBLIC_KEY: BB5kLCqBMGZ84815ejBI69dFuHyUjF0qJHWiW4YYH-xThrf_AXBamgbKxMfnwPEYS2UVGjyNpi2juiCzBh2jepk
       YANDEX_OAUTH_CLIENT_ID: ${{ secrets.YANDEX_OAUTH_CLIENT_ID }}
       YANDEX_OAUTH_CLIENT_SECRET: ${{ secrets.YANDEX_OAUTH_CLIENT_SECRET }}
       GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}

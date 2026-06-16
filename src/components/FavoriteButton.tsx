@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import AuthModal from '@/components/auth/AuthModal'
+import CollectionDropdown from '@/components/CollectionDropdown'
 import { getLocalFavorites, saveLocalFavorites, setPendingAuthIntent } from '@/lib/favorites'
 
 interface Props {
@@ -11,15 +12,13 @@ interface Props {
   title?: string
 }
 
-// Local writes still happen here for instant UI + cache while logged in.
-// Migration on auth is what moves anon saves to server (now robust + intent-aware).
-// Use the centralized saveLocalFavorites (re-exported) for consistency with cards.
-
 export default function FavoriteButton({ slug }: Props) {
   const [saved, setSaved] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [showPlus, setShowPlus] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -28,11 +27,9 @@ export default function FavoriteButton({ slug }: Props) {
       await Promise.resolve()
       if (cancelled) return
 
-      // Check localStorage (shared helper)
       const favs = getLocalFavorites()
       setSaved(favs.includes(slug))
 
-      // Check Supabase auth and saved_articles
       try {
         const sb = getSupabase()
         const { data } = await sb.auth.getUser()
@@ -55,9 +52,6 @@ export default function FavoriteButton({ slug }: Props) {
       }
     })()
 
-    // Live reaction to auth changes (e.g. login inside the modal opened by this button).
-    // This lets us update userId + re-validate from DB and keep the heart state without a full page reload,
-    // preserving the article/list context after auth-triggered favorite.
     const sb = getSupabase()
     const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
       if (cancelled) return
@@ -65,8 +59,8 @@ export default function FavoriteButton({ slug }: Props) {
         const uid = session?.user?.id ?? null
         setUserId(uid)
         if (uid) {
-          // Best-effort recheck; ignore errors (table/RLS/network) — UI already optimistic
-          void sb.from('saved_articles')
+          void sb
+            .from('saved_articles')
             .select('article_slug')
             .eq('user_id', uid)
             .eq('article_slug', slug)
@@ -74,12 +68,11 @@ export default function FavoriteButton({ slug }: Props) {
             .then(({ data: row }) => {
               if (!cancelled && row) setSaved(true)
             })
-          // Also opportunistically process any pending intent for this tab (no-op if none)
-          // (the main processing happens in AuthModal/AuthButton after sign-in)
         }
       } else if (event === 'SIGNED_OUT') {
         setUserId(null)
         setSaved(getLocalFavorites().includes(slug))
+        setShowDropdown(false)
       }
     })
 
@@ -89,27 +82,27 @@ export default function FavoriteButton({ slug }: Props) {
     }
   }, [slug])
 
-  const toggle = async () => {
+  const doToggleSaved = async () => {
     const nextSaved = !saved
     setSaved(nextSaved)
 
-    // localStorage (shared helper for read)
     const favs = getLocalFavorites()
     if (nextSaved) {
       if (!favs.includes(slug)) saveLocalFavorites([...favs, slug])
       setShowPlus(true)
       setTimeout(() => setShowPlus(false), 600)
-      // Anonymous user saved while logged out: store explicit intent so post-login
-      // we ensure this exact article is in DB (idempotent) and can keep context.
       if (!userId) {
-        setPendingAuthIntent({ action: 'favorite', slug, returnTo: typeof window !== 'undefined' ? window.location.pathname : undefined })
+        setPendingAuthIntent({
+          action: 'favorite',
+          slug,
+          returnTo: typeof window !== 'undefined' ? window.location.pathname : undefined,
+        })
         setShowAuth(true)
       }
     } else {
       saveLocalFavorites(favs.filter((s) => s !== slug))
     }
 
-    // Supabase
     if (userId) {
       try {
         const sb = getSupabase()
@@ -130,8 +123,27 @@ export default function FavoriteButton({ slug }: Props) {
     }
   }
 
+  const handleHeartClick = () => {
+    if (!userId) {
+      // Anonymous: keep legacy behavior (toggle + auth modal on save)
+      doToggleSaved()
+    } else {
+      // Authenticated: open collection dropdown
+      setShowDropdown((prev) => !prev)
+    }
+  }
+
   return (
-    <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: '4px', position: 'relative' }}>
+    <div
+      ref={containerRef}
+      style={{
+        display: 'inline-flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '4px',
+        position: 'relative',
+      }}
+    >
       {/* +1 animation */}
       {showPlus && (
         <span
@@ -160,7 +172,7 @@ export default function FavoriteButton({ slug }: Props) {
 
       {/* Heart button */}
       <button
-        onClick={toggle}
+        onClick={handleHeartClick}
         aria-label={saved ? 'Убрать из избранного' : 'Добавить в избранное'}
         title={saved ? 'Убрать из избранного' : 'Добавить в избранное'}
         style={{
@@ -185,15 +197,28 @@ export default function FavoriteButton({ slug }: Props) {
       </button>
 
       {/* Label below */}
-      <span style={{
-        fontSize: '0.72rem',
-        fontWeight: 600,
-        color: saved ? '#e74c3c' : '#999',
-        transition: 'color 0.2s',
-        whiteSpace: 'nowrap',
-      }}>
+      <span
+        style={{
+          fontSize: '0.72rem',
+          fontWeight: 600,
+          color: saved ? '#e74c3c' : '#999',
+          transition: 'color 0.2s',
+          whiteSpace: 'nowrap',
+        }}
+      >
         {saved ? 'В избранном' : 'Сохранить'}
       </span>
+
+      {showDropdown && userId && (
+        <CollectionDropdown
+          slug={slug}
+          userId={userId}
+          isSaved={saved}
+          onToggleSaved={doToggleSaved}
+          onClose={() => setShowDropdown(false)}
+          position="center"
+        />
+      )}
 
       {/* Invite anonymous users to register/login so favorites sync */}
       {showAuth && (

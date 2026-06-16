@@ -48,6 +48,14 @@ export async function insertRows<T>(env: Env, table: string, rows: unknown, sele
   })
 }
 
+export async function upsertRows<T>(env: Env, table: string, rows: unknown, onConflict: string, select = '*'): Promise<T[]> {
+  return supabaseRest<T[]>(env, `${table}?select=${encodeURIComponent(select)}&on_conflict=${encodeURIComponent(onConflict)}`, {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+    body: JSON.stringify(rows),
+  })
+}
+
 export async function updateRows<T>(env: Env, table: string, query: string, patch: unknown, select = '*'): Promise<T[]> {
   return supabaseRest<T[]>(env, `${table}?${query}&select=${encodeURIComponent(select)}`, {
     method: 'PATCH',
@@ -59,6 +67,13 @@ export async function updateRows<T>(env: Env, table: string, query: string, patc
 export async function selectRows<T>(env: Env, table: string, query = 'select=*'): Promise<T[]> {
   return supabaseRest<T[]>(env, `${table}?${query}`, {
     method: 'GET',
+  })
+}
+
+export async function deleteRows(env: Env, table: string, query: string): Promise<void> {
+  await supabaseRest<unknown>(env, `${table}?${query}`, {
+    method: 'DELETE',
+    headers: { Prefer: 'return=minimal' },
   })
 }
 

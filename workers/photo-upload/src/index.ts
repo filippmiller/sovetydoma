@@ -39,6 +39,7 @@ interface Env {
   }
   RESEND_API_KEY?: string
   RATE_LIMIT_KV?: KVNamespace
+  TURNSTILE_SECRET_KEY?: string
 }
 
 const MAX_BYTES = 5 * 1024 * 1024
@@ -170,6 +171,42 @@ async function callSupabaseRpc(env: Env, name: string, body: unknown): Promise<R
 }
 
 // ---------------------------------------------------------------------------
+// Article questions helpers
+// ---------------------------------------------------------------------------
+
+async function verifyTurnstile(env: Env, token: string | undefined, req: Request): Promise<boolean> {
+  if (!env.TURNSTILE_SECRET_KEY) return false
+  if (!token) return false
+  const formData = new FormData()
+  formData.append('secret', env.TURNSTILE_SECRET_KEY)
+  formData.append('response', token)
+  const remoteIp = req.headers.get('CF-Connecting-IP')
+  if (remoteIp) formData.append('remoteip', remoteIp)
+  const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+    method: 'POST',
+    body: formData,
+  })
+  if (!res.ok) return false
+  const data = await res.json() as { success?: boolean }
+  return data.success === true
+}
+
+async function sha256Hex(input: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+function articleQuestionCors(req: Request, env: Env): Record<string, string> {
+  const origin = req.headers.get('Origin') || ''
+  const allowed = parseOriginList(env.ALLOWED_ORIGIN || 'https://1001sovet.ru')
+  return buildCors(origin, allowed, 'POST, GET, OPTIONS', {
+    'Access-Control-Allow-Headers': 'content-type',
+  })
+}
+
+// ---------------------------------------------------------------------------
 // Worker
 // ---------------------------------------------------------------------------
 
@@ -187,6 +224,9 @@ const worker = {
     }
     if (req.method === 'OPTIONS' && url.pathname.startsWith('/contact')) {
       return new Response('ok', { headers: contactCors(req, env) })
+    }
+    if (req.method === 'OPTIONS' && (url.pathname === '/article-question' || url.pathname === '/article-questions')) {
+      return new Response('ok', { headers: articleQuestionCors(req, env) })
     }
     if (req.method === 'OPTIONS') return new Response('ok', { headers: h })
 
@@ -372,6 +412,105 @@ const worker = {
       const key = `${articleSlug}/${uid}-${Date.now()}.${ext}`
       await env.PHOTOS.put(key, body, { httpMetadata: { contentType } })
       return json({ key }, 200, h)
+    }
+
+    // ---------------------------------------------------------------------------
+    // Article questions (Q&A flywheel) — public, no auth required.
+    // ---------------------------------------------------------------------------
+
+    if (url.pathname === '/article-question') {
+      const aqHeaders = articleQuestionCors(req, env)
+      if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, aqHeaders)
+      if (!env.SUPABASE_SERVICE_ROLE_KEY) return json({ error: 'article_question_not_configured' }, 503, aqHeaders)
+
+      const payload = await req.json().catch(() => null) as null | {
+        article_slug?: string
+        question?: string
+        turnstileToken?: string
+      }
+      if (!payload) return json({ error: 'bad_json' }, 400, aqHeaders)
+
+      // Turnstile is progressive: enforced only when a secret is configured.
+      // Until a Turnstile widget is provisioned, questions are still protected
+      // by the per-IP rate limit below + the pending-moderation gate (nothing is
+      // shown publicly until an admin approves). Set TURNSTILE_SECRET_KEY (and
+      // NEXT_PUBLIC_TURNSTILE_SITE_KEY on the client) to turn on bot challenge.
+      if (env.TURNSTILE_SECRET_KEY && !(await verifyTurnstile(env, payload.turnstileToken, req))) {
+        return json({ error: 'turnstile_failed' }, 403, aqHeaders)
+      }
+
+      const articleSlug = cleanArticleSlug(payload.article_slug)
+      if (!articleSlug || articleSlug.length < 3) return json({ error: 'bad_article_slug' }, 400, aqHeaders)
+
+      const questionRaw = String(payload.question || '').trim()
+      if (questionRaw.length < 1 || questionRaw.length > 500) {
+        return json({ error: 'bad_question_length' }, 400, aqHeaders)
+      }
+      // Strip HTML tags (basic regex)
+      const question = questionRaw.replace(/<[^>]+>/g, '').trim()
+      if (question.length < 1) return json({ error: 'empty_question' }, 400, aqHeaders)
+
+      const ip = getClientIp(req)
+      const ipHash = await sha256Hex(ip)
+
+      const [minuteAllowed, hourAllowed] = await Promise.all([
+        checkIngestionRateLimit({ env, bucketKey: `article_question:${ipHash}`, windowSeconds: 60, maxHits: 4 }),
+        checkIngestionRateLimit({ env, bucketKey: `article_question_hour:${ipHash}`, windowSeconds: 3600, maxHits: 30 }),
+      ])
+      if (!minuteAllowed || !hourAllowed) {
+        return json({ error: 'rate_limited' }, 429, aqHeaders)
+      }
+
+      const res = await fetch(`${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/article_questions`, {
+        method: 'POST',
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation',
+        },
+        body: JSON.stringify({
+          article_slug: articleSlug,
+          question,
+          status: 'pending',
+          ip_hash: ipHash,
+        }),
+      })
+
+      if (!res.ok) return json({ error: 'article_question_insert_failed' }, 502, aqHeaders)
+      const rows = await res.json().catch(() => null) as null | Array<{ id: string }>
+      const id = rows?.[0]?.id
+      return json({ success: true, id: id || null }, 200, aqHeaders)
+    }
+
+    if (url.pathname === '/article-questions') {
+      const aqHeaders = articleQuestionCors(req, env)
+      if (req.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, aqHeaders)
+
+      const articleSlug = cleanArticleSlug(url.searchParams.get('article_slug'))
+      let selectUrl = `${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/article_questions?status=eq.approved&select=id,article_slug,question,answer,created_at&order=created_at.desc`
+      if (articleSlug && articleSlug.length >= 3) {
+        selectUrl += `&article_slug=eq.${encodeURIComponent(articleSlug)}`
+      }
+
+      const res = await fetch(selectUrl, {
+        headers: {
+          apikey: env.SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${env.SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!res.ok) return json({ error: 'article_questions_query_failed' }, 502, aqHeaders)
+      const rows = await res.json().catch(() => []) as Array<{
+        id: string
+        article_slug: string
+        question: string
+        answer: string | null
+        created_at: string
+      }>
+
+      return json({ questions: rows }, 200, aqHeaders)
     }
 
     return new Response('Not found', { status: 404, headers: h })

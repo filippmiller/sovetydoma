@@ -85,6 +85,9 @@ export type Env = {
   FB_API_BASE_URL?: string
   FB_AUTOPOST_MAX_DAILY?: string
   FB_PAGES_BY_CATEGORY?: string
+  VAPID_PUBLIC_KEY?: string
+  VAPID_PRIVATE_KEY?: string
+  VAPID_SUBJECT?: string
 }
 
 export type RouteContext = {

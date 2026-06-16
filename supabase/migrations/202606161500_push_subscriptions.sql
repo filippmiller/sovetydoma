@@ -20,15 +20,14 @@ alter table public.push_subscriptions enable row level security;
 CREATE POLICY "service_role all access on push_subscriptions" ON public.push_subscriptions
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
--- Anon can INSERT own subscription (endpoint is effectively a secret key)
-CREATE POLICY "anon can subscribe to push" ON public.push_subscriptions
-  FOR INSERT TO anon WITH CHECK (true);
+-- NO anon policies. Subscribe + unsubscribe go through worker endpoints
+-- (/push/subscribe, /push/unsubscribe) which write via the service role. A
+-- `FOR DELETE TO anon USING (true)` policy (as originally drafted) would let
+-- anyone holding the PUBLIC anon key run `DELETE FROM push_subscriptions` and
+-- wipe every subscription, so it is intentionally omitted.
 
--- Anon can DELETE own subscription by exact endpoint (self-unsubscribe)
-CREATE POLICY "anon can delete own push subscription" ON public.push_subscriptions
-  FOR DELETE TO anon USING (true);
-
--- Public can only SELECT nothing (no SELECT policy for anon/authenticated on this table)
--- service_role does the fan-out reads
+-- Defense-in-depth: strip default table grants so the public anon key cannot
+-- read or mutate this table via PostgREST even if a policy is added later.
+revoke all on public.push_subscriptions from anon, authenticated;
 
 commit;

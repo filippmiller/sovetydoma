@@ -1,9 +1,10 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState, useEffect, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import bridge from '@vkontakte/vk-bridge'
 import {
   View, Panel, PanelHeader, PanelHeaderBack, Group, Header, SimpleCell,
   Div, CardGrid, ContentCard, Button, Search, Placeholder, Footer, Banner, Spacing,
+  Checkbox, Progress, Separator,
 } from '@vkontakte/vkui'
 import { content, imageUrl, articlesByCategory } from './data'
 import type { Article } from './types'
@@ -27,6 +28,38 @@ const mdComponents = {
   hr: () => <div style={{ height: 1, background: 'var(--vkui--color_separator_primary, #e3e3e3)', margin: '18px 0' }} />,
 }
 
+function isProcedural(article: Article): boolean {
+  if (article.recipeSteps && article.recipeSteps.length > 0) return true
+  if (article.schemaType === 'HowTo' || article.schemaType === 'Recipe') return true
+  const body = article.body.replace(/\r\n/g, '\n')
+  return /^##\s*\d+\.?\s+.+$/gm.test(body)
+}
+
+function extractSteps(article: Article): string[] {
+  if (article.recipeSteps && article.recipeSteps.length > 0) {
+    return article.recipeSteps
+  }
+  const body = article.body.replace(/\r\n/g, '\n')
+  const steps: string[] = []
+
+  // Numbered headings as primary fallback
+  const numberedRegex = /^##\s*\d+\.?\s+(.+)$/gm
+  let match
+  while ((match = numberedRegex.exec(body)) !== null) {
+    steps.push(match[1].trim())
+  }
+
+  // If no numbered headings but it's a Recipe/HowTo, use all ## headings
+  if (steps.length === 0 && (article.schemaType === 'Recipe' || article.schemaType === 'HowTo')) {
+    const allHeadingsRegex = /^##\s+(.+)$/gm
+    while ((match = allHeadingsRegex.exec(body)) !== null) {
+      steps.push(match[1].trim())
+    }
+  }
+
+  return steps
+}
+
 export function App() {
   const seen = (() => { try { return localStorage.getItem(ONBOARD_KEY) === '1' } catch { return false } })()
   const [history, setHistory] = useState<PanelId[]>(seen ? ['home'] : ['onboarding'])
@@ -34,6 +67,8 @@ export function App() {
   const [activeArticle, setActiveArticle] = useState<Article | null>(null)
   const [query, setQuery] = useState('')
   const [refreshing, setRefreshing] = useState(false)
+  const [checklistMode, setChecklistMode] = useState(false)
+  const [checkedSteps, setCheckedSteps] = useState<boolean[]>([])
 
   const panel = history[history.length - 1]
   const go = (p: PanelId) => setHistory((h) => [...h, p])
@@ -65,6 +100,58 @@ export function App() {
   const categoryName = activeCategory
     ? content.categories.find((c) => c.slug === activeCategory)?.name || ''
     : ''
+
+  // Checklist logic
+  const steps = activeArticle ? extractSteps(activeArticle) : []
+  const allChecked = steps.length > 0 && checkedSteps.length === steps.length && checkedSteps.every(Boolean)
+  const completedCount = checkedSteps.filter(Boolean).length
+
+  useEffect(() => {
+    if (!activeArticle) {
+      setChecklistMode(false)
+      setCheckedSteps([])
+      return
+    }
+    const s = extractSteps(activeArticle)
+    if (s.length === 0) {
+      setChecklistMode(false)
+      setCheckedSteps([])
+      return
+    }
+    try {
+      const key = `sovetydoma_checklist_${activeArticle.slug}`
+      const saved = localStorage.getItem(key)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length === s.length) {
+          setCheckedSteps(parsed)
+          return
+        }
+      }
+    } catch { /* ignore */ }
+    setCheckedSteps(new Array(s.length).fill(false))
+  }, [activeArticle])
+
+  useEffect(() => {
+    if (!activeArticle || checkedSteps.length === 0) return
+    try {
+      const key = `sovetydoma_checklist_${activeArticle.slug}`
+      localStorage.setItem(key, JSON.stringify(checkedSteps))
+    } catch { /* ignore */ }
+  }, [activeArticle, checkedSteps])
+
+  const toggleStep = (index: number) => {
+    setCheckedSteps((prev) => {
+      const next = [...prev]
+      next[index] = !next[index]
+      return next
+    })
+  }
+
+  const shareCompletion = () => {
+    if (!activeArticle) return
+    bridge.send('VKWebAppShare', { link: activeArticle.url }).catch(() => {})
+  }
 
   return (
     <View activePanel={panel}>
@@ -139,9 +226,57 @@ export function App() {
               <h1 style={{ margin: '8px 0 4px', fontSize: 22, fontWeight: 800, lineHeight: 1.25 }}>{activeArticle.title}</h1>
               <div style={{ opacity: 0.55, fontSize: 13, marginBottom: 14 }}>{activeArticle.categoryName}</div>
               <p style={{ fontSize: 16, lineHeight: 1.55, margin: '0 0 16px', fontWeight: 600 }}>{activeArticle.description}</p>
-              <div className="vkapp-article-body">
-                <ReactMarkdown components={mdComponents}>{activeArticle.body}</ReactMarkdown>
-              </div>
+
+              {isProcedural(activeArticle) && (
+                <Div style={{ padding: 0, marginBottom: 12 }}>
+                  <Button
+                    mode={checklistMode ? 'primary' : 'secondary'}
+                    stretched
+                    size="m"
+                    onClick={() => setChecklistMode((v) => !v)}
+                  >
+                    {checklistMode ? 'Выйти из режима чек-листа' : 'Режим чек-листа'}
+                  </Button>
+                </Div>
+              )}
+
+              {checklistMode && steps.length > 0 ? (
+                <div>
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>
+                      {completedCount} из {steps.length} выполнено
+                    </div>
+                    <Progress value={Math.round((completedCount / steps.length) * 100)} />
+                  </div>
+                  <Separator />
+                  <div style={{ marginTop: 12 }}>
+                    {steps.map((step, i) => (
+                      <Checkbox
+                        key={i}
+                        checked={checkedSteps[i] ?? false}
+                        onChange={() => toggleStep(i)}
+                        style={{ marginBottom: 8 }}
+                      >
+                        {step}
+                      </Checkbox>
+                    ))}
+                  </div>
+                  {allChecked && (
+                    <Div style={{ textAlign: 'center', marginTop: 16 }}>
+                      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>
+                        Отлично! Все шаги выполнены! 🎉
+                      </div>
+                      <Button size="l" onClick={shareCompletion}>
+                        Поделиться
+                      </Button>
+                    </Div>
+                  )}
+                </div>
+              ) : (
+                <div className="vkapp-article-body">
+                  <ReactMarkdown components={mdComponents}>{activeArticle.body}</ReactMarkdown>
+                </div>
+              )}
             </Div>
             <Banner
               mode="tint"

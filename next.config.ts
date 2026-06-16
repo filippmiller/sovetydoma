@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
   },
   env: {
     NEXT_PUBLIC_SITE_URL: siteUrl,
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
+    NEXT_PUBLIC_SUBSCRIPTIONS_API_URL: process.env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL || 'https://sovetydoma-subscriptions.filippmiller.workers.dev',
   },
   // Redirects for reclassified articles (new taxonomy). Note: with output:'export' these are
   // advisory (host must implement 301s too, e.g. via _redirects or server config). We also

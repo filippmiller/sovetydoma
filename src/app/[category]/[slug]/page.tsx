@@ -30,9 +30,11 @@ import ArticlePersonaCard from '@/components/ArticlePersonaCard'
 import ArticleFeedback from '@/components/ArticleFeedback'
 import ArticlePhotoSubmissionCTA from '@/components/ArticlePhotoSubmissionCTA'
 import ArticleQuestionsBlock from '@/components/ArticleQuestionsBlock'
+import ArticleQaBlock from '@/components/ArticleQaBlock'
 import ArticleInternalLinks from '@/components/ArticleInternalLinks'
 import ArticleViewCount from '@/components/ArticleViewCount'
 import ArticleImage from '@/components/ArticleImage'
+import CategoryPushSubscribe from '@/components/CategoryPushSubscribe'
 import CategorySubscriptionCta from '@/components/subscriptions/CategorySubscriptionCta'
 import ArticleSeasonalBadge from '@/components/ArticleSeasonalBadge'
 import { ArticleH2, ArticleH3 } from '@/components/ArticleHeading'
@@ -252,6 +254,7 @@ export default async function ArticlePage({ params }: Props) {
                   categoryName={cat?.name || fm.categoryName}
                   placement="article-header"
                 />
+                <CategoryPushSubscribe category={category} />
               </div>
 
               <h1 style={{ fontSize: '2rem', fontWeight: 800, lineHeight: 1.3, color: '#1a1a1a', marginBottom: '0.75rem' }}>
@@ -367,12 +370,18 @@ export default async function ArticlePage({ params }: Props) {
                 categoryName={cat?.name || fm.categoryName}
                 placement="article-footer"
               />
+              <div style={{ marginTop: '0.5rem' }}>
+                <CategoryPushSubscribe category={category} />
+              </div>
             </div>
 
             <MoreArticles articles={moreInterestingArticles} />
 
             {/* Questions — live Q&A for this article */}
             <ArticleQuestionsBlock articleSlug={slug} />
+
+            {/* Article Q&A flywheel (Feature 6) */}
+            <ArticleQaBlock articleSlug={slug} />
 
             <Comments slug={slug} />
           </div>

@@ -23,9 +23,10 @@ alter table public.article_questions enable row level security;
 CREATE POLICY "service_role all access on article_questions" ON public.article_questions
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
--- Anon can INSERT only with status='pending' (moderated)
-CREATE POLICY "anon can ask questions" ON public.article_questions
-  FOR INSERT TO anon WITH CHECK (status = 'pending');
+-- NO anon INSERT policy: questions are submitted through the Turnstile-gated
+-- photo-upload worker endpoint /article-question, which inserts via the service
+-- role. Allowing a direct anon INSERT would let bots bypass Turnstile and spam
+-- the moderation queue with only the DB rate-limit as a backstop.
 
 -- Public can only SELECT approved rows
 CREATE POLICY "public sees approved questions only" ON public.article_questions

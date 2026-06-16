@@ -20,7 +20,7 @@ binding = "RATE_LIMIT_KV"
 id = "c8ca9c98bcc34fce936764aa02a39d83"
 
 [vars]
-SUPABASE_URL = "https://plwkjdpuxjkmpkqiqzkk.supabase.co"
+SUPABASE_URL = "https://api.1001sovet.ru"
 ALLOWED_ORIGIN = "*"
 CONTACT_ALLOWED_ORIGINS = "https://1001sovet.ru,http://127.0.0.1:4177,http://localhost:4177"
 VIEW_ALLOWED_ORIGINS = "https://1001sovet.ru,http://127.0.0.1:3000,http://localhost:3000,http://127.0.0.1:4177,http://localhost:4177"

@@ -4,6 +4,7 @@ import { getArticlesByCategory, CATEGORIES } from '@/lib/articles'
 import CategoryArticleBrowser from '@/components/CategoryArticleBrowser'
 import Breadcrumb from '@/components/Breadcrumb'
 import CategorySubscriptionCta from '@/components/subscriptions/CategorySubscriptionCta'
+import CategoryPushSubscribe from '@/components/CategoryPushSubscribe'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath } from '@/lib/seo'
@@ -67,6 +68,9 @@ export default async function CategoryPage({ params }: Props) {
                 categoryName={cat.name}
                 placement="category-header"
               />
+              <div style={{ marginTop: '0.5rem' }}>
+                <CategoryPushSubscribe category={category} />
+              </div>
             </div>
           </div>
         </header>

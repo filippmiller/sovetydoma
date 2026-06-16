@@ -5,7 +5,7 @@ import { createConfirmation, createSecureToken, sha256Hex, verifySignedContactTo
 import { getProviderReadiness, sendDigestToChannel } from './providers/registry'
 import { checkRateLimit } from './rate-limit'
 import { hmacSha256Hex, requireSecret, timingSafeEqual, verifySvixSignature, verifyWhatsAppSignature } from './security'
-import { hasSupabaseServiceRole, insertRows, selectRows, updateRows } from './supabase'
+import { hasSupabaseServiceRole, insertRows, selectRows, updateRows, upsertRows } from './supabase'
 import { validateSubscriptionRequest } from '../../../src/lib/subscriptions/validation.mjs'
 import { buildVkArticlePost, findArticleRecord, MAX_VK_MESSAGE_CHARS, publishArticleToVk, sha256Text } from './social/vk'
 import { processVkAutopost } from './social/vk-autopost'
@@ -15,6 +15,8 @@ import { createSupabaseVkIdLoginLink } from './auth/vk-id'
 import { createSupabaseYandexLoginLink } from './auth/yandex'
 import { cleanPath, cleanTimezone, normalizeList, normalizePhone } from './utils'
 import { renderConfirmPage } from './templates/confirm-page'
+
+import { sendWebPush } from './push-send'
 
 const CATEGORY_SLUGS = ['kulinaria', 'dom-i-uborka', 'dacha-i-ogorod', 'layfkhaki', 'ekonomiya', 'rybalka']
 const FREQUENCIES = ['daily_one', 'daily_digest_3', 'weekly_digest_3', 'weekly_digest_7']
@@ -1173,6 +1175,131 @@ async function handleSocialTrack(request: Request, env: Env): Promise<Response> 
   return json({ ok: true })
 }
 
+// ── Push subscription handlers ──
+
+const VALID_CATEGORY_SLUG = /^[a-z0-9-]+$/
+
+async function handlePushSubscribe(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('origin') || ''
+  if (origin && !isAllowedOrigin(env, request)) {
+    return json({ ok: false, error: 'origin_not_allowed' }, 403)
+  }
+
+  const payload = await request.json().catch(() => ({})) as { endpoint?: string; p256dh?: string; auth?: string; category?: string }
+  const endpoint = String(payload.endpoint || '').trim()
+  const p256dh = String(payload.p256dh || '').trim()
+  const auth = String(payload.auth || '').trim()
+  const category = String(payload.category || '').trim()
+
+  if (!endpoint || !p256dh || !auth || !category) {
+    return json({ ok: false, error: 'missing_fields' }, 400)
+  }
+  if (!VALID_CATEGORY_SLUG.test(category)) {
+    return json({ ok: false, error: 'invalid_category' }, 400)
+  }
+  let endpointUrl: URL
+  try {
+    endpointUrl = new URL(endpoint)
+    if (endpointUrl.protocol !== 'https:') throw new Error('not_https')
+  } catch {
+    return json({ ok: false, error: 'invalid_endpoint' }, 400)
+  }
+
+  if (!hasSupabaseServiceRole(env)) {
+    return json({ ok: false, error: 'supabase_service_role_not_configured' }, 503)
+  }
+
+  // Upsert: endpoint is PK, last subscribed category wins
+  await upsertRows(env, 'push_subscriptions', {
+    endpoint,
+    p256dh,
+    auth,
+    category,
+  }, 'endpoint', 'id')
+  return json({ success: true })
+}
+
+async function handlePushUnsubscribe(request: Request, env: Env): Promise<Response> {
+  const origin = request.headers.get('origin') || ''
+  if (origin && !isAllowedOrigin(env, request)) {
+    return json({ ok: false, error: 'origin_not_allowed' }, 403)
+  }
+
+  const payload = await request.json().catch(() => ({})) as { endpoint?: string }
+  const endpoint = String(payload.endpoint || '').trim()
+  if (!endpoint) {
+    return json({ ok: false, error: 'endpoint_required' }, 400)
+  }
+
+  if (!hasSupabaseServiceRole(env)) {
+    return json({ ok: false, error: 'supabase_service_role_not_configured' }, 503)
+  }
+
+  await updateRows(env, 'push_subscriptions', `endpoint=eq.${encodeURIComponent(endpoint)}`, { category: null, p256dh: null, auth: null }, 'id')
+    .catch(() => {})
+  return json({ success: true })
+}
+
+async function handlePushFanOut(request: Request, env: Env): Promise<Response> {
+  const adminError = requireAdmin(request, env)
+  if (adminError) return adminError
+
+  const payload = await request.json().catch(() => ({})) as { category?: string; title?: string; body?: string; url?: string }
+  const category = String(payload.category || '').trim()
+  const title = String(payload.title || '').trim()
+  const body = String(payload.body || '').trim()
+  const url = String(payload.url || '').trim()
+
+  if (!category || !title || !body || !url) {
+    return json({ ok: false, error: 'category_title_body_and_url_required' }, 400)
+  }
+  if (!VALID_CATEGORY_SLUG.test(category)) {
+    return json({ ok: false, error: 'invalid_category' }, 400)
+  }
+
+  if (!hasSupabaseServiceRole(env)) {
+    return json({ ok: false, error: 'supabase_service_role_not_configured' }, 503)
+  }
+
+  const rows = await selectRows<{ endpoint: string; p256dh: string; auth: string; category: string }>(
+    env,
+    'push_subscriptions',
+    `category=eq.${encodeURIComponent(category)}&select=endpoint,p256dh,auth,category`,
+  )
+
+  let sent = 0
+  let failed = 0
+  let removed = 0
+
+  for (const row of rows) {
+    if (!row.p256dh || !row.auth) continue
+    try {
+      const result = await sendWebPush(env, { endpoint: row.endpoint, p256dh: row.p256dh, auth: row.auth }, {
+        title,
+        body,
+        icon: '/icon-192.png',
+        url,
+        tag: `sovetydoma-${category}`,
+      })
+      if (result.ok) {
+        sent += 1
+      } else {
+        failed += 1
+        if (result.removed) {
+          removed += 1
+          await deleteRows(env, 'push_subscriptions', `endpoint=eq.${encodeURIComponent(row.endpoint)}`)
+            .catch(() => {})
+        }
+      }
+    } catch (err) {
+      failed += 1
+      console.error('push_send_failed', (err as Error).message, row.endpoint)
+    }
+  }
+
+  return json({ ok: true, sent, failed, removed })
+}
+
 export async function route(req: Request, env: Env): Promise<Response> {
   const url = new URL(req.url)
 
@@ -1254,6 +1381,18 @@ export async function route(req: Request, env: Env): Promise<Response> {
 
   if (req.method === 'POST' && url.pathname === '/admin/social/fb/post') {
     return handleFbPost(req, env)
+  }
+
+  if (req.method === 'POST' && url.pathname === '/push/subscribe') {
+    return handlePushSubscribe(req, env)
+  }
+
+  if (req.method === 'POST' && url.pathname === '/push/unsubscribe') {
+    return handlePushUnsubscribe(req, env)
+  }
+
+  if (req.method === 'POST' && url.pathname === '/admin/push/fan-out') {
+    return handlePushFanOut(req, env)
   }
 
   return json({ ok: false, error: 'not_found', path: url.pathname }, 404)
