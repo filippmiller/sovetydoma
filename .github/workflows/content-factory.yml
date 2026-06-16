@@ -1,0 +1,69 @@
+name: Content factory (daily — 1 article per category)
+
+# Safe cadence: once a day, generate ONE article per category (Claude text +
+# fal.ai photo), publish them live with no rebuild (DB+R2), and let the
+# subscriptions worker's hourly cron autopost them to the per-category VK/FB
+# groups (with its own daily caps spreading the posts across the day).
+#
+# Required secrets (Settings → Secrets and variables → Actions):
+#   ANTHROPIC_API_KEY              — Claude text generation
+#   FAL_KEY                        — fal.ai image generation
+#   MATRIX_SUPABASE_URL            — RU Supabase REST URL (https://api.1001sovet.ru)
+#   MATRIX_SUPABASE_SERVICE_ROLE_KEY
+#   CLOUDFLARE_API_TOKEN           — R2 write (wrangler r2 object put) for publish-dynamic
+#
+# Manual run: Actions → this workflow → Run workflow (dry_run toggles cost).
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 06:00 UTC daily
+  workflow_dispatch:
+    inputs:
+      categories:
+        description: 'Comma categories, or "all"'
+        required: false
+        default: 'all'
+      dry_run:
+        description: 'Dry run (no API cost / no writes)'
+        required: false
+        default: 'false'
+
+concurrency:
+  group: content-factory
+  cancel-in-progress: false
+
+jobs:
+  factory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      FAL_KEY: ${{ secrets.FAL_KEY }}
+      SUPABASE_URL: ${{ secrets.MATRIX_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.MATRIX_SUPABASE_SERVICE_ROLE_KEY }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+        with: { version: 10 }
+      - uses: actions/setup-node@v6
+        with: { node-version: '24', cache: 'pnpm' }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pnpm install --frozen-lockfile
+      - run: pip install pillow
+
+      - name: Generate (1 article per category)
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then DRY=--dry-run; else DRY=; fi
+          if [ "${{ github.event.inputs.categories }}" = "" ] || [ "${{ github.event.inputs.categories }}" = "all" ]; then
+            node scripts/factory/generate-article.mjs --all $DRY
+          else
+            for c in $(echo "${{ github.event.inputs.categories }}" | tr ',' ' '); do
+              node scripts/factory/generate-article.mjs --category "$c" $DRY || true
+            done
+          fi
+
+      - name: Publish live (no rebuild — DB + R2)
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: node scripts/matrix/publish-dynamic.mjs --limit 12
