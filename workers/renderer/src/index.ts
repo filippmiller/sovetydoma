@@ -31,6 +31,7 @@ interface Env {
   SUPABASE_SERVICE_ROLE_KEY: string // wrangler secret bulk
   TEMPLATE_URL: string          // e.g. https://1001sovet.ru/ekonomiya/ekonomiya-vody/
   SITE_URL: string              // https://1001sovet.ru
+  R2_UPLOAD_SECRET?: string     // shared secret for the authenticated PUT /__r2/ upload
 }
 
 // ---------------------------------------------------------------------------
@@ -644,6 +645,26 @@ function mimeByExt(filename: string): string {
   return map[ext] ?? 'application/octet-stream'
 }
 
+async function handleR2Put(req: Request, env: Env, url: URL): Promise<Response> {
+  const secret = env.R2_UPLOAD_SECRET
+  if (!secret || req.headers.get('x-r2-secret') !== secret) {
+    return new Response('forbidden', { status: 403 })
+  }
+  const key = decodeURIComponent(url.pathname.slice('/__r2/'.length))
+  // Image keys only (optional previews/ prefix); blocks path traversal.
+  if (!/^(previews\/)?[a-z0-9][a-z0-9-]*\.(jpe?g|png|webp)$/i.test(key)) {
+    return new Response('bad key', { status: 400 })
+  }
+  const body = await req.arrayBuffer()
+  if (body.byteLength === 0 || body.byteLength > 10 * 1024 * 1024) {
+    return new Response('bad size', { status: 400 })
+  }
+  await env.ARTICLE_IMAGES.put(key, body, {
+    httpMetadata: { contentType: req.headers.get('content-type') || 'image/jpeg' },
+  })
+  return new Response(JSON.stringify({ ok: true, key }), { status: 200, headers: { 'content-type': 'application/json' } })
+}
+
 async function handleImage(env: Env, filename: string): Promise<Response> {
   // Key matches the URL path after /images/ (incl. the previews/ prefix when present)
   const candidates = filename.startsWith('previews/') ? [filename] : [filename, `previews/${filename}`]
@@ -742,11 +763,18 @@ async function handleSitemap(env: Env): Promise<Response> {
 
 const worker = {
   async fetch(req: Request, env: Env): Promise<Response> {
+    const url = new URL(req.url)
+
+    // Authenticated R2 upload (so the content factory's CI publish step needs no
+    // Cloudflare API token): PUT /__r2/<key> with header x-r2-secret + raw bytes.
+    if (req.method === 'PUT' && url.pathname.startsWith('/__r2/')) {
+      return handleR2Put(req, env, url)
+    }
+
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       return new Response('Method Not Allowed', { status: 405 })
     }
 
-    const url = new URL(req.url)
     const { pathname } = url
 
     // /sitemap-dynamic.xml

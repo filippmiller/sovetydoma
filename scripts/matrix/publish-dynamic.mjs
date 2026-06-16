@@ -33,6 +33,7 @@ const PREVIEWS_DIR = path.join(IMAGES_DIR, 'previews')
 const TODAY = new Date().toISOString().slice(0, 10)
 
 const sb = helpers.getServiceClient()
+const env = helpers.loadEnv()
 
 // Parse slugs filter if provided
 const slugFilter = slugsArg ? slugsArg.split(',').map((s) => s.trim()).filter(Boolean) : []
@@ -122,21 +123,21 @@ if (dryRun) {
   process.exit(0)
 }
 
-// Helper to run wrangler r2 upload
-const uploadToR2 = (filePath, r2Key) => {
+// Upload to R2 via the renderer worker's authenticated PUT /__r2/ endpoint.
+// This avoids needing a Cloudflare API token in CI — the worker holds the R2
+// binding and validates a shared secret (R2_UPLOAD_SECRET).
+const RENDERER_URL = (process.env.RENDERER_URL || env.RENDERER_URL || 'https://sovetydoma-renderer.filippmiller.workers.dev').replace(/\/+$/, '')
+const R2_UPLOAD_SECRET = process.env.R2_UPLOAD_SECRET || env.R2_UPLOAD_SECRET
+const uploadToR2 = async (filePath, r2Key) => {
+  if (!R2_UPLOAD_SECRET) return { success: false, error: 'R2_UPLOAD_SECRET not set' }
   try {
-    execFileSync('npx', [
-      'wrangler', 'r2', 'object', 'put',
-      `${R2_BUCKET}/${r2Key}`,
-      '--file', filePath,
-      '--content-type', 'image/jpeg',
-      '--remote'
-    ], {
-      cwd: ROOT,
-      stdio: ['pipe', 'pipe', 'pipe'],
-      encoding: 'utf8',
-      shell: process.platform === 'win32'
+    const body = fs.readFileSync(filePath)
+    const res = await fetch(`${RENDERER_URL}/__r2/${r2Key}`, {
+      method: 'PUT',
+      headers: { 'x-r2-secret': R2_UPLOAD_SECRET, 'content-type': 'image/jpeg' },
+      body,
     })
+    if (!res.ok) return { success: false, error: `upload_${res.status}: ${(await res.text()).slice(0, 120)}` }
     return { success: true }
   } catch (err) {
     return { success: false, error: err.message }
@@ -195,7 +196,7 @@ for (const r of picked) {
 
   // Upload main image to R2
   console.log(`  Uploading image to R2...`)
-  const uploadResult = uploadToR2(imagePath, r.image_filename)
+  const uploadResult = await uploadToR2(imagePath, r.image_filename)
   if (!uploadResult.success) {
     console.error(`  Image upload failed: ${uploadResult.error}`)
     skipReasons.push(`${r.slug}: image upload failed`)
@@ -205,7 +206,7 @@ for (const r of picked) {
 
   // Upload preview to R2
   console.log(`  Uploading preview to R2...`)
-  const previewUploadResult = uploadToR2(previewPath, `previews/${r.slug}.jpg`)
+  const previewUploadResult = await uploadToR2(previewPath, `previews/${r.slug}.jpg`)
   if (!previewUploadResult.success) {
     console.error(`  Preview upload failed: ${previewUploadResult.error}`)
     skipReasons.push(`${r.slug}: preview upload failed`)

@@ -10,7 +10,7 @@ name: Content factory (daily — 1 article per category)
 #   FAL_KEY                        — fal.ai image generation
 #   MATRIX_SUPABASE_URL            — RU Supabase REST URL (https://api.1001sovet.ru)
 #   MATRIX_SUPABASE_SERVICE_ROLE_KEY
-#   CLOUDFLARE_API_TOKEN           — R2 write (wrangler r2 object put) for publish-dynamic
+#   R2_UPLOAD_SECRET               — shared secret for the renderer /__r2 upload endpoint
 #
 # Manual run: Actions → this workflow → Run workflow (dry_run toggles cost).
 
@@ -44,7 +44,8 @@ jobs:
       FAL_KEY: ${{ secrets.FAL_KEY }}
       SUPABASE_URL: ${{ secrets.MATRIX_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.MATRIX_SUPABASE_SERVICE_ROLE_KEY }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      # Images upload through the renderer worker's /__r2 endpoint (no CF API token).
+      R2_UPLOAD_SECRET: ${{ secrets.R2_UPLOAD_SECRET }}
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
