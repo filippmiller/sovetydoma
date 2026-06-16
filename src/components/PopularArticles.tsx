@@ -31,10 +31,14 @@ export default function PopularArticles({ articles }: Props) {
     async function load() {
       try {
         const sb = getSupabase()
+        // We only need the most-viewed articles to compute a top-5, so bound the
+        // query instead of scanning the whole (ever-growing) counters table.
         const { data } = await sb
           .from('feedback_counters')
           .select('article_slug, kind, count')
           .eq('kind', 'view')
+          .order('count', { ascending: false })
+          .limit(200)
 
         const sorted = sortArticlesByViews(articles, data || [])
         const hasViews = sorted.some((article) => article.viewCount > 0)

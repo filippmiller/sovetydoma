@@ -1,5 +1,16 @@
 import type { Metadata } from 'next'
+import { PT_Sans } from 'next/font/google'
 import './globals.css'
+
+// Self-hosted via next/font (was an external Google Fonts <link> = extra
+// DNS/TLS round-trip + FOUT, slow from Russia). Cyrillic subset is required.
+const ptSans = PT_Sans({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-pt-sans',
+})
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import YandexMetrika from '@/components/YandexMetrika'
@@ -46,16 +57,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru">
+    <html lang="ru" className={ptSans.variable}>
       <head>
-        {/* Google Fonts — preconnect first, then stylesheet (non-blocking) */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400&display=swap"
-        />
         <link rel="alternate" hrefLang="ru" href={SITE_URL} />
         <link rel="alternate" type="application/rss+xml" title="СоветыДома RSS" href={`${SITE_URL}/feed.xml`} />
         {Object.values(CATEGORIES).map((cat) => (

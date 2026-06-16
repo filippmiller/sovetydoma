@@ -245,16 +245,16 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
   let inTime = false
   let timeDone = false
   // For category badge: first <span> inside header > div
-  let inHeaderFirstDiv = false
-  let headerFirstDivDepth = 0
+  const inHeaderFirstDiv = false
+  const headerFirstDivDepth = 0
   let categorySpanDone = false
   // For tags container: div containing the tag <a> links (identified by first tag href pattern)
   // We track a div that contains /tag/ links and replace its contents
-  let tagsDivDepth = 0
+  const tagsDivDepth = 0
   let inTagsDiv = false
-  let tagsDone = false
+  const tagsDone = false
   // For article.prose body replacement
-  let inProse = false
+  const inProse = false
 
   return new HTMLRewriter()
     // ── <title> ──────────────────────────────────────────────────────────
