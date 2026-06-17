@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { processFbAutopost } from './fb-autopost'
+import { processFbAutopost, fbConfiguredCategories } from './fb-autopost'
 
 test('processFbAutopost skips when supabase not configured', async () => {
   const result = await processFbAutopost({
@@ -196,4 +196,23 @@ test('processFbAutopost surfaces article_lookup_failed (not article_not_found) o
   } finally {
     globalThis.fetch = originalFetch
   }
+})
+
+// ── fbConfiguredCategories (redacted inventory helper) ──────────────────────
+
+test('fbConfiguredCategories returns only slugs of entries that have id AND token', () => {
+  const env = { FB_PAGES_BY_CATEGORY: JSON.stringify({
+    'dom-i-uborka': { id: '10', token: 't10' },
+    avto: { id: '20', token: 't20' },
+    rybalka: { id: '30' },        // no token — excluded (mirrors routing)
+    ekonomiya: { token: 't40' },  // no id — excluded
+  }) }
+  const cats = fbConfiguredCategories(env)
+  assert.deepEqual([...cats].sort(), ['avto', 'dom-i-uborka'])
+})
+
+test('fbConfiguredCategories returns [] when map is absent or malformed', () => {
+  assert.deepEqual(fbConfiguredCategories({}), [])
+  assert.deepEqual(fbConfiguredCategories({ FB_PAGES_BY_CATEGORY: '' }), [])
+  assert.deepEqual(fbConfiguredCategories({ FB_PAGES_BY_CATEGORY: '{ broken' }), [])
 })

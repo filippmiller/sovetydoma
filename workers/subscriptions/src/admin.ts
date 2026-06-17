@@ -4,6 +4,9 @@ import { sendOneDigest } from './delivery'
 import { getProviderReadiness } from './providers/registry'
 import { timingSafeEqual } from './security'
 import { hasSupabaseServiceRole, selectRows } from './supabase'
+import { SUBSCRIPTION_CATEGORY_SLUGS } from '../../../src/lib/subscriptions/constants.mjs'
+import { vkConfiguredCategories } from './social/vk-autopost'
+import { fbConfiguredCategories } from './social/fb-autopost'
 
 export function buildSubscriptionsDiagnostics(env: Env) {
   return {
@@ -109,6 +112,33 @@ export async function handleTestSend(request: Request, env: Env): Promise<Respon
     force: true,
   })
   return json({ ok: result.status === 'sent', testSend: true, result }, result.status === 'failed' ? 502 : 200)
+}
+
+/**
+ * GET /admin/social/autopost-inventory — redacted coverage of the per-category
+ * autopost maps vs the 12 top-level categories. Returns ONLY category slugs and
+ * counts; never group IDs, page IDs, tokens, or raw secret JSON. `present` uses
+ * the same validation as real routing (VK needs groupId; FB needs id+token), so
+ * it reflects what autopost would actually post to. Absent/empty/malformed map →
+ * present:[], missing: all 12.
+ */
+export function handleAutopostInventory(request: Request, env: Env): Response {
+  const adminError = requireAdmin(request, env)
+  if (adminError) return adminError
+
+  const all = SUBSCRIPTION_CATEGORY_SLUGS
+  const coverage = (configured: string[]) => {
+    const present = all.filter((slug) => configured.includes(slug))
+    const missing = all.filter((slug) => !present.includes(slug))
+    return { present, missing, count: present.length }
+  }
+
+  return json({
+    ok: true,
+    total: all.length,
+    vk: coverage(vkConfiguredCategories(env)),
+    fb: coverage(fbConfiguredCategories(env)),
+  })
 }
 
 function json(data: unknown, status = 200): Response {

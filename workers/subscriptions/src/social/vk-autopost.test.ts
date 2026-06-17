@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { processVkAutopost } from './vk-autopost'
+import { processVkAutopost, vkConfiguredCategories } from './vk-autopost'
 import type { Env } from '../types'
 
 const baseEnv: Env = {
@@ -625,4 +625,22 @@ test('per-category: category article filtering by category_slug', async () => {
   } finally {
     globalThis.fetch = originalFetch
   }
+})
+
+// ── vkConfiguredCategories (redacted inventory helper) ──────────────────────
+
+test('vkConfiguredCategories returns only slugs of entries that have a groupId', () => {
+  const env = { VK_GROUPS_BY_CATEGORY: JSON.stringify({
+    'dacha-i-ogorod': { groupId: '111' },
+    avto: { groupId: '222' },
+    'krasota-i-uhod': {}, // no groupId — must be excluded (mirrors routing)
+  }) }
+  const cats = vkConfiguredCategories(env)
+  assert.deepEqual([...cats].sort(), ['avto', 'dacha-i-ogorod'])
+})
+
+test('vkConfiguredCategories returns [] when map is absent or malformed', () => {
+  assert.deepEqual(vkConfiguredCategories({}), [])
+  assert.deepEqual(vkConfiguredCategories({ VK_GROUPS_BY_CATEGORY: '' }), [])
+  assert.deepEqual(vkConfiguredCategories({ VK_GROUPS_BY_CATEGORY: 'not valid json' }), [])
 })
