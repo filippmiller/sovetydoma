@@ -7,6 +7,7 @@ import { checkRateLimit } from './rate-limit'
 import { hmacSha256Hex, requireSecret, timingSafeEqual, verifySvixSignature, verifyWhatsAppSignature } from './security'
 import { hasSupabaseServiceRole, insertRows, selectRows, updateRows, upsertRows } from './supabase'
 import { validateSubscriptionRequest } from '../../../src/lib/subscriptions/validation.mjs'
+import { SUBSCRIPTION_CATEGORY_SLUGS } from '../../../src/lib/subscriptions/constants.mjs'
 import { buildVkArticlePost, findArticleRecord, MAX_VK_MESSAGE_CHARS, publishArticleToVk, sha256Text } from './social/vk'
 import { processVkAutopost } from './social/vk-autopost'
 import { buildFbArticlePost, publishArticleToFacebook, MAX_FB_MESSAGE_CHARS } from './social/fb'
@@ -19,7 +20,9 @@ import { handleVkCallback, handleFbVerify, handleFbWebhook, draftPendingResponde
 
 import { sendWebPush } from './push-send'
 
-const CATEGORY_SLUGS = ['kulinaria', 'dom-i-uborka', 'dacha-i-ogorod', 'layfkhaki', 'ekonomiya', 'rybalka']
+// Top-level categories from the shared source of truth (all 12), aligned with
+// validateSubscriptionRequest which already validates against the same list.
+const CATEGORY_SLUGS = SUBSCRIPTION_CATEGORY_SLUGS
 const FREQUENCIES = ['daily_one', 'daily_digest_3', 'weekly_digest_3', 'weekly_digest_7']
 const CHANNEL_ACTIONS: Record<DirectChannel, string> = {
   email: 'check_email',

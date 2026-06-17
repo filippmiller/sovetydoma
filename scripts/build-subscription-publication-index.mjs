@@ -2,17 +2,14 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import matter from 'gray-matter'
+import { SUBSCRIPTION_CATEGORY_SLUGS } from '../src/lib/subscriptions/constants.mjs'
 
 const ROOT = process.cwd()
 const ARTICLES_DIR = path.join(ROOT, 'src/content/articles')
-const CATEGORY_SLUGS = new Set([
-  'kulinaria',
-  'dom-i-uborka',
-  'dacha-i-ogorod',
-  'layfkhaki',
-  'ekonomiya',
-  'rybalka',
-])
+// Single source of truth for top-level categories (all 12) — keep scripts, app
+// and worker in sync via src/lib/subscriptions/constants.mjs instead of a local
+// hardcoded subset.
+const CATEGORY_SLUGS = new Set(SUBSCRIPTION_CATEGORY_SLUGS)
 
 function toIsoMidnight(dateValue) {
   if (typeof dateValue !== 'string') return null
@@ -62,8 +59,8 @@ export function buildPublicationIndex() {
     const filePath = path.join(ARTICLES_DIR, fileName)
     const raw = fs.readFileSync(filePath, 'utf8')
     const { data } = matter(raw)
-    // Only the six channel categories are syndicated; skip the rest rather
-    // than failing the whole sync (taxonomy has grown beyond these).
+    // Syndicate all known top-level categories; skip anything outside the
+    // taxonomy rather than failing the whole sync.
     const categorySlug = String(data?.category || '').trim()
     if (!CATEGORY_SLUGS.has(categorySlug)) continue
     rows.push(normalizeArticleRecord(filePath, data))
