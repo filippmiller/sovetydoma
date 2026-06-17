@@ -7,7 +7,6 @@
 
 import type { Env } from '../types'
 import { insertRows, selectRows, updateRows } from '../supabase'
-import { findArticleRecord } from './vk'
 import type { ArticleRow } from './types'
 
 export type SocialPlatform = 'vk' | 'fb'
@@ -44,7 +43,10 @@ export async function findLatestUnpostedArticle(env: Env, platform: SocialPlatfo
 
   for (const article of recentArticles) {
     if (postedSlugs.has(article.article_slug)) continue
-    if (!findArticleRecord(article.article_slug)) continue
+    // Candidacy is established by presence in articles_publication_index alone;
+    // the poster (resolveArticleRecord) sources the post body+image from the
+    // static index OR content_matrix, so dynamically-published articles (absent
+    // from the static index) must NOT be filtered out here.
     return article
   }
 
@@ -84,7 +86,8 @@ export async function findUnpostedArticleForCategory(env: Env, platform: SocialP
 
   for (const article of recentArticles) {
     if (postedSlugs.has(article.article_slug)) continue
-    if (!findArticleRecord(article.article_slug)) continue
+    // See findLatestUnpostedArticle: do not require the static index here, or
+    // dynamically-published (content_matrix) articles would never be posted.
     return article
   }
 

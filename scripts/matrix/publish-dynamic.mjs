@@ -222,10 +222,11 @@ for (const r of picked) {
   // Update DB row
   console.log(`  Updating database...`)
   const imageUrl = `${IMAGE_URL_PREFIX}/${r.image_filename}`
+  const publishedAt = new Date().toISOString()
   const { error: updErr } = await sb.from('content_matrix')
     .update({
       text_status: 'published',
-      published_at: new Date().toISOString(),
+      published_at: publishedAt,
       image_url: imageUrl,
       frontmatter: fm
     })
@@ -256,6 +257,28 @@ for (const r of picked) {
   if (evtErr) {
     console.error(`  Event log insert failed: ${evtErr.message}`)
     // Non-fatal: continue
+  }
+
+  // Make the freshly-published article a VK/FB autopost candidate WITHOUT a
+  // rebuild or worker redeploy. The social worker reads articles_publication_index
+  // (and social_publications has an FK → article_slug there), but that table is
+  // otherwise only fed from MDX at deploy time. Upserting here closes the seam
+  // between no-redeploy publishing and autopost. Category is whatever the matrix
+  // row carries — the table's CHECK mirrors content_matrix, so any published
+  // category is valid (no 6-category filter here).
+  const { error: idxErr } = await sb.from('articles_publication_index')
+    .upsert({
+      article_slug: r.slug,
+      category_slug: r.category,
+      title: r.title,
+      canonical_path: `/${r.category}/${r.slug}/`,
+      description: r.description || '',
+      published_at: publishedAt,
+    }, { onConflict: 'article_slug' })
+
+  if (idxErr) {
+    console.error(`  Publication-index upsert failed: ${idxErr.message}`)
+    // Non-fatal: article is live; autopost will just not pick it up until fixed.
   }
 
   console.log(`  ✓ Published ${r.slug}`)

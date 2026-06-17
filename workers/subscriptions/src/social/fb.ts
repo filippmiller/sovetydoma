@@ -1,5 +1,5 @@
 import type { Env } from '../types'
-import { findArticleRecord, isSameOrigin, sha256Text, type VkArticleRecord } from './vk'
+import { resolveArticleRecord, isSameOrigin, sha256Text, type VkArticleRecord } from './vk'
 
 // Facebook page feed/photo caption hard limit.
 export const MAX_FB_MESSAGE_CHARS = 63206
@@ -169,7 +169,7 @@ export async function publishArticleToFacebook(
   }
 
   const siteUrl = String(env.PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const record = findArticleRecord(articleSlug)
+  const record = await resolveArticleRecord(env, articleSlug)
   if (!record) {
     return { ok: false, articleSlug, messageLength: 0, bodyHash: '', error: 'article_not_found', errorCode: 'article_not_found' }
   }

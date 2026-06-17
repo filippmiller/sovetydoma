@@ -1,4 +1,5 @@
 import type { Env } from '../types'
+import { selectRows } from '../supabase'
 import vkPublicationIndex from '../generated/vk-publication-index.json'
 
 export type VkArticleRecord = {
@@ -94,6 +95,63 @@ export function validateVkConfig(env: Env): VkConfig {
 
 export function findArticleRecord(articleSlug: string): VkArticleRecord | undefined {
   return index.find((r) => r.article_slug === articleSlug)
+}
+
+type ContentMatrixRow = {
+  slug: string
+  category: string
+  title: string
+  description: string | null
+  image_filename: string | null
+  published_at: string | null
+}
+
+/**
+ * Resolve an article for social posting from either source, in priority order:
+ *   1. the static vk-publication-index.json (existing MDX articles — baked at
+ *      deploy; no DB call, behaviour byte-identical to before);
+ *   2. content_matrix (articles published by the no-redeploy factory, which
+ *      never produce MDX and so are absent from the static index).
+ * Returns undefined when neither source has the slug.
+ *
+ * The content_matrix fallback builds a short-announcement record (variant б):
+ * title + description + canonical link + photo. The article body stays behind
+ * the link — no Markdown strip in the worker yet (possible follow-up).
+ */
+export async function resolveArticleRecord(env: Env, articleSlug: string): Promise<VkArticleRecord | undefined> {
+  const fromIndex = findArticleRecord(articleSlug)
+  if (fromIndex) return fromIndex
+
+  let rows: ContentMatrixRow[]
+  try {
+    rows = await selectRows<ContentMatrixRow>(
+      env,
+      'content_matrix',
+      [
+        `slug=eq.${encodeURIComponent(articleSlug)}`,
+        'domain=eq.1001sovet.ru',
+        'text_status=eq.published',
+        'select=slug,category,title,description,image_filename,published_at',
+        'limit=1',
+      ].join('&'),
+    )
+  } catch {
+    return undefined
+  }
+
+  const row = rows[0]
+  if (!row || !row.category || !row.title) return undefined
+
+  return {
+    article_slug: row.slug,
+    category_slug: row.category,
+    title: row.title,
+    description: row.description || '',
+    canonical_path: `/${row.category}/${row.slug}/`,
+    image_path: row.image_filename ? `/images/${row.image_filename}` : `/images/${row.slug}.jpg`,
+    plain_text: '',
+    published_at: row.published_at,
+  }
 }
 
 export function buildVkArticlePost(input: VkPostInput): VkPostResult {
@@ -246,7 +304,7 @@ export async function publishArticleToVk(
   }
 
   const siteUrl = String(env.PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const record = findArticleRecord(articleSlug)
+  const record = await resolveArticleRecord(env, articleSlug)
 
   if (!record) {
     return { ok: false, articleSlug, messageLength: 0, bodyHash: '', error: 'article_not_found', errorCode: 'article_not_found' }
