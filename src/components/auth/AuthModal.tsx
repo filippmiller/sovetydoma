@@ -41,9 +41,11 @@ interface Props {
   initialTab?: 'login' | 'register'
   /** Optional context line shown under the title, e.g. why the modal opened. */
   reason?: string
+  /** Open directly in password-reset mode (user arrived via a recovery link). */
+  forceReset?: boolean
 }
 
-export default function AuthModal({ isOpen, onClose, initialTab = 'login', reason }: Props) {
+export default function AuthModal({ isOpen, onClose, initialTab = 'login', reason, forceReset = false }: Props) {
   const [tab, setTab] = useState<'login' | 'register'>(initialTab)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -202,7 +204,8 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       setEmailError('')
       setSuccess(null)
       setTab(initialTab)
-      setMode('login')
+      // Recovery link → open straight on the "set new password" form, otherwise login.
+      setMode(forceReset ? 'reset' : 'login')
       setEmail('')
       setPassword('')
       setRegisterEmail('')
@@ -220,7 +223,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       window.clearTimeout(resetId)
       window.removeEventListener('keydown', handleKey)
     }
-  }, [isOpen, onClose, initialTab])
+  }, [isOpen, onClose, initialTab, forceReset])
 
   // P0: Listen for Supabase PASSWORD_RECOVERY event (fires when user follows the reset link and client picks up the tokens)
   useEffect(() => {

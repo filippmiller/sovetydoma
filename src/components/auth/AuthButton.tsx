@@ -13,8 +13,38 @@ export default function AuthButton() {
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  // True when the user arrived via a password-reset link — opens the modal
+  // straight on the "set new password" form, even if a (recovery) session exists.
+  const [recovery, setRecovery] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const closeModal = () => {
+    setModalOpen(false)
+    if (recovery) {
+      setRecovery(false)
+      // Strip the recovery token hash so a refresh doesn't re-open the reset form.
+      try {
+        if (window.location.hash.includes('type=recovery')) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search)
+        }
+      } catch { /* ignore */ }
+    }
+  }
+
+  // Deterministic recovery detection: the email link lands with `#type=recovery`
+  // in the hash. Catch it on mount so we don't depend on racing the
+  // PASSWORD_RECOVERY auth event (which can fire before listeners attach).
+  useEffect(() => {
+    if (!authConfigured || typeof window === 'undefined') return
+    // Browser-only URL read — must run post-mount (SSG renders without window),
+    // so the one-time setState here is intentional.
+    if (window.location.hash.includes('type=recovery')) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRecovery(true)
+      setModalOpen(true)
+    }
+  }, [authConfigured])
 
   useEffect(() => {
     if (!authConfigured) return
@@ -87,6 +117,7 @@ export default function AuthButton() {
 
       // P0: When user follows password reset link, open the auth modal in reset mode
       if (event === 'PASSWORD_RECOVERY') {
+        setRecovery(true)
         setModalOpen(true)
       }
     })
@@ -143,7 +174,7 @@ export default function AuthButton() {
           <span aria-hidden="true">👤</span>
           Войти
         </button>
-        <AuthModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+        <AuthModal isOpen={modalOpen} forceReset={recovery} onClose={closeModal} />
       </>
     )
   }
@@ -153,6 +184,9 @@ export default function AuthButton() {
 
   return (
     <div ref={dropdownRef} style={{ position: 'relative', flexShrink: 0 }}>
+      {/* Recovery link can arrive while a (recovery) session already exists —
+          keep the modal available in the logged-in state too. */}
+      <AuthModal isOpen={modalOpen} forceReset={recovery} onClose={closeModal} />
       <button
         onClick={() => setDropdownOpen((o) => !o)}
         aria-haspopup="true"
