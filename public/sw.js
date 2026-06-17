@@ -1,5 +1,5 @@
-const CACHE = 'sovetydoma-v1'
-const ARTICLE_CACHE = 'sovetydoma-articles-v1'
+const CACHE = 'sovetydoma-v2'
+const ARTICLE_CACHE = 'sovetydoma-articles-v2'
 const MAX_ARTICLES = 10
 
 self.addEventListener('install', e => {
@@ -11,7 +11,12 @@ self.addEventListener('install', e => {
 })
 
 self.addEventListener('activate', e => {
-  e.waitUntil(clients.claim())
+  // Drop caches from older SW versions so deploys reach returning users.
+  e.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== ARTICLE_CACHE).map(k => caches.delete(k))))
+      .then(() => clients.claim())
+  )
 })
 
 self.addEventListener('push', e => {
@@ -45,6 +50,11 @@ self.addEventListener('notificationclick', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url)
+  // Only ever handle same-origin GET. Never intercept cross-origin requests
+  // (e.g. the Supabase Auth API at api.1001sovet.ru): wrapping them in
+  // fetch().catch(caches.match) masks real responses/errors and broke
+  // password recovery (getUser → "Failed to fetch"). Let the browser handle them.
+  if (url.origin !== self.location.origin || e.request.method !== 'GET') return
   // Article pages: network first, cache fallback
   if (url.pathname.match(/^\/[a-z-]+\/[a-z0-9-]+\/$/)) {
     e.respondWith(
