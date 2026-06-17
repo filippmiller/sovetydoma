@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<title>auth recovery debug</title>
+<style>body{font:14px/1.5 monospace;padding:1rem;max-width:900px;margin:auto}pre{background:#111;color:#0f0;padding:1rem;border-radius:8px;white-space:pre-wrap;word-break:break-all}h2{margin:1rem 0 .25rem}</style>
+</head>
+<body>
+<h1>Auth recovery diagnostic (redacted)</h1>
+<p>Isolated page: no app shell, does not register a service worker. Loads @supabase/supabase-js@2.106.2 from CDN with the same client config. Tokens are never printed.</p>
+<pre id="out">running…</pre>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.106.2'
+
+const URL_ = 'https://api.1001sovet.ru'
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzgxMDAwMDAwLCJleHAiOjIwOTYzNjAwMDB9.reN2LvNIuuf9y0P7w_nWvI1hoKhvNMiwSqBMfelzKaI'
+const out = document.getElementById('out')
+const log = []
+const redact = (s) => (typeof s === 'string' && /^eyJ|^EAA/.test(s)) ? '[redacted ' + s.length + ']' : s
+const show = (o) => { out.textContent = JSON.stringify(o, null, 2) }
+
+// fetch logger: records exactly what supabase issues (no token values)
+function makeLoggingFetch(force) {
+  return async (input, init) => {
+    const req = (typeof input === 'object' && input.url) ? input : null
+    const url = req ? req.url : String(input)
+    const method = (init && init.method) || (req && req.method) || 'GET'
+    const credReq = req ? req.credentials : undefined
+    const credInit = init ? init.credentials : undefined
+    const effectiveInit = force ? { ...init, credentials: 'omit' } : init
+    const entry = { url: url.replace(URL_, ''), method, credReq, credInit, forced: force ? 'omit' : null }
+    try {
+      const res = await fetch(input, effectiveInit)
+      entry.status = res.status
+      log.push(entry)
+      return res
+    } catch (e) {
+      entry.error = String(e)
+      log.push(entry)
+      throw e
+    }
+  }
+}
+
+const hash = new URLSearchParams(location.hash.slice(1))
+const access_token = hash.get('access_token')
+const refresh_token = hash.get('refresh_token')
+let email = null
+try { email = JSON.parse(atob((access_token||'').split('.')[1])).email } catch {}
+
+const result = { hashType: hash.get('type'), email, hasTokens: !!(access_token && refresh_token), clients: {} }
+
+async function runClient(name, force) {
+  const r = { steps: {} }
+  try {
+    const sb = createClient(URL_, ANON, {
+      global: { fetch: makeLoggingFetch(force) },
+      auth: { persistSession: false, detectSessionInUrl: false, autoRefreshToken: false },
+    })
+    // exact recovery sequence
+    if (access_token && refresh_token) {
+      const ss = await sb.auth.setSession({ access_token, refresh_token })
+      r.steps.setSession = { ok: !ss.error, err: ss.error?.message, hasSession: !!ss.data?.session, email: ss.data?.user?.email }
+    }
+    const gu = await sb.auth.getUser()
+    r.steps.getUser = { ok: !gu.error, err: gu.error?.message, email: gu.data?.user?.email }
+  } catch (e) {
+    r.fatal = String(e)
+  }
+  return r
+}
+
+(async () => {
+  // primary: omit wrapper (matches prod config)
+  log.length = 0
+  result.clients.omit = await runClient('omit', true)
+  result.clients.omit.requests = log.slice()
+  // comparison: default credentials (no wrapper)
+  log.length = 0
+  result.clients.default = await runClient('default', false)
+  result.clients.default.requests = log.slice()
+  // raw fetch matrix to /auth/v1/user
+  result.rawMatrix = {}
+  for (const mode of ['omit', 'same-origin', 'include']) {
+    try {
+      const res = await fetch(URL_ + '/auth/v1/user', { credentials: mode, headers: { apikey: ANON, Authorization: 'Bearer ' + (access_token || 'x') } })
+      result.rawMatrix[mode] = res.status
+    } catch (e) { result.rawMatrix[mode] = 'ERR:' + String(e).slice(0, 40) }
+  }
+  result.sw = { controlled: !!(navigator.serviceWorker && navigator.serviceWorker.controller) }
+  show(result)
+})()
+</script>
+</body>
+</html>
