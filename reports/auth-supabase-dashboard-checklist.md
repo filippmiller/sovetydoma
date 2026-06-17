@@ -26,7 +26,15 @@
 
 ---
 
-**For owner / person with dashboard access to project `plwkjdpuxjkmpkqiqzkk`**
+# ⛔ SUPERSEDED (EU project + Mailcow) — DO NOT FOLLOW
+
+> Everything below describes the **old EU Supabase project `plwkjdpuxjkmpkqiqzkk`**
+> and a **Mailcow SMTP** (`mail.filippmiller.com:587`) setup that is **NO LONGER
+> USED**. Auth is RU self-hosted + Resend on port **2587** (see the RESOLVED
+> section at the top). Kept for history only. If you act on the lines below
+> (e.g. set port 587 or point at Mailcow) you WILL re-break email.
+
+**For owner / person with dashboard access to project `plwkjdpuxjkmpkqiqzkk`** *(SUPERSEDED)*
 
 This must be verified/fixed for reliable registration + password reset emails.
 
