@@ -1,5 +1,31 @@
 # Supabase Auth Dashboard & Email Deliverability Checklist
 
+> ## ✅ RESOLVED 2026-06-17 — root cause was a blocked SMTP port
+>
+> Auth is now **RU self-hosted** (`api.1001sovet.ru`, GoTrue in docker at
+> `/srv/apps/supabase-1001sovet`), NOT the old EU project below.
+>
+> **The real blocker for BOTH confirmation and password-reset emails:** the
+> Timeweb host **blocks outbound SMTP ports 587, 465 and 25**. GoTrue's
+> synchronous email send hung → `signup`/`recover` returned **504
+> (context deadline exceeded)**, so no email ever left the box.
+>
+> **Fix:** Resend offers alternate ports that Timeweb leaves open — **2587
+> (STARTTLS) and 2465 (TLS)**. Changed `SMTP_PORT=587 → 2587` in
+> `/srv/apps/supabase-1001sovet/.env` and recreated the `auth` container.
+> Verified: `POST /auth/v1/recover` → **200 in ~20ms**, email delivered.
+>
+> GoTrue config that is already correct on the RU box: `GOTRUE_SITE_URL=https://1001sovet.ru`,
+> `GOTRUE_URI_ALLOW_LIST` includes `/moy-kabinet/`, `/auth/callback/`, `/**`,
+> `GOTRUE_MAILER_AUTOCONFIRM=false`, SMTP host `smtp.resend.com`, sender `noreply@1001sovet.ru`.
+>
+> Frontend fix shipped same day: recovery link (`#type=recovery`) now opens the
+> reset form on any page (commit `3032d4b`). See [[fb-responder-setup]] sibling work.
+>
+> The EU-project section below is retained only as historical reference.
+
+---
+
 **For owner / person with dashboard access to project `plwkjdpuxjkmpkqiqzkk`**
 
 This must be verified/fixed for reliable registration + password reset emails.
