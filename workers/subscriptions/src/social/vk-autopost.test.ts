@@ -472,6 +472,7 @@ test('processVkAutopost resolves a dynamic content_matrix article missing from t
   const DYN = 'dinamicheskaya-statya-bez-mdx'
   const originalFetch = globalThis.fetch
   let wallPostCalled = false
+  let contentMatrixQueried = false
   globalThis.fetch = async (input: RequestInfo | URL) => {
     const url = typeof input === 'string' ? input : input.toString()
     if (url.includes('/rpc/')) {
@@ -481,6 +482,7 @@ test('processVkAutopost resolves a dynamic content_matrix article missing from t
       return new Response(JSON.stringify([]), { status: 200, headers: { 'content-type': 'application/json' } })
     }
     if (url.includes('content_matrix')) {
+      contentMatrixQueried = true
       return new Response(JSON.stringify([{
         slug: DYN,
         category: 'dacha-i-ogorod',
@@ -522,6 +524,61 @@ test('processVkAutopost resolves a dynamic content_matrix article missing from t
     assert.equal(result.articleSlug, DYN)
     assert.equal(result.providerPostId, '4242')
     assert.equal(wallPostCalled, true)
+    // Proves resolution came from content_matrix (DB fallback), not the static JSON.
+    assert.equal(contentMatrixQueried, true)
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('processVkAutopost surfaces article_lookup_failed (not article_not_found) on content_matrix DB error', async () => {
+  // Candidate exists in articles_publication_index but is absent from the static
+  // index; the content_matrix lookup then errors. The resolver must NOT mask this
+  // as "not found" — autopost should report a diagnosable lookup failure and not
+  // attempt to post.
+  const DYN = 'dinamicheskaya-statya-db-error'
+  const originalFetch = globalThis.fetch
+  let wallPostCalled = false
+  globalThis.fetch = async (input: RequestInfo | URL) => {
+    const url = typeof input === 'string' ? input : input.toString()
+    if (url.includes('/rpc/')) {
+      return new Response(JSON.stringify({ allowed: true, bucket: 'test' }), { status: 200, headers: { 'content-type': 'application/json' } })
+    }
+    if (url.includes('social_publications')) {
+      return new Response(JSON.stringify([]), { status: 200, headers: { 'content-type': 'application/json' } })
+    }
+    if (url.includes('content_matrix')) {
+      // Simulate a transient Supabase failure during the resolver lookup.
+      return new Response('boom', { status: 500, headers: { 'content-type': 'text/plain' } })
+    }
+    if (url.includes('articles_publication_index')) {
+      return new Response(JSON.stringify([{
+        article_slug: DYN,
+        category_slug: 'dacha-i-ogorod',
+        title: 'Статья с ошибкой БД',
+        canonical_path: `/dacha-i-ogorod/${DYN}/`,
+        description: 'desc',
+        published_at: '2026-06-06T00:00:00.000Z',
+        first_seen_at: '2026-06-06T00:00:00.000Z',
+      }]), { status: 200, headers: { 'content-type': 'application/json' } })
+    }
+    if (url.includes('/wall.post')) {
+      wallPostCalled = true
+      return new Response(JSON.stringify({ response: { post_id: 1 } }), { status: 200, headers: { 'content-type': 'application/json' } })
+    }
+    return new Response(JSON.stringify({ id: 'publication-row' }), { status: 201, headers: { 'content-type': 'application/json' } })
+  }
+
+  try {
+    const result = await processVkAutopost({
+      ...baseEnv,
+      VK_PHOTO_ACCESS_TOKEN: undefined,
+      VK_API_BASE_URL: 'https://api.vk.test/method',
+    }, new Date('2026-06-06T09:00:00Z'))
+    assert.equal(result.ran, true)
+    assert.notEqual(result.posted, true)
+    assert.equal(result.errorCode, 'article_lookup_failed')
+    assert.equal(wallPostCalled, false)
   } finally {
     globalThis.fetch = originalFetch
   }

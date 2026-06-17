@@ -165,7 +165,9 @@ const generatePreview = (imageFilename, slug) => {
 
 let published = 0
 let skipped = 0
+let indexFailures = 0
 const skipReasons = []
+const indexFailReasons = []
 
 for (const r of picked) {
   const imagePath = path.join(IMAGES_DIR, r.image_filename)
@@ -277,8 +279,14 @@ for (const r of picked) {
     }, { onConflict: 'article_slug' })
 
   if (idxErr) {
+    // The article IS live (DB+R2), so this is not a publish failure — but it is
+    // a DEGRADED outcome: without the articles_publication_index row the social
+    // worker can never pick it up for VK/FB autopost. Track it so the run exits
+    // non-zero and CI/cron surfaces the broken autopost contract instead of
+    // reporting a fully-successful publish.
     console.error(`  Publication-index upsert failed: ${idxErr.message}`)
-    // Non-fatal: article is live; autopost will just not pick it up until fixed.
+    indexFailures++
+    indexFailReasons.push(`${r.slug}: articles_publication_index upsert failed (${idxErr.message}) — live but NOT autopost-eligible`)
   }
 
   console.log(`  ✓ Published ${r.slug}`)
@@ -286,7 +294,7 @@ for (const r of picked) {
 }
 
 console.log(`\n${'='.repeat(60)}`)
-console.log(`Done. Published ${published}, skipped ${skipped}.`)
+console.log(`Done. Published ${published}, skipped ${skipped}, index failures ${indexFailures}.`)
 if (skipReasons.length > 0) {
   console.log(`\nSkip reasons:`)
   for (const reason of skipReasons) {
@@ -294,4 +302,14 @@ if (skipReasons.length > 0) {
   }
 }
 
-process.exit(published > 0 && skipped === 0 ? 0 : skipped > 0 ? 1 : 0)
+const degraded = indexFailures > 0
+if (degraded) {
+  console.error(`\n⚠️  DEGRADED: ${indexFailures} article(s) published live but NOT added to articles_publication_index — VK/FB autopost will NOT pick them up until the index is fixed/re-run.`)
+  for (const reason of indexFailReasons) {
+    console.error(`  - ${reason}`)
+  }
+}
+
+// Exit non-zero on any skip OR any degraded (index) outcome, so cron/GitHub
+// Actions see that the autopost index was not fully updated.
+process.exit((skipped > 0 || degraded) ? 1 : 0)

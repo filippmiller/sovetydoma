@@ -169,7 +169,13 @@ export async function publishArticleToFacebook(
   }
 
   const siteUrl = String(env.PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const record = await resolveArticleRecord(env, articleSlug)
+  let record: VkArticleRecord | undefined
+  try {
+    record = await resolveArticleRecord(env, articleSlug)
+  } catch (err) {
+    // Transient lookup/DB error — distinct from "not found" so autopost logs are honest.
+    return { ok: false, articleSlug, messageLength: 0, bodyHash: '', error: (err as Error).message, errorCode: 'article_lookup_failed' }
+  }
   if (!record) {
     return { ok: false, articleSlug, messageLength: 0, bodyHash: '', error: 'article_not_found', errorCode: 'article_not_found' }
   }

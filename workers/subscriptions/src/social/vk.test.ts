@@ -105,10 +105,38 @@ test('buildVkArticlePost throws message_too_long when exceeding limit', () => {
   })
 })
 
-test('publishArticleToVk returns article_not_found for unknown slug', async () => {
-  const result = await publishArticleToVk(baseEnv, 'nonexistent-article-12345', { dryRun: true })
-  assert.equal(result.ok, false)
-  assert.equal(result.errorCode, 'article_not_found')
+test('publishArticleToVk returns article_not_found for unknown slug (DB reachable, empty)', async () => {
+  // Not in the static index AND content_matrix returns no row → genuine not-found.
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify([]), { status: 200, headers: { 'content-type': 'application/json' } })
+  try {
+    const result = await publishArticleToVk(
+      { ...baseEnv, SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'test-key' },
+      'nonexistent-article-12345',
+      { dryRun: true },
+    )
+    assert.equal(result.ok, false)
+    assert.equal(result.errorCode, 'article_not_found')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('publishArticleToVk returns article_lookup_failed when content_matrix lookup errors', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async () => new Response('boom', { status: 500, headers: { 'content-type': 'text/plain' } })
+  try {
+    const result = await publishArticleToVk(
+      { ...baseEnv, SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'test-key' },
+      'nonexistent-article-12345',
+      { dryRun: true },
+    )
+    assert.equal(result.ok, false)
+    assert.equal(result.errorCode, 'article_lookup_failed')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
 })
 
 test('publishArticleToVk dry-run succeeds for known article', async () => {

@@ -112,7 +112,11 @@ type ContentMatrixRow = {
  *      deploy; no DB call, behaviour byte-identical to before);
  *   2. content_matrix (articles published by the no-redeploy factory, which
  *      never produce MDX and so are absent from the static index).
- * Returns undefined when neither source has the slug.
+ * Returns undefined ONLY when neither source has the slug (genuine
+ * not-found). A content_matrix query/Supabase failure is NOT swallowed — it
+ * throws Error('article_lookup_failed') so callers can distinguish a transient
+ * lookup error from missing data (otherwise a flaky DB would look like
+ * "article_not_found" and corrupt autopost diagnostics).
  *
  * The content_matrix fallback builds a short-announcement record (variant б):
  * title + description + canonical link + photo. The article body stays behind
@@ -135,8 +139,11 @@ export async function resolveArticleRecord(env: Env, articleSlug: string): Promi
         'limit=1',
       ].join('&'),
     )
-  } catch {
-    return undefined
+  } catch (err) {
+    // Surface as a distinct, diagnosable error — do NOT collapse to not-found.
+    const e = new Error('article_lookup_failed')
+    ;(e as Error & { cause?: unknown }).cause = err
+    throw e
   }
 
   const row = rows[0]
@@ -304,7 +311,13 @@ export async function publishArticleToVk(
   }
 
   const siteUrl = String(env.PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const record = await resolveArticleRecord(env, articleSlug)
+  let record: VkArticleRecord | undefined
+  try {
+    record = await resolveArticleRecord(env, articleSlug)
+  } catch (err) {
+    // Transient lookup/DB error — distinct from "not found" so autopost logs are honest.
+    return { ok: false, articleSlug, messageLength: 0, bodyHash: '', error: (err as Error).message, errorCode: 'article_lookup_failed' }
+  }
 
   if (!record) {
     return { ok: false, articleSlug, messageLength: 0, bodyHash: '', error: 'article_not_found', errorCode: 'article_not_found' }
