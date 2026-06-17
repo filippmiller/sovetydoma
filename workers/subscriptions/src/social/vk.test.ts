@@ -28,6 +28,14 @@ test('resolveVkGroupForCategory returns undefined when env is empty', () => {
   assert.equal(resolveVkGroupForCategory({}, 'dacha-i-ogorod'), undefined)
 })
 
+test('resolveVkGroupForCategory routes a newer top-level category (12-category taxonomy)', () => {
+  // Routing is map-driven, not gated to the original 6 categories: any of the
+  // 12 top-level categories present in VK_GROUPS_BY_CATEGORY resolves.
+  const env = { VK_GROUPS_BY_CATEGORY: JSON.stringify({ avto: { groupId: '999' }, 'zdorovie-i-bezopasnost': { groupId: '888' } }) }
+  assert.deepEqual(resolveVkGroupForCategory(env, 'avto'), { groupId: '999' })
+  assert.deepEqual(resolveVkGroupForCategory(env, 'zdorovie-i-bezopasnost'), { groupId: '888' })
+})
+
 test('resolveVkGroupForCategory returns undefined on malformed JSON (graceful fallback)', () => {
   assert.equal(resolveVkGroupForCategory({ VK_GROUPS_BY_CATEGORY: 'not valid json' }, 'dacha-i-ogorod'), undefined)
 })

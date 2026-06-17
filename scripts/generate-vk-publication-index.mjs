@@ -3,20 +3,16 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import matter from 'gray-matter'
 import { renderSocialText } from './lib/social-text.mjs'
+import { SUBSCRIPTION_CATEGORY_SLUGS } from '../src/lib/subscriptions/constants.mjs'
 
 const ROOT = process.cwd()
 const ARTICLES_DIR = path.join(ROOT, 'src/content/articles')
 const OUT_DIR = path.join(ROOT, 'workers/subscriptions/src/generated')
 const OUT_FILE = path.join(OUT_DIR, 'vk-publication-index.json')
 
-const CATEGORY_SLUGS = new Set([
-  'kulinaria',
-  'dom-i-uborka',
-  'dacha-i-ogorod',
-  'layfkhaki',
-  'ekonomiya',
-  'rybalka',
-])
+// Single source of truth for top-level categories (all 12) — keep in sync via
+// src/lib/subscriptions/constants.mjs instead of a local hardcoded subset.
+const CATEGORY_SLUGS = new Set(SUBSCRIPTION_CATEGORY_SLUGS)
 
 function toIsoMidnight(dateValue) {
   if (typeof dateValue !== 'string') return null
