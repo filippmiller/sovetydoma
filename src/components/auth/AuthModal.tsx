@@ -458,6 +458,16 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     }
 
     setResetLoading(true)
+    // Ensure the recovery session is active on the client this call uses BEFORE
+    // updateUser. Otherwise updateUser can fail locally ("Auth session missing",
+    // no network call) if the recovery session wasn't carried into this client
+    // instance. Recovery tokens live in the URL hash; setSession is idempotent.
+    try {
+      const hp = new URLSearchParams((typeof window !== 'undefined' ? window.location.hash : '').replace(/^#/, ''))
+      const at = hp.get('access_token')
+      const rt = hp.get('refresh_token')
+      if (at && rt) await supabase.auth.setSession({ access_token: at, refresh_token: rt })
+    } catch { /* fall through — updateUser will surface any real failure */ }
     const { error: err } = await supabase.auth.updateUser({ password: submittedNewPassword })
     setResetLoading(false)
 
