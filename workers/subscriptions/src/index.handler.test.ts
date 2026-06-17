@@ -483,3 +483,52 @@ test('vk id exchange falls back to a private email when VK omits email', async (
     globalThis.fetch = originalFetch
   }
 })
+
+// ── GET /admin/social/autopost-inventory (redacted coverage) ────────────────
+
+test('autopost-inventory returns 503 when ADMIN_API_KEY is not configured', async () => {
+  const response = await worker.fetch(request('/admin/social/autopost-inventory'), baseEnv)
+  assert.equal(response.status, 503)
+})
+
+test('autopost-inventory returns 401 without a valid admin key', async () => {
+  const response = await worker.fetch(request('/admin/social/autopost-inventory'), { ...baseEnv, ADMIN_API_KEY: 'topsecret' })
+  assert.equal(response.status, 401)
+})
+
+test('autopost-inventory returns redacted coverage (slugs only, no IDs/tokens)', async () => {
+  const env: Env = {
+    ...baseEnv,
+    ADMIN_API_KEY: 'topsecret',
+    VK_GROUPS_BY_CATEGORY: JSON.stringify({
+      'dacha-i-ogorod': { groupId: 'SECRET_GID_111' },
+      avto: { groupId: 'SECRET_GID_222' },
+    }),
+    FB_PAGES_BY_CATEGORY: JSON.stringify({
+      'dom-i-uborka': { id: 'SECRET_PID_333', token: 'EAA_SECRET_TOKEN' },
+    }),
+  }
+  const response = await worker.fetch(request('/admin/social/autopost-inventory', {
+    headers: { 'x-admin-key': 'topsecret' },
+  }), env)
+  assert.equal(response.status, 200)
+
+  const raw = await response.text()
+  // Redaction: no group IDs / page IDs / tokens may appear in the response.
+  assert.ok(!raw.includes('SECRET_GID_111'), 'must not leak VK groupId')
+  assert.ok(!raw.includes('SECRET_GID_222'), 'must not leak VK groupId')
+  assert.ok(!raw.includes('SECRET_PID_333'), 'must not leak FB page id')
+  assert.ok(!raw.includes('EAA_SECRET_TOKEN'), 'must not leak FB token')
+
+  const body = JSON.parse(raw)
+  assert.equal(body.ok, true)
+  assert.equal(body.total, 12)
+  assert.deepEqual([...body.vk.present].sort(), ['avto', 'dacha-i-ogorod'])
+  assert.equal(body.vk.count, 2)
+  assert.equal(body.vk.missing.length, 10)
+  assert.deepEqual(body.fb.present, ['dom-i-uborka'])
+  assert.equal(body.fb.count, 1)
+  assert.equal(body.fb.missing.length, 11)
+  assert.ok(!body.vk.missing.includes('avto'))
+  assert.ok(!body.fb.missing.includes('dom-i-uborka'))
+})

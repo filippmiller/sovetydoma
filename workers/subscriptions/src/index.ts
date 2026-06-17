@@ -1,5 +1,5 @@
 import type { Env, SubscriptionStartRequest, DirectChannel } from './types'
-import { buildSubscriptionsDiagnostics, handleDryRun, handleSubscriptionsDiagnostics, handleTestSend, requireAdmin } from './admin'
+import { buildSubscriptionsDiagnostics, handleAutopostInventory, handleDryRun, handleSubscriptionsDiagnostics, handleTestSend, requireAdmin } from './admin'
 import { processDueDigests } from './delivery'
 import { createConfirmation, createSecureToken, sha256Hex, verifySignedContactToken } from './confirmations'
 import { getProviderReadiness, sendDigestToChannel } from './providers/registry'
@@ -1385,6 +1385,10 @@ export async function route(req: Request, env: Env): Promise<Response> {
 
   if (req.method === 'POST' && url.pathname === '/admin/social/fb/post') {
     return handleFbPost(req, env)
+  }
+
+  if (req.method === 'GET' && url.pathname === '/admin/social/autopost-inventory') {
+    return handleAutopostInventory(req, env)
   }
 
   if (req.method === 'POST' && url.pathname === '/push/subscribe') {

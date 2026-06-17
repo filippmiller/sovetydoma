@@ -58,6 +58,17 @@ function parseCategoryGroupMap(env: Env): Map<string, string> | null {
 }
 
 /**
+ * Category slugs that VK autopost can actually route to (a category counts only
+ * if its map entry has a groupId — same validation as parseCategoryGroupMap).
+ * Returns [] when the map is absent/empty/malformed. Keys only — never exposes
+ * group IDs (used by the redacted admin inventory endpoint).
+ */
+export function vkConfiguredCategories(env: Env): string[] {
+  const map = parseCategoryGroupMap(env)
+  return map ? [...map.keys()] : []
+}
+
+/**
  * Process one category in multi-group mode.
  * Returns a VkCategoryResult describing what happened.
  */

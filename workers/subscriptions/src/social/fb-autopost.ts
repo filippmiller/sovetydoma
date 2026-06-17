@@ -58,6 +58,18 @@ function parseCategoryPageMap(env: Env): Map<string, FbPageOverride> | null {
 }
 
 /**
+ * Category slugs that FB autopost can actually route to (a category counts only
+ * if its map entry has BOTH id and token — same validation as
+ * parseCategoryPageMap). Returns [] when the map is absent/empty/malformed.
+ * Keys only — never exposes page IDs or tokens (used by the redacted admin
+ * inventory endpoint).
+ */
+export function fbConfiguredCategories(env: Env): string[] {
+  const map = parseCategoryPageMap(env)
+  return map ? [...map.keys()] : []
+}
+
+/**
  * Process one category in multi-page mode.
  */
 async function processCategoryAutopost(
