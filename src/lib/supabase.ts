@@ -14,7 +14,15 @@ export function getSupabase(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
   if (!url || !key) throw new Error('Supabase env vars not set')
-  _client = createClient(url, key)
+  // Force credentials:'omit' on every request. Self-hosted GoTrue/Kong returns
+  // `Access-Control-Allow-Origin: *` together with `Access-Control-Allow-Credentials: true`
+  // — an invalid combo that the browser rejects ("TypeError: Failed to fetch") for any
+  // credentialed request (which is what gotrue-js issues for getUser/setSession). Our auth
+  // is Bearer + localStorage and never uses cookies, so omitting credentials is safe and
+  // makes the CORS response valid. Without this, password recovery / session validation fail.
+  const omitCredsFetch: typeof fetch = (input, init) =>
+    fetch(input, { ...init, credentials: 'omit' })
+  _client = createClient(url, key, { global: { fetch: omitCredsFetch } })
   return _client
 }
 
