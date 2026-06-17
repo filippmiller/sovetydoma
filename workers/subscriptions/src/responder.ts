@@ -284,7 +284,13 @@ export async function handleResponderSend(req: Request, env: Env): Promise<Respo
         : await vkSendMessage(cfg, String(row.thread_ref || ''), reply)
     } else {
       // Reply on the SAME page the event arrived on (group_ref = page id).
-      const cfg = validateFbConfig(env, resolveFbPageById(env, row.group_ref || undefined))
+      // Fail CLOSED: with a known group_ref that has no token in the map, do NOT
+      // silently fall back to the default page (would reply as the wrong page).
+      const override = resolveFbPageById(env, row.group_ref || undefined)
+      if (row.group_ref && !override) {
+        throw new Error(`no_fb_page_token_for_page:${row.group_ref}`)
+      }
+      const cfg = validateFbConfig(env, override)
       result = row.event_type === 'comment'
         ? await fbReplyToComment(cfg, idTail, reply)
         : await fbSendMessage(cfg, String(row.thread_ref || ''), reply)

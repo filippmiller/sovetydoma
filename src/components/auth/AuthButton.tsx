@@ -37,13 +37,25 @@ export default function AuthButton() {
   // PASSWORD_RECOVERY auth event (which can fire before listeners attach).
   useEffect(() => {
     if (!authConfigured || typeof window === 'undefined') return
-    // Browser-only URL read — must run post-mount (SSG renders without window),
-    // so the one-time setState here is intentional.
-    if (window.location.hash.includes('type=recovery')) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    const hash = window.location.hash
+    if (!hash.includes('type=recovery')) return
+    // GoTrue recovery redirects with the session tokens in the hash. Relying on
+    // the client's detectSessionInUrl is fragile (it depends on flowType and
+    // ignores hash tokens under PKCE), so establish the recovery session
+    // explicitly — without it updateUser() has no auth and the reset fails.
+    const params = new URLSearchParams(hash.slice(1))
+    const access_token = params.get('access_token')
+    const refresh_token = params.get('refresh_token')
+    let cancelled = false
+    ;(async () => {
+      if (access_token && refresh_token) {
+        try { await getSupabase().auth.setSession({ access_token, refresh_token }) } catch { /* form will surface the failure */ }
+      }
+      if (cancelled) return
       setRecovery(true)
       setModalOpen(true)
-    }
+    })()
+    return () => { cancelled = true }
   }, [authConfigured])
 
   useEffect(() => {
