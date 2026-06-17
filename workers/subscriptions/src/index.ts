@@ -1429,7 +1429,7 @@ export async function scheduled(_event: ScheduledEvent, env: Env): Promise<void>
   // Draft replies for any pending responder items (held for human review).
   try {
     const r = await draftPendingResponderItems(env)
-    if (r.drafted || r.skipped) console.log('responder_drafts', JSON.stringify(r))
+    if (r.drafted || r.skipped || r.errored) console.log('responder_drafts', JSON.stringify(r))
   } catch (err) {
     console.error('responder_draft_unexpected_error', (err as Error).message)
   }

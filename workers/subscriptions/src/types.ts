@@ -85,6 +85,8 @@ export type Env = {
   FB_API_BASE_URL?: string
   FB_AUTOPOST_MAX_DAILY?: string
   FB_PAGES_BY_CATEGORY?: string
+  // {"<pageId>":"<pageAccessToken>"} — responder picks the token for the page an event arrived on
+  FB_PAGE_TOKENS_BY_ID?: string
   VAPID_PUBLIC_KEY?: string
   VAPID_PRIVATE_KEY?: string
   VAPID_SUBJECT?: string
