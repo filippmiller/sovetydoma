@@ -56,10 +56,36 @@ test('publishArticleToFacebook returns provider_unconfigured without config', as
   assert.equal(result.errorCode, 'provider_unconfigured')
 })
 
-test('publishArticleToFacebook returns article_not_found for unknown slug', async () => {
-  const result = await publishArticleToFacebook(baseEnv, 'no-such-article')
-  assert.equal(result.ok, false)
-  assert.equal(result.errorCode, 'article_not_found')
+test('publishArticleToFacebook returns article_not_found for unknown slug (DB reachable, empty)', async () => {
+  // Not in the static index AND content_matrix returns no row → genuine not-found.
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify([]), { status: 200, headers: { 'content-type': 'application/json' } })
+  try {
+    const result = await publishArticleToFacebook(
+      { ...baseEnv, SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'test-key' },
+      'no-such-article',
+    )
+    assert.equal(result.ok, false)
+    assert.equal(result.errorCode, 'article_not_found')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('publishArticleToFacebook returns article_lookup_failed when content_matrix lookup errors', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async () => new Response('boom', { status: 500, headers: { 'content-type': 'text/plain' } })
+  try {
+    const result = await publishArticleToFacebook(
+      { ...baseEnv, SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'test-key' },
+      'no-such-article',
+    )
+    assert.equal(result.ok, false)
+    assert.equal(result.errorCode, 'article_lookup_failed')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
 })
 
 test('publishArticleToFacebook dry run returns hash and length', async () => {
