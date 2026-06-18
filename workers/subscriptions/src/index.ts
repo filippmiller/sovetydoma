@@ -8,7 +8,7 @@ import { hmacSha256Hex, requireSecret, timingSafeEqual, verifySvixSignature, ver
 import { hasSupabaseServiceRole, insertRows, selectRows, updateRows, upsertRows } from './supabase'
 import { validateSubscriptionRequest } from '../../../src/lib/subscriptions/validation.mjs'
 import { SUBSCRIPTION_CATEGORY_SLUGS } from '../../../src/lib/subscriptions/constants.mjs'
-import { buildVkArticlePost, findArticleRecord, MAX_VK_MESSAGE_CHARS, publishArticleToVk, sha256Text } from './social/vk'
+import { buildVkArticlePost, resolveArticleRecord, MAX_VK_MESSAGE_CHARS, publishArticleToVk, sha256Text } from './social/vk'
 import { processVkAutopost } from './social/vk-autopost'
 import { buildFbArticlePost, publishArticleToFacebook, MAX_FB_MESSAGE_CHARS } from './social/fb'
 import { processFbAutopost } from './social/fb-autopost'
@@ -899,7 +899,15 @@ async function handleVkDryRun(request: Request, env: Env): Promise<Response> {
   }
 
   const siteUrl = String(env.PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const record = findArticleRecord(articleSlug)
+  // Resolve from the static index OR content_matrix (dynamic, no-redeploy) — same
+  // resolver the real autopost uses, so dry-run works for dynamically-published
+  // slugs. Dry-run only: no VK API call, no DB writes.
+  let record: Awaited<ReturnType<typeof resolveArticleRecord>>
+  try {
+    record = await resolveArticleRecord(env, articleSlug)
+  } catch (err) {
+    return json({ ok: false, error: (err as Error).message, errorCode: 'article_lookup_failed' }, 502)
+  }
   if (!record) {
     return json({ ok: false, error: 'article_not_found' }, 404)
   }
@@ -1038,7 +1046,15 @@ async function handleFbDryRun(request: Request, env: Env): Promise<Response> {
   }
 
   const siteUrl = String(env.PUBLIC_SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const record = findArticleRecord(articleSlug)
+  // Resolve from the static index OR content_matrix (dynamic, no-redeploy) — same
+  // resolver the real autopost uses, so dry-run works for dynamically-published
+  // slugs. Dry-run only: no FB API call, no DB writes.
+  let record: Awaited<ReturnType<typeof resolveArticleRecord>>
+  try {
+    record = await resolveArticleRecord(env, articleSlug)
+  } catch (err) {
+    return json({ ok: false, error: (err as Error).message, errorCode: 'article_lookup_failed' }, 502)
+  }
   if (!record) {
     return json({ ok: false, error: 'article_not_found' }, 404)
   }
