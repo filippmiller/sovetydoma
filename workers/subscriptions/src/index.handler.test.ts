@@ -151,21 +151,29 @@ test('vk dry-run returns provider_unconfigured when VK env missing', async () =>
 })
 
 test('vk dry-run returns article_not_found for unknown slug', async () => {
-  const response = await worker.fetch(request('/admin/social/vk/dry-run', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-admin-key': 'admin-secret' },
-    body: JSON.stringify({ articleSlug: 'nonexistent-article-12345' }),
-  }), {
-    ...baseEnv,
-    ADMIN_API_KEY: 'admin-secret',
-    SUPABASE_URL: 'https://supabase.example',
-    SUPABASE_SERVICE_ROLE_KEY: 'service-role',
-    VK_ACCESS_TOKEN: 'vk-token',
-    VK_GROUP_ID: '123456',
-  })
+  // Not in the static index AND content_matrix returns no row → genuine not-found.
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify([]), { status: 200, headers: { 'content-type': 'application/json' } })
+  try {
+    const response = await worker.fetch(request('/admin/social/vk/dry-run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': 'admin-secret' },
+      body: JSON.stringify({ articleSlug: 'nonexistent-article-12345' }),
+    }), {
+      ...baseEnv,
+      ADMIN_API_KEY: 'admin-secret',
+      SUPABASE_URL: 'https://supabase.example',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-role',
+      VK_ACCESS_TOKEN: 'vk-token',
+      VK_GROUP_ID: '123456',
+    })
 
-  assert.equal(response.status, 404)
-  assert.deepEqual(await response.json(), { ok: false, error: 'article_not_found' })
+    assert.equal(response.status, 404)
+    assert.deepEqual(await response.json(), { ok: false, error: 'article_not_found' })
+  } finally {
+    globalThis.fetch = originalFetch
+  }
 })
 
 test('vk dry-run returns build info for known article', async () => {
@@ -531,4 +539,124 @@ test('autopost-inventory returns redacted coverage (slugs only, no IDs/tokens)',
   assert.equal(body.fb.missing.length, 11)
   assert.ok(!body.vk.missing.includes('avto'))
   assert.ok(!body.fb.missing.includes('dom-i-uborka'))
+})
+
+// ── admin VK/FB dry-run resolves dynamic (content_matrix) articles (da3) ─────
+
+const DRY_SLUG = 'dinamicheskaya-dry-run-statya'
+
+// Mock fetch that drives resolveArticleRecord's content_matrix lookup. The slug
+// is absent from the static vk-publication-index.json, so the resolver falls
+// back to content_matrix (this mock).
+function contentMatrixMock(mode: 'found' | 'empty' | 'error') {
+  return async (input: RequestInfo | URL) => {
+    const url = typeof input === 'string' ? input : input.toString()
+    if (url.includes('content_matrix')) {
+      if (mode === 'error') return new Response('boom', { status: 500, headers: { 'content-type': 'text/plain' } })
+      const rows = mode === 'found' ? [{
+        slug: DRY_SLUG,
+        category: 'dacha-i-ogorod',
+        title: 'Динамическая статья',
+        description: 'Анонс',
+        image_filename: `${DRY_SLUG}.jpg`,
+        published_at: '2026-06-06T00:00:00.000Z',
+      }] : []
+      return new Response(JSON.stringify(rows), { status: 200, headers: { 'content-type': 'application/json' } })
+    }
+    return new Response(JSON.stringify([]), { status: 200, headers: { 'content-type': 'application/json' } })
+  }
+}
+
+const supaCreds = { SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'service-role' }
+const vkDryEnv: Env = { ...baseEnv, ADMIN_API_KEY: 'topsecret', VK_ACCESS_TOKEN: 'vk-token', VK_GROUP_ID: '123456', ...supaCreds }
+const fbDryEnv: Env = { ...baseEnv, ADMIN_API_KEY: 'topsecret', FB_PAGE_ID: '111222333', FB_PAGE_ACCESS_TOKEN: 'fb-token', ...supaCreds }
+
+function dryRun(path: string, env: Env) {
+  return worker.fetch(request(path, {
+    method: 'POST',
+    headers: { 'x-admin-key': 'topsecret', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ articleSlug: DRY_SLUG }),
+  }), env)
+}
+
+test('vk dry-run resolves a dynamic content_matrix article (200)', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = contentMatrixMock('found')
+  try {
+    const res = await dryRun('/admin/social/vk/dry-run', vkDryEnv)
+    assert.equal(res.status, 200)
+    const body = await res.json()
+    assert.equal(body.ok, true)
+    assert.equal(body.dryRun, true)
+    assert.equal(body.articleSlug, DRY_SLUG)
+    assert.equal(body.title, 'Динамическая статья')
+    assert.equal(body.canonicalUrl, `https://1001sovet.ru/dacha-i-ogorod/${DRY_SLUG}/`)
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('vk dry-run returns 404 article_not_found for an unknown slug', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = contentMatrixMock('empty')
+  try {
+    const res = await dryRun('/admin/social/vk/dry-run', vkDryEnv)
+    assert.equal(res.status, 404)
+    assert.equal((await res.json()).error, 'article_not_found')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('vk dry-run returns 502 article_lookup_failed on content_matrix error', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = contentMatrixMock('error')
+  try {
+    const res = await dryRun('/admin/social/vk/dry-run', vkDryEnv)
+    assert.equal(res.status, 502)
+    assert.equal((await res.json()).errorCode, 'article_lookup_failed')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('fb dry-run resolves a dynamic content_matrix article (200)', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = contentMatrixMock('found')
+  try {
+    const res = await dryRun('/admin/social/fb/dry-run', fbDryEnv)
+    assert.equal(res.status, 200)
+    const body = await res.json()
+    assert.equal(body.ok, true)
+    assert.equal(body.dryRun, true)
+    assert.equal(body.articleSlug, DRY_SLUG)
+    assert.equal(body.title, 'Динамическая статья')
+    assert.equal(body.canonicalUrl, `https://1001sovet.ru/dacha-i-ogorod/${DRY_SLUG}/`)
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('fb dry-run returns 404 article_not_found for an unknown slug', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = contentMatrixMock('empty')
+  try {
+    const res = await dryRun('/admin/social/fb/dry-run', fbDryEnv)
+    assert.equal(res.status, 404)
+    assert.equal((await res.json()).error, 'article_not_found')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('fb dry-run returns 502 article_lookup_failed on content_matrix error', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = contentMatrixMock('error')
+  try {
+    const res = await dryRun('/admin/social/fb/dry-run', fbDryEnv)
+    assert.equal(res.status, 502)
+    assert.equal((await res.json()).errorCode, 'article_lookup_failed')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
 })
