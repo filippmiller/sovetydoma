@@ -12,86 +12,74 @@ import type { ArticleRow } from './types'
 export type SocialPlatform = 'vk' | 'fb'
 
 /**
- * Find the most-recently-published article that has NOT been posted to `platform`.
- * Returns null if everything recent is already posted.
+ * Slugs already posted to `platform` (status='posted'). One query; used to
+ * exclude already-posted articles from candidate selection. Generous limit so
+ * the set is complete (posting grows slowly — 1/category/hour).
  */
-export async function findLatestUnpostedArticle(env: Env, platform: SocialPlatform): Promise<ArticleRow | null> {
-  const recentArticles = await selectRows<ArticleRow>(
-    env,
-    'articles_publication_index',
-    [
-      'published_at=not.is.null',
-      'select=article_slug,category_slug,title,canonical_path,description,published_at,first_seen_at',
-      'order=published_at.desc',
-      'limit=20',
-    ].join('&'),
-  )
-
-  if (recentArticles.length === 0) return null
-
+async function fetchPostedSlugSet(env: Env, platform: SocialPlatform): Promise<Set<string>> {
   const posted = await selectRows<{ article_slug: string }>(
     env,
     'social_publications',
-    [
-      `platform=eq.${platform}`,
-      'status=eq.posted',
-      'select=article_slug',
-      'limit=1000',
-    ].join('&'),
+    [`platform=eq.${platform}`, 'status=eq.posted', 'select=article_slug', 'limit=100000'].join('&'),
   )
-  const postedSlugs = new Set(posted.map((p) => p.article_slug))
-
-  for (const article of recentArticles) {
-    if (postedSlugs.has(article.article_slug)) continue
-    // Candidacy is established by presence in articles_publication_index alone;
-    // the poster (resolveArticleRecord) sources the post body+image from the
-    // static index OR content_matrix, so dynamically-published articles (absent
-    // from the static index) must NOT be filtered out here.
-    return article
-  }
-
-  return null
+  return new Set(posted.map((p) => p.article_slug))
 }
 
 /**
- * Find the oldest unposted article for a specific category on `platform`.
- * Filters by category_slug and excludes articles already posted.
+ * Page through articles_publication_index (ordered by published_at) and return
+ * the FIRST row whose slug is not already posted.
+ *
+ * Why pagination instead of a small `LIMIT N` + in-memory filter (#e11): with a
+ * fixed LIMIT, once a category's N oldest rows were all posted the window was
+ * exhausted and EVERY newer unposted row — including dynamically-indexed
+ * articles — was stranded forever (the selector returned null = "no unposted"
+ * even though plenty of newer unposted rows existed). Paging until the first
+ * unposted row is found removes that ceiling while keeping each query bounded.
+ *
+ * Candidacy is presence in the index alone — the poster (resolveArticleRecord)
+ * sources body+image from the static index OR content_matrix, so dynamically-
+ * published articles (absent from the static index) must NOT be filtered here.
+ */
+async function findFirstUnpostedArticle(
+  env: Env,
+  postedSlugs: Set<string>,
+  order: 'asc' | 'desc',
+  categorySlug?: string,
+): Promise<ArticleRow | null> {
+  const PAGE = 500
+  for (let offset = 0; ; offset += PAGE) {
+    const filters = ['published_at=not.is.null']
+    if (categorySlug) filters.push(`category_slug=eq.${encodeURIComponent(categorySlug)}`)
+    filters.push(
+      'select=article_slug,category_slug,title,canonical_path,description,published_at,first_seen_at',
+      `order=published_at.${order}`,
+      `limit=${PAGE}`,
+      `offset=${offset}`,
+    )
+    const page = await selectRows<ArticleRow>(env, 'articles_publication_index', filters.join('&'))
+    for (const article of page) {
+      if (!postedSlugs.has(article.article_slug)) return article
+    }
+    if (page.length < PAGE) return null // last page reached, nothing unposted
+  }
+}
+
+/**
+ * Find the most-recently-published article that has NOT been posted to `platform`.
+ * Returns null only when every indexed article is already posted.
+ */
+export async function findLatestUnpostedArticle(env: Env, platform: SocialPlatform): Promise<ArticleRow | null> {
+  const postedSlugs = await fetchPostedSlugSet(env, platform)
+  return findFirstUnpostedArticle(env, postedSlugs, 'desc')
+}
+
+/**
+ * Find the OLDEST unposted article for a specific category on `platform`.
+ * Returns null only when every indexed article in the category is already posted.
  */
 export async function findUnpostedArticleForCategory(env: Env, platform: SocialPlatform, categorySlug: string): Promise<ArticleRow | null> {
-  const recentArticles = await selectRows<ArticleRow>(
-    env,
-    'articles_publication_index',
-    [
-      'published_at=not.is.null',
-      `category_slug=eq.${encodeURIComponent(categorySlug)}`,
-      'select=article_slug,category_slug,title,canonical_path,description,published_at,first_seen_at',
-      'order=published_at.asc',
-      'limit=20',
-    ].join('&'),
-  )
-
-  if (recentArticles.length === 0) return null
-
-  const posted = await selectRows<{ article_slug: string }>(
-    env,
-    'social_publications',
-    [
-      `platform=eq.${platform}`,
-      'status=eq.posted',
-      'select=article_slug',
-      'limit=1000',
-    ].join('&'),
-  )
-  const postedSlugs = new Set(posted.map((p) => p.article_slug))
-
-  for (const article of recentArticles) {
-    if (postedSlugs.has(article.article_slug)) continue
-    // See findLatestUnpostedArticle: do not require the static index here, or
-    // dynamically-published (content_matrix) articles would never be posted.
-    return article
-  }
-
-  return null
+  const postedSlugs = await fetchPostedSlugSet(env, platform)
+  return findFirstUnpostedArticle(env, postedSlugs, 'asc', categorySlug)
 }
 
 type PublicationResult = {
