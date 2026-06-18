@@ -84,7 +84,8 @@ test('strips raw HTML tags to inert text (no angle brackets leak)', () => {
 test('image markdown becomes alt text only, no url', () => {
   const out = renderSocialText('![Подпись фото](https://1001sovet.ru/images/x.jpg)\n\nДалее текст.')
   assert.ok(!out.includes('https://1001sovet.ru/images/x.jpg'))
-  assert.ok(out.includes('Подпись фото') || out.includes('Далее текст.'))
+  assert.ok(out.includes('Подпись фото'), 'image alt text must survive as plain text')
+  assert.ok(out.includes('Далее текст.'))
 })
 
 test('maxChars caps output length and appends an ellipsis', () => {
@@ -92,8 +93,16 @@ test('maxChars caps output length and appends an ellipsis', () => {
   const out = renderSocialText(long, { maxChars: 120 })
   assert.ok([...out].length <= 120, `length ${[...out].length} should be <= 120`)
   assert.ok(out.endsWith('…'))
-  // no mid-word cut: the char before the ellipsis is sentence/word boundary punctuation or letter
-  assert.ok(!/\S…$/.test(out) || /[.!?]…$/.test(out) === false || true)
+  // The kept text (sans ellipsis) is a prefix of the source and breaks at a
+  // boundary: either the source continues with whitespace, or we ended on
+  // sentence punctuation — never mid-word.
+  const prefix = out.slice(0, -1)
+  assert.ok(long.startsWith(prefix), 'truncated text should remain a source prefix')
+  const nextChar = long[prefix.length]
+  assert.ok(
+    nextChar === undefined || /\s/.test(nextChar) || /[.!?…]$/.test(prefix),
+    'truncation should end on a sentence or word boundary',
+  )
 })
 
 test('maxChars leaves short text unchanged (no ellipsis)', () => {
