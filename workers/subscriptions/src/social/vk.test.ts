@@ -2,10 +2,12 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   buildVkArticlePost,
+  DYNAMIC_PLAIN_TEXT_MAX_CHARS,
   findArticleRecord,
   isSameOrigin,
   MAX_VK_MESSAGE_CHARS,
   publishArticleToVk,
+  resolveArticleRecord,
   resolveVkGroupForCategory,
   validateVkConfig,
 } from './vk'
@@ -111,6 +113,101 @@ test('buildVkArticlePost throws message_too_long when exceeding limit', () => {
   }, (err: unknown) => {
     return (err as Error & { code?: string }).code === 'message_too_long'
   })
+})
+
+// ── resolveArticleRecord: dynamic (content_matrix) body_md → plain_text ───────
+
+const dbEnv: Env = { ...baseEnv, SUPABASE_URL: 'https://test.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'test-key' }
+
+function mockContentMatrix(rows: unknown[]) {
+  const original = globalThis.fetch
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify(rows), { status: 200, headers: { 'content-type': 'application/json' } })
+  return () => { globalThis.fetch = original }
+}
+
+test('resolveArticleRecord renders dynamic body_md into clean plain_text', async () => {
+  const restore = mockContentMatrix([{
+    slug: 'dynamic-slug',
+    category: 'avto',
+    title: 'Заголовок',
+    description: 'Описание',
+    body_md: '## Подзаголовок\n\nЭто **жирный** текст и [ссылка](https://x.ru).\n\n- Пункт один\n- Пункт два',
+    image_filename: null,
+    published_at: '2026-06-01T00:00:00Z',
+  }])
+  try {
+    const record = await resolveArticleRecord(dbEnv, 'dynamic-slug')
+    assert.ok(record)
+    assert.equal(record?.article_slug, 'dynamic-slug')
+    assert.ok(record!.plain_text.length > 0, 'plain_text should be populated from body_md')
+    assert.ok(!record!.plain_text.includes('##'), 'no raw markdown hashes')
+    assert.ok(!record!.plain_text.includes('**'), 'no bold markers')
+    assert.ok(!record!.plain_text.includes('https://x.ru'), 'no leaked link url')
+    assert.ok(record!.plain_text.includes('🔹 Подзаголовок'))
+    assert.ok(record!.plain_text.includes('• Пункт один'))
+  } finally {
+    restore()
+  }
+})
+
+test('resolveArticleRecord leaves plain_text empty for an empty body_md (degrades to teaser)', async () => {
+  const restore = mockContentMatrix([{
+    slug: 'bodyless-slug',
+    category: 'avto',
+    title: 'Только заголовок',
+    description: 'Описание',
+    body_md: null,
+    image_filename: 'pic.jpg',
+    published_at: null,
+  }])
+  try {
+    const record = await resolveArticleRecord(dbEnv, 'bodyless-slug')
+    assert.ok(record)
+    assert.equal(record?.plain_text, '')
+    assert.equal(record?.image_path, '/images/pic.jpg')
+  } finally {
+    restore()
+  }
+})
+
+test('resolveArticleRecord caps a long dynamic body so buildVkArticlePost never throws message_too_long', async () => {
+  const hugeBody = Array.from({ length: 5000 }, (_, i) => `Предложение номер ${i + 1} в очень длинной статье.`).join(' ')
+  const restore = mockContentMatrix([{
+    slug: 'long-slug',
+    category: 'avto',
+    title: 'Длинная статья',
+    description: 'Описание',
+    body_md: hugeBody,
+    image_filename: null,
+    published_at: null,
+  }])
+  try {
+    const record = await resolveArticleRecord(dbEnv, 'long-slug')
+    assert.ok(record)
+    assert.ok([...record!.plain_text].length <= DYNAMIC_PLAIN_TEXT_MAX_CHARS)
+    assert.ok(record!.plain_text.endsWith('…'))
+    const post = buildVkArticlePost({ record: record!, siteUrl: 'https://1001sovet.ru' })
+    assert.ok(post.messageLength < MAX_VK_MESSAGE_CHARS)
+    assert.ok(post.message.includes('Длинная статья'))
+  } finally {
+    restore()
+  }
+})
+
+test('resolveArticleRecord short-circuits to the static index without a DB call (MDX unchanged)', async () => {
+  let fetchCalled = false
+  const original = globalThis.fetch
+  globalThis.fetch = async () => { fetchCalled = true; return new Response('[]', { status: 200 }) }
+  try {
+    const record = await resolveArticleRecord(dbEnv, 'agrovolokno-pod-klubniku-vesnoy')
+    assert.ok(record)
+    assert.equal(record?.article_slug, 'agrovolokno-pod-klubniku-vesnoy')
+    assert.equal(record, findArticleRecord('agrovolokno-pod-klubniku-vesnoy'))
+    assert.equal(fetchCalled, false, 'static index hit must not query the DB')
+  } finally {
+    globalThis.fetch = original
+  }
 })
 
 test('publishArticleToVk returns article_not_found for unknown slug (DB reachable, empty)', async () => {

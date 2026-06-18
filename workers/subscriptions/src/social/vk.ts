@@ -1,5 +1,6 @@
 import type { Env } from '../types'
 import { selectRows } from '../supabase'
+import { renderSocialText } from './social-text'
 import vkPublicationIndex from '../generated/vk-publication-index.json'
 
 export type VkArticleRecord = {
@@ -17,6 +18,13 @@ const index: VkArticleRecord[] = vkPublicationIndex as VkArticleRecord[]
 
 export const MAX_VK_MESSAGE_CHARS = 60000
 const DEFAULT_VK_API_BASE = 'https://api.vk.com/method'
+
+// Soft cap for plain_text rendered from a dynamic (content_matrix) body_md.
+// Keeps dynamic posts to a readable "normal post" length and guarantees the
+// assembled message stays well under MAX_VK_MESSAGE_CHARS / MAX_FB_MESSAGE_CHARS
+// so buildVk/FbArticlePost never throws message_too_long on a long article.
+// Applies ONLY to the dynamic fallback — static MDX plain_text is untouched.
+export const DYNAMIC_PLAIN_TEXT_MAX_CHARS = 3500
 
 export type VkConfig = {
   accessToken: string
@@ -102,6 +110,7 @@ type ContentMatrixRow = {
   category: string
   title: string
   description: string | null
+  body_md: string | null
   image_filename: string | null
   published_at: string | null
 }
@@ -118,9 +127,11 @@ type ContentMatrixRow = {
  * lookup error from missing data (otherwise a flaky DB would look like
  * "article_not_found" and corrupt autopost diagnostics).
  *
- * The content_matrix fallback builds a short-announcement record (variant б):
- * title + description + canonical link + photo. The article body stays behind
- * the link — no Markdown strip in the worker yet (possible follow-up).
+ * The content_matrix fallback renders body_md into readable social-wall text
+ * (mirroring the MDX build-time path), soft-capped to DYNAMIC_PLAIN_TEXT_MAX_CHARS.
+ * If body_md is empty/malformed (renders to nothing) plain_text stays '' and the
+ * post degrades to the prior short-announcement form (title + description + link
+ * + photo) — no regression for bodyless rows.
  */
 export async function resolveArticleRecord(env: Env, articleSlug: string): Promise<VkArticleRecord | undefined> {
   const fromIndex = findArticleRecord(articleSlug)
@@ -135,7 +146,7 @@ export async function resolveArticleRecord(env: Env, articleSlug: string): Promi
         `slug=eq.${encodeURIComponent(articleSlug)}`,
         'domain=eq.1001sovet.ru',
         'text_status=eq.published',
-        'select=slug,category,title,description,image_filename,published_at',
+        'select=slug,category,title,description,body_md,image_filename,published_at',
         'limit=1',
       ].join('&'),
     )
@@ -149,6 +160,10 @@ export async function resolveArticleRecord(env: Env, articleSlug: string): Promi
   const row = rows[0]
   if (!row || !row.category || !row.title) return undefined
 
+  // Render the Markdown body into readable social text (soft-capped). Empty or
+  // unrenderable bodies yield '' → caller degrades to the short announcement.
+  const plainText = renderSocialText(row.body_md || '', { maxChars: DYNAMIC_PLAIN_TEXT_MAX_CHARS })
+
   return {
     article_slug: row.slug,
     category_slug: row.category,
@@ -156,7 +171,7 @@ export async function resolveArticleRecord(env: Env, articleSlug: string): Promi
     description: row.description || '',
     canonical_path: `/${row.category}/${row.slug}/`,
     image_path: row.image_filename ? `/images/${row.image_filename}` : `/images/${row.slug}.jpg`,
-    plain_text: '',
+    plain_text: plainText,
     published_at: row.published_at,
   }
 }
