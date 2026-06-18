@@ -50,6 +50,26 @@ test('buildFbArticlePost composes message with source link', () => {
   assert.ok(post.messageLength <= MAX_FB_MESSAGE_CHARS)
 })
 
+test('buildFbArticlePost includes dynamic plain_text body when present', () => {
+  // A dynamic (content_matrix) record carries rendered body text in plain_text;
+  // the FB post must surface it (not just the title/description teaser).
+  const dynamicRecord = {
+    article_slug: 'dynamic-slug',
+    category_slug: 'avto',
+    title: 'Заголовок',
+    description: 'Краткое описание',
+    canonical_path: '/avto/dynamic-slug/',
+    image_path: '/images/dynamic-slug.jpg',
+    plain_text: '🔹 Подзаголовок\n\nТело статьи с полезным текстом.\n\n• Пункт один',
+    published_at: null,
+  }
+  const post = buildFbArticlePost(dynamicRecord, 'https://1001sovet.ru')
+  assert.ok(post.message.includes('Тело статьи с полезным текстом.'))
+  assert.ok(post.message.includes('• Пункт один'))
+  assert.ok(post.message.includes('Источник: https://1001sovet.ru/avto/dynamic-slug/'))
+  assert.ok(post.messageLength <= MAX_FB_MESSAGE_CHARS)
+})
+
 test('publishArticleToFacebook returns provider_unconfigured without config', async () => {
   const result = await publishArticleToFacebook({}, 'agrovolokno-pod-klubniku-vesnoy')
   assert.equal(result.ok, false)
