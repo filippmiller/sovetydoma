@@ -197,3 +197,20 @@ test('#da8 freshness-first: cutoff boundary (just inside 7d picked; just outside
     } finally { restore() }
   }
 })
+
+test('#e11/#da8: fallback pages PAST the first PAGE=500 (unposted legacy beyond page boundary is found)', async () => {
+  // 520 legacy rows (all older than the freshness window), oldest-first art-000..art-519.
+  // Everything is posted EXCEPT one row at asc-index 510 — beyond the first 500-row
+  // page. The fresh (desc/<=7d) scan returns nothing, so the oldest-first fallback
+  // must page to offset=500 to find it; a single-page selector would miss it.
+  const N = 520
+  const rows = Array.from({ length: N }, (_, i) => art(`art-${String(i).padStart(3, '0')}`, daysAgo(600 - i)))
+  const target = 'art-510'
+  const posted = rows.map((r) => r.article_slug).filter((s) => s !== target)
+  const restore = installSmartFetch(rows, posted)
+  try {
+    const r = await findUnpostedArticleForCategory(env, 'vk', 'kulinaria')
+    assert.ok(r, 'must page past the first 500-row page to find the lone unposted legacy row')
+    assert.equal(r?.article_slug, target, 'returns the unposted row located beyond PAGE=500')
+  } finally { restore() }
+})
