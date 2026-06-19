@@ -72,10 +72,12 @@ jobs:
         run: pip install Pillow
 
       - name: Publish ready matrix rows (no rebuild — DB + R2)
+        env:
+          INPUT_LIMIT: ${{ github.event.inputs.limit || '2' }}
+          INPUT_DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: |
-          LIMIT="${{ github.event.inputs.limit || '2' }}"
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
-            node scripts/matrix/publish-dynamic.mjs --limit "$LIMIT" --dry-run
+          if [ "$INPUT_DRY_RUN" = "true" ]; then
+            node scripts/matrix/publish-dynamic.mjs --limit "$INPUT_LIMIT" --dry-run
           else
-            node scripts/matrix/publish-dynamic.mjs --limit "$LIMIT"
+            node scripts/matrix/publish-dynamic.mjs --limit "$INPUT_LIMIT"
           fi
