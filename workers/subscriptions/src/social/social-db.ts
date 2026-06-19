@@ -12,6 +12,14 @@ import type { ArticleRow } from './types'
 export type SocialPlatform = 'vk' | 'fb'
 
 /**
+ * Freshness window (days) for the per-category selector. Articles published
+ * within this window are posted BEFORE the older legacy backlog so freshly
+ * publish-dynamic articles don't wait days behind the oldest-first queue
+ * (#da8). Const, not env, on purpose — keeps the MVP config-free.
+ */
+const FRESH_WINDOW_DAYS = 7
+
+/**
  * Slugs already posted to `platform` (status='posted'). One query; used to
  * exclude already-posted articles from candidate selection. Generous limit so
  * the set is complete (posting grows slowly — 1/category/hour).
@@ -45,11 +53,13 @@ async function findFirstUnpostedArticle(
   postedSlugs: Set<string>,
   order: 'asc' | 'desc',
   categorySlug?: string,
+  minPublishedAt?: string,
 ): Promise<ArticleRow | null> {
   const PAGE = 500
   for (let offset = 0; ; offset += PAGE) {
     const filters = ['published_at=not.is.null']
     if (categorySlug) filters.push(`category_slug=eq.${encodeURIComponent(categorySlug)}`)
+    if (minPublishedAt) filters.push(`published_at=gte.${encodeURIComponent(minPublishedAt)}`)
     filters.push(
       'select=article_slug,category_slug,title,canonical_path,description,published_at,first_seen_at',
       `order=published_at.${order}`,
@@ -74,11 +84,20 @@ export async function findLatestUnpostedArticle(env: Env, platform: SocialPlatfo
 }
 
 /**
- * Find the OLDEST unposted article for a specific category on `platform`.
- * Returns null only when every indexed article in the category is already posted.
+ * Pick the next unposted article for a specific category on `platform`.
+ *
+ * Freshness-first (#da8): first try the NEWEST unposted article published within
+ * the last FRESH_WINDOW_DAYS, so a freshly publish-dynamic article posts promptly
+ * instead of waiting behind the oldest-first legacy backlog. When nothing recent
+ * is pending, fall back to the OLDEST unposted article — identical to the prior
+ * behaviour, so the legacy backlog keeps draining (and the #e11 paging guarantee
+ * is preserved).
  */
 export async function findUnpostedArticleForCategory(env: Env, platform: SocialPlatform, categorySlug: string): Promise<ArticleRow | null> {
   const postedSlugs = await fetchPostedSlugSet(env, platform)
+  const cutoff = new Date(Date.now() - FRESH_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString()
+  const fresh = await findFirstUnpostedArticle(env, postedSlugs, 'desc', categorySlug, cutoff)
+  if (fresh) return fresh
   return findFirstUnpostedArticle(env, postedSlugs, 'asc', categorySlug)
 }
 
