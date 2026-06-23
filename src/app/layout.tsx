@@ -59,6 +59,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ru" className={ptSans.variable}>
       <head>
+        {/* 0h3.11: strip Supabase auth tokens from the URL hash synchronously,
+            before Yandex Metrika (afterInteractive) or any other script can read
+            location.href and leak access_token/refresh_token to mc.yandex.ru in
+            the page-url param. The raw hash is stashed on window + sessionStorage
+            so the recovery/login flow can still establish the session (see
+            lib/auth/recovery-hash). Must run before <YandexMetrika /> below. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              '(function(){try{var h=location.hash||"";if(h.length>1&&/(access_token|refresh_token|token_type|expires_at|expires_in)=|type=(recovery|signup|magiclink|invite|email_change)/.test(h)){window.__SB_AUTH_HASH__=h;try{sessionStorage.setItem("sb_auth_hash",h)}catch(e){}history.replaceState(null,"",location.pathname+location.search)}}catch(e){}})();',
+          }}
+        />
         <link rel="alternate" hrefLang="ru" href={SITE_URL} />
         <link rel="alternate" type="application/rss+xml" title="СоветыДома RSS" href={`${SITE_URL}/feed.xml`} />
         {Object.values(CATEGORIES).map((cat) => (

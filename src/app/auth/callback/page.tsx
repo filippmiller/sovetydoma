@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import { safeAssign } from '@/lib/auth/safe-redirect'
+import { readAuthHash, getAuthHashParams, clearAuthHash } from '@/lib/auth/recovery-hash'
 
 /**
  * OAuth callback page for Supabase Auth providers (Yandex, VK, Google, etc.).
@@ -66,16 +67,24 @@ export default function AuthCallbackPage() {
         }
 
         if (!code) {
-          // If there's no code, check for hash-based tokens (implicit flow fallback)
-          const hash = window.location.hash
+          // No PKCE code — check for hash-based tokens (implicit flow fallback).
+          // The early sanitizer (app/layout.tsx, bead 0h3.11) moved the hash off
+          // the URL into a safe store before Yandex Metrika could read it, so
+          // detectSessionInUrl can no longer see it — establish the session
+          // explicitly from the captured tokens.
+          const hash = readAuthHash()
           if (hash.includes('access_token')) {
-            // Supabase client automatically picks up tokens from the hash
-            // when initialized. Just verify the session exists.
+            const params = getAuthHashParams()
+            const access_token = params.get('access_token')
+            const refresh_token = params.get('refresh_token')
             const sb = getSupabase()
-            const { data, error: sessionError } = await sb.auth.getSession()
+            const { data, error: sessionError } = access_token && refresh_token
+              ? await sb.auth.setSession({ access_token, refresh_token })
+              : await sb.auth.getSession()
             if (sessionError || !data.session) {
               throw new Error('session_not_found')
             }
+            clearAuthHash()
             if (!cancelled) {
               setStatus('success')
               setMessage('Вход выполнен! Перенаправляем…')
@@ -94,10 +103,16 @@ export default function AuthCallbackPage() {
           // private browsing, or cross-domain issues). Try implicit fallback.
           if (exchangeError.message?.toLowerCase().includes('pkce') || exchangeError.message?.toLowerCase().includes('code_verifier')) {
             console.warn('oauth_pkce_failed_trying_implicit_fallback', exchangeError.message)
-            const hash = window.location.hash
+            const hash = readAuthHash()
             if (hash.includes('access_token')) {
-              const { data, error: sessionError } = await sb.auth.getSession()
+              const params = getAuthHashParams()
+              const access_token = params.get('access_token')
+              const refresh_token = params.get('refresh_token')
+              const { data, error: sessionError } = access_token && refresh_token
+                ? await sb.auth.setSession({ access_token, refresh_token })
+                : await sb.auth.getSession()
               if (!sessionError && data.session) {
+                clearAuthHash()
                 if (!cancelled) {
                   setStatus('success')
                   setMessage('Вход выполнен! Перенаправляем…')
