@@ -6,6 +6,7 @@ import { getSupabase, supabase } from '@/lib/supabase'
 import { migrateLocalFavoritesToServer, processPendingFavoriteIntent } from '@/lib/favorites'
 import { mapAuthError, mapVkAuthError, mapOAuthError } from '@/lib/auth/error-messages'
 import { safeAssign } from '@/lib/auth/safe-redirect'
+import { getAuthHashParams } from '@/lib/auth/recovery-hash'
 import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
 import ForgotPasswordForm from './ForgotPasswordForm'
@@ -463,7 +464,8 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     // no network call) if the recovery session wasn't carried into this client
     // instance. Recovery tokens live in the URL hash; setSession is idempotent.
     try {
-      const hp = new URLSearchParams((typeof window !== 'undefined' ? window.location.hash : '').replace(/^#/, ''))
+      // Tokens were moved off the URL hash by the early sanitizer (0h3.11).
+      const hp = getAuthHashParams()
       const at = hp.get('access_token')
       const rt = hp.get('refresh_token')
       if (at && rt) await supabase.auth.setSession({ access_token: at, refresh_token: rt })

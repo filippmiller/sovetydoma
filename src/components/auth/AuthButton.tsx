@@ -7,6 +7,7 @@ import type { Profile } from '@/lib/supabase'
 import AuthModal from './AuthModal'
 import { migrateLocalFavoritesToServer, clearLocalFavorites, processPendingFavoriteIntent } from '@/lib/favorites'
 import { OPEN_AUTH_EVENT } from '@/lib/auth-gate'
+import { readAuthHash, getAuthHashParams, clearAuthHash } from '@/lib/auth/recovery-hash'
 
 export default function AuthButton() {
   const authConfigured = isSupabaseConfigured()
@@ -23,12 +24,10 @@ export default function AuthButton() {
     setModalOpen(false)
     if (recovery) {
       setRecovery(false)
-      // Strip the recovery token hash so a refresh doesn't re-open the reset form.
-      try {
-        if (window.location.hash.includes('type=recovery')) {
-          window.history.replaceState(null, '', window.location.pathname + window.location.search)
-        }
-      } catch { /* ignore */ }
+      // The recovery hash was already stripped from the URL by the early
+      // sanitizer (app/layout.tsx, bead 0h3.11). Drop the stashed copy so a
+      // refresh doesn't re-open the reset form.
+      clearAuthHash()
     }
   }
 
@@ -37,13 +36,15 @@ export default function AuthButton() {
   // PASSWORD_RECOVERY auth event (which can fire before listeners attach).
   useEffect(() => {
     if (!authConfigured || typeof window === 'undefined') return
-    const hash = window.location.hash
+    // The auth hash was moved off the URL by the early sanitizer (app/layout.tsx,
+    // bead 0h3.11) before Yandex Metrika could read it; read it from there.
+    const hash = readAuthHash()
     if (!hash.includes('type=recovery')) return
     // GoTrue recovery redirects with the session tokens in the hash. Relying on
     // the client's detectSessionInUrl is fragile (it depends on flowType and
     // ignores hash tokens under PKCE), so establish the recovery session
     // explicitly — without it updateUser() has no auth and the reset fails.
-    const params = new URLSearchParams(hash.slice(1))
+    const params = getAuthHashParams()
     const access_token = params.get('access_token')
     const refresh_token = params.get('refresh_token')
     let cancelled = false
