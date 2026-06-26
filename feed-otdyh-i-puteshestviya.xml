@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>СоветыДома — Отдых и путешествия</title>
+    <link>https://1001sovet.ru/otdyh-i-puteshestviya/</link>
+    <description>Сборы в дорогу, экономный отпуск и подготовка к поездкам</description>
+    <language>ru</language>
+    <atom:link href="https://1001sovet.ru/feed-otdyh-i-puteshestviya.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 26 Jun 2026 00:05:33 GMT</lastBuildDate>
+    <image>
+      <url>https://1001sovet.ru/og-default.png</url>
+      <title>СоветыДома</title>
+      <link>https://1001sovet.ru/</link>
+    </image>
+    
+  <item>
+    <title>Летний чек-лист перед отпуском: дом, документы и вещи</title>
+    <link>https://1001sovet.ru/otdyh-i-puteshestviya/letniy-cheklist-pered-otpuskom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/otdyh-i-puteshestviya/letniy-cheklist-pered-otpuskom/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Отдых и путешествия</category>
+    <description>Полный список дел перед отъездом в отпуск, чтобы ничего не забыть и не беспокоиться о доме.</description>
+  </item>
+  <item>
+    <title>Как собрать дорожную сумку за 20 минут и ничего не забыть</title>
+    <link>https://1001sovet.ru/otdyh-i-puteshestviya/dorozhnaya-sumka-za-20-minut/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/otdyh-i-puteshestviya/dorozhnaya-sumka-za-20-minut/</guid>
+    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Отдых и путешествия</category>
+    <description>Проверенный способ упаковки вещей в дорогу, который исключает забытые предметы и перегруз багажа.</description>
+  </item>
+  <item>
+    <title>Как подготовиться к отпуску без лишних трат и финансовых сюрпризов</title>
+    <link>https://1001sovet.ru/otdyh-i-puteshestviya/ekonomnyy-otpusk/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/otdyh-i-puteshestviya/ekonomnyy-otpusk/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Отдых и путешествия</category>
+    <description>Планирование отпуска с экономией на билетах, жилье, питании и развлечениях без потери качества отдыха.</description>
+  </item>
+  </channel>
+</rss>

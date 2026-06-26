@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>СоветыДома — Красота и уход</title>
+    <link>https://1001sovet.ru/krasota-i-uhod/</link>
+    <description>Уход за одеждой, обувью, гигиена и простые домашние средства</description>
+    <language>ru</language>
+    <atom:link href="https://1001sovet.ru/feed-krasota-i-uhod.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 26 Jun 2026 00:05:33 GMT</lastBuildDate>
+    <image>
+      <url>https://1001sovet.ru/og-default.png</url>
+      <title>СоветыДома</title>
+      <link>https://1001sovet.ru/</link>
+    </image>
+    
+  <item>
+    <title>Уход за кожаным диваном: чистка, защита и частые ошибки</title>
+    <link>https://1001sovet.ru/krasota-i-uhod/uhod-za-kozhanym-divanom/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/krasota-i-uhod/uhod-za-kozhanym-divanom/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Красота и уход</category>
+    <description>Как правильно чистить и ухаживать за кожаным диваном, чтобы кожа не трескалась и сохраняла вид.</description>
+  </item>
+  <item>
+    <title>Как сушить одежду в квартире без запаха сырости</title>
+    <link>https://1001sovet.ru/krasota-i-uhod/kak-sushit-odezhdu-v-kvartire/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/krasota-i-uhod/kak-sushit-odezhdu-v-kvartire/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Красота и уход</category>
+    <description>Способы сушки белья в квартире без появления затхлого запаха и сырости на стенах.</description>
+  </item>
+  <item>
+    <title>Как убрать шерсть с дивана, ковра и одежды: все рабочие способы</title>
+    <link>https://1001sovet.ru/krasota-i-uhod/ubrat-sherst-s-divana-i-kovra/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/krasota-i-uhod/ubrat-sherst-s-divana-i-kovra/</guid>
+    <pubDate>Mon, 01 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Красота и уход</category>
+    <description>Обзор методов удаления шерсти животных с мягкой мебели, ковров и ткани: от резиновых перчаток до специальных насадок на пылесос.</description>
+  </item>
+  <item>
+    <title>7 надёжных способов вывести неприятный запах из обуви</title>
+    <link>https://1001sovet.ru/krasota-i-uhod/zapah-iz-obuvi/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/krasota-i-uhod/zapah-iz-obuvi/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Красота и уход</category>
+    <description>Эффективные домашние методы удаления запаха из обуви с помощью соды, уксуса, чая и других подручных средств.</description>
+  </item>
+  <item>
+    <title>Как быстро высушить мокрую обувь и убрать запах за час</title>
+    <link>https://1001sovet.ru/krasota-i-uhod/vysushit-obuv/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/krasota-i-uhod/vysushit-obuv/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Красота и уход</category>
+    <description>Безопасные методы сушки обуви из кожи, замши и текстиля без деформации и неприятного запаха.</description>
+  </item>
+  <item>
+    <title>Как избавиться от статического электричества на одежде и в квартире</title>
+    <link>https://1001sovet.ru/krasota-i-uhod/staticheskoe-elektrichestvo/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/krasota-i-uhod/staticheskoe-elektrichestvo/</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 GMT</pubDate>
+    <category>Красота и уход</category>
+    <description>Проверенные методы борьбы с электризацией одежды, волос и мебели в сухой период года.</description>
+  </item>
+  <item>
+    <title>Как отчистить белые кроссовки дома: 5 способов</title>
+    <link>https://1001sovet.ru/krasota-i-uhod/krossovki-otmyt/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/krasota-i-uhod/krossovki-otmyt/</guid>
+    <pubDate>Thu, 21 May 2026 00:00:00 GMT</pubDate>
+    <category>Красота и уход</category>
+    <description>Как вернуть белизну кроссовкам из ткани, кожи и замши — зубная паста, сода, меламиновая губка и стирка в машинке.</description>
+  </item>
+  </channel>
+</rss>

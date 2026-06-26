@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>СоветыДома — Семья и дети</title>
+    <link>https://1001sovet.ru/semya-i-deti/</link>
+    <description>Организация быта с детьми, школа, семейные покупки и повседневная безопасность</description>
+    <language>ru</language>
+    <atom:link href="https://1001sovet.ru/feed-semya-i-deti.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 26 Jun 2026 00:05:33 GMT</lastBuildDate>
+    <image>
+      <url>https://1001sovet.ru/og-default.png</url>
+      <title>СоветыДома</title>
+      <link>https://1001sovet.ru/</link>
+    </image>
+    
+  <item>
+    <title>Список покупок для семьи: как покупать на неделю без лишнего</title>
+    <link>https://1001sovet.ru/semya-i-deti/spisok-pokupok-dlya-semi/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/semya-i-deti/spisok-pokupok-dlya-semi/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Семья и дети</category>
+    <description>Как составить семейный список покупок на неделю и не покупать лишнего в магазине.</description>
+  </item>
+  <item>
+    <title>Как организовать школьный уголок дома без отдельной комнаты</title>
+    <link>https://1001sovet.ru/semya-i-deti/shkolnyy-ugolok-doma/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/semya-i-deti/shkolnyy-ugolok-doma/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Семья и дети</category>
+    <description>Создание функционального места для учёбы ребёнка в условиях ограниченного пространства.</description>
+  </item>
+  <item>
+    <title>Семейный календарь на холодильнике: как перестать всё забывать</title>
+    <link>https://1001sovet.ru/semya-i-deti/semeynyy-kalendar-na-holodilnike/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/semya-i-deti/semeynyy-kalendar-na-holodilnike/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Семья и дети</category>
+    <description>Как организовать семейный календарь и систему напоминаний на холодильнике.</description>
+  </item>
+  <item>
+    <title>Порядок в игрушках: как хранить, менять и не покупать лишнее</title>
+    <link>https://1001sovet.ru/semya-i-deti/poryadok-v-igrushkah/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/semya-i-deti/poryadok-v-igrushkah/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Семья и дети</category>
+    <description>Простая система хранения детских игрушек в квартире, которая помогает поддерживать порядок каждый день.</description>
+  </item>
+  <item>
+    <title>Как собрать ребёнка в лагерь и ничего важного не забыть</title>
+    <link>https://1001sovet.ru/semya-i-deti/kak-sobrat-rebenka-v-lager/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/semya-i-deti/kak-sobrat-rebenka-v-lager/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Семья и дети</category>
+    <description>Полный список вещей для сборов ребёнка в летний лагерь с учётом лимита багажа.</description>
+  </item>
+  <item>
+    <title>Как хранить школьные тетради, грамоты и рисунки без хаоса</title>
+    <link>https://1001sovet.ru/semya-i-deti/kak-hranit-shkolnye-tetradi/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/semya-i-deti/kak-hranit-shkolnye-tetradi/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Семья и дети</category>
+    <description>Система хранения школьных работ и детского творчества, которая сохраняет память без захламления.</description>
+  </item>
+  <item>
+    <title>Как сэкономить на школьных товарах без потери качества</title>
+    <link>https://1001sovet.ru/semya-i-deti/ekonomiya-na-shkolnyh-tovarah/</link>
+    <guid isPermaLink="true">https://1001sovet.ru/semya-i-deti/ekonomiya-na-shkolnyh-tovarah/</guid>
+    <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
+    <category>Семья и дети</category>
+    <description>Способы сэкономить на подготовке к школе: где покупать, что можно взять дешевле и на чём не стоит экономить.</description>
+  </item>
+  </channel>
+</rss>
