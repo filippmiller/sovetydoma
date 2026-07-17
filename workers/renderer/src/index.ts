@@ -695,7 +695,9 @@ interface SitemapRow {
 
 async function handleSitemap(env: Env): Promise<Response> {
   const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const cacheKey = new Request(`${siteUrl}/sitemap-dynamic.xml`)
+  // Version the internal cache key when sitemap generation semantics change;
+  // otherwise an old edge entry can hide newly included URLs for an hour.
+  const cacheKey = new Request(`${siteUrl}/sitemap-dynamic.xml?generator=v2`)
   const cache = caches.default
 
   const cached = await cache.match(cacheKey)
@@ -707,36 +709,57 @@ async function handleSitemap(env: Env): Promise<Response> {
     'frontmatter->>published_via': 'eq.dynamic',
     domain: 'eq.1001sovet.ru',
     select: 'slug,category,published_at,updated_at',
-    order: 'published_at.desc',
-    limit: '5000',
+    order: 'published_at.desc,category.asc,slug.asc',
   })
 
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
-  let resp: Response
-  try {
-    resp = await fetch(`${base}/rest/v1/content_matrix?${params.toString()}`, {
-      signal: controller.signal,
-      headers: {
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        Accept: 'application/json',
-      },
-    })
-  } catch {
+  // PostgREST/Supabase commonly caps a single response at 1,000 rows even when
+  // a larger `limit` is requested. Fetch explicit pages so older published
+  // articles are not silently omitted from the sitemap.
+  const pageSize = 1000
+  const sitemapUrlLimit = 50_000
+  const rows: SitemapRow[] = []
+
+  while (rows.length < sitemapUrlLimit) {
+    const pageParams = new URLSearchParams(params)
+    pageParams.set('limit', String(pageSize))
+    pageParams.set('offset', String(rows.length))
+
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
+    let resp: Response
+    try {
+      resp = await fetch(`${base}/rest/v1/content_matrix?${pageParams.toString()}`, {
+        signal: controller.signal,
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+          Accept: 'application/json',
+        },
+      })
+    } catch {
+      clearTimeout(timer)
+      return new Response('Sitemap unavailable', {
+        status: 503,
+        headers: { 'Retry-After': '30' },
+      })
+    }
     clearTimeout(timer)
-    return new Response('Sitemap unavailable', {
+
+    if (!resp.ok) {
+      return new Response('Sitemap DB error', { status: 503, headers: { 'Retry-After': '30' } })
+    }
+
+    const page = await resp.json() as SitemapRow[]
+    rows.push(...page)
+    if (page.length < pageSize) break
+  }
+
+  if (rows.length >= sitemapUrlLimit) {
+    return new Response('Sitemap capacity exceeded', {
       status: 503,
-      headers: { 'Retry-After': '30' },
+      headers: { 'Retry-After': '3600' },
     })
   }
-  clearTimeout(timer)
-
-  if (!resp.ok) {
-    return new Response('Sitemap DB error', { status: 503, headers: { 'Retry-After': '30' } })
-  }
-
-  const rows = await resp.json() as SitemapRow[]
 
   const urls = rows.map((r) => {
     const loc = `${siteUrl}/${escapeHtml(r.category)}/${escapeHtml(r.slug)}/`

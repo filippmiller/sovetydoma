@@ -11,7 +11,7 @@ Caddy reverse-proxies requests for articles not present as static files to this 
 |---|---|
 | `GET /:category/:slug/` | Full SEO HTML rendered from `content_matrix` row + HTMLRewriter template transform |
 | `GET /images/<filename>` | Stream article image from R2 bucket `sovetydoma-article-images` |
-| `GET /sitemap-dynamic.xml` | Sitemap for articles published via `published_via=dynamic` |
+| `GET /sitemap-dynamic.xml` | Sitemap for articles published via `published_via=dynamic`; DB results are paginated so PostgREST's 1,000-row response cap cannot truncate it |
 
 ## Architecture
 
@@ -60,6 +60,10 @@ wrangler deploy
 In your Caddyfile, after serving the static `output/` directory, add a fallback for missing article paths:
 
 ```caddyfile
+www.1001sovet.ru {
+  redir https://1001sovet.ru{uri} permanent
+}
+
 1001sovet.ru {
   root * /var/www/1001sovet/output
 
