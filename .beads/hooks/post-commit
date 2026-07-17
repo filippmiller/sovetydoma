@@ -1,0 +1,16 @@
+#!/bin/sh
+# Global post-commit hook: sends commit summary to Telegram
+# Runs in background to avoid blocking git operations
+# Also chains to repo-local post-commit hook if it exists
+
+SCRIPT="$HOME/scripts/commit-summary/commit_summary.py"
+
+if [ -f "$SCRIPT" ]; then
+    python "$SCRIPT" &
+fi
+
+# Chain to repo-local hook (if exists and core.hooksPath overrode it)
+LOCAL_HOOK="$(git rev-parse --git-dir)/hooks/post-commit.local"
+if [ -x "$LOCAL_HOOK" ]; then
+    exec "$LOCAL_HOOK"
+fi
