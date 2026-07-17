@@ -1,5 +1,18 @@
 # VK ID auth setup handoff
 
+> **SUPERSEDED 2026-07-17.** This document describes the original setup for VK app
+> `54625895` and the OneTap SDK widget. Do NOT follow it blindly:
+> - The VK OneTap SDK approach was replaced by a plain OAuth 2.1 PKCE redirect flow
+>   (`https://id.vk.com/authorize` → `/api/auth/vk/callback` → worker exchange).
+> - Canonical VK app id per project passport is `54626241`; HOWEVER live probing on
+>   2026-07-17 showed `54625895` (app name «1001sovet.ru») is the app whose VK ID
+>   console actually has `https://1001sovet.ru/api/auth/vk/callback` whitelisted,
+>   while `54626241` rejects that redirect_uri. See `reports/auth-overhaul-2026-07-17.md`
+>   and bead `sovetydoma-1fc` for the current truth.
+> - Any hardcoded fallback app id was removed from code/CI (fail closed).
+>
+> Kept for history (secret-rotation notes still apply).
+
 Date: 2026-06-06
 
 ## VK dashboard state

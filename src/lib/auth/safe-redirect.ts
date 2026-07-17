@@ -8,18 +8,22 @@
  * can never bounce a freshly-authenticated user to an external page.
  */
 
-const SUPABASE_AUTH_PREFIX = (() => {
+function supabaseAuthPrefix(): string | null {
+  // Evaluated lazily per call (NEXT_PUBLIC_* values are inlined at build time,
+  // so this is effectively constant in the shipped bundle; laziness keeps the
+  // function pure/testable and fail-closed when the env is absent).
   const base = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').trim().replace(/\/+$/, '')
   return base ? `${base}/auth/v1/` : null
-})()
+}
 
 /**
  * Returns true only if `url` starts with the configured Supabase auth v1 prefix.
  * If NEXT_PUBLIC_SUPABASE_URL is not set, always returns false (fail-closed).
  */
 export function assertSupabaseAuthLink(url: string): boolean {
-  if (!SUPABASE_AUTH_PREFIX) return false
-  return url.startsWith(SUPABASE_AUTH_PREFIX)
+  const prefix = supabaseAuthPrefix()
+  if (!prefix) return false
+  return url.startsWith(prefix)
 }
 
 /**

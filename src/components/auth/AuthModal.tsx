@@ -4,32 +4,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { getSupabase, supabase } from '@/lib/supabase'
 import { migrateLocalFavoritesToServer, processPendingFavoriteIntent } from '@/lib/favorites'
-import { mapAuthError, mapVkAuthError, mapOAuthError } from '@/lib/auth/error-messages'
-import { safeAssign } from '@/lib/auth/safe-redirect'
-import { getAuthHashParams } from '@/lib/auth/recovery-hash'
+import { mapAuthError, mapOAuthError } from '@/lib/auth/error-messages'
 import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
 import ForgotPasswordForm from './ForgotPasswordForm'
 import ResetPasswordForm from './ResetPasswordForm'
-
-declare global {
-  interface Window {
-    VKIDSDK?: {
-      Config: {
-        init(config: Record<string, unknown>): void
-      }
-      ConfigResponseMode: { Callback: string }
-      ConfigSource: { LOWCODE: string }
-      WidgetEvents: { ERROR: string }
-      OneTapInternalEvents: { LOGIN_SUCCESS: string }
-      OneTap: new () => {
-        render(options: Record<string, unknown>): {
-          on(event: string, cb: (payload: { code?: string; device_id?: string } | unknown) => void): unknown
-        }
-      }
-    }
-  }
-}
+import SocialAuthSection, { type SocialProvider } from './SocialAuthSection'
+import styles from './auth.module.css'
 
 function isValidEmail(v: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
@@ -60,39 +41,53 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   const [success, setSuccess] = useState<'welcome' | 'verify' | 'forgot-sent' | 'reset-success' | null>(null)
   const [mode, setMode] = useState<'login' | 'register' | 'forgot' | 'reset'>('login')
   const [resendCooldown, setResendCooldown] = useState(0)
-  // For P1.2 registration confirm password
-  // reset confirm is in reset form state if needed; for register:
   const [confirmRegisterPassword, setConfirmRegisterPassword] = useState('')
   const [emailError, setEmailError] = useState('')
   const overlayRef = useRef<HTMLDivElement>(null)
-  const vkContainerRef = useRef<HTMLDivElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
 
-  // P0 reset flow state (kept minimal for this vertical slice)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [resetLoading, setResetLoading] = useState(false)
-  const [vkLoading, setVkLoading] = useState(false)
-  const [oauthLoading, setOauthLoading] = useState<string | null>(null)
+  const [oauthLoading, setOauthLoading] = useState<SocialProvider | null>(null)
 
-  const handleOAuthSignIn = useCallback(async (provider: 'yandex' | 'google' | 'vk') => {
+  // ── Social flows ──────────────────────────────────────────────────────────
+  // VK ID and Yandex ID run as redirect-based authorization-code flows (no
+  // third-party SDK, no iframes): browser → provider consent → our callback →
+  // worker exchange → Supabase session. Google uses the Supabase-native flow.
+
+  // VK ID: OAuth 2.1 + PKCE against id.vk.com/authorize. The PKCE verifier and
+  // the CSRF state are stored in sessionStorage and verified by the static
+  // callback page (/api/auth/vk/callback) before the worker exchange.
+  const handleVkSignIn = useCallback(async () => {
     setError('')
-    setOauthLoading(provider)
+    const appId = (process.env.NEXT_PUBLIC_VK_APP_ID || '').trim()
+    if (!appId) {
+      // Fail closed: never silently fall back to a hardcoded app id.
+      setError('Вход через VK ID пока не настроен. Попробуйте войти по email.')
+      return
+    }
+    setOauthLoading('vk')
     try {
-      const sb = getSupabase()
-      const redirectTo = getOAuthRedirectTo()
-      const { data, error: oauthError } = await sb.auth.signInWithOAuth({
-        provider: provider as unknown as Parameters<typeof sb.auth.signInWithOAuth>[0]['provider'],
-        options: { redirectTo },
-      })
-      if (oauthError) throw oauthError
-      if (data.url) {
-        window.sessionStorage.setItem('auth_redirect_to', getAuthRedirectTo())
-        window.location.href = data.url
-      } else {
-        throw new Error('oauth_url_missing')
-      }
-    } catch (err) {
-      setError(mapOAuthError((err as Error).message))
+      const codeVerifier = createPkceVerifier()
+      const codeChallenge = await createPkceChallenge(codeVerifier)
+      if (!codeChallenge) throw new Error('pkce_unavailable')
+      const state = createPkceVerifier()
+      window.sessionStorage.setItem(VK_ID_CODE_VERIFIER_KEY, codeVerifier)
+      window.sessionStorage.setItem(VK_OAUTH_STATE_KEY, state)
+      window.sessionStorage.setItem('auth_redirect_to', getAuthRedirectTo())
+      const authorizeUrl = new URL('https://id.vk.com/authorize')
+      authorizeUrl.searchParams.set('response_type', 'code')
+      authorizeUrl.searchParams.set('client_id', appId)
+      authorizeUrl.searchParams.set('redirect_uri', `${window.location.origin}/api/auth/vk/callback`)
+      authorizeUrl.searchParams.set('code_challenge', codeChallenge)
+      authorizeUrl.searchParams.set('code_challenge_method', 'S256')
+      authorizeUrl.searchParams.set('state', state)
+      authorizeUrl.searchParams.set('scope', (process.env.NEXT_PUBLIC_VK_SCOPE || 'email').trim() || 'email')
+      window.location.href = authorizeUrl.toString()
+    } catch {
+      setError('Не удалось начать вход через VK ID. Попробуйте ещё раз или войдите по email.')
       setOauthLoading(null)
     }
   }, [])
@@ -122,80 +117,35 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     window.location.href = authorizeUrl
   }, [])
 
-  const handleVkSuccess = useCallback(async (payload: { code?: string; device_id?: string }) => {
+  // Google: native Supabase provider (enabled server-side). The callback page
+  // exchanges the returned code via exchangeCodeForSession.
+  const handleGoogleSignIn = useCallback(async () => {
     setError('')
-    setInfo('')
-    setVkLoading(true)
+    setOauthLoading('google')
     try {
-      const apiBase = (process.env.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL || '').trim().replace(/\/+$/, '')
-      if (!apiBase) throw new Error('vk_api_not_configured')
-      const codeVerifier = vkContainerRef.current?.dataset.codeVerifier || ''
-      if (!payload.code || !payload.device_id || !codeVerifier) throw new Error('vk_payload_missing')
-      const res = await fetch(`${apiBase}/auth/vk/exchange`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          code: payload.code,
-          device_id: payload.device_id,
-          code_verifier: codeVerifier,
-        }),
+      const sb = getSupabase()
+      const { data, error: oauthError } = await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: getOAuthRedirectTo() },
       })
-      const body = await res.json().catch(() => ({})) as { ok?: boolean; actionLink?: string; error?: string; message?: string }
-      if (!res.ok || !body.ok || !body.actionLink) {
-        throw new Error(body.message || body.error || 'vk_exchange_failed')
-      }
-      // C1: guard against open-redirect via server-supplied actionLink
-      if (!safeAssign(body.actionLink)) {
-        throw new Error('vk_invalid_action_link')
+      if (oauthError) throw oauthError
+      if (data.url) {
+        window.sessionStorage.setItem('auth_redirect_to', getAuthRedirectTo())
+        window.location.href = data.url
+      } else {
+        throw new Error('oauth_url_missing')
       }
     } catch (err) {
-      setError(mapVkAuthError((err as Error).message))
-      setVkLoading(false)
+      setError(mapOAuthError((err as Error).message))
+      setOauthLoading(null)
     }
   }, [])
 
-  useEffect(() => {
-    if (!isOpen || !isVkAuthEnabled() || tab !== 'login' || mode !== 'login' || success) return
-    let cancelled = false
-    ;(async () => {
-      try {
-        await loadVkIdSdk()
-        if (cancelled || !vkContainerRef.current || !window.VKIDSDK) return
-        const VKID = window.VKIDSDK
-        const codeVerifier = createPkceVerifier()
-        vkContainerRef.current.dataset.codeVerifier = codeVerifier
-        window.sessionStorage.setItem(VK_ID_CODE_VERIFIER_KEY, codeVerifier)
-        const redirectUrl = safeRedirectUrl(`${window.location.origin}/api/auth/vk/callback`)
-        if (!redirectUrl) {
-          if (!cancelled) setError('VK ID временно недоступен (неверный адрес редиректа).')
-          return
-        }
-        VKID.Config.init({
-          app: Number(process.env.NEXT_PUBLIC_VK_APP_ID || '54625895'),
-          redirectUrl,
-          responseMode: VKID.ConfigResponseMode.Callback,
-          source: VKID.ConfigSource.LOWCODE,
-          scope: process.env.NEXT_PUBLIC_VK_SCOPE || 'email',
-          codeVerifier,
-        })
-        const oneTap = new VKID.OneTap()
-        const rendered = oneTap.render({
-          container: vkContainerRef.current,
-          showAlternativeLogin: true,
-          oauthList: ['ok_ru', 'mail_ru'],
-        })
-        rendered.on(VKID.WidgetEvents.ERROR, () => {
-          if (!cancelled) setError('Не удалось открыть VK ID. Попробуйте позже.')
-        })
-        rendered.on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, (payload) => {
-          void handleVkSuccess(payload as { code?: string; device_id?: string })
-        })
-      } catch {
-        if (!cancelled) setError('VK ID временно недоступен.')
-      }
-    })()
-    return () => { cancelled = true }
-  }, [isOpen, tab, mode, success, handleVkSuccess])
+  const vkAuthEnabled = process.env.NEXT_PUBLIC_VK_AUTH_ENABLED === 'true' && Boolean((process.env.NEXT_PUBLIC_VK_APP_ID || '').trim())
+  const yandexAuthEnabled = Boolean((process.env.NEXT_PUBLIC_YANDEX_OAUTH_CLIENT_ID || '').trim())
+  const googleAuthEnabled = true // provider is enabled on the Supabase side
+
+  // ── Lifecycle / a11y ─────────────────────────────────────────────────────
 
   useEffect(() => {
     if (!isOpen) return
@@ -215,16 +165,52 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
       setConfirmRegisterPassword('')
       setNewPassword('')
       setConfirmPassword('')
+      setOauthLoading(null)
     }, 0)
+    return () => window.clearTimeout(resetId)
+  }, [isOpen, initialTab, forceReset])
+
+  // Focus management: remember the trigger, move focus inside on open,
+  // trap Tab inside the dialog, restore focus on close.
+  useEffect(() => {
+    if (!isOpen) {
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus()
+        previousFocusRef.current = null
+      }
+      return
+    }
+    previousFocusRef.current = document.activeElement as HTMLElement | null
+    const focusId = window.setTimeout(() => {
+      const first = dialogRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
+      first?.focus()
+    }, 0)
+
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab' || !dialogRef.current) return
+      const focusables = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+        .filter((el) => el.offsetParent !== null)
+      if (focusables.length === 0) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
     window.addEventListener('keydown', handleKey)
     return () => {
-      window.clearTimeout(resetId)
+      window.clearTimeout(focusId)
       window.removeEventListener('keydown', handleKey)
     }
-  }, [isOpen, onClose, initialTab, forceReset])
+  }, [isOpen, onClose])
 
   // P0: Listen for Supabase PASSWORD_RECOVERY event (fires when user follows the reset link and client picks up the tokens)
   useEffect(() => {
@@ -464,8 +450,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     // no network call) if the recovery session wasn't carried into this client
     // instance. Recovery tokens live in the URL hash; setSession is idempotent.
     try {
-      // Tokens were moved off the URL hash by the early sanitizer (0h3.11).
-      const hp = getAuthHashParams()
+      const hp = new URLSearchParams((typeof window !== 'undefined' ? window.location.hash : '').replace(/^#/, ''))
       const at = hp.get('access_token')
       const rt = hp.get('refresh_token')
       if (at && rt) await supabase.auth.setSession({ access_token: at, refresh_token: rt })
@@ -484,114 +469,66 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     setSuccess('reset-success')
   }
 
+  const socialSection = (
+    <SocialAuthSection
+      vkEnabled={vkAuthEnabled}
+      yandexEnabled={yandexAuthEnabled}
+      googleEnabled={googleAuthEnabled}
+      loadingProvider={oauthLoading}
+      onVkSignIn={() => { void handleVkSignIn() }}
+      onYandexSignIn={handleYandexSignIn}
+      onGoogleSignIn={() => { void handleGoogleSignIn() }}
+    />
+  )
+
+  const titleText = mode === 'forgot' ? 'Восстановить пароль' : (tab === 'login' ? 'Вход в СоветыДома' : 'Регистрация')
+  const subtitleText = reason
+    ? reason
+    : mode === 'forgot'
+      ? 'Мы отправим ссылку для сброса пароля, если такой аккаунт существует'
+      : tab === 'login'
+        ? 'Сохраняйте статьи, оставляйте комментарии'
+        : 'Присоединяйтесь — это бесплатно'
+
   // Render through a portal to <body> so the fixed overlay is never trapped
   // by an ancestor's containing block (e.g. a card's transform/overflow).
   return createPortal(
     <div
       ref={overlayRef}
+      className={styles.overlay}
       onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 1000,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1rem',
-        backdropFilter: 'blur(2px)',
-      }}
     >
-      <div style={{
-        background: '#fff',
-        borderRadius: '16px',
-        width: '100%',
-        maxWidth: '420px',
-        boxShadow: '0 12px 48px rgba(0,0,0,0.2)',
-        padding: '2rem',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        {/* Top accent strip */}
-        <div style={{
-          position: 'absolute',
-          top: 0, left: 0, right: 0,
-          height: '4px',
-          background: 'linear-gradient(90deg, #c0392b, #e74c3c)',
-          borderRadius: '16px 16px 0 0',
-        }} />
-
+      <div
+        ref={dialogRef}
+        className={styles.dialog}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="auth-modal-title"
+        aria-describedby="auth-modal-desc"
+      >
         {/* Close button */}
-        <button
-          onClick={onClose}
-          aria-label="Закрыть"
-          style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            background: '#f5f3f0',
-            border: 'none',
-            width: '30px',
-            height: '30px',
-            borderRadius: '50%',
-            fontSize: '1.1rem',
-            cursor: 'pointer',
-            color: '#888',
-            lineHeight: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
+        <button onClick={onClose} aria-label="Закрыть" className={styles.closeButton}>
           ×
         </button>
 
         {/* Title */}
-        <div style={{ marginBottom: '0.35rem', marginTop: '0.5rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a' }}>
-            {mode === 'forgot' ? 'Восстановить пароль' : (tab === 'login' ? 'Вход в СоветыДома' : 'Регистрация')}
-          </h2>
-        </div>
+        <h2 id="auth-modal-title" className={styles.title}>{titleText}</h2>
 
         {/* Benefit subtitle (or contextual reason if the modal was invoked from an action) */}
-        <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.85rem', color: reason ? '#c0392b' : '#888', fontWeight: reason ? 600 : 400 }}>
-          {reason
-            ? reason
-            : mode === 'forgot'
-              ? 'Мы отправим ссылку для сброса пароля, если такой аккаунт существует'
-              : tab === 'login'
-                ? 'Сохраняйте статьи, оставляйте комментарии'
-                : 'Присоединяйтесь — это бесплатно'}
+        <p id="auth-modal-desc" className={reason ? styles.subtitleReason : styles.subtitle}>
+          {subtitleText}
         </p>
 
-        {/* Tab switcher — pill style (hidden during forgot flow) */}
-        {mode !== 'forgot' && (
-          <div style={{
-            display: 'flex',
-            background: '#f5f3f0',
-            borderRadius: '10px',
-            padding: '4px',
-            marginBottom: '1.5rem',
-            gap: '4px',
-          }}>
+        {/* Tab switcher — pill style (hidden during forgot/reset flows) */}
+        {mode !== 'forgot' && mode !== 'reset' && (
+          <div className={styles.tabs} role="tablist" aria-label="Вход или регистрация">
             {(['login', 'register'] as const).map((t) => (
               <button
                 key={t}
+                role="tab"
+                aria-selected={tab === t}
                 onClick={() => switchTab(t)}
-                style={{
-                  flex: 1,
-                  padding: '0.5rem 0',
-                  fontSize: '0.88rem',
-                  fontWeight: 700,
-                  border: 'none',
-                  borderRadius: '7px',
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                  transition: 'all 0.2s',
-                  background: tab === t ? '#fff' : 'transparent',
-                  color: tab === t ? '#c0392b' : '#888',
-                  boxShadow: tab === t ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-                }}
+                className={`${styles.tab} ${tab === t ? styles.tabActive : ''}`}
               >
                 {t === 'login' ? 'Войти' : 'Зарегистрироваться'}
               </button>
@@ -601,45 +538,33 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
 
         {/* Success states */}
         {success === 'welcome' && (
-          <div style={{
-            textAlign: 'center',
-            padding: '2rem 1rem',
-            color: '#27ae60',
-            fontSize: '1rem',
-            fontWeight: 700,
-          }}>
+          <div className={styles.welcome}>
             🎉 Добро пожаловать!
           </div>
         )}
 
         {success === 'verify' && (
-          <div style={{
-            background: '#f0fff4',
-            border: '1.5px solid #b2dfdb',
-            borderRadius: '10px',
-            padding: '1.25rem',
-            textAlign: 'center',
-            color: '#1e8449',
-          }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>📧</div>
-            <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>
+          <div className={styles.successCard}>
+            <div className={styles.successIcon}>📧</div>
+            <p className={styles.successTitle}>
               Проверьте почту для подтверждения аккаунта
             </p>
-            <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.82rem', color: '#555' }}>
+            <p className={styles.successText}>
               Мы отправили письмо на <strong>{registerEmail}</strong>. Перейдите по ссылке в письме.
             </p>
-            <p style={{ margin: '0.3rem 0 0.6rem 0', fontSize: '0.78rem', color: '#666' }}>
+            <p className={styles.successText}>
               Если письма нет несколько минут — проверьте папку «Спам».
             </p>
             <button
               type="button"
               onClick={resendConfirmation}
               disabled={resending || resendCooldown > 0}
-              style={{ ...btnStyle, marginTop: '0.5rem', width: '100%', opacity: (resending || resendCooldown > 0) ? 0.6 : 1 }}
+              className={styles.primaryButton}
+              style={{ marginTop: '0.5rem', width: '100%' }}
             >
               {resending ? 'Отправляем...' : (resendCooldown > 0 ? `Отправить ещё раз (${resendCooldown}с)` : 'Отправить письмо ещё раз')}
             </button>
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.6rem' }}>
+            <div className={styles.buttonRow} style={{ marginTop: '0.6rem' }}>
               <button
                 type="button"
                 onClick={() => {
@@ -648,7 +573,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                   setTab('register')
                   setMode('login')
                 }}
-                style={{ ...secondaryBtnStyle, flex: 1, fontSize: '0.85rem' }}
+                className={styles.secondaryButton}
               >
                 Изменить email
               </button>
@@ -659,55 +584,41 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                   setMode('login')
                   setTab('login')
                 }}
-                style={{ ...secondaryBtnStyle, flex: 1, fontSize: '0.85rem' }}
+                className={styles.secondaryButton}
               >
                 Назад к входу
               </button>
             </div>
-            {info && <p style={{ ...successTextStyle, marginTop: '0.7rem' }}>{info}</p>}
-            {error && <p style={{ ...errorStyle, marginTop: '0.7rem' }}>{error}</p>}
+            {info && <p className={styles.info} style={{ marginTop: '0.7rem' }} aria-live="polite">{info}</p>}
+            {error && <p className={styles.error} style={{ marginTop: '0.7rem' }} role="alert">{error}</p>}
           </div>
         )}
 
         {success === 'forgot-sent' && (
-          <div style={{
-            background: '#f0fff4',
-            border: '1.5px solid #b2dfdb',
-            borderRadius: '10px',
-            padding: '1.25rem',
-            textAlign: 'center',
-            color: '#1e8449',
-          }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>📧</div>
-            <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>
+          <div className={styles.successCard}>
+            <div className={styles.successIcon}>📧</div>
+            <p className={styles.successTitle}>
               Если аккаунт с таким email существует, мы отправили инструкции по восстановлению пароля.
             </p>
-            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.82rem', color: '#555' }}>
+            <p className={styles.successText}>
               Проверьте почту (включая папку «Спам»).
             </p>
-            <button type="button" onClick={goBackToLogin} style={{ ...secondaryBtnStyle, marginTop: '1rem', width: '100%' }}>
+            <button type="button" onClick={goBackToLogin} className={styles.secondaryButton} style={{ marginTop: '1rem', width: '100%' }}>
               Вернуться к входу
             </button>
           </div>
         )}
 
         {success === 'reset-success' && (
-          <div style={{
-            background: '#f0fff4',
-            border: '1.5px solid #b2dfdb',
-            borderRadius: '10px',
-            padding: '1.25rem',
-            textAlign: 'center',
-            color: '#1e8449',
-          }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>✅</div>
-            <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>
+          <div className={styles.successCard}>
+            <div className={styles.successIcon}>✅</div>
+            <p className={styles.successTitle}>
               Пароль успешно изменён
             </p>
-            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.82rem', color: '#555' }}>
+            <p className={styles.successText}>
               Теперь вы можете войти с новым паролем.
             </p>
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+            <div className={styles.buttonRow} style={{ marginTop: '1rem' }}>
               <button
                 type="button"
                 onClick={() => {
@@ -716,7 +627,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                   setNewPassword('')
                   setConfirmPassword('')
                 }}
-                style={{ ...secondaryBtnStyle, flex: 1 }}
+                className={styles.secondaryButton}
               >
                 Войти
               </button>
@@ -729,7 +640,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
                     window.location.reload()
                   }
                 }}
-                style={{ ...btnStyle, flex: 1, marginTop: 0 }}
+                className={styles.primaryButton}
               >
                 В личный кабинет
               </button>
@@ -737,29 +648,29 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
           </div>
         )}
 
-        {/* Login form */}
+        {/* Login: social section + email form */}
         {!success && tab === 'login' && mode === 'login' && (
-          <LoginForm
-            email={email}
-            password={password}
-            error={error}
-            info={info}
-            emailError={emailError}
-            loading={loading}
-            vkAuthEnabled={isVkAuthEnabled()}
-            vkLoading={vkLoading}
-            vkContainerRef={vkContainerRef}
-            oauthLoading={oauthLoading}
-            onSubmit={handleLogin}
-            onEmailChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
-            onEmailBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
-            onPasswordChange={(e) => setPassword(e.target.value)}
-            onGoToForgot={goToForgot}
-            onResendConfirmation={resendConfirmation}
-            onResending={resending}
-            onYandexSignIn={handleYandexSignIn}
-            onOAuthSignIn={handleOAuthSignIn}
-          />
+          <>
+            {socialSection}
+            {(vkAuthEnabled || yandexAuthEnabled || googleAuthEnabled) && (
+              <div className={styles.divider}><span>или с email</span></div>
+            )}
+            <LoginForm
+              email={email}
+              password={password}
+              error={error}
+              info={info}
+              emailError={emailError}
+              loading={loading}
+              onSubmit={handleLogin}
+              onEmailChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError('') }}
+              onEmailBlur={() => { if (email && !isValidEmail(email)) setEmailError('Введите корректный email адрес.') }}
+              onPasswordChange={(e) => setPassword(e.target.value)}
+              onGoToForgot={goToForgot}
+              onResendConfirmation={resendConfirmation}
+              onResending={resending}
+            />
+          </>
         )}
 
         {/* Forgot password request form (P0) */}
@@ -793,41 +704,39 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
           />
         )}
 
-        {/* Register form */}
+        {/* Register: social section + email form */}
         {!success && tab === 'register' && (
-          <RegisterForm
-            displayName={displayName}
-            registerEmail={registerEmail}
-            registerPassword={registerPassword}
-            confirmRegisterPassword={confirmRegisterPassword}
-            emailError={emailError}
-            error={error}
-            info={info}
-            loading={loading}
-            onSubmit={handleRegister}
-            onDisplayNameChange={(e) => setDisplayName(e.target.value)}
-            onEmailChange={(e) => { setRegisterEmail(e.target.value); if (emailError) setEmailError('') }}
-            onEmailBlur={() => { if (registerEmail && !isValidEmail(registerEmail)) setEmailError('Введите корректный email адрес.') }}
-            onPasswordChange={(e) => setRegisterPassword(e.target.value)}
-            onConfirmPasswordChange={(e) => setConfirmRegisterPassword(e.target.value)}
-            onTermsChange={() => { if (error) setError('') }}
-          />
+          <>
+            {socialSection}
+            {(vkAuthEnabled || yandexAuthEnabled || googleAuthEnabled) && (
+              <div className={styles.divider}><span>или с email</span></div>
+            )}
+            <RegisterForm
+              displayName={displayName}
+              registerEmail={registerEmail}
+              registerPassword={registerPassword}
+              confirmRegisterPassword={confirmRegisterPassword}
+              emailError={emailError}
+              error={error}
+              info={info}
+              loading={loading}
+              onSubmit={handleRegister}
+              onDisplayNameChange={(e) => setDisplayName(e.target.value)}
+              onEmailChange={(e) => { setRegisterEmail(e.target.value); if (emailError) setEmailError('') }}
+              onEmailBlur={() => { if (registerEmail && !isValidEmail(registerEmail)) setEmailError('Введите корректный email адрес.') }}
+              onPasswordChange={(e) => setRegisterPassword(e.target.value)}
+              onConfirmPasswordChange={(e) => setConfirmRegisterPassword(e.target.value)}
+              onTermsChange={() => { if (error) setError('') }}
+            />
+          </>
         )}
-
-        {/* Social proof footer */}
-        <p style={{
-          margin: '1.25rem 0 0 0',
-          textAlign: 'center',
-          fontSize: '0.8rem',
-          color: '#bbb',
-        }}>
-          🏠 Уже 500+ читателей СоветыДома
-        </p>
       </div>
     </div>,
     document.body,
   )
 }
+
+const FOCUSABLE_SELECTOR = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 function getAuthRedirectTo() {
   if (typeof window === 'undefined') return 'https://1001sovet.ru/moy-kabinet/'
@@ -845,43 +754,9 @@ function getOAuthRedirectTo(): string {
   return `${siteOrigin}/auth/callback/`
 }
 
-function isVkAuthEnabled(): boolean {
-  return process.env.NEXT_PUBLIC_VK_AUTH_ENABLED === 'true'
-}
-
-function safeRedirectUrl(value: string): string | null {
-  try {
-    const url = new URL(value)
-    // Only allow http: and https: protocols
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null
-    return url.toString()
-  } catch {
-    return null
-  }
-}
-
 const VK_ID_CODE_VERIFIER_KEY = 'sovetydoma_vk_id_code_verifier'
+const VK_OAUTH_STATE_KEY = 'sovetydoma_vk_oauth_state'
 const YANDEX_STATE_KEY = 'sovetydoma_yandex_oauth_state'
-
-function loadVkIdSdk(): Promise<void> {
-  if (typeof window === 'undefined') return Promise.resolve()
-  if (window.VKIDSDK) return Promise.resolve()
-  return new Promise((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>('script[data-vkid-sdk="true"]')
-    if (existing) {
-      existing.addEventListener('load', () => resolve(), { once: true })
-      existing.addEventListener('error', () => reject(new Error('vk_sdk_load_failed')), { once: true })
-      return
-    }
-    const script = document.createElement('script')
-    script.src = 'https://unpkg.com/@vkid/sdk@2.6.5/dist-sdk/umd/index.js'
-    script.async = true
-    script.dataset.vkidSdk = 'true'
-    script.onload = () => resolve()
-    script.onerror = () => reject(new Error('vk_sdk_load_failed'))
-    document.head.appendChild(script)
-  })
-}
 
 function createPkceVerifier(): string {
   const bytes = new Uint8Array(48)
@@ -892,49 +767,11 @@ function createPkceVerifier(): string {
     .replace(/=+$/g, '')
 }
 
-// --- Shared styles (kept here for success-state JSX that remains inline) ---
-const errorStyle: React.CSSProperties = {
-  color: '#c0392b',
-  fontSize: '0.85rem',
-  margin: 0,
-  background: '#fff0f0',
-  border: '1px solid #f5c6cb',
-  borderRadius: '6px',
-  padding: '0.5rem 0.75rem',
-}
-
-const successTextStyle: React.CSSProperties = {
-  color: '#1e8449',
-  fontSize: '0.85rem',
-  margin: 0,
-  background: '#f0fff4',
-  border: '1px solid #b2dfdb',
-  borderRadius: '6px',
-  padding: '0.5rem 0.75rem',
-}
-
-const btnStyle: React.CSSProperties = {
-  backgroundColor: '#c0392b',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '9px',
-  padding: '0.75rem 1rem',
-  fontSize: '0.95rem',
-  fontWeight: 700,
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-  transition: 'background 0.2s, opacity 0.2s',
-  marginTop: '0.25rem',
-}
-
-const secondaryBtnStyle: React.CSSProperties = {
-  backgroundColor: '#fff',
-  color: '#c0392b',
-  border: '1.5px solid #c0392b',
-  borderRadius: '9px',
-  padding: '0.7rem 1rem',
-  fontSize: '0.9rem',
-  fontWeight: 700,
-  cursor: 'pointer',
-  fontFamily: 'inherit',
+async function createPkceChallenge(verifier: string): Promise<string | null> {
+  if (typeof window === 'undefined' || !window.crypto?.subtle) return null
+  const digest = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/g, '')
 }

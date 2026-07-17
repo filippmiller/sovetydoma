@@ -140,7 +140,11 @@ export default function ArticleCard({ article, wordCount, featured = false, view
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexWrap: 'wrap', marginTop: '0.85rem', paddingTop: '0.7rem', borderTop: '1px solid #f0ece7', fontSize: '0.74rem', color: '#999' }}>
-          <time style={{ fontSize: '0.74rem', color: '#aaa' }}>
+          {/* suppressHydrationWarning: relativeDate() is time-dependent — the
+              prerendered value ("2 нед. назад") legitimately differs from the
+              client-computed one days later; without this React logs #418 and
+              discards the SSR subtree. */}
+          <time dateTime={article.date} suppressHydrationWarning style={{ fontSize: '0.74rem', color: '#aaa' }}>
             {relativeDate(article.date)}
           </time>
           <span aria-label="Просмотры" title="Просмотры" style={{ whiteSpace: 'nowrap' }}>

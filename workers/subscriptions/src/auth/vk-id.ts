@@ -64,7 +64,10 @@ function vkIdAuthBase(env: Env): string {
 }
 
 function vkIdAppId(env: Env): string {
-  return cleanText(env.VK_ID_APP_ID || '54625895', 32)
+  // Fail closed: no hardcoded fallback app id. The canonical VK ID app lives in
+  // wrangler.toml [vars]; if it is missing, requireVkIdConfig reports the
+  // provider as unconfigured instead of silently using a stale/foreign app.
+  return cleanText(env.VK_ID_APP_ID, 32)
 }
 
 function vkIdRedirectUri(env: Env): string {

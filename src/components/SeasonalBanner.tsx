@@ -33,6 +33,7 @@ export default function SeasonalBanner() {
   return (
     <a
       href={`/${season.category}`}
+      suppressHydrationWarning
       style={{
         display: 'flex',
         alignItems: 'center',

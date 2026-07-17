@@ -34,7 +34,10 @@ jobs:
       NEXT_PUBLIC_CONTACT_WORKER_URL: ${{ secrets.NEXT_PUBLIC_CONTACT_WORKER_URL || secrets.NEXT_PUBLIC_PHOTO_WORKER_URL }}
       NEXT_PUBLIC_SUBSCRIPTIONS_API_URL: ${{ secrets.NEXT_PUBLIC_SUBSCRIPTIONS_API_URL }}
       NEXT_PUBLIC_VK_AUTH_ENABLED: ${{ secrets.NEXT_PUBLIC_VK_AUTH_ENABLED || 'false' }}
-      NEXT_PUBLIC_VK_APP_ID: ${{ secrets.NEXT_PUBLIC_VK_APP_ID || '54625895' }}
+      # No fallback app id (fail closed): a stale hardcoded id here previously
+      # pointed VK login at the wrong VK app. If the secret is missing the VK
+      # button stays hidden (NEXT_PUBLIC_VK_AUTH_ENABLED gates it).
+      NEXT_PUBLIC_VK_APP_ID: ${{ secrets.NEXT_PUBLIC_VK_APP_ID }}
       NEXT_PUBLIC_VK_SCOPE: ${{ secrets.NEXT_PUBLIC_VK_SCOPE || 'email' }}
       NEXT_PUBLIC_YANDEX_OAUTH_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_YANDEX_OAUTH_CLIENT_ID }}
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}

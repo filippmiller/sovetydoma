@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
 import { safeAssign } from '@/lib/auth/safe-redirect'
+import { verifyOAuthState } from '@/lib/auth/oauth-state'
 import { readAuthHash, getAuthHashParams, clearAuthHash } from '@/lib/auth/recovery-hash'
 
 /**
@@ -39,8 +40,10 @@ export default function AuthCallbackPage() {
           try { return window.sessionStorage.getItem(YANDEX_STATE_KEY) } catch { return null }
         })()
         if (storedYandexState) {
+          // One-time CSRF token: delete BEFORE comparing so a replayed
+          // callback URL can never succeed twice.
           try { window.sessionStorage.removeItem(YANDEX_STATE_KEY) } catch { /* ignore */ }
-          if (!returnedState || returnedState !== storedYandexState) {
+          if (!verifyOAuthState(storedYandexState, returnedState)) {
             throw new Error('state_mismatch')
           }
           if (!code) throw new Error('authorization_code_missing')

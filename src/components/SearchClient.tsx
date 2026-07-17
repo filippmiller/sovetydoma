@@ -178,7 +178,7 @@ export default function SearchClient({ articles }: Props) {
                           }}>
                             {cat?.name || article.categoryName}
                           </span>
-                          <span style={{ fontSize: '0.75rem', color: '#bbb' }}>{relativeDate(article.date)}</span>
+                          <span suppressHydrationWarning style={{ fontSize: '0.75rem', color: '#bbb' }}>{relativeDate(article.date)}</span>
                         </div>
                         <h3 style={{ fontSize: '0.97rem', fontWeight: 700, color: '#1a1a1a', margin: '0 0 0.3rem', lineHeight: 1.4 }}>
                           {article.title}

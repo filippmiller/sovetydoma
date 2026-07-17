@@ -17,7 +17,13 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 const STATE_FILE = path.join(here, '..', '.vk-pkce.local.json')
 const TOKEN_FILE = path.join(here, '..', '.vk-user-token.local.json')
 
-const APP_ID = process.env.VK_ID_APP_ID || '54625895'
+// No fallback: pass the app id explicitly. Using a stale hardcoded id here once
+// pointed this flow at the wrong VK app (see bead sovetydoma-1fc).
+const APP_ID = process.env.VK_ID_APP_ID
+if (!APP_ID) {
+  console.error('VK_ID_APP_ID env var is required (example: VK_ID_APP_ID=54626241 node scripts/vk-id-pkce.mjs start)')
+  process.exit(1)
+}
 const REDIRECT_URI = process.env.VK_ID_REDIRECT_URI || 'https://1001sovet.ru/api/auth/vk/callback'
 const SCOPE = 'wall photos groups offline'
 const AUTH_BASE = 'https://id.vk.com'

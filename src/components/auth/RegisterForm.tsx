@@ -2,76 +2,7 @@
 
 import React from 'react'
 import PasswordInput from './PasswordInput'
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: '0.82rem',
-  fontWeight: 600,
-  color: '#555',
-  marginBottom: '0.35rem',
-}
-
-const inputWrapStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  border: '1.5px solid #e0dbd5',
-  borderRadius: '8px',
-  overflow: 'hidden',
-  background: '#faf9f7',
-  transition: 'border-color 0.2s',
-}
-
-const iconStyle: React.CSSProperties = {
-  padding: '0 0.5rem 0 0.75rem',
-  fontSize: '1rem',
-  userSelect: 'none',
-  flexShrink: 0,
-}
-
-const inputStyle: React.CSSProperties = {
-  flex: 1,
-  padding: '0.65rem 0.75rem 0.65rem 0.25rem',
-  border: 'none',
-  background: 'transparent',
-  fontSize: '0.95rem',
-  outline: 'none',
-  width: '100%',
-  fontFamily: 'inherit',
-}
-
-const errorStyle: React.CSSProperties = {
-  color: '#c0392b',
-  fontSize: '0.85rem',
-  margin: 0,
-  background: '#fff0f0',
-  border: '1px solid #f5c6cb',
-  borderRadius: '6px',
-  padding: '0.5rem 0.75rem',
-}
-
-const successTextStyle: React.CSSProperties = {
-  color: '#1e8449',
-  fontSize: '0.85rem',
-  margin: 0,
-  background: '#f0fff4',
-  border: '1px solid #b2dfdb',
-  borderRadius: '6px',
-  padding: '0.5rem 0.75rem',
-}
-
-const btnStyle: React.CSSProperties = {
-  backgroundColor: '#c0392b',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '9px',
-  padding: '0.75rem 1rem',
-  fontSize: '0.95rem',
-  fontWeight: 700,
-  cursor: 'pointer',
-  fontFamily: 'inherit',
-  transition: 'background 0.2s, opacity 0.2s',
-  marginTop: '0.25rem',
-}
+import styles from './auth.module.css'
 
 export interface RegisterFormProps {
   displayName: string
@@ -109,27 +40,30 @@ export default function RegisterForm({
   onTermsChange,
 }: RegisterFormProps) {
   return (
-    <form onSubmit={onSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <form onSubmit={onSubmit} noValidate className={styles.form}>
       <div>
-        <label style={labelStyle}>Имя пользователя</label>
-        <div style={inputWrapStyle}>
-          <span style={iconStyle}>👤</span>
+        <label htmlFor="auth-register-name" className={styles.label}>Имя пользователя</label>
+        <div className={styles.inputWrap}>
+          <span className={styles.inputIcon} aria-hidden="true">👤</span>
           <input
+            id="auth-register-name"
             name="displayName"
             type="text"
             value={displayName}
             onChange={onDisplayNameChange}
             required
+            autoComplete="nickname"
             placeholder="Ваше имя"
-            style={inputStyle}
+            className={styles.input}
           />
         </div>
       </div>
       <div>
-        <label style={labelStyle}>Email</label>
-        <div style={inputWrapStyle}>
-          <span style={iconStyle}>📧</span>
+        <label htmlFor="auth-register-email" className={styles.label}>Email</label>
+        <div className={styles.inputWrap}>
+          <span className={styles.inputIcon} aria-hidden="true">📧</span>
           <input
+            id="auth-register-email"
             name="email"
             type="email"
             value={registerEmail}
@@ -138,14 +72,17 @@ export default function RegisterForm({
             required
             autoComplete="email"
             placeholder="you@example.com"
-            style={inputStyle}
+            className={styles.input}
+            aria-invalid={Boolean(emailError)}
+            aria-describedby={emailError ? 'auth-register-email-error' : undefined}
           />
         </div>
-        {emailError && <p style={errorStyle}>{emailError}</p>}
+        {emailError && <p id="auth-register-email-error" className={styles.error} role="alert">{emailError}</p>}
       </div>
       <div>
-        <label style={labelStyle}>Пароль</label>
+        <label htmlFor="auth-register-password" className={styles.label}>Пароль</label>
         <PasswordInput
+          id="auth-register-password"
           name="password"
           value={registerPassword}
           onChange={onPasswordChange}
@@ -156,8 +93,9 @@ export default function RegisterForm({
         />
       </div>
       <div>
-        <label style={labelStyle}>Повторите пароль</label>
+        <label htmlFor="auth-register-password-confirm" className={styles.label}>Повторите пароль</label>
         <PasswordInput
+          id="auth-register-password-confirm"
           name="confirmPassword"
           value={confirmRegisterPassword}
           onChange={onConfirmPasswordChange}
@@ -167,23 +105,22 @@ export default function RegisterForm({
           required
         />
       </div>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.82rem', color: '#555' }}>
+      <div className={styles.termsRow}>
         <input
           type="checkbox"
           id="terms"
           name="terms"
           value="accepted"
           required
-          style={{ marginTop: '0.2rem' }}
           onChange={onTermsChange}
         />
         <label htmlFor="terms" style={{ lineHeight: 1.3 }}>
-          Я согласен(а) с <a href="/terms" target="_blank" style={{ color: '#c0392b' }}>Условиями использования</a> и <a href="/privacy" target="_blank" style={{ color: '#c0392b' }}>Политикой конфиденциальности</a>.
+          Я согласен(а) с <a href="/terms" target="_blank">Условиями использования</a> и <a href="/privacy" target="_blank">Политикой конфиденциальности</a>.
         </label>
       </div>
-      {error && <p style={errorStyle}>{error}</p>}
-      {info && <p style={successTextStyle}>{info}</p>}
-      <button type="submit" disabled={loading} style={btnStyle}>
+      {error && <p className={styles.error} role="alert">{error}</p>}
+      {info && <p className={styles.info} aria-live="polite">{info}</p>}
+      <button type="submit" disabled={loading} className={styles.primaryButton}>
         {loading ? 'Регистрируем…' : 'Зарегистрироваться'}
       </button>
     </form>

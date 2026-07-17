@@ -23,14 +23,28 @@
       (async function () {
         var status = document.getElementById('status');
         var codeVerifierKey = 'sovetydoma_vk_id_code_verifier';
+        var stateKey = 'sovetydoma_vk_oauth_state';
         var apiBase = 'https://sovetydoma-subscriptions.filippmiller.workers.dev';
+        // Open-redirect guard: the worker's actionLink must be a Supabase auth
+        // URL — anything else is refused (same rule as src/lib/auth/safe-redirect.ts).
+        var expectedActionLinkPrefix = 'https://plwkjdpuxjkmpkqiqzkk.supabase.co/auth/v1/';
         try {
           var params = new URLSearchParams(window.location.search);
           var error = params.get('error') || '';
           var code = params.get('code') || '';
           var deviceId = params.get('device_id') || params.get('deviceId') || '';
+          var returnedState = params.get('state') || '';
           var codeVerifier = window.sessionStorage.getItem(codeVerifierKey) || '';
+          var storedState = window.sessionStorage.getItem(stateKey) || '';
           if (error) throw new Error(error);
+
+          // CSRF: the returned state must match the one we generated when the
+          // user clicked "Продолжить с VK ID". The stored value is one-time.
+          window.sessionStorage.removeItem(stateKey);
+          if (!storedState || !returnedState || returnedState !== storedState) {
+            throw new Error('state_mismatch');
+          }
+
           if (!code || !deviceId || !codeVerifier) throw new Error('missing_callback_payload');
 
           var res = await fetch(apiBase + '/auth/vk/exchange', {
@@ -46,12 +60,17 @@
           if (!res.ok || !body.ok || !body.actionLink) {
             throw new Error(body.message || body.error || 'vk_exchange_failed');
           }
+          if (String(body.actionLink).indexOf(expectedActionLinkPrefix) !== 0) {
+            throw new Error('vk_invalid_action_link');
+          }
 
           window.sessionStorage.removeItem(codeVerifierKey);
           window.location.replace(body.actionLink);
         } catch (err) {
           console.error('[vk-auth-callback]', err);
-          status.textContent = 'Не удалось войти через VK ID. Вернитесь на сайт и попробуйте еще раз.';
+          status.textContent = err && err.message === 'state_mismatch'
+            ? 'Проверка безопасности входа не пройдена. Вернитесь на сайт и попробуйте войти ещё раз.'
+            : 'Не удалось войти через VK ID. Вернитесь на сайт и попробуйте еще раз.';
         }
       })();
     </script>

@@ -200,7 +200,7 @@ export default function RecipeFilter({ recipes }: Props) {
                       <span>⏱ {prepMin < 60 ? `${prepMin} мин` : `${Math.floor(prepMin / 60)} ч ${prepMin % 60 ? `${prepMin % 60} мин` : ''}`}</span>
                     )}
                     {recipe.recipeYield && <span>🍽 {recipe.recipeYield}</span>}
-                    <span style={{ marginLeft: 'auto' }}>{relativeDate(recipe.date)}</span>
+                    <span suppressHydrationWarning style={{ marginLeft: 'auto' }}>{relativeDate(recipe.date)}</span>
                   </div>
 
                   {recipe.tags.length > 0 && (
