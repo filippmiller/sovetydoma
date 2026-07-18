@@ -67,6 +67,7 @@ test('social auth is available in the registration tab too (single implementatio
 test('VK callback page enforces the CSRF state and allowlists the action link', () => {
   assert.match(vkCallbackPage, /sovetydoma_vk_oauth_state/)
   assert.match(vkCallbackPage, /state_mismatch/)
+  assert.match(vkCallbackPage, /state:\s*returnedState/)
   assert.match(vkCallbackPage, /expectedActionLinkPrefix/)
   assert.match(vkCallbackPage, /\/auth\/v1\//)
 })

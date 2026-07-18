@@ -7,6 +7,7 @@ export type VkIdExchangeInput = {
   code: string
   deviceId: string
   codeVerifier: string
+  state: string
 }
 
 type VkTokenResponse = {
@@ -17,6 +18,7 @@ type VkTokenResponse = {
   expires_in?: number
   user_id?: number | string
   email?: string
+  state?: string
   error?: string
   error_description?: string
 }
@@ -94,34 +96,41 @@ async function postForm<T>(url: string, body: URLSearchParams): Promise<T> {
   })
   const data = await res.json().catch(() => ({})) as T & { error?: string; error_description?: string }
   if (!res.ok || data.error) {
-    throw new Error(data.error || `http_${res.status}`)
+    throw new Error([data.error || `http_${res.status}`, data.error_description].filter(Boolean).join(': '))
   }
   return data as T
 }
 
 export async function exchangeVkIdCode(env: Env, input: VkIdExchangeInput): Promise<VkTokenResponse> {
+  // VK ID's official Web SDK sends every exchange parameter except `code`
+  // in the query string. The endpoint does not treat an all-form-body request
+  // as equivalent, so mirror that wire format exactly.
+  const endpoint = new URL(`${vkIdAuthBase(env)}/oauth2/auth`)
+  endpoint.searchParams.set('grant_type', 'authorization_code')
+  endpoint.searchParams.set('redirect_uri', vkIdRedirectUri(env))
+  endpoint.searchParams.set('client_id', vkIdAppId(env))
+  endpoint.searchParams.set('code_verifier', input.codeVerifier)
+  endpoint.searchParams.set('state', input.state)
+  endpoint.searchParams.set('device_id', input.deviceId)
   const body = new URLSearchParams()
-  body.set('grant_type', 'authorization_code')
   body.set('code', input.code)
-  body.set('code_verifier', input.codeVerifier)
-  body.set('client_id', vkIdAppId(env))
-  body.set('device_id', input.deviceId)
-  body.set('redirect_uri', vkIdRedirectUri(env))
+  // A confidential-client secret, when configured, stays in the request body
+  // so it cannot leak through URLs, proxy logs, or tracing metadata.
   if (env.VK_ID_CLIENT_SECRET) {
     body.set('client_secret', env.VK_ID_CLIENT_SECRET)
   }
-
-  return postForm<VkTokenResponse>(`${vkIdAuthBase(env)}/oauth2/auth`, body)
+  return postForm<VkTokenResponse>(endpoint.toString(), body)
 }
 
 export async function fetchVkIdUserInfo(env: Env, accessToken: string): Promise<VkUserInfoResponse> {
+  const endpoint = new URL(`${vkIdAuthBase(env)}/oauth2/user_info`)
+  endpoint.searchParams.set('client_id', vkIdAppId(env))
   const body = new URLSearchParams()
   body.set('access_token', accessToken)
-  body.set('client_id', vkIdAppId(env))
   if (env.VK_ID_CLIENT_SECRET) {
     body.set('client_secret', env.VK_ID_CLIENT_SECRET)
   }
-  return postForm<VkUserInfoResponse>(`${vkIdAuthBase(env)}/oauth2/user_info`, body)
+  return postForm<VkUserInfoResponse>(endpoint.toString(), body)
 }
 
 export async function generateSupabaseMagicLink(env: Env, email: string, userData: Record<string, unknown>): Promise<string> {
@@ -155,6 +164,8 @@ export async function createSupabaseVkIdLoginLink(env: Env, input: VkIdExchangeI
   }
 
   const token = await exchangeVkIdCode(env, input)
+  const returnedState = cleanText(token.state, 300)
+  if (returnedState !== input.state) throw new Error('vk_token_state_mismatch')
   const accessToken = cleanText(token.access_token, 2000)
   if (!accessToken) throw new Error('vk_access_token_missing')
 

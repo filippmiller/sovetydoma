@@ -794,15 +794,16 @@ async function handleVkIdExchange(request: Request, env: Env): Promise<Response>
     return json({ ok: false, error: 'origin_not_allowed' }, 403)
   }
 
-  const payload = await request.json().catch(() => ({})) as { code?: string; device_id?: string; deviceId?: string; code_verifier?: string; codeVerifier?: string }
+  const payload = await request.json().catch(() => ({})) as { code?: string; device_id?: string; deviceId?: string; code_verifier?: string; codeVerifier?: string; state?: string }
   const code = String(payload.code || '').trim()
   const deviceId = String(payload.device_id || payload.deviceId || '').trim()
   const codeVerifier = String(payload.code_verifier || payload.codeVerifier || '').trim()
+  const state = String(payload.state || '').trim()
 
-  if (!code || !deviceId || !codeVerifier) {
-    return json({ ok: false, error: 'vk_code_device_id_and_verifier_required' }, 400)
+  if (!code || !deviceId || !codeVerifier || !state) {
+    return json({ ok: false, error: 'vk_code_device_id_verifier_and_state_required' }, 400)
   }
-  if (code.length > 2000 || deviceId.length > 300 || codeVerifier.length > 300) {
+  if (code.length > 2000 || deviceId.length > 300 || codeVerifier.length > 300 || state.length > 300) {
     return json({ ok: false, error: 'invalid_vk_payload' }, 400)
   }
   if (!hasSupabaseServiceRole(env)) {
@@ -816,7 +817,7 @@ async function handleVkIdExchange(request: Request, env: Env): Promise<Response>
   }
 
   try {
-    const result = await createSupabaseVkIdLoginLink(env, { code, deviceId, codeVerifier })
+    const result = await createSupabaseVkIdLoginLink(env, { code, deviceId, codeVerifier, state })
     return json({
       ok: true,
       actionLink: result.actionLink,

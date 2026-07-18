@@ -220,14 +220,14 @@ test('vk id exchange rejects disallowed origins', async () => {
       Origin: 'https://evil.example',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ code: 'code', device_id: 'device', code_verifier: 'verifier' }),
+    body: JSON.stringify({ code: 'code', device_id: 'device', code_verifier: 'verifier', state: 'state' }),
   }), baseEnv)
 
   assert.equal(response.status, 403)
   assert.deepEqual(await response.json(), { ok: false, error: 'origin_not_allowed' })
 })
 
-test('vk id exchange requires code device id and verifier', async () => {
+test('vk id exchange requires code device id verifier and state', async () => {
   const response = await worker.fetch(request('/auth/vk/exchange', {
     method: 'POST',
     headers: {
@@ -238,7 +238,7 @@ test('vk id exchange requires code device id and verifier', async () => {
   }), baseEnv)
 
   assert.equal(response.status, 400)
-  assert.deepEqual(await response.json(), { ok: false, error: 'vk_code_device_id_and_verifier_required' })
+  assert.deepEqual(await response.json(), { ok: false, error: 'vk_code_device_id_verifier_and_state_required' })
 })
 
 test('vk id exchange requires Supabase service role configuration', async () => {
@@ -248,7 +248,7 @@ test('vk id exchange requires Supabase service role configuration', async () => 
       Origin: 'https://1001sovet.ru',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ code: 'code', device_id: 'device', code_verifier: 'verifier' }),
+    body: JSON.stringify({ code: 'code', device_id: 'device', code_verifier: 'verifier', state: 'state' }),
   }), baseEnv)
 
   assert.equal(response.status, 503)
@@ -276,7 +276,7 @@ test('vk id exchange fails closed when VK_ID_APP_ID is not configured', async ()
         Origin: 'https://1001sovet.ru',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ code: 'code', device_id: 'device', code_verifier: 'verifier' }),
+      body: JSON.stringify({ code: 'code', device_id: 'device', code_verifier: 'verifier', state: 'state' }),
     }), {
       ...baseEnv,
       SUPABASE_URL: 'https://supabase.example',
@@ -303,18 +303,23 @@ test('vk id exchange returns Supabase action link after VK verification', async 
     if (url.includes('/rest/v1/rpc/notification_check_rate_limit')) {
       return new Response(JSON.stringify({ allowed: true, bucket: 'ok' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
     }
-    if (url === 'https://id.vk.com/oauth2/auth') {
+    if (url.startsWith('https://id.vk.com/oauth2/auth?')) {
+      const query = new URL(url).searchParams
+      assert.equal(query.get('grant_type'), 'authorization_code')
+      assert.equal(query.get('redirect_uri'), 'https://1001sovet.ru/api/auth/vk/callback')
+      assert.equal(query.get('client_id'), '54625895')
+      assert.equal(query.get('code_verifier'), 'vk-verifier')
+      assert.equal(query.get('state'), 'vk-state')
+      assert.equal(query.get('device_id'), 'vk-device')
       const body = new URLSearchParams(String(init?.body || ''))
       assert.equal(body.get('code'), 'vk-code')
-      assert.equal(body.get('device_id'), 'vk-device')
-      assert.equal(body.get('code_verifier'), 'vk-verifier')
-      assert.equal(body.get('client_id'), '54625895')
-      return new Response(JSON.stringify({ access_token: 'vk-access-token', user_id: '123' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      assert.deepEqual([...body.keys()], ['code'])
+      return new Response(JSON.stringify({ access_token: 'vk-access-token', user_id: '123', state: 'vk-state' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
     }
-    if (url === 'https://id.vk.com/oauth2/user_info') {
+    if (url === 'https://id.vk.com/oauth2/user_info?client_id=54625895') {
       const body = new URLSearchParams(String(init?.body || ''))
       assert.equal(body.get('access_token'), 'vk-access-token')
-      assert.equal(body.get('client_id'), '54625895')
+      assert.deepEqual([...body.keys()], ['access_token'])
       return new Response(JSON.stringify({
         user: { user_id: '123', first_name: 'Ivan', last_name: 'Petrov', avatar: 'https://vk.example/avatar.jpg', email: 'ivan@example.com' },
       }), { status: 200, headers: { 'Content-Type': 'application/json' } })
@@ -338,7 +343,7 @@ test('vk id exchange returns Supabase action link after VK verification', async 
         Origin: 'https://1001sovet.ru',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ code: 'vk-code', device_id: 'vk-device', code_verifier: 'vk-verifier' }),
+      body: JSON.stringify({ code: 'vk-code', device_id: 'vk-device', code_verifier: 'vk-verifier', state: 'vk-state' }),
     }), {
       ...baseEnv,
       SUPABASE_URL: 'https://supabase.example',
@@ -351,8 +356,43 @@ test('vk id exchange returns Supabase action link after VK verification', async 
     assert.equal(body.ok, true)
     assert.equal(body.actionLink, 'https://supabase.example/auth/v1/verify?token=generated')
     assert.equal(body.emailHint, 'iv***@example.com')
-    assert.ok(calls.includes('https://id.vk.com/oauth2/auth'))
-    assert.ok(calls.includes('https://id.vk.com/oauth2/user_info'))
+    assert.ok(calls.some((url) => url.startsWith('https://id.vk.com/oauth2/auth?')))
+    assert.ok(calls.includes('https://id.vk.com/oauth2/user_info?client_id=54625895'))
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})
+
+test('vk id exchange rejects a token response with a mismatched state', async () => {
+  const originalFetch = globalThis.fetch
+  globalThis.fetch = async (input: string | URL | Request) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    if (url.includes('/rest/v1/rpc/notification_check_rate_limit')) {
+      return new Response(JSON.stringify({ allowed: true, bucket: 'ok' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    if (url.startsWith('https://id.vk.com/oauth2/auth?')) {
+      return new Response(JSON.stringify({ access_token: 'vk-access-token', user_id: '123', state: 'wrong-state' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+    return new Response(JSON.stringify({ error: 'unexpected_fetch', url }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+  }
+
+  try {
+    const response = await worker.fetch(request('/auth/vk/exchange', {
+      method: 'POST',
+      headers: {
+        Origin: 'https://1001sovet.ru',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code: 'vk-code', device_id: 'vk-device', code_verifier: 'vk-verifier', state: 'vk-state' }),
+    }), {
+      ...baseEnv,
+      SUPABASE_URL: 'https://supabase.example',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-role',
+      VK_ID_APP_ID: '54625895',
+    })
+
+    assert.equal(response.status, 502)
+    assert.deepEqual(await response.json(), { ok: false, error: 'vk_auth_failed' })
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -485,10 +525,10 @@ test('vk id exchange falls back to a private email when VK omits email', async (
     if (url.includes('/rest/v1/rpc/notification_check_rate_limit')) {
       return new Response(JSON.stringify({ allowed: true, bucket: 'ok' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
     }
-    if (url === 'https://id.vk.com/oauth2/auth') {
-      return new Response(JSON.stringify({ access_token: 'vk-access-token', user_id: '123' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    if (url.startsWith('https://id.vk.com/oauth2/auth?')) {
+      return new Response(JSON.stringify({ access_token: 'vk-access-token', user_id: '123', state: 'vk-state' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
     }
-    if (url === 'https://id.vk.com/oauth2/user_info') {
+    if (url === 'https://id.vk.com/oauth2/user_info?client_id=54625895') {
       return new Response(JSON.stringify({
         user: { user_id: '123', first_name: 'Ivan', last_name: 'Petrov' },
       }), { status: 200, headers: { 'Content-Type': 'application/json' } })
@@ -510,7 +550,7 @@ test('vk id exchange falls back to a private email when VK omits email', async (
         Origin: 'https://1001sovet.ru',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ code: 'vk-code', device_id: 'vk-device', code_verifier: 'vk-verifier' }),
+      body: JSON.stringify({ code: 'vk-code', device_id: 'vk-device', code_verifier: 'vk-verifier', state: 'vk-state' }),
     }), {
       ...baseEnv,
       SUPABASE_URL: 'https://supabase.example',

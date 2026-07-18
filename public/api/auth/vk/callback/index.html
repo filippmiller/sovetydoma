@@ -53,7 +53,8 @@
             body: JSON.stringify({
               code: code,
               device_id: deviceId,
-              code_verifier: codeVerifier
+              code_verifier: codeVerifier,
+              state: returnedState
             })
           });
           var body = await res.json().catch(function () { return {}; });
