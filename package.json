@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/validate-articles.mjs && node scripts/generate-build-metadata.mjs && node scripts/generate-article-index.mjs && node scripts/generate-questions-index.mjs && node scripts/generate-sitemap.mjs && node scripts/generate-rss.mjs && node scripts/generate-image-dimensions.mjs && node scripts/generate-webp.mjs && next build",
+    "build": "node scripts/validate-articles.mjs && node scripts/generate-build-metadata.mjs && node scripts/generate-article-index.mjs && node scripts/generate-questions-index.mjs && node scripts/generate-sitemap.mjs && node scripts/generate-rss.mjs && node scripts/generate-image-dimensions.mjs && node scripts/generate-webp.mjs && next build --webpack && node scripts/audit-static-export.mjs",
     "generate:webp": "node scripts/generate-webp.mjs",
     "start": "next start",
     "lint": "eslint src scripts workers eslint.config.mjs next.config.ts postcss.config.mjs",
