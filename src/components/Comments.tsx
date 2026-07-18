@@ -139,7 +139,7 @@ export default function Comments({ slug }: Props) {
   if (!commentsConfigured) return null
 
   return (
-    <section style={{ marginTop: '3rem', borderTop: '2px solid #f0ede8', paddingTop: '2rem' }}>
+    <section data-dynamic-widget="comments" style={{ marginTop: '3rem', borderTop: '2px solid #f0ede8', paddingTop: '2rem' }}>
       {/* Section heading */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.75rem' }}>
         <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#1a1a1a' }}>

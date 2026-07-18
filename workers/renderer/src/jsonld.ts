@@ -12,29 +12,31 @@ export interface PersonaInfo {
   name: string
   slug: string
   role: string
+  icon: string
 }
 
 // Mirrors src/lib/personas.ts PERSONAS array (category→persona mapping).
 // Keep in sync if personas.ts changes.
 const PERSONA_BY_CATEGORY: Record<string, PersonaInfo> = {
-  'dom-i-uborka':          { slug: 'maryana-sidorova', name: 'Марьяна Сидорова', role: 'Редактор разделов «Дом и уборка» и «Кулинария»' },
-  kulinaria:               { slug: 'maryana-sidorova', name: 'Марьяна Сидорова', role: 'Редактор разделов «Дом и уборка» и «Кулинария»' },
-  'krasota-i-uhod':        { slug: 'maryana-sidorova', name: 'Марьяна Сидорова', role: 'Редактор разделов «Дом и уборка» и «Кулинария»' },
-  layfkhaki:               { slug: 'petr-pupkin',      name: 'Пётр Пупкин',      role: 'Редактор раздела «Лайфхаки»' },
-  'zdorovie-i-bezopasnost':{ slug: 'petr-pupkin',      name: 'Пётр Пупкин',      role: 'Редактор раздела «Лайфхаки»' },
-  'pokupki-i-tehnika':     { slug: 'petr-pupkin',      name: 'Пётр Пупкин',      role: 'Редактор раздела «Лайфхаки»' },
-  'dacha-i-ogorod':        { slug: 'petr-ivanov',      name: 'Пётр Иванов',      role: 'Редактор разделов «Дача и огород» и «Экономия»' },
-  ekonomiya:               { slug: 'petr-ivanov',      name: 'Пётр Иванов',      role: 'Редактор разделов «Дача и огород» и «Экономия»' },
-  'semya-i-deti':          { slug: 'petr-ivanov',      name: 'Пётр Иванов',      role: 'Редактор разделов «Дача и огород» и «Экономия»' },
-  'otdyh-i-puteshestviya': { slug: 'petr-ivanov',      name: 'Пётр Иванов',      role: 'Редактор разделов «Дача и огород» и «Экономия»' },
-  rybalka:                 { slug: 'andrey-rybak',     name: 'Андрей Рыбаков',   role: 'Редактор раздела «Рыбалка»' },
-  avto:                    { slug: 'igor-kolesnikov',  name: 'Игорь Колесников', role: 'Редактор раздела «Авто»' },
+  'dom-i-uborka':          { slug: 'maryana-sidorova', name: 'Марьяна Сидорова', role: 'Редактор разделов «Дом и уборка» и «Кулинария»', icon: '🏡' },
+  kulinaria:               { slug: 'maryana-sidorova', name: 'Марьяна Сидорова', role: 'Редактор разделов «Дом и уборка» и «Кулинария»', icon: '🏡' },
+  'krasota-i-uhod':        { slug: 'maryana-sidorova', name: 'Марьяна Сидорова', role: 'Редактор разделов «Дом и уборка» и «Кулинария»', icon: '🏡' },
+  layfkhaki:               { slug: 'aleksey-morozov',  name: 'Алексей Морозов',  role: 'Редактор разделов «Лайфхаки», «Здоровье и безопасность» и «Покупки и техника»', icon: '✍️' },
+  'zdorovie-i-bezopasnost':{ slug: 'aleksey-morozov',  name: 'Алексей Морозов',  role: 'Редактор разделов «Лайфхаки», «Здоровье и безопасность» и «Покупки и техника»', icon: '✍️' },
+  'pokupki-i-tehnika':     { slug: 'aleksey-morozov',  name: 'Алексей Морозов',  role: 'Редактор разделов «Лайфхаки», «Здоровье и безопасность» и «Покупки и техника»', icon: '✍️' },
+  'dacha-i-ogorod':        { slug: 'petr-ivanov',      name: 'Пётр Иванов',      role: 'Редактор разделов «Дача и огород» и «Экономия»', icon: '🚜' },
+  ekonomiya:               { slug: 'petr-ivanov',      name: 'Пётр Иванов',      role: 'Редактор разделов «Дача и огород» и «Экономия»', icon: '🚜' },
+  'semya-i-deti':          { slug: 'petr-ivanov',      name: 'Пётр Иванов',      role: 'Редактор разделов «Дача и огород» и «Экономия»', icon: '🚜' },
+  'otdyh-i-puteshestviya': { slug: 'petr-ivanov',      name: 'Пётр Иванов',      role: 'Редактор разделов «Дача и огород» и «Экономия»', icon: '🚜' },
+  rybalka:                 { slug: 'andrey-rybak',     name: 'Андрей Рыбаков',   role: 'Редактор раздела «Рыбалка»', icon: '🎣' },
+  avto:                    { slug: 'igor-kolesnikov',  name: 'Игорь Колесников', role: 'Редактор раздела «Авто»', icon: '🚗' },
 }
 
 const DEFAULT_PERSONA: PersonaInfo = {
   slug: 'maryana-sidorova',
   name: 'Марьяна Сидорова',
   role: 'Редактор разделов «Дом и уборка» и «Кулинария»',
+  icon: '🏡',
 }
 
 export function resolvePersona(author: string | undefined, category: string): PersonaInfo {

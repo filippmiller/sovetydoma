@@ -26,6 +26,12 @@ import { buildJsonLd, CATEGORY_NAMES, resolvePersona, type ArticleRow } from './
 import { fetchTemplate } from './template'
 import { BAKED_CSS } from './bakedCss'
 import {
+  buildCommentsHtml,
+  buildQuestionsHtml,
+  type DynamicComment,
+  type DynamicQuestion,
+} from './ugc'
+import {
   buildHubHtml,
   buildHubIndexHtml,
   buildRelatedHtml,
@@ -38,7 +44,7 @@ import {
 } from './links'
 
 // Bump to invalidate cached rendered pages after a worker change.
-const RENDER_VERSION = '7'
+const RENDER_VERSION = '8'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -116,6 +122,48 @@ async function fetchArticle(env: Env, category: string, slug: string): Promise<A
 
   const rows = await resp.json() as ArticleRow[]
   return rows[0] ?? null
+}
+
+async function fetchUgcRows<T>(env: Env, table: string, params: URLSearchParams): Promise<T[]> {
+  const base = env.SUPABASE_URL.replace(/\/+$/, '')
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
+  let resp: Response
+  try {
+    resp = await fetch(`${base}/rest/v1/${table}?${params.toString()}`, {
+      signal: controller.signal,
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        Accept: 'application/json',
+      },
+    })
+  } finally {
+    clearTimeout(timer)
+  }
+  if (!resp.ok) throw new Error(`ugc_${table}_${resp.status}`)
+  return resp.json() as Promise<T[]>
+}
+
+function fetchApprovedQuestions(env: Env, slug: string): Promise<DynamicQuestion[]> {
+  return fetchUgcRows<DynamicQuestion>(env, 'questions', new URLSearchParams({
+    article_slug: `eq.${slug}`,
+    status: 'eq.approved',
+    select: 'slug,title,answers_count',
+    order: 'created_at.desc',
+    limit: '20',
+  }))
+}
+
+function fetchApprovedComments(env: Env, slug: string): Promise<DynamicComment[]> {
+  return fetchUgcRows<DynamicComment>(env, 'comments', new URLSearchParams({
+    article_slug: `eq.${slug}`,
+    is_approved: 'eq.true',
+    is_deleted: 'eq.false',
+    select: 'id,content,parent_id,created_at',
+    order: 'created_at.asc',
+    limit: '100',
+  }))
 }
 
 /**
@@ -324,7 +372,14 @@ a{color:#c0392b}</style>
  * in a way that breaks SEO. Hiding it would require extra selector work for minimal gain.)
  */
 
-function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, schemas: { article: object; breadcrumb: object; extra: object[] }, relatedHtml: string | null) {
+function buildTransformer(
+  row: ArticleRow,
+  siteUrl: string,
+  bodyHtml: string,
+  schemas: { article: object; breadcrumb: object; extra: object[] },
+  relatedHtml: string | null,
+  ugcHtml: { questions: string; comments: string },
+) {
   const categoryName = CATEGORY_NAMES[row.category] ?? row.category
   const persona = resolvePersona((row.frontmatter as Record<string, string | undefined>)?.author, row.category)
   const canonicalUrl = `${siteUrl}/${row.category}/${row.slug}/`
@@ -397,6 +452,21 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
         el.setAttribute('content', description)
       },
     })
+    .on('meta[name="keywords"]', {
+      element(el) {
+        el.setAttribute('content', row.tags.join(', '))
+      },
+    })
+    .on('meta[name="category"]', {
+      element(el) {
+        el.setAttribute('content', categoryName)
+      },
+    })
+    .on('meta[property="article:section"]', {
+      element(el) {
+        el.setAttribute('content', categoryName)
+      },
+    })
     .on('link[rel="canonical"]', {
       element(el) {
         el.setAttribute('href', canonicalUrl)
@@ -419,6 +489,27 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
         if (name === 'twitter:title') el.setAttribute('content', row.title)
         else if (name === 'twitter:description') el.setAttribute('content', description)
         else if (name === 'twitter:image') el.setAttribute('content', imageUrl)
+      },
+    })
+    .on('a[href^="https://t.me/share/url"]', {
+      element(el) {
+        el.setAttribute('href', `https://t.me/share/url?url=${encodeURIComponent(canonicalUrl)}&text=${encodeURIComponent(row.title)}`)
+      },
+    })
+    .on('a[href^="https://wa.me/"]', {
+      element(el) {
+        el.setAttribute('href', `https://wa.me/?text=${encodeURIComponent(`${row.title} ${canonicalUrl}`)}`)
+      },
+    })
+    .on('a[href^="https://vk.com/share.php"]', {
+      element(el) {
+        el.setAttribute('href', `https://vk.com/share.php?url=${encodeURIComponent(canonicalUrl)}&title=${encodeURIComponent(row.title)}`)
+      },
+    })
+    .on('a[href^="/podpiski/?category="]', {
+      element(el) {
+        el.setAttribute('href', `/podpiski/?category=${encodeURIComponent(row.category)}#subscription-panel`)
+        el.setAttribute('aria-label', `Подписаться на категорию ${categoryName}`)
       },
     })
     // ── JSON-LD: remove existing, inject fresh after last one ─────────────
@@ -612,6 +703,11 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
         }
       },
     })
+    .on('[data-dynamic-widget="persona"] [data-persona-icon]', {
+      element(el) {
+        el.setInnerContent(persona.icon, { html: false })
+      },
+    })
     .on('div[style*="color:#777"]', {
       element(el) {
         el.setInnerContent(escapeHtml(persona.role), { html: true })
@@ -627,6 +723,20 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
     .on('article.prose', {
       element(el) {
         el.setInnerContent(bodyHtml, { html: true })
+      },
+    })
+    // ── Dynamic UGC islands ──────────────────────────────────────────────
+    // Next hydration is intentionally stripped because its Flight payload
+    // belongs to the template article. Replace client-only loading states
+    // with server-rendered approved rows (or honest empty/error states).
+    .on('[data-dynamic-widget="questions"]', {
+      element(el) {
+        el.setInnerContent(ugcHtml.questions, { html: true })
+      },
+    })
+    .on('[data-dynamic-widget="comments"]', {
+      element(el) {
+        el.setInnerContent(ugcHtml.comments, { html: true })
       },
     })
 }
@@ -692,8 +802,18 @@ async function handleArticle(req: Request, env: Env, category: string, slug: str
     relatedHtml = null
   }
 
+  const [questionsResult, commentsResult] = await Promise.allSettled([
+    fetchApprovedQuestions(env, row.slug),
+    fetchApprovedComments(env, row.slug),
+  ])
+  const ugcHtml = {
+    questions: buildQuestionsHtml(questionsResult.status === 'fulfilled' ? questionsResult.value : null),
+    comments: buildCommentsHtml(commentsResult.status === 'fulfilled' ? commentsResult.value : null),
+  }
+
   // Fetch template HTML (cached 10 min)
-  const templateUrl = (env.TEMPLATE_URL || `${siteUrl}/ekonomiya/ekonomiya-vody/`).replace(/\/+$/, '') + '/'
+  const templateBase = (env.TEMPLATE_URL || `${siteUrl}/ekonomiya/ekonomiya-vody/`).replace(/\/+$/, '') + '/'
+  const templateUrl = `${templateBase}?renderer-shell=${RENDER_VERSION}`
   let templateHtml: string
   try {
     templateHtml = await fetchTemplate(templateUrl)
@@ -708,7 +828,7 @@ async function handleArticle(req: Request, env: Env, category: string, slug: str
   }
 
   // Apply HTMLRewriter transforms
-  const transformer = buildTransformer(row, siteUrl, bodyHtml, schemas, relatedHtml)
+  const transformer = buildTransformer(row, siteUrl, bodyHtml, schemas, relatedHtml, ugcHtml)
   const templateResp = new Response(templateHtml, {
     headers: { 'Content-Type': 'text/html; charset=utf-8' },
   })

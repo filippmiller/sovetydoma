@@ -21,6 +21,7 @@ export default function ArticlePersonaCard({ author, category, updated }: Props)
 
   return (
     <div
+      data-dynamic-widget="persona"
       style={{
         display: 'flex', gap: '0.85rem', alignItems: 'flex-start',
         background: '#faf9f7', border: '1px solid #eee6db', borderRadius: '10px',
@@ -28,6 +29,7 @@ export default function ArticlePersonaCard({ author, category, updated }: Props)
       }}
     >
       <div
+        data-persona-icon
         aria-hidden="true"
         style={{
           width: 44, height: 44, borderRadius: '50%', flexShrink: 0,

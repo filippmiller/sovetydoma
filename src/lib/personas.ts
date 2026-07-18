@@ -21,13 +21,13 @@ export const PERSONAS: Persona[] = [
     contact: 'maryana.sidorova@1001sovet.ru',
   },
   {
-    slug: 'petr-pupkin',
-    name: 'Пётр Пупкин',
-    role: 'Редактор раздела «Лайфхаки»',
-    bio: 'Отвечает за мелкий ремонт, инструменты и бытовые лайфхаки. Считает, что почти всё можно починить своими руками.',
+    slug: 'aleksey-morozov',
+    name: 'Алексей Морозов',
+    role: 'Редактор разделов «Лайфхаки», «Здоровье и безопасность» и «Покупки и техника»',
+    bio: 'Курирует практические материалы о повседневной безопасности, полезных привычках и выборе техники. Проверяет, чтобы рекомендации были понятными, осторожными и применимыми в быту.',
     icon: '🔧',
     categories: ['layfkhaki', 'zdorovie-i-bezopasnost', 'pokupki-i-tehnika'],
-    contact: 'petr.pupkin@1001sovet.ru',
+    contact: 'redaktor@1001sovet.ru',
   },
   {
     slug: 'petr-ivanov',
@@ -59,6 +59,7 @@ export const PERSONAS: Persona[] = [
 ]
 
 const BY_SLUG = new Map(PERSONAS.map((p) => [p.slug, p]))
+const LEGACY_SLUGS: Record<string, string> = { 'petr-pupkin': 'aleksey-morozov' }
 
 /**
  * Resolve the editorial profile for an article. An explicit `author` slug in
@@ -66,7 +67,8 @@ const BY_SLUG = new Map(PERSONAS.map((p) => [p.slug, p]))
  * article's category; otherwise the first profile.
  */
 export function resolvePersona(opts: { author?: string; category?: string }): Persona {
-  if (opts.author && BY_SLUG.has(opts.author)) return BY_SLUG.get(opts.author)!
+  const authorSlug = opts.author ? (LEGACY_SLUGS[opts.author] ?? opts.author) : undefined
+  if (authorSlug && BY_SLUG.has(authorSlug)) return BY_SLUG.get(authorSlug)!
   if (opts.category) {
     const byCat = PERSONAS.find((p) => p.categories.includes(opts.category!))
     if (byCat) return byCat
@@ -75,5 +77,9 @@ export function resolvePersona(opts: { author?: string; category?: string }): Pe
 }
 
 export function getPersona(slug: string): Persona | null {
-  return BY_SLUG.get(slug) ?? null
+  return BY_SLUG.get(LEGACY_SLUGS[slug] ?? slug) ?? null
+}
+
+export function canonicalPersonaSlug(slug: string): string {
+  return LEGACY_SLUGS[slug] ?? slug
 }

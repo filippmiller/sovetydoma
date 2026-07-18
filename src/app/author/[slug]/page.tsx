@@ -2,10 +2,10 @@ export const dynamicParams = false
 export const revalidate = false
 
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import Breadcrumb from '@/components/Breadcrumb'
-import { PERSONAS, getPersona, resolvePersona } from '@/lib/personas'
+import { PERSONAS, canonicalPersonaSlug, getPersona, resolvePersona } from '@/lib/personas'
 import { getAllArticles, CATEGORIES } from '@/lib/articles'
 import type { AnswerRow, QuestionRow } from '@/lib/questions'
 import questionsIndex from '@/lib/questions-index.json'
@@ -18,7 +18,7 @@ const QUESTIONS = questionsIndex as unknown as QWithAnswers[]
 interface Props { params: Promise<{ slug: string }> }
 
 export function generateStaticParams() {
-  return PERSONAS.map((p) => ({ slug: p.slug }))
+  return [...PERSONAS.map((p) => ({ slug: p.slug })), { slug: 'petr-pupkin' }]
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -35,6 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function AuthorPage({ params }: Props) {
   const { slug } = await params
+  const canonicalSlug = canonicalPersonaSlug(slug)
+  if (canonicalSlug !== slug) permanentRedirect(`/author/${canonicalSlug}/`)
   const persona = getPersona(slug)
   if (!persona) notFound()
 

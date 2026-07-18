@@ -30,7 +30,6 @@ import ArticlePersonaCard from '@/components/ArticlePersonaCard'
 import ArticleFeedback from '@/components/ArticleFeedback'
 import ArticlePhotoSubmissionCTA from '@/components/ArticlePhotoSubmissionCTA'
 import ArticleQuestionsBlock from '@/components/ArticleQuestionsBlock'
-import ArticleQaBlock from '@/components/ArticleQaBlock'
 import ArticleInternalLinks from '@/components/ArticleInternalLinks'
 import ArticleViewCount from '@/components/ArticleViewCount'
 import ArticleImage from '@/components/ArticleImage'
@@ -379,9 +378,6 @@ export default async function ArticlePage({ params }: Props) {
 
             {/* Questions — live Q&A for this article */}
             <ArticleQuestionsBlock articleSlug={slug} />
-
-            {/* Article Q&A flywheel (Feature 6) */}
-            <ArticleQaBlock articleSlug={slug} />
 
             <Comments slug={slug} />
           </div>
