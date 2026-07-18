@@ -6,7 +6,7 @@ compatibility_date = "2026-06-02"
 ALLOWED_ORIGINS = "https://1001sovet.ru,http://localhost:3000,http://127.0.0.1:3000"
 SUBSCRIPTIONS_API_URL = "https://sovetydoma-subscriptions.filippmiller.workers.dev"
 PUBLIC_SITE_URL = "https://1001sovet.ru"
-VK_ID_APP_ID = "54626241"
+VK_ID_APP_ID = "54625895"
 VK_ID_REDIRECT_URI = "https://1001sovet.ru/api/auth/vk/callback"
 # Yandex OAuth redirect_uri — must match exactly what is registered in the Yandex app.
 # Derived server-side; never accepted from the client (security: prevents redirect_uri injection).

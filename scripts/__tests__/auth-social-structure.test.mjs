@@ -19,14 +19,14 @@ const deployYml = readFileSync('.github/workflows/deploy.yml', 'utf8')
 const pkceScript = readFileSync('workers/subscriptions/scripts/vk-id-pkce.mjs', 'utf8')
 const wranglerToml = readFileSync('workers/subscriptions/wrangler.toml', 'utf8')
 
-test('stale VK app id 54625895 is gone from code and CI (fail closed)', () => {
+test('obsolete VK app id 54626241 is gone from runtime code and CI (fail closed)', () => {
   for (const [name, src] of Object.entries({ authModal, vkWorker, deployYml, pkceScript })) {
-    assert.ok(!src.includes('54625895'), `${name} still references the stale VK app id`)
+    assert.ok(!src.includes('54626241'), `${name} still references the obsolete VK app id`)
   }
 })
 
-test('canonical VK app id 54626241 is configured in the worker vars', () => {
-  assert.match(wranglerToml, /VK_ID_APP_ID = "54626241"/)
+test('canonical VK app id 54625895 is configured in the worker vars', () => {
+  assert.match(wranglerToml, /VK_ID_APP_ID = "54625895"/)
 })
 
 test('no duplicate/fake VK button via Supabase OAuth remains', () => {

@@ -258,9 +258,8 @@ test('vk id exchange requires Supabase service role configuration', async () => 
 })
 
 test('vk id exchange fails closed when VK_ID_APP_ID is not configured', async () => {
-  // No hardcoded fallback app id (the stale 54625895 fallback previously pointed
-  // the flow at the wrong VK app). Missing env => provider_unconfigured, never
-  // a silent default.
+  // No hardcoded fallback app id. Missing env => provider_unconfigured, never
+  // a silent default that could drift from the frontend configuration.
   const originalFetch = globalThis.fetch
   globalThis.fetch = async (input: string | URL | Request) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
@@ -309,13 +308,13 @@ test('vk id exchange returns Supabase action link after VK verification', async 
       assert.equal(body.get('code'), 'vk-code')
       assert.equal(body.get('device_id'), 'vk-device')
       assert.equal(body.get('code_verifier'), 'vk-verifier')
-      assert.equal(body.get('client_id'), '54626241')
+      assert.equal(body.get('client_id'), '54625895')
       return new Response(JSON.stringify({ access_token: 'vk-access-token', user_id: '123' }), { status: 200, headers: { 'Content-Type': 'application/json' } })
     }
     if (url === 'https://id.vk.com/oauth2/user_info') {
       const body = new URLSearchParams(String(init?.body || ''))
       assert.equal(body.get('access_token'), 'vk-access-token')
-      assert.equal(body.get('client_id'), '54626241')
+      assert.equal(body.get('client_id'), '54625895')
       return new Response(JSON.stringify({
         user: { user_id: '123', first_name: 'Ivan', last_name: 'Petrov', avatar: 'https://vk.example/avatar.jpg', email: 'ivan@example.com' },
       }), { status: 200, headers: { 'Content-Type': 'application/json' } })
@@ -344,7 +343,7 @@ test('vk id exchange returns Supabase action link after VK verification', async 
       ...baseEnv,
       SUPABASE_URL: 'https://supabase.example',
       SUPABASE_SERVICE_ROLE_KEY: 'service-role',
-      VK_ID_APP_ID: '54626241',
+      VK_ID_APP_ID: '54625895',
     })
 
     assert.equal(response.status, 200)
@@ -516,7 +515,7 @@ test('vk id exchange falls back to a private email when VK omits email', async (
       ...baseEnv,
       SUPABASE_URL: 'https://supabase.example',
       SUPABASE_SERVICE_ROLE_KEY: 'service-role',
-      VK_ID_APP_ID: '54626241',
+      VK_ID_APP_ID: '54625895',
     })
 
     assert.equal(response.status, 200)
