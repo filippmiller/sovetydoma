@@ -25,9 +25,22 @@
         var codeVerifierKey = 'sovetydoma_vk_id_code_verifier';
         var stateKey = 'sovetydoma_vk_oauth_state';
         var apiBase = 'https://sovetydoma-subscriptions.filippmiller.workers.dev';
-        // Open-redirect guard: the worker's actionLink must be a Supabase auth
-        // URL — anything else is refused (same rule as src/lib/auth/safe-redirect.ts).
-        var expectedActionLinkPrefix = 'https://plwkjdpuxjkmpkqiqzkk.supabase.co/auth/v1/';
+        // Open-redirect guard: accept only the two known public origins for the
+        // same Supabase deployment (the self-hosted auth endpoint and its
+        // legacy project URL), and only the /auth/v1/ path.
+        var allowedActionLinkOrigins = [
+          'https://api.1001sovet.ru',
+          'https://plwkjdpuxjkmpkqiqzkk.supabase.co'
+        ];
+        function isExpectedActionLink(value) {
+          try {
+            var target = new URL(String(value));
+            return allowedActionLinkOrigins.indexOf(target.origin) !== -1
+              && target.pathname.indexOf('/auth/v1/') === 0;
+          } catch (_) {
+            return false;
+          }
+        }
         try {
           var params = new URLSearchParams(window.location.search);
           var error = params.get('error') || '';
@@ -61,7 +74,7 @@
           if (!res.ok || !body.ok || !body.actionLink) {
             throw new Error(body.message || body.error || 'vk_exchange_failed');
           }
-          if (String(body.actionLink).indexOf(expectedActionLinkPrefix) !== 0) {
+          if (!isExpectedActionLink(body.actionLink)) {
             throw new Error('vk_invalid_action_link');
           }
 

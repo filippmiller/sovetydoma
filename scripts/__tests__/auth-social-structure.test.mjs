@@ -64,12 +64,14 @@ test('social auth is available in the registration tab too (single implementatio
   assert.match(registerBlock[1], /\{socialSection\}/)
 })
 
-test('VK callback page enforces the CSRF state and allowlists the action link', () => {
+test('VK callback page enforces the CSRF state and allowlists both trusted Supabase auth origins', () => {
   assert.match(vkCallbackPage, /sovetydoma_vk_oauth_state/)
   assert.match(vkCallbackPage, /state_mismatch/)
   assert.match(vkCallbackPage, /state:\s*returnedState/)
-  assert.match(vkCallbackPage, /expectedActionLinkPrefix/)
-  assert.match(vkCallbackPage, /\/auth\/v1\//)
+  assert.match(vkCallbackPage, /allowedActionLinkOrigins/)
+  assert.match(vkCallbackPage, /https:\/\/api\.1001sovet\.ru/)
+  assert.match(vkCallbackPage, /https:\/\/plwkjdpuxjkmpkqiqzkk\.supabase\.co/)
+  assert.match(vkCallbackPage, /target\.pathname\.indexOf\('\/auth\/v1\/'\) === 0/)
 })
 
 test('auth dialog is accessible and fits small viewports', () => {
