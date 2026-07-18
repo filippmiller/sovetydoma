@@ -13,6 +13,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
 import helpers from './lib.mjs'
+import { buildQualityContext, checkArticleQuality, fetchAllPublishedForContext } from './quality-gate.mjs'
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
 const has = (k) => process.argv.includes(k)
@@ -21,6 +22,7 @@ const limit = parseInt(arg('--limit', '10'), 10)
 const category = arg('--category', '')
 const slugsArg = arg('--slugs', '')
 const dryRun = has('--dry-run')
+const force = has('--force') // bypass the quality gate (logs a loud warning)
 const agent = 'publish-dynamic'
 
 const DOMAIN = '1001sovet.ru'
@@ -62,6 +64,10 @@ if (error) {
   process.exit(1)
 }
 
+// Quality gate context: titles/descriptions/intros of already-published
+// articles (for duplicate and boilerplate detection). Paginated fetch.
+const qualityCtx = buildQualityContext(await fetchAllPublishedForContext(sb))
+
 const picked = []
 for (const r of data || []) {
   if (picked.length >= limit) break
@@ -73,6 +79,20 @@ for (const r of data || []) {
   if (r.text_status === 'published' || r.published_at) {
     console.warn(`skip ${r.slug}: already published`)
     continue
+  }
+
+  // Quality gate: block obviously weak/duplicate material from going live.
+  const gate = checkArticleQuality(r, qualityCtx)
+  for (const issue of gate.issues) {
+    const fn = issue.severity === 'block' ? console.warn : console.log
+    fn(`  [gate:${issue.severity}] ${r.slug}: ${issue.code} — ${issue.message}`)
+  }
+  if (!gate.ok && !force) {
+    console.warn(`skip ${r.slug}: quality gate blocked (use --force to override)`)
+    continue
+  }
+  if (!gate.ok && force) {
+    console.warn(`FORCE-PUBLISHING ${r.slug} despite quality gate blocks`)
   }
 
   // Validate image exists locally

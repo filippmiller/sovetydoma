@@ -11,15 +11,34 @@
  *   GET /:category/:slug/         → full SEO HTML for a published DB article
  *   GET /images/<filename>        → stream article image from R2
  *   GET /sitemap-dynamic.xml      → sitemap for dynamically-published articles
+ *   GET /stati/                   → hub: index of all category hubs
+ *   GET /stati/<category>/        → hub: paginated listing of dynamic articles
+ *   GET /stati/<category>/<page>/ → hub: page N of the listing
+ *
+ * Internal linking (SEO, 2026-07): every dynamic article gets a server-rendered
+ * "Читайте также" block (related same-category articles + hub link), and the
+ * /stati/ hub pages list every dynamic article with crawlable <a href> links.
+ * See src/links.ts (pure functions, unit-tested).
  */
 
 import { mdToHtml, slugify } from './md'
 import { buildJsonLd, CATEGORY_NAMES, resolvePersona, type ArticleRow } from './jsonld'
 import { fetchTemplate } from './template'
 import { BAKED_CSS } from './bakedCss'
+import {
+  buildHubHtml,
+  buildHubIndexHtml,
+  buildRelatedHtml,
+  fetchAllPages,
+  HUB_PAGE_SIZE,
+  paginate,
+  selectRelated,
+  type HubCategory,
+  type RelatedCandidate,
+} from './links'
 
 // Bump to invalidate cached rendered pages after a worker change.
-const RENDER_VERSION = '6'
+const RENDER_VERSION = '7'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -97,6 +116,68 @@ async function fetchArticle(env: Env, category: string, slug: string): Promise<A
 
   const rows = await resp.json() as ArticleRow[]
   return rows[0] ?? null
+}
+
+/**
+ * Fetch ALL published+active rows of a category (static + dynamic) for
+ * related-links selection and hub pages. Paginates explicitly because
+ * PostgREST caps a single response (commonly 1,000 rows). Result is cached
+ * in the Cache API for CATEGORY_ROWS_CACHE_TTL seconds so article renders
+ * do not hit the DB on every request.
+ */
+const CATEGORY_ROWS_CACHE_TTL = 600 // seconds
+
+async function fetchCategoryRows(env: Env, category: string): Promise<RelatedCandidate[]> {
+  const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
+  const cacheKey = new Request(`${siteUrl}/__internal/cat-rows/${category}?render=${RENDER_VERSION}`)
+  const cache = caches.default
+  const cached = await cache.match(cacheKey)
+  if (cached) return cached.json() as Promise<RelatedCandidate[]>
+
+  const base = env.SUPABASE_URL.replace(/\/+$/, '')
+
+  const rows = await fetchAllPages<RelatedCandidate>(async (offset, limit) => {
+    const params = new URLSearchParams({
+      category: `eq.${category}`,
+      text_status: 'eq.published',
+      disposition: 'eq.active',
+      domain: 'eq.1001sovet.ru',
+      select: 'slug,category,title,description,tags,image_filename,published_at,text_status,published_via:frontmatter->>published_via',
+      order: 'published_at.desc,slug.asc',
+      limit: String(limit),
+      offset: String(offset),
+    })
+
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
+    let resp: Response
+    try {
+      resp = await fetch(`${base}/rest/v1/content_matrix?${params.toString()}`, {
+        signal: controller.signal,
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+          Accept: 'application/json',
+        },
+      })
+    } catch (err) {
+      clearTimeout(timer)
+      throw new Error(`db_fetch_failed: ${String(err)}`)
+    }
+    clearTimeout(timer)
+
+    if (!resp.ok) throw new Error(`db_fetch_${resp.status}`)
+    return resp.json() as Promise<RelatedCandidate[]>
+  }, { maxRows: 10_000 })
+
+  const cacheResp = new Response(JSON.stringify(rows), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': `public, max-age=${CATEGORY_ROWS_CACHE_TTL}`,
+    },
+  })
+  cache.put(cacheKey, cacheResp).catch(() => {/* ignore */})
+  return rows
 }
 
 // ---------------------------------------------------------------------------
@@ -243,7 +324,7 @@ a{color:#c0392b}</style>
  * in a way that breaks SEO. Hiding it would require extra selector work for minimal gain.)
  */
 
-function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, schemas: { article: object; breadcrumb: object; extra: object[] }) {
+function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, schemas: { article: object; breadcrumb: object; extra: object[] }, relatedHtml: string | null) {
   const categoryName = CATEGORY_NAMES[row.category] ?? row.category
   const persona = resolvePersona((row.frontmatter as Record<string, string | undefined>)?.author, row.category)
   const canonicalUrl = `${siteUrl}/${row.category}/${row.slug}/`
@@ -503,10 +584,16 @@ function buildTransformer(row: ArticleRow, siteUrl: string, bodyHtml: string, sc
         el.setInnerContent(tocHtml, { html: true })
       },
     })
-    // ── Related articles (template's, wrong category) — drop ─────────────
+    // ── Related articles — replace the template's (wrong-category) block ──
+    // with our server-rendered "Читайте также" links (same category,
+    // published only, no self-links). Falls back to dropping the section.
     .on('section.related-articles', {
       element(el) {
-        el.remove()
+        if (relatedHtml) {
+          el.setInnerContent(relatedHtml, { html: true })
+        } else {
+          el.remove()
+        }
       },
     })
     // ── «С чего начать» summary (template's steps, wrong article) — drop ──
@@ -589,6 +676,22 @@ async function handleArticle(req: Request, env: Env, category: string, slug: str
   // Build JSON-LD schemas
   const schemas = buildJsonLd(row)
 
+  // Related links (same category, published only). Failure must never break
+  // article rendering — fall back to removing the template's related block.
+  let relatedHtml: string | null = null
+  try {
+    const categoryRows = await fetchCategoryRows(env, row.category)
+    const related = selectRelated(categoryRows, { slug: row.slug, tags: row.tags }, 6)
+    if (related.length > 0) {
+      relatedHtml = buildRelatedHtml(related, {
+        category: row.category,
+        categoryName: CATEGORY_NAMES[row.category] ?? row.category,
+      })
+    }
+  } catch {
+    relatedHtml = null
+  }
+
   // Fetch template HTML (cached 10 min)
   const templateUrl = (env.TEMPLATE_URL || `${siteUrl}/ekonomiya/ekonomiya-vody/`).replace(/\/+$/, '') + '/'
   let templateHtml: string
@@ -605,7 +708,7 @@ async function handleArticle(req: Request, env: Env, category: string, slug: str
   }
 
   // Apply HTMLRewriter transforms
-  const transformer = buildTransformer(row, siteUrl, bodyHtml, schemas)
+  const transformer = buildTransformer(row, siteUrl, bodyHtml, schemas, relatedHtml)
   const templateResp = new Response(templateHtml, {
     headers: { 'Content-Type': 'text/html; charset=utf-8' },
   })
@@ -697,7 +800,7 @@ async function handleSitemap(env: Env): Promise<Response> {
   const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
   // Version the internal cache key when sitemap generation semantics change;
   // otherwise an old edge entry can hide newly included URLs for an hour.
-  const cacheKey = new Request(`${siteUrl}/sitemap-dynamic.xml?generator=v2`)
+  const cacheKey = new Request(`${siteUrl}/sitemap-dynamic.xml?generator=v3`)
   const cache = caches.default
 
   const cached = await cache.match(cacheKey)
@@ -767,7 +870,24 @@ async function handleSitemap(env: Env): Promise<Response> {
     return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`
   }).join('\n')
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>`
+  // Crawlable hub pages (/stati/…) — they carry the HTML links to all dynamic
+  // articles, so they belong in the sitemap too. Counts come from the same
+  // row set, so hub URLs and article URLs can never disagree.
+  const perCategory = new Map<string, number>()
+  for (const r of rows) perCategory.set(r.category, (perCategory.get(r.category) ?? 0) + 1)
+  const hubUrls = [`  <url>\n    <loc>${siteUrl}/stati/</loc>\n  </url>`]
+  for (const [cat, count] of [...perCategory.entries()].sort()) {
+    if (count === 0) continue
+    const pages = Math.ceil(count / HUB_PAGE_SIZE)
+    for (let p = 1; p <= pages; p++) {
+      const loc = p === 1 ? `${siteUrl}/stati/${escapeHtml(cat)}/` : `${siteUrl}/stati/${escapeHtml(cat)}/${p}/`
+      hubUrls.push(`  <url>\n    <loc>${loc}</loc>\n  </url>`)
+    }
+  }
+
+  const allUrls = hubUrls.join('\n') + (urls ? '\n' + urls : '')
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${allUrls}\n</urlset>`
 
   const response = new Response(xml, {
     headers: {
@@ -776,6 +896,79 @@ async function handleSitemap(env: Env): Promise<Response> {
     },
   })
 
+  cache.put(cacheKey, response.clone()).catch(() => {/* ignore */})
+  return response
+}
+
+// ---------------------------------------------------------------------------
+// Routes: GET /stati/… — crawlable hub pages for dynamic articles
+// ---------------------------------------------------------------------------
+
+const HUB_CACHE_TTL = 600 // seconds
+
+const HUB_CATEGORIES: HubCategory[] = Object.entries(CATEGORY_NAMES).map(([slug, name]) => ({ slug, name }))
+
+async function handleHub(env: Env, category: string | null, page: number): Promise<Response> {
+  const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
+  const cacheKey = new Request(`${siteUrl}/stati/${category ?? ''}/${page}?render=${RENDER_VERSION}`)
+  const cache = caches.default
+
+  const cached = await cache.match(cacheKey)
+  if (cached) return cached
+
+  let html: string
+
+  if (!category) {
+    html = buildHubIndexHtml(HUB_CATEGORIES, siteUrl)
+  } else {
+    const categoryName = CATEGORY_NAMES[category]
+    if (!categoryName) {
+      return new Response(notFoundHtml(siteUrl), {
+        status: 404,
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      })
+    }
+
+    let rows: RelatedCandidate[]
+    try {
+      rows = await fetchCategoryRows(env, category)
+    } catch {
+      return new Response('Service temporarily unavailable — DB timeout', {
+        status: 503,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Retry-After': '10' },
+      })
+    }
+
+    // Hubs list dynamically-published articles only — static ones are already
+    // linked from the main category page.
+    const dynamic = rows.filter((r) => r.published_via === 'dynamic')
+    const totalPages = Math.max(1, Math.ceil(dynamic.length / HUB_PAGE_SIZE))
+    if (page > totalPages) {
+      return new Response(notFoundHtml(siteUrl), {
+        status: 404,
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      })
+    }
+
+    const pg = paginate(dynamic, page, HUB_PAGE_SIZE)
+    html = buildHubHtml({
+      siteUrl,
+      category: { slug: category, name: categoryName },
+      categories: HUB_CATEGORIES,
+      articles: pg.items,
+      page: pg.page,
+      totalPages: pg.totalPages,
+      totalItems: pg.totalItems,
+    })
+  }
+
+  const response = new Response(html, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': `public, max-age=${HUB_CACHE_TTL}, s-maxage=${HUB_CACHE_TTL * 2}`,
+    },
+  })
   cache.put(cacheKey, response.clone()).catch(() => {/* ignore */})
   return response
 }
@@ -803,6 +996,21 @@ const worker = {
     // /sitemap-dynamic.xml
     if (pathname === '/sitemap-dynamic.xml') {
       return handleSitemap(env)
+    }
+
+    // /stati/… — crawlable hub pages (also proxied by Caddy)
+    const hubMatch = pathname.match(/^\/stati(?:\/([a-z0-9-]+)(?:\/(\d+))?)?(\/?)$/)
+    if (hubMatch) {
+      const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
+      const category = hubMatch[1] ?? null
+      const page = hubMatch[2] ? parseInt(hubMatch[2], 10) : 1
+      // Canonical form: trailing slash; page 1 lives at the bare category path.
+      if (hubMatch[3] !== '/' || hubMatch[2] === '1') {
+        const base = `/stati/${category ? `${category}/` : ''}`
+        const target = hubMatch[2] && hubMatch[2] !== '1' ? `${base}${page}/` : base
+        return Response.redirect(`${siteUrl}${target}`, 301)
+      }
+      return handleHub(env, category, page)
     }
 
     // /images/<filename> and /images/previews/<filename>

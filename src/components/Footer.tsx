@@ -77,6 +77,7 @@ export default function Footer() {
             <Link href="/privacy/" style={{ color: '#999', textDecoration: 'none' }}>Конфиденциальность</Link>
             <Link href="/cookies/" style={{ color: '#999', textDecoration: 'none' }}>Cookies</Link>
             <Link href="/feed.xml" style={{ color: '#999', textDecoration: 'none' }}>RSS</Link>
+            <Link href="/stati/" style={{ color: '#999', textDecoration: 'none' }}>Все материалы</Link>
           </div>
         </div>
       </div>

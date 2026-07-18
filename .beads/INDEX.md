@@ -87,4 +87,5 @@ Add real bead folders below when they exist:
 
 ```text
 BEAD-ID        status    title
+BEAD-OPS-DA6   running   VK/FB 12-category autopost — complete group/page maps
 ```

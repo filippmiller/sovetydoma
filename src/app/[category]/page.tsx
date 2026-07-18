@@ -80,6 +80,19 @@ export default async function CategoryPage({ params }: Props) {
         ) : (
           <CategoryArticleBrowser articles={articles} />
         )}
+
+        {/* Server-rendered crawlable link to the full dynamic listing of this
+            category (hub page served by the renderer worker). This is the
+            navigation chain that lets search bots reach dynamically published
+            articles without JavaScript. */}
+        <nav aria-label="Полный список материалов рубрики" style={{ marginTop: '2rem', padding: '1rem 1.25rem', background: '#fff', border: '1px solid #eae4db', borderRadius: '10px' }}>
+          <a href={`/stati/${category}/`} style={{ color: '#2980b9', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem' }}>
+            Все материалы рубрики «{cat.name}», включая новые →
+          </a>
+          <p style={{ margin: '0.4rem 0 0', color: '#888', fontSize: '0.82rem' }}>
+            Полный хронологический список опубликованных статей рубрики с пагинацией.
+          </p>
+        </nav>
       </div>
     </>
   )
