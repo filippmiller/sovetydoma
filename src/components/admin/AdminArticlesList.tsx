@@ -1,35 +1,42 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import type { ArticleFrontmatter } from '@/lib/articles'
 import AdminShell from './AdminShell'
 import { useAdminAuth } from '@/lib/admin-auth'
+import {
+  AdminApiError,
+  listArticles,
+  type AdminArticleListItem,
+  type AdminTextStatus,
+} from '@/lib/admin-api'
+import { SUBSCRIPTION_CATEGORY_SLUGS } from '@/lib/subscriptions/constants.mjs'
+import { CATEGORIES } from '@/lib/categories'
 
-interface Props {
-  articles: (ArticleFrontmatter & { wordCount: number })[]
-}
+const PER_PAGE = 50
+const SEARCH_DEBOUNCE_MS = 350
 
-type SortKey = 'date' | 'title' | 'category' | 'wordCount'
-type SortDir = 'asc' | 'desc'
+const CATEGORY_SLUGS: string[] = SUBSCRIPTION_CATEGORY_SLUGS
 
-const SCHEMA_BADGE: Record<string, { label: string; color: string; bg: string }> = {
-  Recipe: { label: 'Recipe', color: '#9a3412', bg: '#fff7ed' },
-  HowTo: { label: 'HowTo', color: '#1e40af', bg: '#eff6ff' },
-}
+const STATUS_OPTIONS: { value: '' | AdminTextStatus; label: string }[] = [
+  { value: '', label: 'Все статусы' },
+  { value: 'idea', label: 'Идея' },
+  { value: 'draft', label: 'Черновик' },
+  { value: 'reviewed', label: 'Проверен' },
+  { value: 'approved', label: 'Одобрен' },
+  { value: 'published', label: 'Опубликован' },
+  { value: 'unpublished', label: 'Снят с публикации' },
+  { value: 'scheduled', label: 'Запланирован' },
+]
 
-const CATEGORY_LABELS: Record<string, string> = {
-  kulinaria: 'Кулинария',
-  'dom-i-uborka': 'Дом и уборка',
-  'dacha-i-ogorod': 'Дача и огород',
-  layfkhaki: 'Лайфхаки',
-  ekonomiya: 'Экономия',
-  rybalka: 'Рыбалка',
-  'zdorovie-i-bezopasnost': 'Здоровье и безопасность',
-  'semya-i-deti': 'Семья и дети',
-  'krasota-i-uhod': 'Красота и уход',
-  'otdyh-i-puteshestviya': 'Отдых и путешествия',
-  'pokupki-i-tehnika': 'Покупки и техника',
+const STATUS_BADGE: Record<string, { label: string; color: string; bg: string }> = {
+  idea: { label: 'Идея', color: '#6b7280', bg: '#f3f4f6' },
+  draft: { label: 'Черновик', color: '#9a3412', bg: '#fff7ed' },
+  reviewed: { label: 'Проверен', color: '#1e40af', bg: '#eff6ff' },
+  approved: { label: 'Одобрен', color: '#166534', bg: '#f0fdf4' },
+  published: { label: 'Опубликован', color: '#15803d', bg: '#dcfce7' },
+  unpublished: { label: 'Снят', color: '#b91c1c', bg: '#fee2e2' },
+  scheduled: { label: 'Запланирован', color: '#7e22ce', bg: '#faf5ff' },
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -44,60 +51,70 @@ const CATEGORY_COLORS: Record<string, string> = {
   'krasota-i-uhod': '#e91e63',
   'otdyh-i-puteshestviya': '#2980b9',
   'pokupki-i-tehnika': '#f39c12',
+  avto: '#34495e',
 }
 
-export default function AdminArticlesList({ articles }: Props) {
+function categoryLabel(slug: string): string {
+  return CATEGORIES[slug]?.name || slug
+}
+
+function formatDate(d: string | null) {
+  if (!d) return '—'
+  const dt = new Date(d)
+  if (Number.isNaN(dt.getTime())) return '—'
+  return dt.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
+interface LoadState {
+  status: 'loading' | 'ready' | 'error'
+  items: AdminArticleListItem[]
+  page: number
+  total: number
+  error: string | null
+}
+
+export default function AdminArticlesList() {
   const authState = useAdminAuth()
+  const [status, setStatus] = useState('')
+  const [category, setCategory] = useState('')
   const [query, setQuery] = useState('')
-  const [sortKey, setSortKey] = useState<SortKey>('date')
-  const [sortDir, setSortDir] = useState<SortDir>('desc')
-  const [filterCategory, setFilterCategory] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [reloadNonce, setReloadNonce] = useState(0)
+  const [state, setState] = useState<LoadState>({ status: 'loading', items: [], page: 1, total: 0, error: null })
 
-  const filtered = useMemo(() => {
-    let list = [...articles]
-    if (query.trim()) {
-      const q = query.trim().toLowerCase()
-      list = list.filter(a =>
-        a.title.toLowerCase().includes(q) ||
-        a.category.toLowerCase().includes(q) ||
-        (CATEGORY_LABELS[a.category] || '').toLowerCase().includes(q) ||
-        a.tags.some(t => t.toLowerCase().includes(q))
-      )
+  // Debounce the search box before it hits the API.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedQuery(query.trim())
+      setPage(1)
+    }, SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(t)
+  }, [query])
+
+  const load = useCallback(async () => {
+    setState(s => ({ ...s, status: 'loading', error: null }))
+    try {
+      const res = await listArticles({ page, per_page: PER_PAGE, status, category, q: debouncedQuery, sort: 'updated_at.desc' })
+      setState({ status: 'ready', items: res.items, page: res.page, total: res.total, error: null })
+    } catch (e) {
+      const msg = e instanceof AdminApiError
+        ? `${e.message} (${e.code}${e.status ? `, HTTP ${e.status}` : ''})`
+        : e instanceof Error ? e.message : 'Неизвестная ошибка'
+      console.error('[AdminArticlesList] load failed', e)
+      setState(s => ({ ...s, status: 'error', error: msg }))
     }
-    if (filterCategory) {
-      list = list.filter(a => a.category === filterCategory)
-    }
-    list.sort((a, b) => {
-      let va: string | number = ''
-      let vb: string | number = ''
-      if (sortKey === 'date') { va = a.date; vb = b.date }
-      else if (sortKey === 'title') { va = a.title.toLowerCase(); vb = b.title.toLowerCase() }
-      else if (sortKey === 'category') { va = a.category; vb = b.category }
-      else if (sortKey === 'wordCount') { va = a.wordCount; vb = b.wordCount }
-      if (va < vb) return sortDir === 'asc' ? -1 : 1
-      if (va > vb) return sortDir === 'asc' ? 1 : -1
-      return 0
-    })
-    return list
-  }, [articles, query, sortKey, sortDir, filterCategory])
+  }, [page, status, category, debouncedQuery])
 
-  function toggleSort(key: SortKey) {
-    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
-    else { setSortKey(key); setSortDir(key === 'date' || key === 'wordCount' ? 'desc' : 'asc') }
-  }
-
-  function renderSortIndicator(col: SortKey) {
-    if (sortKey !== col) return <span style={{ color: '#ccc', marginLeft: '0.25rem' }}>↕</span>
-    return <span style={{ color: '#c0392b', marginLeft: '0.25rem' }}>{sortDir === 'asc' ? '↑' : '↓'}</span>
-  }
-
-  function formatDate(d: string) {
-    return new Date(d).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })
-  }
-
-  const categories = [...new Set(articles.map(a => a.category))].sort()
+  useEffect(() => {
+    if (authState !== 'authed') return
+    const id = window.setTimeout(() => { void load() }, 0)
+    return () => window.clearTimeout(id)
+  }, [authState, load, reloadNonce])
 
   if (authState !== 'authed') return null
+
+  const totalPages = Math.max(1, Math.ceil(state.total / PER_PAGE))
 
   return (
     <AdminShell activeNav="articles">
@@ -106,7 +123,7 @@ export default function AdminArticlesList({ articles }: Props) {
           <div>
             <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>Статьи</h1>
             <p style={{ color: '#888', fontSize: '0.9rem', margin: '0.25rem 0 0' }}>
-              {filtered.length} из {articles.length} статей
+              {state.status === 'ready' ? `Всего: ${state.total} · страница ${state.page} из ${totalPages}` : 'Загрузка из admin-api...'}
             </p>
           </div>
         </div>
@@ -127,7 +144,7 @@ export default function AdminArticlesList({ articles }: Props) {
             type="search"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Поиск по заголовку, категории, тегу..."
+            placeholder="Поиск по заголовку или slug..."
             style={{
               flex: '1 1 220px',
               padding: '0.55rem 0.85rem',
@@ -139,8 +156,26 @@ export default function AdminArticlesList({ articles }: Props) {
             }}
           />
           <select
-            value={filterCategory}
-            onChange={e => setFilterCategory(e.target.value)}
+            value={status}
+            onChange={e => { setStatus(e.target.value); setPage(1) }}
+            style={{
+              padding: '0.55rem 0.85rem',
+              border: '1.5px solid #e5e7eb',
+              borderRadius: '7px',
+              fontSize: '0.9rem',
+              outline: 'none',
+              fontFamily: 'inherit',
+              background: '#fff',
+              cursor: 'pointer',
+            }}
+          >
+            {STATUS_OPTIONS.map(o => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <select
+            value={category}
+            onChange={e => { setCategory(e.target.value); setPage(1) }}
             style={{
               padding: '0.55rem 0.85rem',
               border: '1.5px solid #e5e7eb',
@@ -153,13 +188,13 @@ export default function AdminArticlesList({ articles }: Props) {
             }}
           >
             <option value="">Все категории</option>
-            {categories.map(c => (
-              <option key={c} value={c}>{CATEGORY_LABELS[c] || c}</option>
+            {CATEGORY_SLUGS.map(c => (
+              <option key={c} value={c}>{categoryLabel(c)}</option>
             ))}
           </select>
-          {(query || filterCategory) && (
+          {(query || status || category) && (
             <button
-              onClick={() => { setQuery(''); setFilterCategory('') }}
+              onClick={() => { setQuery(''); setStatus(''); setCategory(''); setPage(1) }}
               style={{
                 padding: '0.55rem 0.85rem',
                 border: '1px solid #e5e7eb',
@@ -176,153 +211,234 @@ export default function AdminArticlesList({ articles }: Props) {
           )}
         </div>
 
+        {/* Error state */}
+        {state.status === 'error' && (
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+            padding: '2.5rem',
+            textAlign: 'center',
+          }}>
+            <div style={{ fontSize: '1.6rem', marginBottom: '0.5rem' }}>⚠️</div>
+            <div style={{ color: '#b91c1c', fontWeight: 600, marginBottom: '0.25rem' }}>Не удалось загрузить статьи</div>
+            <div style={{ color: '#888', fontSize: '0.85rem', marginBottom: '1rem' }}>{state.error}</div>
+            <button
+              onClick={() => setReloadNonce(n => n + 1)}
+              style={{
+                padding: '0.55rem 1.25rem',
+                background: '#1a1a1a',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '7px',
+                fontSize: '0.88rem',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                fontWeight: 600,
+              }}
+            >
+              Повторить
+            </button>
+          </div>
+        )}
+
+        {/* Loading state */}
+        {state.status === 'loading' && (
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+            padding: '3rem',
+            textAlign: 'center',
+            color: '#aaa',
+            fontSize: '0.95rem',
+          }}>
+            Загрузка...
+          </div>
+        )}
+
         {/* Table */}
-        <div style={{
-          background: '#fff',
-          borderRadius: '12px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-          overflow: 'auto',
-        }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.87rem', minWidth: '700px' }}>
-            <thead>
-              <tr style={{ background: '#f8f8f8', borderBottom: '2px solid #f0f0f0' }}>
-                <th style={{ padding: '0.7rem 1rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', width: '2.5rem' }}>#</th>
-                <th
-                  style={{ padding: '0.7rem 1rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', userSelect: 'none' }}
-                  onClick={() => toggleSort('title')}
-                >
-                  Заголовок {renderSortIndicator('title')}
-                </th>
-                <th
-                  style={{ padding: '0.7rem 0.75rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
-                  onClick={() => toggleSort('category')}
-                >
-                  Категория {renderSortIndicator('category')}
-                </th>
-                <th
-                  style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
-                  onClick={() => toggleSort('date')}
-                >
-                  Дата {renderSortIndicator('date')}
-                </th>
-                <th style={{ padding: '0.7rem 0.75rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Теги</th>
-                <th style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Schema</th>
-                <th
-                  style={{ padding: '0.7rem 0.75rem', textAlign: 'right', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
-                  onClick={() => toggleSort('wordCount')}
-                >
-                  Слов {renderSortIndicator('wordCount')}
-                </th>
-                <th style={{ padding: '0.7rem 1rem', textAlign: 'right', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#bbb', fontSize: '0.95rem' }}>
-                    Статьи не найдены
-                  </td>
+        {state.status === 'ready' && (
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+            overflow: 'auto',
+          }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.87rem', minWidth: '760px' }}>
+              <thead>
+                <tr style={{ background: '#f8f8f8', borderBottom: '2px solid #f0f0f0' }}>
+                  <th style={{ padding: '0.7rem 1rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', width: '2.5rem' }}>#</th>
+                  <th style={{ padding: '0.7rem 1rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Заголовок</th>
+                  <th style={{ padding: '0.7rem 0.75rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Категория</th>
+                  <th style={{ padding: '0.7rem 0.75rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Статус</th>
+                  <th style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }} title="Сортировка: по дате обновления, новые сверху">Обновлено ↓</th>
+                  <th style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Рев.</th>
+                  <th style={{ padding: '0.7rem 1rem', textAlign: 'right', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}></th>
                 </tr>
-              )}
-              {filtered.map((art, i) => {
-                const badge = art.schemaType ? SCHEMA_BADGE[art.schemaType] : null
-                const catColor = CATEGORY_COLORS[art.category] || '#888'
-                return (
-                  <tr
-                    key={art.slug}
-                    style={{ background: i % 2 === 0 ? '#fff' : '#fafafa', borderTop: '1px solid #f0f0f0', transition: 'background 0.1s' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#f0f4ff')}
-                    onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? '#fff' : '#fafafa')}
-                  >
-                    <td style={{ padding: '0.7rem 1rem', color: '#bbb', fontSize: '0.78rem' }}>{i + 1}</td>
-                    <td style={{ padding: '0.7rem 1rem', maxWidth: '260px' }}>
-                      <div style={{ fontWeight: 600, color: '#1a1a1a', lineHeight: 1.35 }}>
-                        <Link href={`/admin/articles/${art.slug}/`} style={{ color: 'inherit', textDecoration: 'none' }}>
-                          {art.title}
-                        </Link>
-                      </div>
-                      <div style={{ fontSize: '0.74rem', color: '#aaa', marginTop: '0.1rem', fontFamily: 'monospace' }}>{art.slug}</div>
+              </thead>
+              <tbody>
+                {state.items.length === 0 && (
+                  <tr>
+                    <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#bbb', fontSize: '0.95rem' }}>
+                      Статьи не найдены
                     </td>
-                    <td style={{ padding: '0.7rem 0.75rem' }}>
-                      <span style={{
-                        display: 'inline-block',
-                        padding: '2px 8px',
-                        borderRadius: '4px',
-                        fontSize: '0.76rem',
-                        fontWeight: 600,
-                        color: catColor,
-                        background: catColor + '18',
-                        whiteSpace: 'nowrap',
-                      }}>
-                        {CATEGORY_LABELS[art.category] || art.category}
-                      </span>
-                    </td>
-                    <td style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#666', whiteSpace: 'nowrap', fontSize: '0.83rem' }}>
-                      {formatDate(art.date)}
-                    </td>
-                    <td style={{ padding: '0.7rem 0.75rem', maxWidth: '160px' }}>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
-                        {art.tags.slice(0, 3).map(tag => (
-                          <span key={tag} style={{
-                            fontSize: '0.72rem',
-                            padding: '1px 6px',
-                            borderRadius: '3px',
-                            background: '#f0ede8',
-                            color: '#666',
-                          }}>
-                            #{tag}
-                          </span>
-                        ))}
-                        {art.tags.length > 3 && (
-                          <span style={{ fontSize: '0.72rem', color: '#aaa' }}>+{art.tags.length - 3}</span>
-                        )}
-                      </div>
-                    </td>
-                    <td style={{ padding: '0.7rem 0.75rem', textAlign: 'center' }}>
-                      {badge ? (
+                  </tr>
+                )}
+                {state.items.map((art, i) => {
+                  const badge = STATUS_BADGE[art.text_status] || { label: art.text_status, color: '#666', bg: '#f3f4f6' }
+                  const catColor = CATEGORY_COLORS[art.category] || '#888'
+                  return (
+                    <tr
+                      key={art.id}
+                      style={{ background: i % 2 === 0 ? '#fff' : '#fafafa', borderTop: '1px solid #f0f0f0', transition: 'background 0.1s' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#f0f4ff')}
+                      onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? '#fff' : '#fafafa')}
+                    >
+                      <td style={{ padding: '0.7rem 1rem', color: '#bbb', fontSize: '0.78rem' }}>{(state.page - 1) * PER_PAGE + i + 1}</td>
+                      <td style={{ padding: '0.7rem 1rem', maxWidth: '280px' }}>
+                        <div style={{ fontWeight: 600, color: '#1a1a1a', lineHeight: 1.35 }}>
+                          <Link href={`/admin/article/?id=${encodeURIComponent(art.id)}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                            {art.title}
+                          </Link>
+                        </div>
+                        <div style={{ fontSize: '0.74rem', color: '#aaa', marginTop: '0.1rem', fontFamily: 'monospace' }}>{art.slug}</div>
+                        <div style={{ display: 'flex', gap: '4px', marginTop: '0.25rem', flexWrap: 'wrap' }}>
+                          {art.disposition && (
+                            <span style={{
+                              fontSize: '0.72rem',
+                              padding: '1px 6px',
+                              borderRadius: '3px',
+                              background: '#eef2ff',
+                              color: '#4338ca',
+                              fontWeight: 600,
+                            }}>
+                              {art.disposition}
+                            </span>
+                          )}
+                          {art.published_via && (
+                            <span style={{
+                              fontSize: '0.72rem',
+                              padding: '1px 6px',
+                              borderRadius: '3px',
+                              background: '#fff7ed',
+                              color: '#9a3412',
+                              fontWeight: 600,
+                            }}
+                              title="Опубликовано без пересборки сайта"
+                            >
+                              ⚡ {art.published_via}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td style={{ padding: '0.7rem 0.75rem' }}>
                         <span style={{
                           display: 'inline-block',
-                          padding: '2px 7px',
+                          padding: '2px 8px',
                           borderRadius: '4px',
-                          fontSize: '0.73rem',
+                          fontSize: '0.76rem',
+                          fontWeight: 600,
+                          color: catColor,
+                          background: catColor + '18',
+                          whiteSpace: 'nowrap',
+                        }}>
+                          {categoryLabel(art.category)}
+                        </span>
+                      </td>
+                      <td style={{ padding: '0.7rem 0.75rem' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          fontSize: '0.76rem',
                           fontWeight: 700,
                           color: badge.color,
                           background: badge.bg,
+                          whiteSpace: 'nowrap',
                         }}>
                           {badge.label}
                         </span>
-                      ) : (
-                        <span style={{ fontSize: '0.73rem', color: '#ccc', padding: '2px 7px', background: '#f8f8f8', borderRadius: '4px' }}>—</span>
-                      )}
-                    </td>
-                    <td style={{ padding: '0.7rem 0.75rem', textAlign: 'right', color: '#888', fontSize: '0.83rem' }}>
-                      {art.wordCount.toLocaleString('ru-RU')}
-                    </td>
-                    <td style={{ padding: '0.7rem 1rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                      <a
-                        href={`/${art.category}/${art.slug}/`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          fontSize: '0.8rem',
-                          color: '#c0392b',
-                          textDecoration: 'none',
-                          fontWeight: 600,
-                          padding: '3px 8px',
-                          border: '1px solid #f5c6c2',
-                          borderRadius: '5px',
-                          background: '#fff',
-                        }}
-                      >
-                        Просмотр →
-                      </a>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                      </td>
+                      <td style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#666', whiteSpace: 'nowrap', fontSize: '0.83rem' }}>
+                        {formatDate(art.updated_at)}
+                      </td>
+                      <td style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#888', fontSize: '0.83rem' }}>
+                        {art.revision_count ?? 0}
+                      </td>
+                      <td style={{ padding: '0.7rem 1rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                        <Link
+                          href={`/admin/article/?id=${encodeURIComponent(art.id)}`}
+                          style={{
+                            fontSize: '0.8rem',
+                            color: '#c0392b',
+                            textDecoration: 'none',
+                            fontWeight: 600,
+                            padding: '3px 8px',
+                            border: '1px solid #f5c6c2',
+                            borderRadius: '5px',
+                            background: '#fff',
+                          }}
+                        >
+                          Редактировать →
+                        </Link>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.75rem',
+                padding: '0.9rem 1rem',
+                borderTop: '1px solid #f0f0f0',
+                background: '#fafafa',
+              }}>
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={state.page <= 1}
+                  style={{
+                    padding: '0.4rem 0.9rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '0.85rem',
+                    cursor: state.page <= 1 ? 'default' : 'pointer',
+                    background: '#fff',
+                    color: state.page <= 1 ? '#ccc' : '#444',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  ← Назад
+                </button>
+                <span style={{ fontSize: '0.85rem', color: '#888' }}>
+                  Стр. {state.page} из {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={state.page >= totalPages}
+                  style={{
+                    padding: '0.4rem 0.9rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '0.85rem',
+                    cursor: state.page >= totalPages ? 'default' : 'pointer',
+                    background: '#fff',
+                    color: state.page >= totalPages ? '#ccc' : '#444',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  Вперёд →
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </AdminShell>
   )

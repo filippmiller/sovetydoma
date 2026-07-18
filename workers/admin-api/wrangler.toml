@@ -1,0 +1,14 @@
+name = "sovetydoma-admin-api"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+
+[vars]
+SUPABASE_URL = "https://api.1001sovet.ru"
+RENDERER_URL = "https://sovetydoma-renderer.filippmiller.workers.dev"
+SITE_URL = "https://1001sovet.ru"
+ALLOWED_ORIGINS = "https://1001sovet.ru,https://www.1001sovet.ru,http://localhost:3000"
+
+# Secrets (set via `wrangler secret bulk` — NOT `secret put`, PowerShell BOM corrupts it):
+#   SUPABASE_SERVICE_ROLE_KEY
+#   SUPABASE_ANON_KEY
+#   RENDERER_PURGE_SECRET

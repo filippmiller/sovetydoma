@@ -49,7 +49,10 @@ export default function AdminShell({ activeNav, children }: Props) {
             loginAt: Date.now(),
           })
         }
-      } catch {}
+      } catch (e) {
+        // Non-fatal: the shell still renders, but never swallow silently.
+        console.warn('[AdminShell] profile fetch failed', e)
+      }
     })()
   }, [])
 
@@ -57,7 +60,9 @@ export default function AdminShell({ activeNav, children }: Props) {
     try {
       const { getSupabase } = await import('@/lib/supabase')
       await getSupabase().auth.signOut()
-    } catch {}
+    } catch (e) {
+      console.warn('[AdminShell] signOut failed', e)
+    }
     window.location.href = '/admin/login/'
   }
 

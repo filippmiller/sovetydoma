@@ -11,5 +11,9 @@ SUPABASE_URL = "https://api.1001sovet.ru"
 TEMPLATE_URL = "https://1001sovet.ru/ekonomiya/ekonomiya-vody/"
 SITE_URL = "https://1001sovet.ru"
 
-# Secret (set via `wrangler secret bulk` — NOT `secret put`, PowerShell BOM corrupts it):
+# Secrets (set via `wrangler secret bulk` — NOT `secret put`, PowerShell BOM corrupts it):
 #   SUPABASE_SERVICE_ROLE_KEY
+#   RENDERER_PURGE_SECRET — enables POST /__purge (targeted Cache API invalidation
+#     after a dynamic publish). Must match the x-purge-secret header sent by the
+#     publishing pipeline (scripts/factory/publish-dynamic). If unset, /__purge
+#     fails closed with 503 purge_not_configured.

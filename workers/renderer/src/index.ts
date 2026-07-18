@@ -42,9 +42,15 @@ import {
   type HubCategory,
   type RelatedCandidate,
 } from './links'
-
-// Bump to invalidate cached rendered pages after a worker change.
-const RENDER_VERSION = '9'
+import {
+  RENDER_VERSION,
+  articleCacheUrl,
+  categoryRowsCacheUrl,
+  hubCacheUrl,
+  siteBaseUrl,
+  sitemapCacheUrl,
+} from './cacheKeys'
+import { handlePurge } from './purge'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -57,6 +63,7 @@ interface Env {
   TEMPLATE_URL: string          // e.g. https://1001sovet.ru/ekonomiya/ekonomiya-vody/
   SITE_URL: string              // https://1001sovet.ru
   R2_UPLOAD_SECRET?: string     // shared secret for the authenticated PUT /__r2/ upload
+  RENDERER_PURGE_SECRET?: string // shared secret for POST /__purge (wrangler secret bulk)
 }
 
 // ---------------------------------------------------------------------------
@@ -176,8 +183,7 @@ function fetchApprovedComments(env: Env, slug: string): Promise<DynamicComment[]
 const CATEGORY_ROWS_CACHE_TTL = 600 // seconds
 
 async function fetchCategoryRows(env: Env, category: string): Promise<RelatedCandidate[]> {
-  const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const cacheKey = new Request(`${siteUrl}/__internal/cat-rows/${category}?render=${RENDER_VERSION}`)
+  const cacheKey = new Request(categoryRowsCacheUrl(siteBaseUrl(env), category))
   const cache = caches.default
   const cached = await cache.match(cacheKey)
   if (cached) return cached.json() as Promise<RelatedCandidate[]>
@@ -747,8 +753,8 @@ function buildTransformer(
 // ---------------------------------------------------------------------------
 
 async function handleArticle(req: Request, env: Env, category: string, slug: string): Promise<Response> {
-  const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const cacheKey = new Request(`${siteUrl}/${category}/${slug}/?render=${RENDER_VERSION}`, { method: 'GET' })
+  const siteUrl = siteBaseUrl(env)
+  const cacheKey = new Request(articleCacheUrl(siteUrl, category, slug), { method: 'GET' })
   const cache = caches.default
 
   // Check article response cache first
@@ -918,10 +924,10 @@ interface SitemapRow {
 }
 
 async function handleSitemap(env: Env): Promise<Response> {
-  const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
+  const siteUrl = siteBaseUrl(env)
   // Version the internal cache key when sitemap generation semantics change;
   // otherwise an old edge entry can hide newly included URLs for an hour.
-  const cacheKey = new Request(`${siteUrl}/sitemap-dynamic.xml?generator=v3`)
+  const cacheKey = new Request(sitemapCacheUrl(siteUrl))
   const cache = caches.default
 
   const cached = await cache.match(cacheKey)
@@ -1030,8 +1036,8 @@ const HUB_CACHE_TTL = 600 // seconds
 const HUB_CATEGORIES: HubCategory[] = Object.entries(CATEGORY_NAMES).map(([slug, name]) => ({ slug, name }))
 
 async function handleHub(env: Env, category: string | null, page: number): Promise<Response> {
-  const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
-  const cacheKey = new Request(`${siteUrl}/stati/${category ?? ''}/${page}?render=${RENDER_VERSION}`)
+  const siteUrl = siteBaseUrl(env)
+  const cacheKey = new Request(hubCacheUrl(siteUrl, category, page))
   const cache = caches.default
 
   const cached = await cache.match(cacheKey)
@@ -1106,6 +1112,12 @@ const worker = {
     // Cloudflare API token): PUT /__r2/<key> with header x-r2-secret + raw bytes.
     if (req.method === 'PUT' && url.pathname.startsWith('/__r2/')) {
       return handleR2Put(req, env, url)
+    }
+
+    // Targeted cache invalidation after a dynamic publish/update:
+    // POST /__purge {category, slug?} with header x-purge-secret.
+    if (url.pathname === '/__purge') {
+      return handlePurge(req, env, (category) => fetchCategoryRows(env, category))
     }
 
     if (req.method !== 'GET' && req.method !== 'HEAD') {
