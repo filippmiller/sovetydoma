@@ -22,7 +22,7 @@
  */
 
 import { mdToHtml, slugify } from './md'
-import { buildJsonLd, CATEGORY_NAMES, resolvePersona, type ArticleRow } from './jsonld'
+import { articleImageFilename, buildJsonLd, CATEGORY_NAMES, resolvePersona, type ArticleRow } from './jsonld'
 import { fetchTemplate } from './template'
 import { BAKED_CSS } from './bakedCss'
 import {
@@ -44,7 +44,7 @@ import {
 } from './links'
 
 // Bump to invalidate cached rendered pages after a worker change.
-const RENDER_VERSION = '8'
+const RENDER_VERSION = '9'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -383,7 +383,8 @@ function buildTransformer(
   const categoryName = CATEGORY_NAMES[row.category] ?? row.category
   const persona = resolvePersona((row.frontmatter as Record<string, string | undefined>)?.author, row.category)
   const canonicalUrl = `${siteUrl}/${row.category}/${row.slug}/`
-  const imageUrl = `${siteUrl}/images/${row.image_filename ?? row.slug + '.jpg'}`
+  const imageFilename = articleImageFilename(row)
+  const imageUrl = `${siteUrl}/images/${imageFilename}`
   const pageTitle = `${row.title} — СоветыДома`
   const description = row.description
   const fm = row.frontmatter as Record<string, unknown>
@@ -593,7 +594,7 @@ function buildTransformer(
       element(el) {
         if (inFigure && !inFigureImg) {
           inFigureImg = true
-          el.setAttribute('src', `/images/${row.image_filename ?? row.slug + '.jpg'}`)
+          el.setAttribute('src', `/images/${imageFilename}`)
           el.setAttribute('alt', row.title)
         }
       },

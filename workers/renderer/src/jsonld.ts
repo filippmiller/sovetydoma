@@ -58,6 +58,17 @@ export interface ArticleRow {
   word_count: number
 }
 
+// Replaced media must get a new immutable URL. Reusing the old R2 key leaves
+// the previous image visible in browsers and CDNs for up to a year.
+const IMAGE_REPLACEMENTS: Record<string, string> = {
+  'kak-snizit-davlenie-za-10-minut-bez-tabletok':
+    'kak-snizit-davlenie-za-10-minut-bez-tabletok-no-person.jpg',
+}
+
+export function articleImageFilename(row: ArticleRow): string {
+  return IMAGE_REPLACEMENTS[row.slug] ?? row.image_filename ?? `${row.slug}.jpg`
+}
+
 // Category display names — mirrors src/lib/categories.mjs
 export const CATEGORY_NAMES: Record<string, string> = {
   kulinaria:               'Кулинария',
@@ -149,7 +160,7 @@ function isoDurationFromHuman(time?: string): string | undefined {
 
 export function buildJsonLd(row: ArticleRow): { article: object; breadcrumb: object; extra: object[] } {
   const url = `${SITE_URL}/${row.category}/${row.slug}/`
-  const imageUrl = `${SITE_URL}/images/${row.image_filename ?? row.slug + '.jpg'}`
+  const imageUrl = `${SITE_URL}/images/${articleImageFilename(row)}`
   const datePublished = row.published_at.slice(0, 10) // ISO date
   const dateModified = (row.updated_at ?? row.published_at).slice(0, 10)
 
