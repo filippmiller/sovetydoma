@@ -15,10 +15,15 @@
 //   node scripts/factory/generate-article.mjs --category dacha-i-ogorod
 //   node scripts/factory/generate-article.mjs --all            (1 per category)
 //   node scripts/factory/generate-article.mjs --all --dry-run  (no writes/cost)
+// Exit codes: 0 ok · 1 generic failure · 42 provider balance/quota exhausted
+// (prints `PROVIDER_BALANCE_EXHAUSTED provider=<name>` on stderr; see provider-errors.mjs).
 import fs from 'node:fs'
 import path from 'node:path'
 import Anthropic from '@anthropic-ai/sdk'
 import helpers from '../matrix/lib.mjs'
+import { EXIT_PROVIDER_BALANCE, classifyProviderBalanceError } from './provider-errors.mjs'
+
+export { EXIT_PROVIDER_BALANCE, classifyProviderBalanceError }
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
 const has = (k) => process.argv.includes(k)
@@ -203,10 +208,19 @@ async function generateForCategory(category) {
 }
 
 const results = []
+let balanceProvider = null
 for (const c of categories) {
   try { results.push(await generateForCategory(c)) }
-  catch (e) { console.error(`✗ ${c}: ${e.message}`); results.push({ category: c, ok: false, error: e.message }) }
+  catch (e) {
+    console.error(`✗ ${c}: ${e.message}`)
+    balanceProvider = balanceProvider || classifyProviderBalanceError(e)
+    results.push({ category: c, ok: false, error: e.message })
+  }
 }
 const ok = results.filter((r) => r.ok).length
 console.log(`\nFactory: ${ok}/${results.length} categories generated${dryRun ? ' [dry-run]' : ''}.`)
+if (balanceProvider) {
+  console.error(`PROVIDER_BALANCE_EXHAUSTED provider=${balanceProvider}`)
+  process.exit(EXIT_PROVIDER_BALANCE)
+}
 process.exit(results.some((r) => !r.ok) ? 1 : 0)

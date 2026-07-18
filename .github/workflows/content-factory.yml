@@ -11,6 +11,8 @@ name: Content factory (every 5h — 1 article, rotating category)
 #   MATRIX_SUPABASE_URL            — RU Supabase REST URL (https://api.1001sovet.ru)
 #   MATRIX_SUPABASE_SERVICE_ROLE_KEY
 #   R2_UPLOAD_SECRET               — shared secret for the renderer /__r2 upload endpoint
+#   TELEGRAM_BOT_TOKEN             — operator alert on factory failure (see last step)
+#   TELEGRAM_CHAT_ID               — operator alert chat
 #
 # Manual run: Actions → this workflow → Run workflow (dry_run toggles cost).
 
@@ -58,7 +60,9 @@ jobs:
       - run: pip install pillow
 
       - name: Generate (1 article, rotating category)
+        id: generate
         run: |
+          EXIT=0
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then DRY=--dry-run; else DRY=; fi
           SEL="${{ github.event.inputs.categories }}"
           CATS=(kulinaria dom-i-uborka dacha-i-ogorod layfkhaki ekonomiya rybalka zdorovie-i-bezopasnost semya-i-deti krasota-i-uhod otdyh-i-puteshestviya pokupki-i-tehnika avto)
@@ -67,15 +71,45 @@ jobs:
             IDX=$(( ($(date +%s) / 18000) % ${#CATS[@]} ))
             CAT=${CATS[$IDX]}
             echo "Rotating category -> $CAT"
-            node scripts/factory/generate-article.mjs --category "$CAT" $DRY
+            node scripts/factory/generate-article.mjs --category "$CAT" $DRY || EXIT=$?
           elif [ "$SEL" = "all" ]; then
-            node scripts/factory/generate-article.mjs --all $DRY
+            CAT=all
+            node scripts/factory/generate-article.mjs --all $DRY || EXIT=$?
           else
+            CAT="$SEL"
             for c in $(echo "$SEL" | tr ',' ' '); do
-              node scripts/factory/generate-article.mjs --category "$c" $DRY || true
+              node scripts/factory/generate-article.mjs --category "$c" $DRY || { EXIT=$?; if [ "$EXIT" = "42" ]; then break; fi; }
             done
           fi
+          # Exit code 42 = provider balance/quota exhausted (operator must top up).
+          echo "exit_code=$EXIT" >> "$GITHUB_OUTPUT"
+          echo "category=$CAT" >> "$GITHUB_OUTPUT"
+          exit $EXIT
 
+      # Gated on generation success so a failed run can never silently 'publish' a gap.
       - name: Publish live (no rebuild — DB + R2)
-        if: ${{ github.event.inputs.dry_run != 'true' }}
+        if: ${{ github.event.inputs.dry_run != 'true' && steps.generate.outcome == 'success' }}
         run: node scripts/matrix/publish-dynamic.mjs --limit 3
+
+      - name: Alert operator (Telegram)
+        if: failure()
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Pass step outputs via env (not inline ${{ }}) — same pattern as telegram-notify.yml.
+          GEN_EXIT: ${{ steps.generate.outputs.exit_code }}
+          GEN_CATEGORY: ${{ steps.generate.outputs.category }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ "$GEN_EXIT" = "42" ]; then
+            REASON="Исчерпан баланс/квота провайдера (код 42). Действие: пополнить баланс Anthropic relay (или fal.ai). Тихого запасного провайдера нет — генерация остановлена до пополнения."
+          else
+            REASON="Сбой генерации (код ${GEN_EXIT:-unknown}) — смотрите логи запуска."
+          fi
+          MSG="🚨 Content factory: СБОЙ
+          Категория: ${GEN_CATEGORY:-?}
+          ${REASON}
+          Запуск: ${RUN_URL}"
+          curl -s -X POST "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TG_CHAT_ID}" \
+            --data-urlencode "text=${MSG}" > /dev/null

@@ -108,6 +108,16 @@ To unblock a fresh cron run after testing, clear the rate buckets:
 - The index covers only the 6 syndicated categories (kulinaria, dom-i-uborka, dacha-i-ogorod, layfkhaki, ekonomiya, rybalka); other categories are skipped.
 - Deploy after code changes: `cd workers/subscriptions && npx wrangler deploy`.
 
+## Provider failure & balance exhaustion
+
+The content factory (`.github/workflows/content-factory.yml`, every 5h) fails **loudly**, never silently:
+
+- `scripts/factory/generate-article.mjs` exits **42** and prints one stderr line `PROVIDER_BALANCE_EXHAUSTED provider=<anthropic|fal>` when the Anthropic relay or fal.ai reports credit/quota/balance exhaustion (patterns in `scripts/factory/provider-errors.mjs`: /credit balance/i, /insufficient.?quota/i, HTTP 402, …). All other failures keep exit **1**.
+- The publish step is gated on generation success (`steps.generate.outcome == 'success'`), so a failed run can never silently "succeed" a publishing gap.
+- On any failure the workflow sends ONE Telegram alert (secrets `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID`) with the category, run URL, and whether it was balance exhaustion vs a generic failure.
+
+**Operator action for exit 42:** top up the Anthropic relay balance (or fal.ai, per the alert), or explicitly approve a fallback provider. There is **NO silent fallback provider by design** — the pipeline stops until a human acts, so content gaps are always visible.
+
 ## Roadmap
 
 - Multi-page routing (category → own FB Page / VK community) + 5×/day cadence — bead `sovetydoma-ovx`. Design in `docs/AUTOPOST-MULTIPAGE.md`.
