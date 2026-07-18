@@ -34,6 +34,7 @@ Do not interpret “finish every bead” as permission to fabricate completion. 
   - `AdminShell.tsx` exposes Categories, Tags and Settings links with `href="#"`.
   - Several admin data paths swallow errors with empty `catch` blocks, and direct navigation can show a blank/fallback state while auth resolves.
 - Root renderer checks passed after the cache-busting fix: TypeScript clean and 23/23 renderer tests green.
+- Scheduled content-factory run `29640962692` failed on 2026-07-18 because the configured Anthropic relay returned `credit balance is too low`; no article was generated. Treat funding/new paid-provider choice as an operator action, but independently make the pipeline fail clearly, support an approved fallback when available, and prevent silent publishing gaps. See `sovetydoma-6sq`.
 - Admin/backlog work is captured in epic `sovetydoma-11g` with ten children. Do not replace this with a markdown TODO list.
 
 ## Required architecture outcomes
