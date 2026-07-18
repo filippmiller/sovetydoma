@@ -63,15 +63,6 @@ export async function insertRevision(
   }
 }
 
-/** Compensation: remove a revision snapshot when the guarded write did not happen. */
-export async function deleteRevision(env: SupabaseEnv, matrixId: string, revision: number): Promise<void> {
-  try {
-    await sbRest(env, `article_revisions?matrix_id=eq.${encodeURIComponent(matrixId)}&revision=eq.${revision}`, { method: 'DELETE' })
-  } catch {
-    // best-effort
-  }
-}
-
 /** Factory-consistent event log row on content_matrix_events. Best-effort. */
 export async function insertMatrixEvent(
   env: SupabaseEnv,

@@ -134,7 +134,7 @@ describe('admin-api worker', () => {
     })
 
     const res = await worker.fetch(
-      new Request('https://api.test/admin/articles?status=draft&category=ekonomiya&q=hello,world&page=2&per_page=25&sort=title&sort_dir=asc', { headers: AUTH }),
+      new Request('https://api.test/admin/articles?status=draft&category=ekonomiya&q=hello,world&page=2&per_page=25&sort=title.asc', { headers: AUTH }),
       ENV,
     )
     assert.equal(res.status, 200)
@@ -273,9 +273,10 @@ describe('admin-api worker', () => {
     assert.equal(patchCall.body.revision_count, 3)
     assert.deepEqual(patchCall.body.frontmatter, { pinned: true })
 
-    // Revision snapshot happens BEFORE the guarded write and holds the old row.
+    // Revision snapshot holds the old row and is written AFTER the guarded write
+    // wins (serialization prevents a unique(matrix_id, revision) collision).
     const revCall = calls.find((c) => c.url.includes('article_revisions'))!
-    assert.ok(calls.indexOf(revCall) < calls.indexOf(patchCall))
+    assert.ok(calls.indexOf(revCall) > calls.indexOf(patchCall))
     assert.equal(revCall.body.matrix_id, ARTICLE_ID)
     assert.equal(revCall.body.revision, 3)
     assert.equal(revCall.body.snapshot.title, 'Test title')
@@ -425,6 +426,40 @@ describe('admin-api worker', () => {
     assert.equal(res.status, 200)
     const body = await res.json() as Record<string, unknown>
     assert.equal(body.already_published, true)
+  })
+
+  it('re-publish preserves original published_at and frontmatter.date', async () => {
+    const row = currentRow({
+      text_status: 'unpublished',
+      published_at: '2026-06-01T08:00:00Z',
+      frontmatter: { date: '2026-06-01', published_via: 'dynamic' },
+    })
+    installFetch((call) => {
+      const authRes = authOk(call)
+      if (authRes) return authRes
+      if (call.url === 'https://renderer.test/__purge') return restJson({ ok: true })
+      if (call.url.includes('/rest/v1/admin_audit_events') && call.method === 'GET') return restJson([])
+      if (call.url.includes('/rest/v1/content_matrix') && call.method === 'GET') return restJson([row])
+      if (call.url.includes('/rest/v1/content_matrix') && call.method === 'PATCH') return restJson([{ ...row, text_status: 'published' }])
+      if (call.url.includes('/rest/v1/articles_publication_index')) return restJson(null, { status: 201 })
+      if (call.url.includes('/rest/v1/content_matrix_events')) return restJson(null, { status: 201 })
+      if (call.url.includes('/rest/v1/admin_audit_events')) return restJson(null, { status: 201 })
+      throw new Error(`unexpected call ${call.method} ${call.url}`)
+    })
+
+    const res = await worker.fetch(
+      new Request(`https://api.test/admin/articles/${ARTICLE_ID}/publish`, {
+        method: 'POST',
+        headers: { ...AUTH, 'Idempotency-Key': 'pub-3' },
+      }),
+      ENV,
+    )
+    assert.equal(res.status, 200)
+    const patchCall = calls.find((c) => c.method === 'PATCH')!
+    // Original publish date is not stomped on re-publish.
+    assert.equal(patchCall.body.published_at, '2026-06-01T08:00:00Z')
+    assert.equal(patchCall.body.frontmatter.date, '2026-06-01')
+    assert.equal(patchCall.body.frontmatter.published_via, 'dynamic')
   })
 
   it('unpublish rejects a non-published row with 409', async () => {

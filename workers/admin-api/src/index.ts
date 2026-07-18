@@ -19,7 +19,6 @@ import {
   findIdempotentReplay,
   insertAuditEvent,
   insertRevision,
-  deleteRevision,
   insertMatrixEvent,
 } from './audit'
 import { checkMutationRateLimit } from './rate-limit'
@@ -129,9 +128,12 @@ async function listArticles(req: Request, env: Env, h: Record<string, string>): 
     params.push(`or=(title.ilike.*${enc}*,slug.ilike.*${enc}*)`)
   }
 
-  const sortRaw = (sp.get('sort') || 'updated_at').trim()
-  const sortCol = SORTABLE_COLUMNS.has(sortRaw) ? sortRaw : 'updated_at'
-  const sortDir = (sp.get('sort_dir') || 'desc').toLowerCase() === 'asc' ? 'asc' : 'desc'
+  // Single `sort=column.direction` param (PostgREST-native, matches the admin
+  // client). A bare `column` (no direction) defaults to desc; unknown columns
+  // and directions fall back to `updated_at.desc`.
+  const [sortColRaw, sortDirRaw = ''] = (sp.get('sort') || 'updated_at.desc').trim().split('.')
+  const sortCol = SORTABLE_COLUMNS.has(sortColRaw) ? sortColRaw : 'updated_at'
+  const sortDir = sortDirRaw.toLowerCase() === 'asc' ? 'asc' : 'desc'
   params.push(`order=${sortCol}.${sortDir}`)
 
   const offset = (page - 1) * perPage
@@ -228,30 +230,29 @@ async function patchArticle(req: Request, env: Env, h: Record<string, string>, i
   const revision = (typeof cur.revision_count === 'number' ? cur.revision_count : 0) + 1
   update.revision_count = revision
 
-  // Snapshot the CURRENT row BEFORE the write.
-  const revOk = await insertRevision(env, { matrix_id: id, revision, snapshot: cur, actor_id: actor.id })
-  if (!revOk) return err(h, 502, 'upstream_error', 'Failed to store revision snapshot')
-
-  // Optimistic-concurrency guarded write.
+  // Optimistic-concurrency guarded write FIRST. Only the writer whose
+  // X-Expected-Updated-At still matches wins (the trigger bumps updated_at, so
+  // a concurrent editor's guard matches zero rows). Serializing here means the
+  // revision snapshot below can never collide on unique(matrix_id, revision).
   const headers = serviceHeaders(env, { Prefer: 'return=representation' })
   if (!headers) return err(h, 503, 'not_configured', 'Database not configured')
   const patchRes = await fetch(
     `${sbBase(env)}/rest/v1/content_matrix?id=eq.${encodeURIComponent(id)}&updated_at=eq.${encodeURIComponent(expected)}`,
     { method: 'PATCH', headers, body: JSON.stringify(update) },
   )
-  if (!patchRes.ok) {
-    await deleteRevision(env, id, revision)
-    return err(h, 502, 'upstream_error', 'Failed to update article')
-  }
+  if (!patchRes.ok) return err(h, 502, 'upstream_error', 'Failed to update article')
   const updated = (await patchRes.json().catch(() => []) as Array<Record<string, unknown>>)[0]
   if (!updated) {
     // Guard failed — row changed or disappeared since the client last saw it.
-    await deleteRevision(env, id, revision)
     const exists = await fetch(`${sbBase(env)}/rest/v1/content_matrix?id=eq.${encodeURIComponent(id)}&select=id`, { headers })
     const stillThere = exists.ok && ((await exists.json().catch(() => []) as unknown[]).length > 0)
     if (!stillThere) return err(h, 404, 'not_found', 'Article not found')
     return err(h, 409, 'conflict', 'Row was modified since X-Expected-Updated-At; refetch and retry')
   }
+
+  // Snapshot the pre-write row for the winning writer (rollback-ready).
+  // Best-effort: a failed snapshot must not undo an already-committed edit.
+  await insertRevision(env, { matrix_id: id, revision, snapshot: cur, actor_id: actor.id })
 
   const result = { item: updated }
   await insertAuditEvent(env, {
@@ -300,11 +301,14 @@ async function publishArticle(req: Request, env: Env, h: Record<string, string>,
   // Mirror scripts/matrix/publish-dynamic.mjs DB semantics (NO-REDEPLOY):
   // text_status='published', published_at set once, frontmatter.published_via='dynamic'.
   const now = new Date().toISOString()
-  const publishedAt = (typeof cur.published_at === 'string' && cur.published_at) || now
+  const isRepublish = typeof cur.published_at === 'string' && !!cur.published_at
+  const publishedAt = isRepublish ? cur.published_at : now
   const curFm = cur.frontmatter && typeof cur.frontmatter === 'object' && !Array.isArray(cur.frontmatter)
     ? cur.frontmatter as Record<string, unknown>
     : {}
-  const fm = { ...curFm, published_via: 'dynamic', date: now.slice(0, 10) }
+  // First publish stamps today's date (parity with publish-dynamic). Re-publishing
+  // a previously-published article preserves its original date instead of stomping it.
+  const fm = { ...curFm, published_via: 'dynamic', ...(isRepublish ? {} : { date: now.slice(0, 10) }) }
 
   const headers = serviceHeaders(env, { Prefer: 'return=representation' })
   if (!headers) return err(h, 503, 'not_configured', 'Database not configured')
