@@ -31,30 +31,51 @@ export default function AuthButton() {
     }
   }
 
-  // Deterministic recovery detection: the email link lands with `#type=recovery`
-  // in the hash. Catch it on mount so we don't depend on racing the
-  // PASSWORD_RECOVERY auth event (which can fire before listeners attach).
+  // Supabase action links (recovery, magiclink, signup, invite) return session
+  // tokens in the URL hash. The root-layout sanitizer removes that hash before
+  // analytics can see it and stashes it in sessionStorage, so establish the
+  // session explicitly for every auth type — not only password recovery.
   useEffect(() => {
     if (!authConfigured || typeof window === 'undefined') return
-    // The auth hash was moved off the URL by the early sanitizer (app/layout.tsx,
-    // bead 0h3.11) before Yandex Metrika could read it; read it from there.
     const hash = readAuthHash()
-    if (!hash.includes('type=recovery')) return
-    // GoTrue recovery redirects with the session tokens in the hash. Relying on
-    // the client's detectSessionInUrl is fragile (it depends on flowType and
-    // ignores hash tokens under PKCE), so establish the recovery session
-    // explicitly — without it updateUser() has no auth and the reset fails.
+    if (!hash) return
     const params = getAuthHashParams()
     const access_token = params.get('access_token')
     const refresh_token = params.get('refresh_token')
+    const isRecovery = params.get('type') === 'recovery'
     let cancelled = false
     ;(async () => {
       if (access_token && refresh_token) {
-        try { await getSupabase().auth.setSession({ access_token, refresh_token }) } catch { /* form will surface the failure */ }
+        try {
+          const { data, error } = await getSupabase().auth.setSession({ access_token, refresh_token })
+          if (error || !data.session) throw error || new Error('auth_session_missing')
+        } catch (error) {
+          // Never log the tokens; retain the stashed hash so the user can retry
+          // after a transient failure or see the recovery form's own error.
+          console.error('auth_hash_session_failed', error instanceof Error ? error.name : 'unknown_error')
+          if (!cancelled && isRecovery) {
+            setRecovery(true)
+            setModalOpen(true)
+          }
+          return
+        }
+      } else if (!isRecovery) {
+        return
       }
       if (cancelled) return
-      setRecovery(true)
-      setModalOpen(true)
+      if (isRecovery) {
+        setRecovery(true)
+        setModalOpen(true)
+        return
+      }
+
+      // Magic-link/signup/invite is complete: discard the one-time token copy
+      // and the pre-auth redirect hint, then land in the authenticated cabinet.
+      clearAuthHash()
+      try { window.sessionStorage.removeItem('auth_redirect_to') } catch { /* ignore */ }
+      if (window.location.pathname !== '/moy-kabinet/') {
+        window.location.replace('/moy-kabinet/')
+      }
     })()
     return () => { cancelled = true }
   }, [authConfigured])

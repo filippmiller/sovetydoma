@@ -9,6 +9,7 @@ import { test } from 'node:test'
 // - the dialog is accessible and fits small viewports
 
 const authModal = readFileSync('src/components/auth/AuthModal.tsx', 'utf8')
+const authButton = readFileSync('src/components/auth/AuthButton.tsx', 'utf8')
 const loginForm = readFileSync('src/components/auth/LoginForm.tsx', 'utf8')
 const registerForm = readFileSync('src/components/auth/RegisterForm.tsx', 'utf8')
 const socialSection = readFileSync('src/components/auth/SocialAuthSection.tsx', 'utf8')
@@ -72,6 +73,15 @@ test('VK callback page enforces the CSRF state and allowlists both trusted Supab
   assert.match(vkCallbackPage, /https:\/\/api\.1001sovet\.ru/)
   assert.match(vkCallbackPage, /https:\/\/plwkjdpuxjkmpkqiqzkk\.supabase\.co/)
   assert.match(vkCallbackPage, /target\.pathname\.indexOf\('\/auth\/v1\/'\) === 0/)
+})
+
+test('captured Supabase magic-link tokens establish a session and land in the cabinet', () => {
+  assert.doesNotMatch(authButton, /if \(!hash\.includes\('type=recovery'\)\) return/)
+  assert.match(authButton, /const isRecovery = params\.get\('type'\) === 'recovery'/)
+  assert.match(authButton, /auth\.setSession\(\{ access_token, refresh_token \}\)/)
+  assert.match(authButton, /error \|\| !data\.session/)
+  assert.match(authButton, /clearAuthHash\(\)/)
+  assert.match(authButton, /window\.location\.replace\('\/moy-kabinet\/'\)/)
 })
 
 test('auth dialog is accessible and fits small viewports', () => {
