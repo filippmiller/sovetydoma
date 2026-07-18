@@ -66,7 +66,7 @@ Docs may explain procedures, but the passport beads must say which docs are curr
 
 - **NO-REDEPLOY publishing**: publishing an article must NOT rebuild the site. Use the dynamic publish path. See bead `sovetydoma-0q8` and `docs/NO-REDEPLOY-PUBLISHING.md`.
 - **Never build on the VPS** — it only serves prebuilt static files.
-- **Worker secrets only via `wrangler secret bulk`** — PowerShell pipe into `secret put` corrupts values with a BOM.
+- **Worker secrets only via `wrangler secret bulk`** — PowerShell pipe into `secret put` corrupts values with a BOM. Use `npx -y wrangler@latest` (3.114 `secret bulk` fails with API 10202) and feed the JSON via cmd input redirection, not a PowerShell pipe.
 - **Never pipe tsc/build output through head/tail** when the exit code matters.
 - Do not deploy or mutate production unless the task requires it.
 

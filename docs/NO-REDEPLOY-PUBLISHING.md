@@ -23,6 +23,11 @@ scale and is the wrong path for content.
 4. Optional: a periodic rebuild folds DB articles into static for speed. This is an
    optimization only — the site works without it.
 
+## Targeted cache invalidation & admin control plane (live since 2026-07-18)
+
+- **Renderer `POST /__purge`** (header `x-purge-secret`, timing-safe) deletes the exact Cache API keys for one article + its category rows + hub pages + `sitemap-dynamic.xml` (shared helpers in `src/cacheKeys.ts`). Cache API delete is per-datacenter; residual staleness elsewhere is bounded by existing TTLs (article 300 s, hubs/cat-rows 600 s, sitemap 3600 s).
+- **`sovetydoma-admin-api` worker** (`workers/admin-api/`) is the server-side admin BFF: Supabase JWT + `profiles.role='admin'` on every request, paginated runtime article list/detail over `content_matrix`, PATCH with optimistic concurrency (`X-Expected-Updated-At` → 409) and `Idempotency-Key` replay, publish/unpublish with `articles_publication_index` upsert + automatic `/__purge` + append-only `admin_audit_events`/`article_revisions` (migration `202607181200_admin_control_plane.sql`). Admin UI: `/admin/articles/` (runtime manager) and `/admin/article/?id=` (editor). Unpublishing sets `text_status='unpublished'` — the renderer only serves `published`, so the URL stops serving within the cache TTL, no rebuild.
+
 ## Architecture (live since 2026-06-11)
 
 **Cloudflare Worker** (`workers/renderer/`) serves `GET /:category/:slug/` for articles in the DB that don't exist as static files:
@@ -31,7 +36,7 @@ scale and is the wrong path for content.
 - Renders `body_md` with a built-in markdown renderer
 - **Strips all Next.js scripts + Flight payload** — dynamic pages are pure static HTML (no hydration; ratings/comments/interactive widgets remain disabled until the nightly fold-in is implemented; this is deliberate)
 - Also serves `/images/*` from R2 bucket `sovetydoma-article-images` (incl. 240px previews) and `/sitemap-dynamic.xml` (rows where `frontmatter.published_via='dynamic'`)
-- **Internal linking (2026-07-18, RENDER_VERSION=7):** every dynamic article gets a server-rendered «Читайте также» block (`src/links.ts` — same-category, published-only, tag-scored, deterministic per-slug rotation, no self-links/dupes) plus a link to its category hub. Crawlable hub pages `/stati/`, `/stati/<category>/`, `/stati/<category>/<page>/` (40 articles/page) list every dynamic article with plain `<a href>` links; hub URLs are included in `sitemap-dynamic.xml`. Static category pages and the footer link to the hubs, forming the chain homepage → category → hub → dynamic articles. PostgREST reads paginate explicitly (1,000-row cap) via `fetchAllPages` and are cached 10 min in the Cache API.
+- **Internal linking (2026-07-18, RENDER_VERSION=9; now defined in `workers/renderer/src/cacheKeys.ts`):** every dynamic article gets a server-rendered «Читайте также» block (`src/links.ts` — same-category, published-only, tag-scored, deterministic per-slug rotation, no self-links/dupes) plus a link to its category hub. Crawlable hub pages `/stati/`, `/stati/<category>/`, `/stati/<category>/<page>/` (40 articles/page) list every dynamic article with plain `<a href>` links; hub URLs are included in `sitemap-dynamic.xml`. Static category pages and the footer link to the hubs, forming the chain homepage → category → hub → dynamic articles. PostgREST reads paginate explicitly (1,000-row cap) via `fetchAllPages` and are cached 10 min in the Cache API.
 
 **Caddy on the VPS** (1001sovet.ru vhost) routes:
 - Named matcher `@dynamic` = not a static file AND (images/* OR sitemap-dynamic.xml OR stati/* hub pages OR category/slug for the 12 known categories)
