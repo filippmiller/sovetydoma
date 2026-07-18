@@ -35,6 +35,7 @@ Do not interpret “finish every bead” as permission to fabricate completion. 
   - Several admin data paths swallow errors with empty `catch` blocks, and direct navigation can show a blank/fallback state while auth resolves.
 - Root renderer checks passed after the cache-busting fix: TypeScript clean and 23/23 renderer tests green.
 - Scheduled content-factory run `29640962692` failed on 2026-07-18 because the configured Anthropic relay returned `credit balance is too low`; no article was generated. Treat funding/new paid-provider choice as an operator action, but independently make the pipeline fail clearly, support an approved fallback when available, and prevent silent publishing gaps. See `sovetydoma-6sq`.
+- A production disk-exhaustion incident occurred on 2026-07-18: `/dev/sda1` reached 154/154 GB, PostgreSQL PANICed with `No space left on device`, and dynamic pages returned 503. Emergency recovery preserved the last 5000 lines of the three largest Docker logs under `/root/docker-log-tail-before-cleanup-20260718`, reclaimed about 9 GB, restarted `supabase-db`/`supabase-rest`, and restored representative dynamic URLs to HTTP 200. Permanent Docker/journald rotation, disk alerts and a recovery runbook remain P0 work in `sovetydoma-11g.8.1`.
 - Admin/backlog work is captured in epic `sovetydoma-11g` with ten children. Do not replace this with a markdown TODO list.
 
 ## Required architecture outcomes
@@ -76,7 +77,7 @@ Use subagents aggressively but safely. Prefer cheaper/faster agents for bounded 
 
 ## Priority and operating rules
 
-1. First stabilize P0 production regressions and security/data-integrity risks.
+1. First stabilize P0 production regressions and security/data-integrity risks. Begin with `sovetydoma-11g.8.1`: prevent another full-disk outage before sustained crawling, generation or browser load testing.
 2. Then complete `sovetydoma-11g.1` through `.5` and `.9`; these form the admin/no-redeploy critical path.
 3. Complete interactive parity, operations and taxonomy work.
 4. Triage and resolve every remaining open/in-progress bead under `sovetydoma-11g.10`, respecting dependencies and explicit operator approvals.
