@@ -6,8 +6,12 @@
 // reference dynamic articles (verified 2026-07-17), so the only possible
 // inbound links come from bodies of other dynamic articles.
 //
-// Usage: node scripts/audit-dynamic-orphans.mjs [--json]
-// Read-only. Requires SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY in .env.local.
+// Usage: node scripts/audit-dynamic-orphans.mjs [--json] [--via-hubs]
+//   default:    body-link analysis via DB (needs SUPABASE_* in .env.local)
+//   --via-hubs: crawl-based check against the LIVE site — fetches
+//               sitemap-dynamic.xml and every hub page, then counts dynamic
+//               articles not linked from any hub. No DB access needed.
+// Read-only.
 
 import helpers from './matrix/lib.mjs'
 
@@ -38,6 +42,26 @@ async function fetchAllPublishedDynamic() {
     if (data.length < PAGE) break
   }
   return rows
+}
+
+if (process.argv.includes('--via-hubs')) {
+  const BASE = 'https://1001sovet.ru'
+  const sm = await (await fetch(`${BASE}/sitemap-dynamic.xml`)).text()
+  const locs = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
+  const articleUrls = locs.filter((u) => !u.includes('/stati/'))
+  const hubUrls = locs.filter((u) => u.includes('/stati/') && u !== `${BASE}/stati/`)
+  const linked = new Set()
+  for (const hub of hubUrls) {
+    const html = await (await fetch(hub)).text()
+    for (const m of html.matchAll(/<a class="item" href="(\/[a-z0-9-]+\/[a-z0-9-]+\/)"/g)) {
+      linked.add(BASE + m[1])
+    }
+  }
+  const orphans = articleUrls.filter((u) => !linked.has(u))
+  console.log(`sitemap articles: ${articleUrls.length}, hub pages: ${hubUrls.length}, linked from hubs: ${linked.size}`)
+  console.log(`ORPHANS (not linked from any hub page): ${orphans.length}`)
+  if (orphans.length) console.log(orphans.slice(0, 20))
+  process.exit(orphans.length ? 1 : 0)
 }
 
 const rows = await fetchAllPublishedDynamic()

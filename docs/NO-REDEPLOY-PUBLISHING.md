@@ -31,15 +31,17 @@ scale and is the wrong path for content.
 - Renders `body_md` with a built-in markdown renderer
 - **Strips all Next.js scripts + Flight payload** — dynamic pages are pure static HTML (no hydration; ratings/comments/interactive widgets remain disabled until the nightly fold-in is implemented; this is deliberate)
 - Also serves `/images/*` from R2 bucket `sovetydoma-article-images` (incl. 240px previews) and `/sitemap-dynamic.xml` (rows where `frontmatter.published_via='dynamic'`)
+- **Internal linking (2026-07-18, RENDER_VERSION=7):** every dynamic article gets a server-rendered «Читайте также» block (`src/links.ts` — same-category, published-only, tag-scored, deterministic per-slug rotation, no self-links/dupes) plus a link to its category hub. Crawlable hub pages `/stati/`, `/stati/<category>/`, `/stati/<category>/<page>/` (40 articles/page) list every dynamic article with plain `<a href>` links; hub URLs are included in `sitemap-dynamic.xml`. Static category pages and the footer link to the hubs, forming the chain homepage → category → hub → dynamic articles. PostgREST reads paginate explicitly (1,000-row cap) via `fetchAllPages` and are cached 10 min in the Cache API.
 
 **Caddy on the VPS** (1001sovet.ru vhost) routes:
-- Named matcher `@dynamic` = not a static file AND (images/* OR sitemap-dynamic.xml OR category/slug for the 12 known categories)
+- Named matcher `@dynamic` = not a static file AND (images/* OR sitemap-dynamic.xml OR stati/* hub pages OR category/slug for the 12 known categories)
 - Static files **always** win; no match → reverse-proxy to `https://sovetydoma-renderer.filippmiller.workers.dev`
 - DB reads via Supabase REST at `https://api.1001sovet.ru` (service-role key, set via `wrangler secret bulk` — never `secret put`, PowerShell BOM)
 
 **Publishing runbook** (the new way):
 1. `node scripts/matrix/regen-images-fal.mjs --slugs a,b,c` (if images missing locally)
 2. `node scripts/matrix/publish-dynamic.mjs --slugs a,b,c` (or `--category X --limit N`; supports `--dry-run`)
+   - **Quality gate** (`scripts/matrix/quality-gate.mjs`) blocks obviously weak material: too short, bad title/description length, missing image, duplicate title/description vs published, boilerplate intros; `--force` overrides. `--report` mode scans all published dynamic articles into `reports/content-quality-gate-<date>.md`
    - Generates 240px preview
    - Uploads image + preview to R2 via `wrangler`
    - Sets `text_status='published'` + `published_at` + `image_url` + `frontmatter.published_via='dynamic'`
