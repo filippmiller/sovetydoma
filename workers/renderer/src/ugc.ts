@@ -33,20 +33,58 @@ function emptyState(icon: string, text: string): string {
   return `<div style="text-align:center;color:#777;background:#faf9f7;border:1.5px dashed #e8e4df;border-radius:12px;padding:1.75rem 1rem"><div style="font-size:1.6rem;margin-bottom:0.4rem">${icon}</div><p style="margin:0;font-size:0.92rem">${escapeHtml(text)}</p></div>`
 }
 
-export function buildQuestionsHtml(rows: DynamicQuestion[] | null): string {
+// Anonymous question submission goes to the photo-upload worker, which persists
+// into the `questions` table (pending → moderation). connect-src on the site CSP
+// allows *.workers.dev, so this fetch is permitted from the dynamic page.
+const QUESTION_WORKER = 'https://sovetydoma-photo-upload.filippmiller.workers.dev'
+
+/**
+ * Progressive-enhancement "ask a question" form for dynamic (renderer-served)
+ * pages. Next hydration is stripped on these pages, so the React block is dead;
+ * this self-contained vanilla form + inline script restores the write path. The
+ * script carries a `type` attribute so the renderer's Flight-chunk strip
+ * (which only removes typeless inline scripts) never touches it.
+ */
+function askQuestionForm(articleSlug: string): string {
+  const sid = 'aq_' + articleSlug.replace(/[^a-z0-9]+/gi, '').slice(0, 32)
+  const sidJson = JSON.stringify(sid)
+  const slugJson = JSON.stringify(articleSlug)
+  const workerJson = JSON.stringify(QUESTION_WORKER)
+  return `<div id="${escapeHtml(sid)}" style="margin-top:1.25rem;background:#faf9f7;border:1px solid #ede9e4;border-radius:12px;padding:1rem 1.1rem">`
+    + '<div style="font-weight:700;color:#1a1a1a;font-size:0.95rem;margin-bottom:0.5rem">Есть вопрос по теме?</div>'
+    + '<textarea data-aq-input maxlength="500" rows="3" placeholder="Ваш вопрос…" style="width:100%;box-sizing:border-box;border:1.5px solid #e5e1db;border-radius:8px;padding:0.6rem 0.75rem;font-size:0.92rem;font-family:inherit;resize:vertical"></textarea>'
+    + '<div data-aq-msg role="status" style="font-size:0.82rem;margin:0.4rem 0 0;min-height:1.1em"></div>'
+    + '<button type="button" data-aq-send style="margin-top:0.5rem;background:#c0392b;color:#fff;border:none;border-radius:8px;padding:0.55rem 1.1rem;font-weight:700;font-size:0.9rem;cursor:pointer">Отправить вопрос</button>'
+    + '</div>'
+    + `<script type="text/javascript">(function(){`
+    + `var root=document.getElementById(${sidJson});if(!root||root.dataset.aqBound)return;root.dataset.aqBound='1';`
+    + `var ta=root.querySelector('[data-aq-input]'),btn=root.querySelector('[data-aq-send]'),msg=root.querySelector('[data-aq-msg]');`
+    + `btn.addEventListener('click',function(){var q=(ta.value||'').trim();`
+    + `if(q.length<5){msg.style.color='#c0392b';msg.textContent='Вопрос слишком короткий';return;}`
+    + `if(q.length>500){msg.style.color='#c0392b';msg.textContent='Максимум 500 символов';return;}`
+    + `btn.disabled=true;msg.style.color='#777';msg.textContent='Отправляем…';`
+    + `fetch(${workerJson}+'/article-question',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({article_slug:${slugJson},question:q})})`
+    + `.then(function(r){return r.json().catch(function(){return {};});})`
+    + `.then(function(d){if(d&&d.success){ta.value='';msg.style.color='#166534';msg.textContent='Спасибо! Вопрос отправлен на модерацию и появится после проверки.';}else{msg.style.color='#c0392b';msg.textContent='Не удалось отправить. Попробуйте позже.';btn.disabled=false;}})`
+    + `.catch(function(){msg.style.color='#c0392b';msg.textContent='Сеть недоступна. Попробуйте позже.';btn.disabled=false;});});`
+    + `})();</script>`
+}
+
+export function buildQuestionsHtml(rows: DynamicQuestion[] | null, articleSlug: string): string {
   const heading = '<div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;margin-bottom:1rem"><h2 style="margin:0;font-size:1.2rem;font-weight:800;color:#1a1a1a">❓ Вопросы по статье</h2></div>'
+  const form = askQuestionForm(articleSlug)
   if (rows === null) {
-    return heading + emptyState('🕓', 'Вопросы временно недоступны. Попробуйте обновить страницу позже.')
+    return heading + emptyState('🕓', 'Вопросы временно недоступны. Попробуйте обновить страницу позже.') + form
   }
   if (rows.length === 0) {
-    return heading + emptyState('💬', 'Пока вопросов нет.')
+    return heading + emptyState('💬', 'Пока вопросов нет. Задайте первый!') + form
   }
   const items = rows.map((row) => {
     const count = Math.max(0, row.answers_count ?? 0)
     const meta = count > 0 ? `💬 ${count} ${pluralAnswers(count)}` : 'Пока без ответа'
     return `<a href="/q/${encodeURIComponent(row.slug)}/" style="text-decoration:none"><div style="background:#faf9f7;border:1px solid #ede9e4;border-radius:10px;padding:0.9rem 1.1rem"><div style="font-weight:700;color:#1a1a1a;font-size:0.95rem">${escapeHtml(row.title)}</div><div style="font-size:0.78rem;color:#888;margin-top:0.3rem">${meta}</div></div></a>`
   }).join('')
-  return `${heading}<div style="display:flex;flex-direction:column;gap:0.75rem">${items}</div>`
+  return `${heading}<div style="display:flex;flex-direction:column;gap:0.75rem">${items}</div>${form}`
 }
 
 function commentAuthor(row: DynamicComment): string {

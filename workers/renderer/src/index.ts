@@ -817,7 +817,7 @@ async function handleArticle(req: Request, env: Env, category: string, slug: str
     fetchApprovedComments(env, row.slug),
   ])
   const ugcHtml = {
-    questions: buildQuestionsHtml(questionsResult.status === 'fulfilled' ? questionsResult.value : null),
+    questions: buildQuestionsHtml(questionsResult.status === 'fulfilled' ? questionsResult.value : null, row.slug),
     comments: buildCommentsHtml(commentsResult.status === 'fulfilled' ? commentsResult.value : null),
   }
 

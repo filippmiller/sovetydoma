@@ -4,16 +4,30 @@ import { buildCommentsHtml, buildQuestionsHtml } from './ugc'
 
 describe('dynamic UGC server rendering', () => {
   it('renders honest question empty and unavailable states without a loading placeholder', () => {
-    assert.match(buildQuestionsHtml([]), /Пока вопросов нет/)
-    assert.match(buildQuestionsHtml(null), /временно недоступны/)
-    assert.doesNotMatch(buildQuestionsHtml([]), /Загрузка/)
+    assert.match(buildQuestionsHtml([], 'test-article'), /Пока вопросов нет/)
+    assert.match(buildQuestionsHtml(null, 'test-article'), /временно недоступны/)
+    assert.doesNotMatch(buildQuestionsHtml([], 'test-article'), /Загрузка/)
+  })
+
+  it('always renders a working ask-question form wired to the worker', () => {
+    for (const rows of [null, [], [{ slug: 's', title: 't', answers_count: 0 }]] as const) {
+      const html = buildQuestionsHtml(rows, 'idealnyy-borshch')
+      assert.match(html, /Есть вопрос по теме\?/)
+      assert.match(html, /\/article-question/)
+      // The submit script carries a type so the renderer's typeless-inline strip keeps it.
+      assert.match(html, /<script type="text\/javascript">/)
+      // The article slug is passed to the POST body.
+      assert.match(html, /idealnyy-borshch/)
+    }
   })
 
   it('escapes question content and links to the indexable question page', () => {
-    const html = buildQuestionsHtml([{ slug: 'bezopasnyj-vopros', title: '<script>alert(1)</script>', answers_count: 2 }])
+    const html = buildQuestionsHtml([{ slug: 'bezopasnyj-vopros', title: '<script>alert(1)</script>', answers_count: 2 }], 'a')
     assert.match(html, /\/q\/bezopasnyj-vopros\//)
     assert.match(html, /2 ответа/)
-    assert.doesNotMatch(html, /<script>/)
+    // User content is escaped — no executable script injected from the title.
+    assert.doesNotMatch(html, /<script>alert\(1\)<\/script>/)
+    assert.match(html, /&lt;script&gt;/)
   })
 
   it('renders comment counts, replies and escaped reader content', () => {

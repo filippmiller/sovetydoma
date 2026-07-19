@@ -461,7 +461,13 @@ const worker = {
         return json({ error: 'rate_limited' }, 429, aqHeaders)
       }
 
-      const res = await fetch(`${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/article_questions`, {
+      // Persist into the `questions` table — the SAME table the article page
+      // and the dynamic renderer read from (status='approved'). The old
+      // `article_questions` table was a dead parallel store nothing displayed.
+      // Anonymous submission: user_id null, author_name default, pending
+      // moderation. A unique question slug powers its /q/<slug>/ page.
+      const questionSlug = `q-${[...crypto.getRandomValues(new Uint8Array(8))].map((b) => b.toString(16).padStart(2, '0')).join('')}`
+      const res = await fetch(`${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/questions`, {
         method: 'POST',
         headers: {
           apikey: env.SUPABASE_SERVICE_ROLE_KEY,
@@ -470,10 +476,12 @@ const worker = {
           Prefer: 'return=representation',
         },
         body: JSON.stringify({
+          slug: questionSlug,
           article_slug: articleSlug,
-          question,
+          title: question,
+          body: '',
           status: 'pending',
-          ip_hash: ipHash,
+          author_name: 'Аноним',
         }),
       })
 
