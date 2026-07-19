@@ -37,7 +37,15 @@ async function supabaseRest<T>(env: Env, path: string, init: RequestInit): Promi
     throw new Error(code)
   }
   if (res.status === 204) return undefined as T
-  return res.json() as Promise<T>
+  // Tolerate empty/non-JSON success bodies (e.g. some DELETE/return=minimal
+  // responses come back 200 with no body); res.json() would throw on those.
+  const text = await res.text()
+  if (!text) return undefined as T
+  try {
+    return JSON.parse(text) as T
+  } catch {
+    return undefined as T
+  }
 }
 
 export async function insertRows<T>(env: Env, table: string, rows: unknown, select = '*'): Promise<T[]> {

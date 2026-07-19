@@ -1236,7 +1236,7 @@ async function handlePushSubscribe(request: Request, env: Env): Promise<Response
     p256dh,
     auth,
     category,
-  }, 'endpoint', 'id')
+  }, 'endpoint', 'endpoint')
   return json({ success: true })
 }
 
@@ -1256,8 +1256,15 @@ async function handlePushUnsubscribe(request: Request, env: Env): Promise<Respon
     return json({ ok: false, error: 'supabase_service_role_not_configured' }, 503)
   }
 
-  await updateRows(env, 'push_subscriptions', `endpoint=eq.${encodeURIComponent(endpoint)}`, { category: null, p256dh: null, auth: null }, 'id')
-    .catch(() => {})
+  // Delete the row outright: endpoint/p256dh/auth/category are all NOT NULL, so
+  // the old "null out the fields" approach always violated the constraint (and
+  // was silently swallowed), leaving the user still subscribed. Best-effort:
+  // never surface a 500 to the client (it clears local state regardless).
+  try {
+    await deleteRows(env, 'push_subscriptions', `endpoint=eq.${encodeURIComponent(endpoint)}`)
+  } catch {
+    // swallow — client already treats this as unsubscribed locally
+  }
   return json({ success: true })
 }
 
