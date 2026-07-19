@@ -60,4 +60,31 @@ describe('auth-gated PE islands for dynamic pages', () => {
     assert.doesNotMatch(html, /data-category="a"onclick="/)
     assert.match(html, /&quot;/)
   })
+
+  // Guardrail: every emitted inline script must be syntactically valid JS.
+  // A stray token (e.g. a `;` inside an object literal) silently breaks the
+  // island on ~1700 dynamic pages AND pollutes the console. Compile each
+  // script body with `new Function` (compiles, does not execute).
+  it('every emitted inline script parses as valid JavaScript', () => {
+    const htmls: Array<[string, string]> = [
+      ['reactions', buildReactionsHtml('idealnyy-borshch')],
+      ['rating', buildRatingHtml('idealnyy-borshch')],
+      ['favorite', buildFavoriteHtml('idealnyy-borshch')],
+      ['push', buildPushHtml('kulinaria')],
+    ]
+    const re = /<script type="text\/javascript">([\s\S]*?)<\/script>/g
+    for (const [name, html] of htmls) {
+      let m: RegExpExecArray | null
+      let count = 0
+      while ((m = re.exec(html)) !== null) {
+        count += 1
+        const body = m[1]
+        assert.doesNotThrow(() => {
+          // eslint-disable-next-line no-new-func
+          new Function(body)
+        }, `${name} inline script #${count} must be valid JS`)
+      }
+      assert.ok(count >= 1, `${name} should emit at least one inline script`)
+    }
+  })
 })

@@ -100,7 +100,7 @@ export function buildReactionsHtml(articleSlug: string): string {
     `var p=next` +
     `?fetch(REST+'/reactions?'+q,{method:'DELETE',headers:peHeaders(session.token)}).then(function(){` +
     `return fetch(REST+'/reactions',{method:'POST',headers:peHeaders(session.token,{'Content-Type':'application/json','Prefer':'return=minimal'}),` +
-    `body:JSON.stringify({user_id:session.userId,article_slug:slug,emoji:rx.emoji});});})` +
+    `body:JSON.stringify({user_id:session.userId,article_slug:slug,emoji:rx.emoji})});})` +
     `:fetch(REST+'/reactions?'+q,{method:'DELETE',headers:peHeaders(session.token)});` +
     `p.then(function(){return loadCounts();}).catch(function(){loadCounts();});});` +
     `})();</script>`

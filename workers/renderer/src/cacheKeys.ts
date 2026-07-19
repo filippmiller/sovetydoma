@@ -5,7 +5,7 @@
 // handlers actually use.
 
 // Bump to invalidate cached rendered pages after a worker change.
-export const RENDER_VERSION = '12'
+export const RENDER_VERSION = '13'
 
 export function siteBaseUrl(env: { SITE_URL?: string }): string {
   return (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')

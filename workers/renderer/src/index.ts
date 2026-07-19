@@ -808,7 +808,12 @@ function buildTransformer(
     .on('[data-dynamic-widget="push"]', {
       element(el) {
         // After static rebuild, CategoryPushSubscribe shells exist and are
-        // replaced here. Legacy path injects push after the rating shell above.
+        // replaced here. It renders in TWO spots on the article page, so inject
+        // the island only once (same DOM id can't repeat) and drop duplicates.
+        if (pushInjected) {
+          el.remove()
+          return
+        }
         el.replace(ugcHtml.push, { html: true })
         pushInjected = true
       },
