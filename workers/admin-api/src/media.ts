@@ -21,6 +21,8 @@ import {
 
 export interface MediaEnv extends SupabaseEnv {
   ARTICLE_IMAGES?: R2Bucket
+  /** Service binding to sovetydoma-renderer (preferred for /__purge). */
+  RENDERER?: Fetcher
   FAL_KEY?: string
   FAL_MODEL?: string
   RENDERER_URL?: string
@@ -60,15 +62,22 @@ export async function purgeRenderer(env: MediaEnv, category: unknown, slug: unkn
   status?: number
   detail?: string
 }> {
-  if (!env.RENDERER_URL || !env.RENDERER_PURGE_SECRET) {
+  if (!env.RENDERER_PURGE_SECRET) {
+    return { ok: false, detail: 'purge_not_configured' }
+  }
+  if (!env.RENDERER && !env.RENDERER_URL) {
     return { ok: false, detail: 'purge_not_configured' }
   }
   try {
-    const res = await fetch(`${env.RENDERER_URL.replace(/\/+$/, '')}/__purge`, {
+    const init: RequestInit = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-purge-secret': env.RENDERER_PURGE_SECRET },
       body: JSON.stringify({ category, slug }),
-    })
+    }
+    // Prefer service binding — HTTP fetch worker→worker on *.workers.dev often returns CF 1042.
+    const res = env.RENDERER
+      ? await env.RENDERER.fetch('https://renderer.internal/__purge', init)
+      : await fetch(`${env.RENDERER_URL!.replace(/\/+$/, '')}/__purge`, init)
     if (res.ok) return { ok: true, status: res.status }
     const body = await res.text().catch(() => '')
     return { ok: false, status: res.status, detail: body.slice(0, 200) || res.statusText }

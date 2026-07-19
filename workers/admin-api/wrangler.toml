@@ -6,6 +6,11 @@ compatibility_date = "2026-06-01"
 binding = "ARTICLE_IMAGES"
 bucket_name = "sovetydoma-article-images"
 
+# Worker-to-worker purge (avoids CF 1042 on workers.dev HTTP subrequests).
+[[services]]
+binding = "RENDERER"
+service = "sovetydoma-renderer"
+
 [vars]
 SUPABASE_URL = "https://api.1001sovet.ru"
 RENDERER_URL = "https://sovetydoma-renderer.filippmiller.workers.dev"

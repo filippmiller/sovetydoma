@@ -41,6 +41,7 @@ export interface Env extends SupabaseEnv, MediaEnv {
   ALLOWED_ORIGINS?: string
   RENDERER_URL?: string
   RENDERER_PURGE_SECRET?: string
+  RENDERER?: Fetcher
   SITE_URL?: string
   VERSION?: string
   ARTICLE_IMAGES?: R2Bucket
@@ -473,7 +474,8 @@ const worker = {
         media: {
           r2: !!env.ARTICLE_IMAGES,
           fal: !!env.FAL_KEY,
-          purge: !!(env.RENDERER_URL && env.RENDERER_PURGE_SECRET),
+          purge: !!(env.RENDERER_PURGE_SECRET && (env.RENDERER || env.RENDERER_URL)),
+          renderer_binding: !!env.RENDERER,
         },
       }, 200, h)
     }
