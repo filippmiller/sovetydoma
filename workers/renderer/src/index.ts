@@ -818,7 +818,7 @@ async function handleArticle(req: Request, env: Env, category: string, slug: str
   ])
   const ugcHtml = {
     questions: buildQuestionsHtml(questionsResult.status === 'fulfilled' ? questionsResult.value : null, row.slug),
-    comments: buildCommentsHtml(commentsResult.status === 'fulfilled' ? commentsResult.value : null),
+    comments: buildCommentsHtml(commentsResult.status === 'fulfilled' ? commentsResult.value : null, row.slug),
   }
 
   // Fetch template HTML (cached 10 min)

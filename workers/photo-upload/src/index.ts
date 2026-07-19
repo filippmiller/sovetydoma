@@ -225,7 +225,7 @@ const worker = {
     if (req.method === 'OPTIONS' && url.pathname.startsWith('/contact')) {
       return new Response('ok', { headers: contactCors(req, env) })
     }
-    if (req.method === 'OPTIONS' && (url.pathname === '/article-question' || url.pathname === '/article-questions')) {
+    if (req.method === 'OPTIONS' && (url.pathname === '/article-question' || url.pathname === '/article-questions' || url.pathname === '/article-comment')) {
       return new Response('ok', { headers: articleQuestionCors(req, env) })
     }
     if (req.method === 'OPTIONS') return new Response('ok', { headers: h })
@@ -519,6 +519,78 @@ const worker = {
       }>
 
       return json({ questions: rows }, 200, aqHeaders)
+    }
+
+    // ---------------------------------------------------------------------------
+    // Article comments — public anonymous submit (moderated). Same CORS/Turnstile/
+    // rate-limit pattern as /article-question. Inserts via service_role so no
+    // anon INSERT RLS policy is required. is_approved=false until a moderator
+    // approves; the renderer only reads approved rows.
+    // ---------------------------------------------------------------------------
+
+    if (url.pathname === '/article-comment') {
+      const acHeaders = articleQuestionCors(req, env)
+      if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, acHeaders)
+      if (!env.SUPABASE_SERVICE_ROLE_KEY) return json({ error: 'article_comment_not_configured' }, 503, acHeaders)
+
+      const payload = await req.json().catch(() => null) as null | {
+        article_slug?: string
+        content?: string
+        turnstileToken?: string
+      }
+      if (!payload) return json({ error: 'bad_json' }, 400, acHeaders)
+
+      // Turnstile is progressive: enforced only when a secret is configured.
+      if (env.TURNSTILE_SECRET_KEY && !(await verifyTurnstile(env, payload.turnstileToken, req))) {
+        return json({ error: 'turnstile_failed' }, 403, acHeaders)
+      }
+
+      const articleSlug = cleanArticleSlug(payload.article_slug)
+      if (!articleSlug || articleSlug.length < 3) return json({ error: 'bad_article_slug' }, 400, acHeaders)
+
+      const contentRaw = String(payload.content || '').trim()
+      if (contentRaw.length < 1 || contentRaw.length > 2000) {
+        return json({ error: 'bad_content_length' }, 400, acHeaders)
+      }
+      // Strip HTML tags (basic regex)
+      const content = contentRaw.replace(/<[^>]+>/g, '').trim()
+      if (content.length < 1) return json({ error: 'empty_content' }, 400, acHeaders)
+
+      const ip = getClientIp(req)
+      const ipHash = await sha256Hex(ip)
+
+      const [minuteAllowed, hourAllowed] = await Promise.all([
+        checkIngestionRateLimit({ env, bucketKey: `article_comment:${ipHash}`, windowSeconds: 60, maxHits: 4 }),
+        checkIngestionRateLimit({ env, bucketKey: `article_comment_hour:${ipHash}`, windowSeconds: 3600, maxHits: 30 }),
+      ])
+      if (!minuteAllowed || !hourAllowed) {
+        return json({ error: 'rate_limited' }, 429, acHeaders)
+      }
+
+      // Anonymous submission: user_id null, author_name default, pending
+      // moderation (is_approved=false). No parent_id (top-level only).
+      const res = await fetch(`${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/comments`, {
+        method: 'POST',
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation',
+        },
+        body: JSON.stringify({
+          article_slug: articleSlug,
+          content,
+          author_name: 'Аноним',
+          is_approved: false,
+          user_id: null,
+          parent_id: null,
+        }),
+      })
+
+      if (!res.ok) return json({ error: 'article_comment_insert_failed' }, 502, acHeaders)
+      const rows = await res.json().catch(() => null) as null | Array<{ id: string }>
+      const id = rows?.[0]?.id
+      return json({ success: true, id: id || null }, 200, acHeaders)
     }
 
     return new Response('Not found', { status: 404, headers: h })

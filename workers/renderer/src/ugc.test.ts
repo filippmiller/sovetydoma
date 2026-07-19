@@ -34,11 +34,23 @@ describe('dynamic UGC server rendering', () => {
     const html = buildCommentsHtml([
       { id: '1', content: 'Полезно & понятно', parent_id: null, created_at: '2026-07-18T00:00:00Z', profiles: { display_name: 'Анна' } },
       { id: '2', content: '<b>Спасибо</b>', parent_id: '1', created_at: '2026-07-18T01:00:00Z', profiles: null },
-    ])
+    ], 'test-article')
     assert.match(html, />2<\/span>/)
     assert.match(html, /Анна/)
     assert.match(html, /Читатель/)
     assert.match(html, /Полезно &amp; понятно/)
     assert.doesNotMatch(html, /<b>Спасибо<\/b>/)
+  })
+
+  it('always renders a working comment form wired to the worker', () => {
+    for (const rows of [null, [], [{ id: '1', content: 'ok', parent_id: null, created_at: '2026-07-18T00:00:00Z', profiles: null }]] as const) {
+      const html = buildCommentsHtml(rows, 'idealnyy-borshch')
+      assert.match(html, /Оставить комментарий/)
+      assert.match(html, /\/article-comment/)
+      // The submit script carries a type so the renderer's typeless-inline strip keeps it.
+      assert.match(html, /<script type="text\/javascript">/)
+      // The article slug is passed to the POST body.
+      assert.match(html, /idealnyy-borshch/)
+    }
   })
 })
