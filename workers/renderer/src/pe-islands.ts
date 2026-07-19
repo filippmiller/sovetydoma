@@ -241,7 +241,7 @@ export function buildFavoriteHtml(articleSlug: string): string {
     `var slug=${slugJson},saved=false,msg=root.querySelector('[data-fv-msg]'),btn=root.querySelector('[data-fv-btn]'),lab=root.querySelector('[data-fv-lab]');` +
     `function getLocal(){try{var raw=localStorage.getItem('favorites');return raw?JSON.parse(raw):[];}catch(e){return [];}}` +
     `function setLocal(arr){try{localStorage.setItem('favorites',JSON.stringify(arr));}catch(e){}}` +
-    `function paint(){if(btn){btn.textContent=saved?'❤️':'🤍';btn.setAttribute('aria-label',saved?'Убрать из избранного':'Добавить в избранное');` +
+    `function paint(){if(btn){btn.textContent=saved?'❤️':'🤍';var t=saved?'Убрать из избранного':'Добавить в избранное';btn.setAttribute('aria-label',t);btn.setAttribute('title',t);` +
     `btn.style.border=saved?'1.5px solid #f8c8c8':'1.5px solid #e0dbd5';btn.style.background=saved?'#fff0f0':'transparent';}` +
     `if(lab){lab.textContent=saved?'В избранном':'Сохранить';lab.style.color=saved?'#e74c3c':'#999';}}` +
     `function load(){var favs=getLocal();saved=favs.indexOf(slug)>=0;paint();` +

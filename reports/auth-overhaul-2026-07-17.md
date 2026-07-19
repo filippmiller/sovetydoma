@@ -1,5 +1,15 @@
 # Auth overhaul 2026-07-17 — VK ID / Яндекс ID / Google / Email
 
+> **CORRECTION (2026-07-19).** The "VK blocked on app `54626241` redirect URI"
+> conclusion below is SUPERSEDED. Auth VK ID login was switched to app
+> **`54625895`** (commit `ff4e70f86`), whose redirect
+> `https://1001sovet.ru/api/auth/vk/callback` IS registered — verified live:
+> `id.vk.com/authorize?client_id=54625895&redirect_uri=…` → 200 → real VK ID
+> login page (no "redirect_uri invalid"). The code (workers/subscriptions
+> `VK_ID_APP_ID`, tests, PKCE script) uses `54625895` consistently. App
+> `54626241` is a SEPARATE mini-app for the autopost track (see docs/AUTOPOST.md),
+> not the login app — do not conflate them. VK login is NOT blocked.
+
 Status report + runbook for the auth repair session. Beads: `sovetydoma-gsk`,
 `sovetydoma-1fc`, `sovetydoma-chf`, passport `sovetydoma-8x5`.
 
