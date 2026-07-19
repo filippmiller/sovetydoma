@@ -66,7 +66,7 @@ function seedCategoryRows(store: Map<string, Response>, category: string, dynami
     ...Array.from({ length: stat }, (_, i) => ({ slug: `st-${i}`, published_via: 'static' })),
   ]
   store.set(
-    `https://1001sovet.ru/__internal/cat-rows/${category}?render=9`,
+    `https://1001sovet.ru/__internal/cat-rows/${category}?render=10`,
     new Response(JSON.stringify(rows), { headers: { 'content-type': 'application/json' } }),
   )
 }
@@ -162,12 +162,12 @@ describe('POST /__purge', () => {
       }
 
       const expected = [
-        'https://1001sovet.ru/ekonomiya/kak-sekonomit-na-vode/?render=9',
-        'https://1001sovet.ru/__internal/cat-rows/ekonomiya?render=9',
-        'https://1001sovet.ru/stati//1?render=9',
-        'https://1001sovet.ru/stati/ekonomiya/1?render=9',
-        'https://1001sovet.ru/stati/ekonomiya/2?render=9',
-        'https://1001sovet.ru/stati/ekonomiya/3?render=9',
+        'https://1001sovet.ru/ekonomiya/kak-sekonomit-na-vode/?render=10',
+        'https://1001sovet.ru/__internal/cat-rows/ekonomiya?render=10',
+        'https://1001sovet.ru/stati//1?render=10',
+        'https://1001sovet.ru/stati/ekonomiya/1?render=10',
+        'https://1001sovet.ru/stati/ekonomiya/2?render=10',
+        'https://1001sovet.ru/stati/ekonomiya/3?render=10',
         'https://1001sovet.ru/sitemap-dynamic.xml?generator=v3',
         'https://1001sovet.ru/zen.xml?generator=v4',
       ]
@@ -178,7 +178,7 @@ describe('POST /__purge', () => {
       assert.match(body.note, /per-datacenter/)
 
       // cat-rows entry was actually evicted from the cache
-      assert.equal(cache.store.has('https://1001sovet.ru/__internal/cat-rows/ekonomiya?render=9'), false)
+      assert.equal(cache.store.has('https://1001sovet.ru/__internal/cat-rows/ekonomiya?render=10'), false)
     } finally {
       cache.restore()
     }
@@ -194,10 +194,10 @@ describe('POST /__purge', () => {
       const body = await resp.json() as { purged: string[] }
 
       const expected = [
-        'https://1001sovet.ru/__internal/cat-rows/kulinaria?render=9',
-        'https://1001sovet.ru/stati//1?render=9',
-        'https://1001sovet.ru/stati/kulinaria/1?render=9',
-        'https://1001sovet.ru/stati/kulinaria/2?render=9',
+        'https://1001sovet.ru/__internal/cat-rows/kulinaria?render=10',
+        'https://1001sovet.ru/stati//1?render=10',
+        'https://1001sovet.ru/stati/kulinaria/1?render=10',
+        'https://1001sovet.ru/stati/kulinaria/2?render=10',
         'https://1001sovet.ru/sitemap-dynamic.xml?generator=v3',
         'https://1001sovet.ru/zen.xml?generator=v4',
       ]
