@@ -247,6 +247,73 @@ describe('admin-api media routes', () => {
     assert.ok(purgeCall)
   })
 
+  it('assign leaves media rows untouched when the guarded article update loses a 409 race', async () => {
+    installFetch((call) => {
+      const a = authOk(call)
+      if (a) return a
+      if (call.url.includes('admin_audit_events') && call.method === 'GET') return restJson([])
+      if (call.url.includes('content_matrix') && call.method === 'GET') return restJson([articleRow()])
+      if (call.url.includes('article_media') && call.method === 'GET') {
+        return restJson([{ id: MEDIA_ID, article_id: ARTICLE_ID, version: 2, storage_key: 'k-v2.jpg', status: 'candidate', source: 'generated', provider: 'fal' }])
+      }
+      if (call.url.includes('content_matrix') && call.method === 'PATCH') return restJson([]) // guarded update matches no row
+      if (call.url.includes('article_media') && call.method === 'PATCH') return restJson([])
+      throw new Error(`unexpected ${call.method} ${call.url}`)
+    })
+    const res = await worker.fetch(new Request(
+      `https://api.test/admin/articles/${ARTICLE_ID}/media/${MEDIA_ID}/assign`,
+      {
+        method: 'POST',
+        headers: { ...AUTH, Origin: 'https://1001sovet.ru', 'Idempotency-Key': 'assign-409', 'X-Expected-Updated-At': '2026-07-18T12:00:00Z', 'Content-Type': 'application/json' },
+        body: '{}',
+      },
+    ), ENV)
+    assert.equal(res.status, 409)
+    // The article guard runs first, so no media-status flip happened.
+    const mediaPatch = calls.find((c) => c.url.includes('article_media') && c.method === 'PATCH')
+    assert.equal(mediaPatch, undefined)
+  })
+
+  it('archiving the live media promotes the previous version back to live', async () => {
+    const PREV_ID = 'ffffffff-1111-2222-3333-444444444444'
+    installFetch((call) => {
+      const a = authOk(call)
+      if (a) return a
+      if (call.url.includes('admin_audit_events') && call.method === 'GET') return restJson([])
+      if (call.url.includes('content_matrix') && call.method === 'GET') {
+        return restJson([articleRow({ text_status: 'published', published_at: '2026-07-01T00:00:00Z', active_media_id: MEDIA_ID, image_filename: 'k-v3.jpg' })])
+      }
+      if (call.url.includes('article_media') && call.url.includes('status=eq.archived') && call.method === 'GET') {
+        return restJson([{ id: PREV_ID, article_id: ARTICLE_ID, version: 2, storage_key: 'k-v2.jpg', status: 'archived' }])
+      }
+      if (call.url.includes('article_media') && call.url.includes(`id=eq.${MEDIA_ID}`) && call.method === 'GET') {
+        return restJson([{ id: MEDIA_ID, article_id: ARTICLE_ID, version: 3, storage_key: 'k-v3.jpg', status: 'live' }])
+      }
+      if (call.url.includes('article_media') && call.method === 'PATCH') return restJson([{}])
+      if (call.url.includes('content_matrix') && call.method === 'PATCH') {
+        return restJson([articleRow({ active_media_id: PREV_ID, image_filename: 'k-v2.jpg' })])
+      }
+      if (call.url.includes('article_revisions')) return restJson({}, { status: 201 })
+      if (call.url.includes('content_matrix_events')) return restJson({}, { status: 201 })
+      if (call.url.includes('admin_audit_events') && call.method === 'POST') return restJson({}, { status: 201 })
+      if (call.url.includes('article_media_events')) return restJson({}, { status: 201 })
+      if (call.url === 'https://renderer.test/__purge') return restJson({ ok: true })
+      throw new Error(`unexpected ${call.method} ${call.url}`)
+    })
+    const res = await worker.fetch(new Request(
+      `https://api.test/admin/articles/${ARTICLE_ID}/media/${MEDIA_ID}/archive`,
+      {
+        method: 'POST',
+        headers: { ...AUTH, Origin: 'https://1001sovet.ru', 'Idempotency-Key': 'arch-1', 'Content-Type': 'application/json' },
+        body: '{}',
+      },
+    ), ENV)
+    assert.equal(res.status, 200)
+    const promote = calls.find((c) => c.url.includes(`article_media?id=eq.${PREV_ID}`) && c.method === 'PATCH')
+    assert.ok(promote, 'expected a PATCH promoting the previous version')
+    assert.equal(promote!.body!.status, 'live')
+  })
+
   it('health reports media capability flags', async () => {
     installFetch(() => { throw new Error('no fetch') })
     const res = await worker.fetch(new Request('https://api.test/admin/health'), ENV)

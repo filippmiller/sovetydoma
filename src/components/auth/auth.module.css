@@ -163,16 +163,6 @@
   color: #fff;
 }
 
-.socialGoogle {
-  background: #fff;
-  color: #1f1f1f;
-  border: 1.5px solid #dadce0;
-}
-
-.socialGoogle:not(:disabled):hover {
-  background: #f7f8f8;
-  filter: none;
-}
 
 .divider {
   display: flex;

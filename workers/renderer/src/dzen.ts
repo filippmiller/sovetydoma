@@ -66,7 +66,6 @@ export function buildDzenFeed(rows: DzenRow[], siteUrl: string, now = new Date()
     <description>${escapeXml(row.description || '')}</description>
     <pubDate>${new Date(row.published_at).toUTCString()}</pubDate>
     <enclosure url="${escapeXml(imageUrl)}" type="image/jpeg" />
-    <media:content url="${escapeXml(imageUrl)}" medium="image" type="image/jpeg" />
     <content:encoded><![CDATA[${cdata(fullHtml)}]]></content:encoded>
   </item>`
   }).join('\n')
@@ -74,7 +73,6 @@ export function buildDzenFeed(rows: DzenRow[], siteUrl: string, now = new Date()
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
      xmlns:content="http://purl.org/rss/1.0/modules/content/"
-     xmlns:media="http://search.yahoo.com/mrss/"
      xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>СоветыДома</title>

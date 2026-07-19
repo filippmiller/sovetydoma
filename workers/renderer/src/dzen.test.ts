@@ -48,7 +48,7 @@ describe('Dzen daily feed', () => {
     assert.match(xml, /<figure><img src="https:\/\/1001sovet\.ru\/images\/sovet-i-uyut\.jpg"/)
     assert.match(xml, /<figcaption>.*<\/figcaption><\/figure>/)
     assert.match(xml, /<enclosure url="https:\/\/1001sovet\.ru\/images\/sovet-i-uyut\.jpg" type="image\/jpeg" \/>/)
-    assert.match(xml, /<media:content url="https:\/\/1001sovet\.ru\/images\/sovet-i-uyut\.jpg" medium="image" type="image\/jpeg" \/>/)
+    assert.doesNotMatch(xml, /<media:content/)
     assert.doesNotMatch(xml, /pogovorim\.vsedomatut\.com/)
   })
 })

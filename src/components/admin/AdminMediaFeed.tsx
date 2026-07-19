@@ -451,7 +451,7 @@ export default function AdminMediaFeed() {
                   outline: focusedCard ? '2px solid #c0392b33' : 'none',
                 }}
               >
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 0 }}>
+                <div className="mediaFeedCardGrid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: 0 }}>
                   <div style={{ background: '#111', minHeight: '220px', position: 'relative' }}>
                     {img ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -635,7 +635,7 @@ export default function AdminMediaFeed() {
       </div>
       <style>{`
         @media (max-width: 720px) {
-          div[style*="grid-template-columns: minmax(0, 1.1fr)"] {
+          .mediaFeedCardGrid {
             grid-template-columns: 1fr !important;
           }
         }

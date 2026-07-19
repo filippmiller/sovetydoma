@@ -85,7 +85,6 @@ function buildZenItem(a) {
     <description>${escapeXml(a.description || '')}</description>
     <pubDate>${toRfc822(a.date)}</pubDate>
     <enclosure url="${escapeXml(imageUrl)}" type="image/jpeg" />
-    <media:content url="${escapeXml(imageUrl)}" medium="image" type="image/jpeg" />
     <content:encoded><![CDATA[${fullHtml}]]></content:encoded>
   </item>`
 }
@@ -95,7 +94,6 @@ const itemsXml = articles.map(buildZenItem).join('')
 const feed = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
      xmlns:content="http://purl.org/rss/1.0/modules/content/"
-     xmlns:media="http://search.yahoo.com/mrss/"
      xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>СоветыДома</title>

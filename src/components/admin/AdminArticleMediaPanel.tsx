@@ -94,7 +94,7 @@ export default function AdminArticleMediaPanel({ articleId, updatedAt, textStatu
       {msg && <div style={{ color: '#166534', fontSize: '0.85rem', marginBottom: '0.5rem' }}>{msg}</div>}
 
       {!loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '1rem' }}>
+        <div className="mediaPanelGrid" style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: '1rem' }}>
           <div style={{ background: '#111', borderRadius: 8, overflow: 'hidden', minHeight: 120 }}>
             {img ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -167,7 +167,7 @@ export default function AdminArticleMediaPanel({ articleId, updatedAt, textStatu
       )}
       <style>{`
         @media (max-width: 640px) {
-          section > div[style*="grid-template-columns: 160px"] {
+          .mediaPanelGrid {
             grid-template-columns: 1fr !important;
           }
         }

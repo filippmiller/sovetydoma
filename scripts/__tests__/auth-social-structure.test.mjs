@@ -49,14 +49,15 @@ test('VK ID uses the redirect PKCE flow, not the OneTap SDK widget', () => {
 test('social section offers the two primary providers with uniform copy', () => {
   assert.match(socialSection, /Продолжить с VK ID/)
   assert.match(socialSection, /Продолжить с Яндекс ID/)
-  assert.match(socialSection, /Продолжить с Google/)
+  // Google sign-in/registration was removed — must not reappear.
+  assert.doesNotMatch(socialSection, /Продолжить с Google/)
+  assert.doesNotMatch(socialSection, /loadingProvider === 'google'/)
   // Real SVG brand icons, not glued text pseudo-icons ("ЯВойти", "GВойти", "VKВойти")
   assert.match(socialSection, /<svg/)
   assert.doesNotMatch(socialSection, /['"]Я['"]|['"]G['"]|['"]VK['"]/)
   // Loading states are labelled per provider
   assert.match(socialSection, /loadingProvider === 'vk'/)
   assert.match(socialSection, /loadingProvider === 'yandex'/)
-  assert.match(socialSection, /loadingProvider === 'google'/)
 })
 
 test('social auth is available in the registration tab too (single implementation)', () => {

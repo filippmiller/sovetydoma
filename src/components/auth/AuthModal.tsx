@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { getSupabase, supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { migrateLocalFavoritesToServer, processPendingFavoriteIntent } from '@/lib/favorites'
-import { mapAuthError, mapOAuthError } from '@/lib/auth/error-messages'
+import { mapAuthError } from '@/lib/auth/error-messages'
 import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
 import ForgotPasswordForm from './ForgotPasswordForm'
@@ -55,7 +55,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
   // ── Social flows ──────────────────────────────────────────────────────────
   // VK ID and Yandex ID run as redirect-based authorization-code flows (no
   // third-party SDK, no iframes): browser → provider consent → our callback →
-  // worker exchange → Supabase session. Google uses the Supabase-native flow.
+  // worker exchange → Supabase session.
 
   // VK ID: OAuth 2.1 + PKCE against id.vk.com/authorize. The PKCE verifier and
   // the CSRF state are stored in sessionStorage and verified by the static
@@ -117,33 +117,8 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     window.location.href = authorizeUrl
   }, [])
 
-  // Google: native Supabase provider (enabled server-side). The callback page
-  // exchanges the returned code via exchangeCodeForSession.
-  const handleGoogleSignIn = useCallback(async () => {
-    setError('')
-    setOauthLoading('google')
-    try {
-      const sb = getSupabase()
-      const { data, error: oauthError } = await sb.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: getOAuthRedirectTo() },
-      })
-      if (oauthError) throw oauthError
-      if (data.url) {
-        window.sessionStorage.setItem('auth_redirect_to', getAuthRedirectTo())
-        window.location.href = data.url
-      } else {
-        throw new Error('oauth_url_missing')
-      }
-    } catch (err) {
-      setError(mapOAuthError((err as Error).message))
-      setOauthLoading(null)
-    }
-  }, [])
-
   const vkAuthEnabled = process.env.NEXT_PUBLIC_VK_AUTH_ENABLED === 'true' && Boolean((process.env.NEXT_PUBLIC_VK_APP_ID || '').trim())
   const yandexAuthEnabled = Boolean((process.env.NEXT_PUBLIC_YANDEX_OAUTH_CLIENT_ID || '').trim())
-  const googleAuthEnabled = true // provider is enabled on the Supabase side
 
   // ── Lifecycle / a11y ─────────────────────────────────────────────────────
 
@@ -473,11 +448,9 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     <SocialAuthSection
       vkEnabled={vkAuthEnabled}
       yandexEnabled={yandexAuthEnabled}
-      googleEnabled={googleAuthEnabled}
       loadingProvider={oauthLoading}
       onVkSignIn={() => { void handleVkSignIn() }}
       onYandexSignIn={handleYandexSignIn}
-      onGoogleSignIn={() => { void handleGoogleSignIn() }}
     />
   )
 
@@ -652,7 +625,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
         {!success && tab === 'login' && mode === 'login' && (
           <>
             {socialSection}
-            {(vkAuthEnabled || yandexAuthEnabled || googleAuthEnabled) && (
+            {(vkAuthEnabled || yandexAuthEnabled) && (
               <div className={styles.divider}><span>или с email</span></div>
             )}
             <LoginForm
@@ -708,7 +681,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
         {!success && tab === 'register' && (
           <>
             {socialSection}
-            {(vkAuthEnabled || yandexAuthEnabled || googleAuthEnabled) && (
+            {(vkAuthEnabled || yandexAuthEnabled) && (
               <div className={styles.divider}><span>или с email</span></div>
             )}
             <RegisterForm

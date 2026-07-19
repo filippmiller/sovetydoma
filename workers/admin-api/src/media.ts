@@ -765,16 +765,46 @@ async function setLiveMedia(
   const headers = serviceHeaders(env, { Prefer: 'return=representation' })
   if (!headers) return { ok: false, status: 503, error: 'not_configured', message: 'Database not configured' }
 
-  // Retire current live versions (DB rows only — R2 objects stay).
+  // Article row is the source of truth for the public hero, and the guarded
+  // update is the concurrency gate. Commit it FIRST; only flip the media-status
+  // bookkeeping AFTER it succeeds. This prevents the split-brain state where the
+  // media rows were re-pointed but the article write lost a 409 race.
+  const storageKey = String(media.storage_key)
+  const site = env.SITE_URL || 'https://1001sovet.ru'
+  const revision = (typeof article.revision_count === 'number' ? article.revision_count : 0) + 1
+  const update: Record<string, unknown> = {
+    image_filename: storageKey,
+    image_url: publicImageUrl(site, storageKey),
+    image_status: 'approved',
+    image_source: media.source || 'generated',
+    image_model: media.provider || null,
+    active_media_id: mediaId,
+    revision_count: revision,
+  }
+  if (media.prompt) update.image_prompt = media.prompt
+
+  let patchUrl = `${sbBase(env)}/rest/v1/content_matrix?id=eq.${encodeURIComponent(articleId)}`
+  if (expectedUpdatedAt) {
+    patchUrl += `&updated_at=eq.${encodeURIComponent(expectedUpdatedAt)}`
+  }
+  const patchRes = await fetch(patchUrl, { method: 'PATCH', headers, body: JSON.stringify(update) })
+  if (!patchRes.ok) return { ok: false, status: 502, error: 'upstream_error', message: 'Failed to update article image' }
+  const updated = (await patchRes.json().catch(() => []) as Array<Record<string, unknown>>)[0]
+  if (!updated) {
+    // Guard lost the race — nothing else has been touched, so this is clean.
+    return { ok: false, status: 409, error: 'conflict', message: 'Row was modified; refetch and retry' }
+  }
+
+  // Article committed. Now retire the previous live rows and activate the target
+  // (DB rows only — R2 objects stay immutable).
   await fetch(
-    `${sbBase(env)}/rest/v1/article_media?article_id=eq.${encodeURIComponent(articleId)}&status=eq.live`,
+    `${sbBase(env)}/rest/v1/article_media?article_id=eq.${encodeURIComponent(articleId)}&status=eq.live&id=neq.${encodeURIComponent(mediaId)}`,
     {
       method: 'PATCH',
       headers: serviceHeaders(env, { Prefer: 'return=minimal' })!,
       body: JSON.stringify({ status: 'archived', retired_at: new Date().toISOString() }),
     },
   )
-
   const activateRes = await fetch(
     `${sbBase(env)}/rest/v1/article_media?id=eq.${encodeURIComponent(mediaId)}`,
     {
@@ -787,33 +817,7 @@ async function setLiveMedia(
       }),
     },
   )
-  if (!activateRes.ok) return { ok: false, status: 502, error: 'upstream_error', message: 'Failed to activate media' }
   const activated = (await activateRes.json().catch(() => []) as Array<Record<string, unknown>>)[0] || media
-
-  const storageKey = String(activated.storage_key || media.storage_key)
-  const site = env.SITE_URL || 'https://1001sovet.ru'
-  const revision = (typeof article.revision_count === 'number' ? article.revision_count : 0) + 1
-  const update: Record<string, unknown> = {
-    image_filename: storageKey,
-    image_url: publicImageUrl(site, storageKey),
-    image_status: 'approved',
-    image_source: activated.source || 'generated',
-    image_model: activated.provider || null,
-    active_media_id: mediaId,
-    revision_count: revision,
-  }
-  if (activated.prompt) update.image_prompt = activated.prompt
-
-  let patchUrl = `${sbBase(env)}/rest/v1/content_matrix?id=eq.${encodeURIComponent(articleId)}`
-  if (expectedUpdatedAt) {
-    patchUrl += `&updated_at=eq.${encodeURIComponent(expectedUpdatedAt)}`
-  }
-  const patchRes = await fetch(patchUrl, { method: 'PATCH', headers, body: JSON.stringify(update) })
-  if (!patchRes.ok) return { ok: false, status: 502, error: 'upstream_error', message: 'Failed to update article image' }
-  const updated = (await patchRes.json().catch(() => []) as Array<Record<string, unknown>>)[0]
-  if (!updated) {
-    return { ok: false, status: 409, error: 'conflict', message: 'Row was modified; refetch and retry' }
-  }
 
   await insertRevision(env, {
     matrix_id: articleId,
@@ -991,6 +995,18 @@ export async function archiveMedia(
     const prev = prevRes && prevRes.ok
       ? (await prevRes.json().catch(() => []) as Array<Record<string, unknown>>)[0]
       : null
+    // Promote the fallback version to 'live' so it isn't left as an archived row
+    // that the article nonetheless points at (which would leave zero live media).
+    if (prev?.id) {
+      await fetch(
+        `${sbBase(env)}/rest/v1/article_media?id=eq.${encodeURIComponent(String(prev.id))}`,
+        {
+          method: 'PATCH',
+          headers: serviceHeaders(env, { Prefer: 'return=minimal' })!,
+          body: JSON.stringify({ status: 'live', activated_at: new Date().toISOString(), retired_at: null }),
+        },
+      )
+    }
     const revision = (typeof article.revision_count === 'number' ? article.revision_count : 0) + 1
     const patch: Record<string, unknown> = {
       revision_count: revision,
