@@ -80,6 +80,8 @@ export default function AdminArticlesList() {
   const [query, setQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [page, setPage] = useState(1)
+  const [sortCol, setSortCol] = useState<'updated_at' | 'title' | 'created_at' | 'published_at'>('updated_at')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [reloadNonce, setReloadNonce] = useState(0)
   const [state, setState] = useState<LoadState>({ status: 'loading', items: [], page: 1, total: 0, error: null })
 
@@ -92,10 +94,22 @@ export default function AdminArticlesList() {
     return () => clearTimeout(t)
   }, [query])
 
+  function toggleSort(col: 'updated_at' | 'title' | 'created_at' | 'published_at') {
+    if (sortCol === col) {
+      setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'))
+    } else {
+      setSortCol(col)
+      setSortDir(col === 'title' ? 'asc' : 'desc')
+    }
+    setPage(1)
+  }
+
+  const sortParam = `${sortCol}.${sortDir}`
+
   const load = useCallback(async () => {
     setState(s => ({ ...s, status: 'loading', error: null }))
     try {
-      const res = await listArticles({ page, per_page: PER_PAGE, status, category, q: debouncedQuery, sort: 'updated_at.desc' })
+      const res = await listArticles({ page, per_page: PER_PAGE, status, category, q: debouncedQuery, sort: sortParam })
       setState({ status: 'ready', items: res.items, page: res.page, total: res.total, error: null })
     } catch (e) {
       const msg = e instanceof AdminApiError
@@ -104,7 +118,7 @@ export default function AdminArticlesList() {
       console.error('[AdminArticlesList] load failed', e)
       setState(s => ({ ...s, status: 'error', error: msg }))
     }
-  }, [page, status, category, debouncedQuery])
+  }, [page, status, category, debouncedQuery, sortParam])
 
   useEffect(() => {
     if (authState !== 'authed') return
@@ -269,10 +283,26 @@ export default function AdminArticlesList() {
               <thead>
                 <tr style={{ background: '#f8f8f8', borderBottom: '2px solid #f0f0f0' }}>
                   <th style={{ padding: '0.7rem 1rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', width: '2.5rem' }}>#</th>
-                  <th style={{ padding: '0.7rem 1rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Заголовок</th>
+                  <th
+                    role="columnheader"
+                    aria-sort={sortCol === 'title' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                    onClick={() => toggleSort('title')}
+                    style={{ padding: '0.7rem 1rem', textAlign: 'left', color: sortCol === 'title' ? '#c0392b' : '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer', userSelect: 'none' }}
+                    title="Сортировать по заголовку"
+                  >
+                    Заголовок {sortCol === 'title' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                  </th>
                   <th style={{ padding: '0.7rem 0.75rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Категория</th>
                   <th style={{ padding: '0.7rem 0.75rem', textAlign: 'left', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Статус</th>
-                  <th style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }} title="Сортировка: по дате обновления, новые сверху">Обновлено ↓</th>
+                  <th
+                    role="columnheader"
+                    aria-sort={sortCol === 'updated_at' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                    onClick={() => toggleSort('updated_at')}
+                    style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: sortCol === 'updated_at' ? '#c0392b' : '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', cursor: 'pointer', userSelect: 'none' }}
+                    title="Сортировать по дате обновления"
+                  >
+                    Обновлено {sortCol === 'updated_at' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
+                  </th>
                   <th style={{ padding: '0.7rem 0.75rem', textAlign: 'center', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>Рев.</th>
                   <th style={{ padding: '0.7rem 1rem', textAlign: 'right', color: '#888', fontWeight: 600, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}></th>
                 </tr>

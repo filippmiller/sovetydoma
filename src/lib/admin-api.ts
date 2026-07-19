@@ -86,6 +86,93 @@ export interface PublishArticleResult {
   index_ok?: boolean
   already_published?: boolean
   already_unpublished?: boolean
+  purge_detail?: string | null
+  purge_status?: number | null
+}
+
+export type MediaVersionStatus =
+  | 'live'
+  | 'candidate'
+  | 'generating'
+  | 'failed'
+  | 'rejected'
+  | 'archived'
+
+export interface ArticleMediaVersion {
+  id: string | null
+  article_id?: string
+  version: number
+  storage_key: string
+  preview_key?: string | null
+  mime?: string
+  width?: number | null
+  height?: number | null
+  sha256?: string | null
+  source?: string | null
+  provider?: string | null
+  prompt?: string | null
+  negative_prompt?: string | null
+  alt?: string | null
+  status: MediaVersionStatus | string
+  parent_media_id?: string | null
+  generation_job_id?: string | null
+  created_at?: string | null
+  activated_at?: string | null
+  retired_at?: string | null
+  public_url?: string | null
+  synthetic?: boolean
+}
+
+export interface MediaInventoryCard {
+  article: {
+    id: string
+    slug: string
+    category: string
+    title: string
+    text_status: string
+    disposition?: string | null
+    updated_at: string
+    published_at?: string | null
+    image_filename?: string | null
+    image_prompt?: string | null
+    image_source?: string | null
+    image_model?: string | null
+    image_status?: string | null
+    active_media_id?: string | null
+    revision_count?: number
+  }
+  media_status: string
+  live: ArticleMediaVersion | null
+  candidates: ArticleMediaVersion[]
+  versions: ArticleMediaVersion[]
+  public_image_url: string | null
+}
+
+export interface MediaInventoryResponse {
+  items: MediaInventoryCard[]
+  next_cursor: string | null
+  limit: number
+}
+
+export interface MediaGenerationJob {
+  id: string
+  article_id: string
+  status: string
+  provider?: string
+  model?: string
+  prompt?: string
+  negative_prompt?: string | null
+  candidate_count?: number
+  progress?: number
+  attempt?: number
+  max_attempts?: number
+  retryable?: boolean
+  error_code?: string | null
+  error_message?: string | null
+  cost_usd?: number | null
+  media_ids?: string[]
+  created_at?: string
+  finished_at?: string | null
 }
 
 export interface AdminApiClientOptions {
@@ -108,6 +195,55 @@ export interface AdminApiClient {
   ): Promise<AdminArticle>
   publishArticle(id: string, idempotencyKey?: string): Promise<PublishArticleResult>
   unpublishArticle(id: string, idempotencyKey?: string): Promise<PublishArticleResult>
+  listMedia(params?: {
+    cursor?: string
+    limit?: number
+    status?: string
+    category?: string
+    source?: string
+    q?: string
+  }): Promise<MediaInventoryResponse>
+  getArticleMedia(articleId: string): Promise<{
+    article: AdminArticle
+    live: ArticleMediaVersion | null
+    versions: ArticleMediaVersion[]
+    jobs: MediaGenerationJob[]
+  }>
+  startMediaGeneration(
+    articleId: string,
+    body?: { prompt?: string; negative_prompt?: string; count?: number; presets?: string[] },
+    idempotencyKey?: string,
+  ): Promise<{ job: MediaGenerationJob }>
+  uploadArticleMedia(
+    articleId: string,
+    body: { data_base64: string; mime?: string; alt?: string; prompt?: string },
+    idempotencyKey?: string,
+  ): Promise<{ media: ArticleMediaVersion }>
+  assignMedia(
+    articleId: string,
+    mediaId: string,
+    expectedUpdatedAt?: string,
+    idempotencyKey?: string,
+  ): Promise<{ item: AdminArticle; media: ArticleMediaVersion; purge_ok: boolean | null }>
+  applyMediaAndPublish(
+    articleId: string,
+    mediaId: string,
+    expectedUpdatedAt?: string,
+    idempotencyKey?: string,
+  ): Promise<{ item: AdminArticle; media: ArticleMediaVersion; purge_ok: boolean | null }>
+  archiveMedia(
+    articleId: string,
+    mediaId: string,
+    idempotencyKey?: string,
+  ): Promise<{ media: ArticleMediaVersion; item: AdminArticle; purge_ok: boolean | null }>
+  rollbackMedia(
+    articleId: string,
+    mediaId: string,
+    expectedUpdatedAt?: string,
+    idempotencyKey?: string,
+  ): Promise<{ item: AdminArticle; media: ArticleMediaVersion; purge_ok: boolean | null }>
+  getMediaJob(jobId: string): Promise<{ job: MediaGenerationJob; media: ArticleMediaVersion[] }>
+  retryMediaJob(jobId: string, idempotencyKey?: string): Promise<{ job_id: string; status: string }>
 }
 
 const DEFAULT_SORT = 'updated_at.desc'
@@ -239,6 +375,83 @@ export function createAdminApiClient(options: AdminApiClientOptions = {}): Admin
       })) as PublishArticleResult
       return { ...payload, item: unwrapItem(payload) }
     },
+
+    listMedia(params = {}): Promise<MediaInventoryResponse> {
+      const qs = new URLSearchParams()
+      if (params.cursor) qs.set('cursor', params.cursor)
+      qs.set('limit', String(params.limit ?? 30))
+      if (params.status) qs.set('status', params.status)
+      if (params.category) qs.set('category', params.category)
+      if (params.source) qs.set('source', params.source)
+      if (params.q) qs.set('q', params.q)
+      return request(`/admin/media?${qs.toString()}`) as Promise<MediaInventoryResponse>
+    },
+
+    getArticleMedia(articleId: string) {
+      return request(`/admin/articles/${encodeURIComponent(articleId)}/media`) as ReturnType<AdminApiClient['getArticleMedia']>
+    },
+
+    startMediaGeneration(articleId, body = {}, idempotencyKey = newIdempotencyKey()) {
+      return request(`/admin/articles/${encodeURIComponent(articleId)}/media/generations`, {
+        method: 'POST',
+        headers: { 'Idempotency-Key': idempotencyKey },
+        body,
+      }) as Promise<{ job: MediaGenerationJob }>
+    },
+
+    uploadArticleMedia(articleId, body, idempotencyKey = newIdempotencyKey()) {
+      return request(`/admin/articles/${encodeURIComponent(articleId)}/media/uploads`, {
+        method: 'POST',
+        headers: { 'Idempotency-Key': idempotencyKey },
+        body,
+      }) as Promise<{ media: ArticleMediaVersion }>
+    },
+
+    assignMedia(articleId, mediaId, expectedUpdatedAt, idempotencyKey = newIdempotencyKey()) {
+      const headers: Record<string, string> = { 'Idempotency-Key': idempotencyKey }
+      if (expectedUpdatedAt) headers['X-Expected-Updated-At'] = expectedUpdatedAt
+      return request(
+        `/admin/articles/${encodeURIComponent(articleId)}/media/${encodeURIComponent(mediaId)}/assign`,
+        { method: 'POST', headers, body: {} },
+      ) as ReturnType<AdminApiClient['assignMedia']>
+    },
+
+    applyMediaAndPublish(articleId, mediaId, expectedUpdatedAt, idempotencyKey = newIdempotencyKey()) {
+      const headers: Record<string, string> = { 'Idempotency-Key': idempotencyKey }
+      if (expectedUpdatedAt) headers['X-Expected-Updated-At'] = expectedUpdatedAt
+      return request(
+        `/admin/articles/${encodeURIComponent(articleId)}/media/${encodeURIComponent(mediaId)}/apply-and-publish`,
+        { method: 'POST', headers, body: {} },
+      ) as ReturnType<AdminApiClient['applyMediaAndPublish']>
+    },
+
+    archiveMedia(articleId, mediaId, idempotencyKey = newIdempotencyKey()) {
+      return request(
+        `/admin/articles/${encodeURIComponent(articleId)}/media/${encodeURIComponent(mediaId)}/archive`,
+        { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: {} },
+      ) as ReturnType<AdminApiClient['archiveMedia']>
+    },
+
+    rollbackMedia(articleId, mediaId, expectedUpdatedAt, idempotencyKey = newIdempotencyKey()) {
+      const headers: Record<string, string> = { 'Idempotency-Key': idempotencyKey }
+      if (expectedUpdatedAt) headers['X-Expected-Updated-At'] = expectedUpdatedAt
+      return request(
+        `/admin/articles/${encodeURIComponent(articleId)}/media/${encodeURIComponent(mediaId)}/rollback`,
+        { method: 'POST', headers, body: {} },
+      ) as ReturnType<AdminApiClient['rollbackMedia']>
+    },
+
+    getMediaJob(jobId: string) {
+      return request(`/admin/media/jobs/${encodeURIComponent(jobId)}`) as ReturnType<AdminApiClient['getMediaJob']>
+    },
+
+    retryMediaJob(jobId: string, idempotencyKey = newIdempotencyKey()) {
+      return request(`/admin/media/jobs/${encodeURIComponent(jobId)}/retry`, {
+        method: 'POST',
+        headers: { 'Idempotency-Key': idempotencyKey },
+        body: {},
+      }) as ReturnType<AdminApiClient['retryMediaJob']>
+    },
   }
 }
 
@@ -269,4 +482,69 @@ export function publishArticle(id: string, idempotencyKey?: string): Promise<Pub
 
 export function unpublishArticle(id: string, idempotencyKey?: string): Promise<PublishArticleResult> {
   return createAdminApiClient().unpublishArticle(id, idempotencyKey)
+}
+
+export function listMedia(
+  params?: Parameters<AdminApiClient['listMedia']>[0],
+): Promise<MediaInventoryResponse> {
+  return createAdminApiClient().listMedia(params)
+}
+
+export function getArticleMedia(articleId: string) {
+  return createAdminApiClient().getArticleMedia(articleId)
+}
+
+export function startMediaGeneration(
+  articleId: string,
+  body?: { prompt?: string; negative_prompt?: string; count?: number; presets?: string[] },
+  idempotencyKey?: string,
+) {
+  return createAdminApiClient().startMediaGeneration(articleId, body, idempotencyKey)
+}
+
+export function uploadArticleMedia(
+  articleId: string,
+  body: { data_base64: string; mime?: string; alt?: string; prompt?: string },
+  idempotencyKey?: string,
+) {
+  return createAdminApiClient().uploadArticleMedia(articleId, body, idempotencyKey)
+}
+
+export function assignMedia(
+  articleId: string,
+  mediaId: string,
+  expectedUpdatedAt?: string,
+  idempotencyKey?: string,
+) {
+  return createAdminApiClient().assignMedia(articleId, mediaId, expectedUpdatedAt, idempotencyKey)
+}
+
+export function applyMediaAndPublish(
+  articleId: string,
+  mediaId: string,
+  expectedUpdatedAt?: string,
+  idempotencyKey?: string,
+) {
+  return createAdminApiClient().applyMediaAndPublish(articleId, mediaId, expectedUpdatedAt, idempotencyKey)
+}
+
+export function archiveMedia(articleId: string, mediaId: string, idempotencyKey?: string) {
+  return createAdminApiClient().archiveMedia(articleId, mediaId, idempotencyKey)
+}
+
+export function rollbackMedia(
+  articleId: string,
+  mediaId: string,
+  expectedUpdatedAt?: string,
+  idempotencyKey?: string,
+) {
+  return createAdminApiClient().rollbackMedia(articleId, mediaId, expectedUpdatedAt, idempotencyKey)
+}
+
+export function getMediaJob(jobId: string) {
+  return createAdminApiClient().getMediaJob(jobId)
+}
+
+export function retryMediaJob(jobId: string, idempotencyKey?: string) {
+  return createAdminApiClient().retryMediaJob(jobId, idempotencyKey)
 }

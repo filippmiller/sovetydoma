@@ -14,6 +14,7 @@ import {
   type AdminArticle,
 } from '@/lib/admin-api'
 import { CATEGORIES } from '@/lib/categories'
+import AdminArticleMediaPanel from './AdminArticleMediaPanel'
 
 const CATEGORY_COLORS: Record<string, string> = {
   kulinaria: '#e67e22',
@@ -372,6 +373,13 @@ export default function AdminArticleEditor() {
                 рев. {article.revision_count ?? 0} · обновлено {new Date(article.updated_at).toLocaleString('ru-RU')}
               </span>
             </div>
+
+            <AdminArticleMediaPanel
+              articleId={article.id}
+              updatedAt={article.updated_at}
+              textStatus={article.text_status}
+              onArticleMutated={() => { void load() }}
+            />
 
             {/* Banners */}
             {conflict && (

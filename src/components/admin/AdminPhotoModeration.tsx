@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
 import AdminShell from './AdminShell'
 import { useAdminAuth } from '@/lib/admin-auth'
 import { getSupabase } from '@/lib/supabase'
@@ -12,13 +13,21 @@ export default function AdminPhotoModeration() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected'>('pending')
 
+  const [error, setError] = useState<string | null>(null)
+
   const load = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
       const sb = getSupabase()
-      const { data } = await sb.from('photos').select('*').eq('status', filter).order('created_at', { ascending: false })
+      const { data, error: qErr } = await sb.from('photos').select('*').eq('status', filter).order('created_at', { ascending: false })
+      if (qErr) throw new Error(qErr.message)
       setPhotos((data as PhotoRow[]) || [])
-    } catch { /* */ }
+    } catch (e) {
+      console.error('[AdminPhotoModeration] load failed', e)
+      setError(e instanceof Error ? e.message : 'Не удалось загрузить фото')
+      setPhotos([])
+    }
     setLoading(false)
   }, [filter])
 
@@ -30,10 +39,15 @@ export default function AdminPhotoModeration() {
 
   const setStatus = async (id: string, status: 'approved' | 'rejected') => {
     try {
+      setError(null)
       const sb = getSupabase()
-      await sb.from('photos').update({ status, reviewed_at: new Date().toISOString() }).eq('id', id)
+      const { error: uErr } = await sb.from('photos').update({ status, reviewed_at: new Date().toISOString() }).eq('id', id)
+      if (uErr) throw new Error(uErr.message)
       setPhotos((prev) => prev.filter((p) => p.id !== id))
-    } catch { /* */ }
+    } catch (e) {
+      console.error('[AdminPhotoModeration] update failed', e)
+      setError(e instanceof Error ? e.message : 'Не удалось обновить статус')
+    }
   }
 
   if (authState !== 'authed') return null
@@ -41,10 +55,19 @@ export default function AdminPhotoModeration() {
   return (
     <AdminShell activeNav="photos">
       <div style={{ padding: '2rem' }}>
-        <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>Фото на модерации</h1>
+        <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>Фото читателей</h1>
         <p style={{ color: '#888', fontSize: '0.9rem', margin: '0.25rem 0 1.5rem' }}>
-          Загруженные читателями фото. Автопроверка выносит предварительный вердикт; спорные остаются здесь для ручной проверки.
+          UGC-фото читателей («Покажите, что получилось»). Hero-изображения статей — в разделе{' '}
+          <Link href="/admin/media/" style={{ color: '#c0392b', fontWeight: 600 }}>Медиа статей</Link>.
         </p>
+        {error && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', borderRadius: 8, padding: '0.65rem 0.9rem', marginBottom: '1rem', fontSize: '0.88rem' }}>
+            {error}
+            <button type="button" onClick={() => void load()} style={{ marginLeft: 12, border: 'none', background: '#b91c1c', color: '#fff', borderRadius: 5, padding: '0.25rem 0.6rem', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>
+              Повторить
+            </button>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
           {(['pending', 'approved', 'rejected'] as const).map((f) => (

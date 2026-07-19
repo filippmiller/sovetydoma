@@ -9,13 +9,12 @@ const NAV_LINKS = [
   { key: 'overview', label: 'Обзор', href: '/admin/', icon: '📊' },
   { key: 'analytics', label: 'Аналитика', href: '/admin/analytics/', icon: '📈' },
   { key: 'articles', label: 'Статьи', href: '/admin/articles/', icon: '📄' },
-  { key: 'photos', label: 'Фото на модерации', href: '/admin/photos/', icon: '📷' },
+  { key: 'media', label: 'Медиа статей', href: '/admin/media/', icon: '🖼️' },
+  { key: 'photos', label: 'Фото читателей', href: '/admin/photos/', icon: '📷' },
   { key: 'questions', label: 'Вопросы по статьям', href: '/admin/questions/', icon: '💬' },
   { key: 'push', label: 'Push-уведомления', href: '/admin/push/', icon: '📲' },
   { key: 'responder', label: 'Ответчик VK/FB', href: '/admin/responder/', icon: '💬' },
-  { key: 'categories', label: 'Категории', href: '#', icon: '🗂️' },
-  { key: 'tags', label: 'Теги', href: '#', icon: '🏷️' },
-  { key: 'settings', label: 'Настройки', href: '#', icon: '⚙️' },
+  // Categories / Tags / Settings are not implemented yet — omit dead href="#" links.
 ]
 
 interface AdminUser {

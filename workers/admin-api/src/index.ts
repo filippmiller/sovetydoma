@@ -22,14 +22,31 @@ import {
   insertMatrixEvent,
 } from './audit'
 import { checkMutationRateLimit } from './rate-limit'
+import {
+  listMediaInventory,
+  getArticleMedia,
+  startGeneration,
+  uploadMedia,
+  assignMedia,
+  archiveMedia,
+  rollbackMedia,
+  getJob,
+  retryJob,
+  purgeRenderer as purgeRendererDetailed,
+  type MediaEnv,
+} from './media'
 
-export interface Env extends SupabaseEnv {
+export interface Env extends SupabaseEnv, MediaEnv {
   SUPABASE_ANON_KEY?: string
   ALLOWED_ORIGINS?: string
   RENDERER_URL?: string
   RENDERER_PURGE_SECRET?: string
   SITE_URL?: string
   VERSION?: string
+  ARTICLE_IMAGES?: R2Bucket
+  FAL_KEY?: string
+  FAL_MODEL?: string
+  R2_UPLOAD_SECRET?: string
 }
 
 const DEFAULT_ORIGINS = 'https://1001sovet.ru,https://www.1001sovet.ru,http://localhost:3000'
@@ -85,18 +102,8 @@ async function fetchMatrixRow(env: Env, id: string): Promise<Record<string, unkn
   return rows[0] || null
 }
 
-async function purgeRenderer(env: Env, category: unknown, slug: unknown): Promise<boolean> {
-  if (!env.RENDERER_URL || !env.RENDERER_PURGE_SECRET) return false
-  try {
-    const res = await fetch(`${env.RENDERER_URL.replace(/\/+$/, '')}/__purge`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-purge-secret': env.RENDERER_PURGE_SECRET },
-      body: JSON.stringify({ category, slug }),
-    })
-    return res.ok
-  } catch {
-    return false
-  }
+async function purgeRenderer(env: Env, category: unknown, slug: unknown): Promise<{ ok: boolean; detail?: string; status?: number }> {
+  return purgeRendererDetailed(env, category, slug)
 }
 
 // ---------------------------------------------------------------------------
@@ -358,10 +365,16 @@ async function publishArticle(req: Request, env: Env, h: Record<string, string>,
     payload: { published_via: 'dynamic' },
   })
 
-  // Purge renderer caches; tolerate failure (reported via purge_ok).
-  const purgeOk = await purgeRenderer(env, cur.category, cur.slug)
+  // Purge renderer caches; tolerate failure (reported via purge_ok + detail).
+  const purge = await purgeRenderer(env, cur.category, cur.slug)
 
-  const result = { item: updated, index_ok: indexOk, purge_ok: purgeOk }
+  const result = {
+    item: updated,
+    index_ok: indexOk,
+    purge_ok: purge.ok,
+    purge_detail: purge.detail || null,
+    purge_status: purge.status || null,
+  }
   await insertAuditEvent(env, {
     actor_id: actor.id,
     actor_email: actor.email,
@@ -417,9 +430,14 @@ async function unpublishArticle(req: Request, env: Env, h: Record<string, string
   })
 
   // Purge article + sitemap + hubs (renderer expands the purge set server-side).
-  const purgeOk = await purgeRenderer(env, cur.category, cur.slug)
+  const purge = await purgeRenderer(env, cur.category, cur.slug)
 
-  const result = { item: updated, purge_ok: purgeOk }
+  const result = {
+    item: updated,
+    purge_ok: purge.ok,
+    purge_detail: purge.detail || null,
+    purge_status: purge.status || null,
+  }
   await insertAuditEvent(env, {
     actor_id: actor.id,
     actor_email: actor.email,
@@ -441,14 +459,23 @@ async function unpublishArticle(req: Request, env: Env, h: Record<string, string
 // ---------------------------------------------------------------------------
 
 const worker = {
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
     const url = new URL(req.url)
     const h = corsHeaders(req, env)
 
     if (req.method === 'OPTIONS') return new Response('ok', { headers: h })
 
     if (url.pathname === '/admin/health' && req.method === 'GET') {
-      return json({ ok: true, version: env.VERSION || 'dev', now: new Date().toISOString() }, 200, h)
+      return json({
+        ok: true,
+        version: env.VERSION || 'dev',
+        now: new Date().toISOString(),
+        media: {
+          r2: !!env.ARTICLE_IMAGES,
+          fal: !!env.FAL_KEY,
+          purge: !!(env.RENDERER_URL && env.RENDERER_PURGE_SECRET),
+        },
+      }, 200, h)
     }
 
     if (!url.pathname.startsWith('/admin/')) {
@@ -467,9 +494,60 @@ const worker = {
       return err(h, 429, 'rate_limited', 'Too many mutating requests; slow down')
     }
 
+    // ---- Media inventory & jobs ----
+    if (url.pathname === '/admin/media') {
+      if (req.method !== 'GET') return err(h, 405, 'method_not_allowed', 'Method not allowed')
+      return listMediaInventory(req, env, h)
+    }
+
+    const jobMatch = url.pathname.match(/^\/admin\/media\/jobs\/([^/]+)(\/retry)?$/)
+    if (jobMatch) {
+      const jobId = jobMatch[1]
+      const jobAction = jobMatch[2] || ''
+      if (!UUID_RE.test(jobId)) return err(h, 400, 'bad_id', 'Invalid job id (uuid expected)')
+      if (!jobAction && req.method === 'GET') return getJob(env, h, jobId)
+      if (jobAction === '/retry' && req.method === 'POST') return retryJob(req, env, h, jobId, auth.user, ctx)
+      return err(h, 405, 'method_not_allowed', 'Method not allowed')
+    }
+
     if (url.pathname === '/admin/articles') {
       if (req.method !== 'GET') return err(h, 405, 'method_not_allowed', 'Method not allowed')
       return listArticles(req, env, h)
+    }
+
+    // Article media nested routes
+    const mediaMatch = url.pathname.match(
+      /^\/admin\/articles\/([^/]+)\/media(?:\/(generations|uploads|([^/]+)\/(assign|apply-and-publish|archive|rollback)))?$/,
+    )
+    if (mediaMatch) {
+      const articleId = mediaMatch[1]
+      if (!UUID_RE.test(articleId)) return err(h, 400, 'bad_id', 'Invalid article id (uuid expected)')
+      const tail = mediaMatch[2] || ''
+      if (!tail && req.method === 'GET') return getArticleMedia(env, h, articleId)
+      if (tail === 'generations' && req.method === 'POST') {
+        return startGeneration(req, env, h, articleId, auth.user, ctx)
+      }
+      if (tail === 'uploads' && req.method === 'POST') {
+        return uploadMedia(req, env, h, articleId, auth.user)
+      }
+      const mediaId = mediaMatch[3]
+      const mediaAction = mediaMatch[4]
+      if (mediaId && mediaAction) {
+        if (!UUID_RE.test(mediaId)) return err(h, 400, 'bad_id', 'Invalid media id (uuid expected)')
+        if (mediaAction === 'assign' && req.method === 'POST') {
+          return assignMedia(req, env, h, articleId, mediaId, auth.user, { publish: false })
+        }
+        if (mediaAction === 'apply-and-publish' && req.method === 'POST') {
+          return assignMedia(req, env, h, articleId, mediaId, auth.user, { publish: true })
+        }
+        if (mediaAction === 'archive' && req.method === 'POST') {
+          return archiveMedia(req, env, h, articleId, mediaId, auth.user)
+        }
+        if (mediaAction === 'rollback' && req.method === 'POST') {
+          return rollbackMedia(req, env, h, articleId, mediaId, auth.user)
+        }
+      }
+      return err(h, 405, 'method_not_allowed', 'Method not allowed')
     }
 
     const m = url.pathname.match(/^\/admin\/articles\/([^/]+)(\/publish|\/unpublish)?$/)

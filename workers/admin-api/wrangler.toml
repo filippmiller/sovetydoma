@@ -2,13 +2,20 @@ name = "sovetydoma-admin-api"
 main = "src/index.ts"
 compatibility_date = "2026-06-01"
 
+[[r2_buckets]]
+binding = "ARTICLE_IMAGES"
+bucket_name = "sovetydoma-article-images"
+
 [vars]
 SUPABASE_URL = "https://api.1001sovet.ru"
 RENDERER_URL = "https://sovetydoma-renderer.filippmiller.workers.dev"
 SITE_URL = "https://1001sovet.ru"
 ALLOWED_ORIGINS = "https://1001sovet.ru,https://www.1001sovet.ru,http://localhost:3000"
+FAL_MODEL = "fal-ai/flux/schnell"
 
 # Secrets (set via `wrangler secret bulk` — NOT `secret put`, PowerShell BOM corrupts it):
 #   SUPABASE_SERVICE_ROLE_KEY
 #   SUPABASE_ANON_KEY
 #   RENDERER_PURGE_SECRET
+#   FAL_KEY                    (image generation)
+#   R2_UPLOAD_SECRET          (optional fallback if R2 binding unavailable)
