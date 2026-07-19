@@ -33,6 +33,7 @@ import {
 } from './ugc'
 import {
   buildFavoriteHtml,
+  buildFooterCountHtml,
   buildHeaderAuthHtml,
   buildPushHtml,
   buildRatingHtml,
@@ -402,6 +403,7 @@ function buildTransformer(
     favorite: string
     push: string
     headerAuth: string
+    footerCount: string
   },
 ) {
   const categoryName = CATEGORY_NAMES[row.category] ?? row.category
@@ -420,6 +422,7 @@ function buildTransformer(
   // Push PE is injected once next to the /podpiski text CTA (SSR-null on template).
   let pushInjected = false
   let headerAuthInjected = false
+  let footerCountInjected = false
 
   // Build tag links HTML
   const tagLinksHtml = (Array.isArray(row.tags) ? row.tags : [])
@@ -830,6 +833,15 @@ function buildTransformer(
         el.append(ugcHtml.headerAuth, { html: true })
       },
     })
+    .on('footer', {
+      element(el) {
+        // Fold the published-dynamic article count into the footer total (the
+        // React FooterArticleCount is dead on dynamic pages). Appended once.
+        if (footerCountInjected) return
+        footerCountInjected = true
+        el.append(ugcHtml.footerCount, { html: true })
+      },
+    })
 }
 
 // ---------------------------------------------------------------------------
@@ -905,6 +917,7 @@ async function handleArticle(req: Request, env: Env, category: string, slug: str
     favorite: buildFavoriteHtml(row.slug),
     push: buildPushHtml(row.category),
     headerAuth: buildHeaderAuthHtml(),
+    footerCount: buildFooterCountHtml(),
   }
 
   // Fetch template HTML (cached 10 min)

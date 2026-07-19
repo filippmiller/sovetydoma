@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import {
   buildFavoriteHtml,
+  buildFooterCountHtml,
   buildHeaderAuthHtml,
   buildPushHtml,
   buildRatingHtml,
@@ -81,6 +82,7 @@ describe('auth-gated PE islands for dynamic pages', () => {
       ['favorite', buildFavoriteHtml('idealnyy-borshch')],
       ['push', buildPushHtml('kulinaria')],
       ['headerAuth', buildHeaderAuthHtml()],
+      ['footerCount', buildFooterCountHtml()],
     ]
     const re = /<script type="text\/javascript">([\s\S]*?)<\/script>/g
     for (const [name, html] of htmls) {

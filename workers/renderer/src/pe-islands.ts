@@ -71,6 +71,26 @@ export function buildHeaderAuthHtml(): string {
     + `})();</script>`
 }
 
+const COUNT_WORKER = 'https://sovetydoma-photo-upload.filippmiller.workers.dev/article-count'
+
+/**
+ * Footer article-count island for dynamic pages. The React FooterArticleCount
+ * client component is dead here (hydration stripped), so this typed inline
+ * script folds the published-dynamic count into the footer total, updating the
+ * same #site-article-total / #site-article-word nodes.
+ */
+export function buildFooterCountHtml(): string {
+  return `<script type="text/javascript">(function(){`
+    + `var el=document.getElementById('site-article-total');if(!el||el.dataset.cntBound)return;el.dataset.cntBound='1';`
+    + `var stat=parseInt(el.getAttribute('data-static'),10)||0;`
+    + `fetch(${JSON.stringify(COUNT_WORKER)}).then(function(r){return r.ok?r.json():null;}).then(function(d){`
+    + `if(!d||typeof d.published!=='number'||d.published<=0)return;var total=stat+d.published;`
+    + `el.textContent=String(total);var w=document.getElementById('site-article-word');`
+    + `if(w){var m10=total%10,m100=total%100,word='статей';`
+    + `if(m10===1&&m100!==11)word='статья';else if(m10>=2&&m10<=4&&(m100<10||m100>=20))word='статьи';`
+    + `w.textContent=word;}}).catch(function(){});})();</script>`
+}
+
 const REACTIONS: Array<{ emoji: string; label: string }> = [
   { emoji: '👍', label: 'Полезно' },
   { emoji: '❤️', label: 'Нравится' },
