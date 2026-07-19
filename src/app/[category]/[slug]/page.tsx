@@ -349,8 +349,8 @@ export default async function ArticlePage({ params }: Props) {
             {/* Print button for recipes */}
             {fm.schemaType === 'Recipe' && <PrintRecipeButton />}
 
-            {/* Star rating */}
-            <div style={{ marginTop: '2rem' }}>
+            {/* Star rating — marker on the outer shell so the renderer PE replace keeps layout */}
+            <div data-dynamic-widget="rating" style={{ marginTop: '2rem' }}>
               <StarRating slug={slug} />
             </div>
 

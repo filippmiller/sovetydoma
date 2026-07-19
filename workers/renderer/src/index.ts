@@ -32,6 +32,12 @@ import {
   type DynamicQuestion,
 } from './ugc'
 import {
+  buildFavoriteHtml,
+  buildPushHtml,
+  buildRatingHtml,
+  buildReactionsHtml,
+} from './pe-islands'
+import {
   buildHubHtml,
   buildHubIndexHtml,
   buildRelatedHtml,
@@ -387,7 +393,14 @@ function buildTransformer(
   bodyHtml: string,
   schemas: { article: object; breadcrumb: object; extra: object[] },
   relatedHtml: string | null,
-  ugcHtml: { questions: string; comments: string },
+  ugcHtml: {
+    questions: string
+    comments: string
+    reactions: string
+    rating: string
+    favorite: string
+    push: string
+  },
 ) {
   const categoryName = CATEGORY_NAMES[row.category] ?? row.category
   const persona = resolvePersona((row.frontmatter as Record<string, string | undefined>)?.author, row.category)
@@ -402,6 +415,8 @@ function buildTransformer(
   const dateIso = row.published_at.slice(0, 10)
   const dateFormatted = formatDateRu(dateIso)
   const dateRelative = relativeDate(dateIso)
+  // Push PE is injected once next to the /podpiski text CTA (SSR-null on template).
+  let pushInjected = false
 
   // Build tag links HTML
   const tagLinksHtml = (Array.isArray(row.tags) ? row.tags : [])
@@ -749,6 +764,55 @@ function buildTransformer(
         el.setInnerContent(ugcHtml.comments, { html: true })
       },
     })
+    // Auth-gated PE islands (reactions / rating / favorite / push). Prefer
+    // data-dynamic-widget markers; fall back to the unique inline styles that
+    // the current static template still emits for the dead client shells.
+    // Combined selectors so each element is handled once even when it carries
+    // both a marker and the legacy style.
+    .on('[data-dynamic-widget="reactions"], div[style="margin-top:1.5rem"]', {
+      element(el) {
+        const marked = el.getAttribute('data-dynamic-widget') === 'reactions'
+        const legacy = !el.getAttribute('data-dynamic-widget')
+          && el.getAttribute('style') === 'margin-top:1.5rem'
+        if (marked || legacy) el.replace(ugcHtml.reactions, { html: true })
+      },
+    })
+    .on('[data-dynamic-widget="rating"], div[style="margin-top:2rem"]', {
+      element(el) {
+        const marked = el.getAttribute('data-dynamic-widget') === 'rating'
+        const legacy = !el.getAttribute('data-dynamic-widget')
+          && el.getAttribute('style') === 'margin-top:2rem'
+        if (!marked && !legacy) return
+        // Push is SSR-null on the current template (client-only). On the legacy
+        // rating shell, append the push island once right after the stars.
+        if (legacy && !pushInjected) {
+          pushInjected = true
+          el.replace(ugcHtml.rating + ugcHtml.push, { html: true })
+        } else {
+          el.replace(ugcHtml.rating, { html: true })
+        }
+      },
+    })
+    .on(
+      '[data-dynamic-widget="favorite"], div[style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;position:relative"]',
+      {
+        element(el) {
+          const marked = el.getAttribute('data-dynamic-widget') === 'favorite'
+          const legacy = !el.getAttribute('data-dynamic-widget')
+            && el.getAttribute('style')
+              === 'display:inline-flex;flex-direction:column;align-items:center;gap:4px;position:relative'
+          if (marked || legacy) el.replace(ugcHtml.favorite, { html: true })
+        },
+      },
+    )
+    .on('[data-dynamic-widget="push"]', {
+      element(el) {
+        // After static rebuild, CategoryPushSubscribe shells exist and are
+        // replaced here. Legacy path injects push after the rating shell above.
+        el.replace(ugcHtml.push, { html: true })
+        pushInjected = true
+      },
+    })
 }
 
 // ---------------------------------------------------------------------------
@@ -819,6 +883,10 @@ async function handleArticle(req: Request, env: Env, category: string, slug: str
   const ugcHtml = {
     questions: buildQuestionsHtml(questionsResult.status === 'fulfilled' ? questionsResult.value : null, row.slug),
     comments: buildCommentsHtml(commentsResult.status === 'fulfilled' ? commentsResult.value : null, row.slug),
+    reactions: buildReactionsHtml(row.slug),
+    rating: buildRatingHtml(row.slug),
+    favorite: buildFavoriteHtml(row.slug),
+    push: buildPushHtml(row.category),
   }
 
   // Fetch template HTML (cached 10 min)

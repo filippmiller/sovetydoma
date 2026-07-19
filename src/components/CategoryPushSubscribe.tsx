@@ -124,10 +124,24 @@ export default function CategoryPushSubscribe({ category }: Props) {
     }
   }, [category])
 
-  if (!supported) return null
+  // Always emit a marked shell so the renderer PE island can replace it on
+  // dynamic pages (SSR previously returned null → push was missing entirely).
+  if (!supported) {
+    return (
+      <div
+        data-dynamic-widget="push"
+        data-category={category}
+        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}
+      />
+    )
+  }
 
   return (
-    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+    <div
+      data-dynamic-widget="push"
+      data-category={category}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}
+    >
       {subscribed ? (
         <button
           onClick={handleUnsubscribe}

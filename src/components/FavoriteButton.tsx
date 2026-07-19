@@ -136,6 +136,7 @@ export default function FavoriteButton({ slug }: Props) {
   return (
     <div
       ref={containerRef}
+      data-dynamic-widget="favorite"
       style={{
         display: 'inline-flex',
         flexDirection: 'column',

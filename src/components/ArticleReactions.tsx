@@ -102,7 +102,7 @@ export default function ArticleReactions({ slug }: Props) {
   }
 
   return (
-    <div style={{ marginTop: '1.5rem' }}>
+    <div data-dynamic-widget="reactions" style={{ marginTop: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
         {REACTIONS.map((r, i) => (
           <button
