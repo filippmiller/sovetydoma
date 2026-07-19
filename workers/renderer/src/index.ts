@@ -1218,6 +1218,18 @@ const worker = {
 
     const { pathname } = url
 
+    // Dzen domain ownership fallback. The same file also lives in /public so it
+    // remains available after the next static site deployment.
+    if (pathname === '/zen_9GBGqu3l7j70QIjqAIEi38HTtJBvFw4LAh5fZLZ2vugYXbtiMWhNuU8WY87gEZ20.html') {
+      return new Response('<meta name="zen-verification" content="9GBGqu3l7j70QIjqAIEi38HTtJBvFw4LAh5fZLZ2vugYXbtiMWhNuU8WY87gEZ20" />\n', {
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'public, max-age=3600',
+          'X-Content-Type-Options': 'nosniff',
+        },
+      })
+    }
+
     // /sitemap-dynamic.xml
     if (pathname === '/sitemap-dynamic.xml') {
       return handleSitemap(env)

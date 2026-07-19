@@ -33,5 +33,5 @@ export function sitemapCacheUrl(base: string): string {
 
 /** Dzen RSS feed: one stable article per Moscow day. */
 export function dzenFeedCacheUrl(base: string): string {
-  return `${base}/zen.xml?generator=v2`
+  return `${base}/zen.xml?generator=v3`
 }

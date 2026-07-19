@@ -70,8 +70,12 @@ const articles = files
 
 function buildZenItem(a) {
   const url = `${SITE_URL}/${a.category}/${a.slug}/`
+  const imageUrl = a.image
+    ? new URL(String(a.image).replace(/^\/+/, ''), `${SITE_URL}/`).toString()
+    : `${SITE_URL}/images/${encodeURIComponent(a.slug)}.jpg`
   const bodyHtml = markdownToHtml(a.body)
-  const fullHtml = `<h1>${a.title}</h1>\n<p>${a.description || ''}</p>\n${bodyHtml}`
+  const image = `<figure><img src="${escapeXml(imageUrl)}" alt="${escapeXml(a.title)}" /><figcaption>${escapeXml(a.title)}</figcaption></figure>`
+  const fullHtml = `<h1>${escapeXml(a.title)}</h1>\n${image}\n<p>${escapeXml(a.description || '')}</p>\n${bodyHtml}`
 
   return `
   <item>
@@ -80,6 +84,8 @@ function buildZenItem(a) {
     <guid isPermaLink="true">${url}</guid>
     <description>${escapeXml(a.description || '')}</description>
     <pubDate>${toRfc822(a.date)}</pubDate>
+    <enclosure url="${escapeXml(imageUrl)}" type="image/jpeg" />
+    <media:content url="${escapeXml(imageUrl)}" medium="image" type="image/jpeg" />
     <content:encoded><![CDATA[${fullHtml}]]></content:encoded>
   </item>`
 }
@@ -89,6 +95,7 @@ const itemsXml = articles.map(buildZenItem).join('')
 const feed = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
      xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:media="http://search.yahoo.com/mrss/"
      xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>СоветыДома</title>
