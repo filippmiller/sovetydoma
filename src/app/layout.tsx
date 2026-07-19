@@ -13,6 +13,7 @@ const ptSans = PT_Sans({
 })
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import AdminChromeGate from '@/components/AdminChromeGate'
 import YandexMetrika from '@/components/YandexMetrika'
 import BackToTop from '@/components/BackToTop'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
@@ -90,9 +91,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', margin: 0 }}>
         <a href="#main-content" className="skip-link">Перейти к содержимому</a>
         <YandexMetrika />
-        <Header />
+        <AdminChromeGate><Header /></AdminChromeGate>
         <main id="main-content" style={{ flex: 1 }}>{children}</main>
-        <Footer />
+        <AdminChromeGate><Footer /></AdminChromeGate>
         <BackToTop />
         <ServiceWorkerRegistration />
         <AnalyticsTracker />
