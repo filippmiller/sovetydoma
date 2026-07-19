@@ -46,11 +46,13 @@ import {
   RENDER_VERSION,
   articleCacheUrl,
   categoryRowsCacheUrl,
+  dzenFeedCacheUrl,
   hubCacheUrl,
   siteBaseUrl,
   sitemapCacheUrl,
 } from './cacheKeys'
 import { handlePurge } from './purge'
+import { buildDzenFeed, selectDailyDzenRows, type DzenRow } from './dzen'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -64,6 +66,7 @@ interface Env {
   SITE_URL: string              // https://1001sovet.ru
   R2_UPLOAD_SECRET?: string     // shared secret for the authenticated PUT /__r2/ upload
   RENDERER_PURGE_SECRET?: string // shared secret for POST /__purge (wrangler secret bulk)
+  DZEN_FEED_START_DATE?: string // YYYY-MM-DD; prevents an initial historical import flood
 }
 
 // ---------------------------------------------------------------------------
@@ -1031,6 +1034,95 @@ async function handleSitemap(env: Env): Promise<Response> {
 // Routes: GET /stati/… — crawlable hub pages for dynamic articles
 // ---------------------------------------------------------------------------
 
+// Dzen imports the full article body from this RSS feed. Selecting the earliest
+// Moscow-time publication of each day keeps the cadence at one stable item/day
+// even though the content factory publishes several articles daily.
+const DZEN_FEED_CACHE_TTL = 900
+
+async function handleDzenFeed(env: Env): Promise<Response> {
+  const siteUrl = siteBaseUrl(env)
+  const cacheKey = new Request(dzenFeedCacheUrl(siteUrl))
+  const cache = caches.default
+  const cached = await cache.match(cacheKey)
+  if (cached) return cached
+
+  const startDate = /^\d{4}-\d{2}-\d{2}$/.test(env.DZEN_FEED_START_DATE || '')
+    ? env.DZEN_FEED_START_DATE as string
+    : '2026-07-19'
+  const base = env.SUPABASE_URL.replace(/\/+$/, '')
+  const params = new URLSearchParams({
+    text_status: 'eq.published',
+    disposition: 'eq.active',
+    domain: 'eq.1001sovet.ru',
+    published_at: `gte.${startDate}T00:00:00+03:00`,
+    select: 'slug,category,title,description,body_md,image_filename,published_at',
+    order: 'published_at.asc,slug.asc',
+    limit: '1000',
+  })
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
+  let upstream: Response
+  try {
+    upstream = await fetch(`${base}/rest/v1/content_matrix?${params.toString()}`, {
+      signal: controller.signal,
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        Accept: 'application/json',
+      },
+    })
+  } catch {
+    clearTimeout(timer)
+    return new Response('Dzen feed unavailable', { status: 503, headers: { 'Retry-After': '30' } })
+  }
+  clearTimeout(timer)
+
+  if (!upstream.ok) {
+    return new Response('Dzen feed DB error', { status: 503, headers: { 'Retry-After': '30' } })
+  }
+
+  let rows = await upstream.json() as DzenRow[]
+
+  // Keep the feed connectable while the content factory is temporarily idle:
+  // bootstrap it with the latest published article, but do not expose a backlog.
+  if (rows.length === 0) {
+    const fallbackParams = new URLSearchParams(params)
+    fallbackParams.delete('published_at')
+    fallbackParams.set('order', 'published_at.desc,slug.asc')
+    fallbackParams.set('limit', '1')
+    const fallbackController = new AbortController()
+    const fallbackTimer = setTimeout(() => fallbackController.abort(), DB_TIMEOUT_MS)
+    try {
+      const fallback = await fetch(`${base}/rest/v1/content_matrix?${fallbackParams.toString()}`, {
+        signal: fallbackController.signal,
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+          Accept: 'application/json',
+        },
+      })
+      if (fallback.ok) rows = await fallback.json() as DzenRow[]
+    } catch {
+      // The primary query succeeded, so an empty but valid feed is safer than
+      // turning a transient bootstrap lookup failure into a 503.
+    } finally {
+      clearTimeout(fallbackTimer)
+    }
+  }
+
+  const xml = buildDzenFeed(selectDailyDzenRows(rows), siteUrl)
+  const response = new Response(xml, {
+    headers: {
+      'Content-Type': 'application/rss+xml; charset=utf-8',
+      'Cache-Control': `public, max-age=${DZEN_FEED_CACHE_TTL}, s-maxage=${DZEN_FEED_CACHE_TTL}`,
+      'X-Content-Type-Options': 'nosniff',
+    },
+  })
+  cache.put(cacheKey, response.clone()).catch(() => {/* ignore */})
+  return response
+}
+
 const HUB_CACHE_TTL = 600 // seconds
 
 const HUB_CATEGORIES: HubCategory[] = Object.entries(CATEGORY_NAMES).map(([slug, name]) => ({ slug, name }))
@@ -1132,6 +1224,10 @@ const worker = {
     }
 
     // /stati/… — crawlable hub pages (also proxied by Caddy)
+    if (pathname === '/zen.xml') {
+      return handleDzenFeed(env)
+    }
+
     const hubMatch = pathname.match(/^\/stati(?:\/([a-z0-9-]+)(?:\/(\d+))?)?(\/?)$/)
     if (hubMatch) {
       const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')

@@ -169,6 +169,7 @@ describe('POST /__purge', () => {
         'https://1001sovet.ru/stati/ekonomiya/2?render=9',
         'https://1001sovet.ru/stati/ekonomiya/3?render=9',
         'https://1001sovet.ru/sitemap-dynamic.xml?generator=v3',
+        'https://1001sovet.ru/zen.xml?generator=v2',
       ]
       assert.deepEqual(sorted(cache.deleted), sorted(expected))
       assert.deepEqual(sorted(body.purged), sorted(expected))
@@ -198,6 +199,7 @@ describe('POST /__purge', () => {
         'https://1001sovet.ru/stati/kulinaria/1?render=9',
         'https://1001sovet.ru/stati/kulinaria/2?render=9',
         'https://1001sovet.ru/sitemap-dynamic.xml?generator=v3',
+        'https://1001sovet.ru/zen.xml?generator=v2',
       ]
       assert.deepEqual(sorted(cache.deleted), sorted(expected))
       assert.deepEqual(sorted(body.purged), sorted(expected))

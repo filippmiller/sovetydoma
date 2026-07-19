@@ -10,6 +10,7 @@ bucket_name = "sovetydoma-article-images"
 SUPABASE_URL = "https://api.1001sovet.ru"
 TEMPLATE_URL = "https://1001sovet.ru/ekonomiya/ekonomiya-vody/"
 SITE_URL = "https://1001sovet.ru"
+DZEN_FEED_START_DATE = "2026-07-19"
 
 # Secrets (set via `wrangler secret bulk` — NOT `secret put`, PowerShell BOM corrupts it):
 #   SUPABASE_SERVICE_ROLE_KEY

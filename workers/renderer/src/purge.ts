@@ -9,6 +9,7 @@ import { HUB_PAGE_SIZE } from './links'
 import {
   articleCacheUrl,
   categoryRowsCacheUrl,
+  dzenFeedCacheUrl,
   hubCacheUrl,
   siteBaseUrl,
   sitemapCacheUrl,
@@ -115,6 +116,7 @@ export async function handlePurge(
   }
 
   keys.push(sitemapCacheUrl(base))
+  keys.push(dzenFeedCacheUrl(base))
 
   const cache = caches.default
   await Promise.all(keys.map((key) => cache.delete(new Request(key)).catch(() => false)))
@@ -123,6 +125,6 @@ export async function handlePurge(
     purged: keys,
     purge_all_colos: false,
     hub_pages_source: hubPagesSource,
-    note: 'Cache API delete is per-datacenter: entries in other colos keep serving until their TTL expires (article 300s, hub/cat-rows 600s, sitemap 3600s).',
+    note: 'Cache API delete is per-datacenter: entries in other colos keep serving until their TTL expires (article 300s, hub/cat-rows 600s, Dzen feed 900s, sitemap 3600s).',
   }, 200)
 }

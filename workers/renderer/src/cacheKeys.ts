@@ -30,3 +30,8 @@ export function hubCacheUrl(base: string, category: string | null, page: number)
 export function sitemapCacheUrl(base: string): string {
   return `${base}/sitemap-dynamic.xml?generator=v3`
 }
+
+/** Dzen RSS feed: one stable article per Moscow day. */
+export function dzenFeedCacheUrl(base: string): string {
+  return `${base}/zen.xml?generator=v2`
+}
