@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import {
   buildFavoriteHtml,
+  buildHeaderAuthHtml,
   buildPushHtml,
   buildRatingHtml,
   buildReactionsHtml,
@@ -55,6 +56,14 @@ describe('auth-gated PE islands for dynamic pages', () => {
     assert.match(html, /<script type="text\/javascript">/)
   })
 
+  it('header auth island reflects the session and links to the cabinet', () => {
+    const html = buildHeaderAuthHtml()
+    assert.match(html, /<script type="text\/javascript">/)
+    assert.match(html, /Войти или зарегистрироваться/) // targets the header button
+    assert.match(html, /\/moy-kabinet\//)
+    assert.match(html, /-auth-token/) // reads the GoTrue session
+  })
+
   it('escapes category/slug into HTML attributes safely', () => {
     const html = buildPushHtml('a"onclick="alert(1)')
     assert.doesNotMatch(html, /data-category="a"onclick="/)
@@ -71,6 +80,7 @@ describe('auth-gated PE islands for dynamic pages', () => {
       ['rating', buildRatingHtml('idealnyy-borshch')],
       ['favorite', buildFavoriteHtml('idealnyy-borshch')],
       ['push', buildPushHtml('kulinaria')],
+      ['headerAuth', buildHeaderAuthHtml()],
     ]
     const re = /<script type="text\/javascript">([\s\S]*?)<\/script>/g
     for (const [name, html] of htmls) {

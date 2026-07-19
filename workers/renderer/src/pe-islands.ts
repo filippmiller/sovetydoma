@@ -38,12 +38,37 @@ function peAuthHelpersJs(): string {
     `function peGetSession(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);` +
     `if(!k||k.indexOf('-auth-token')<0)continue;var raw=localStorage.getItem(k);if(!raw)continue;` +
     `var data=JSON.parse(raw);var s=data&&(data.currentSession||data);` +
-    `if(s&&s.access_token&&s.user&&s.user.id)return{token:s.access_token,userId:s.user.id};}}catch(e){}return null;}` +
+    `if(s&&s.access_token&&s.user&&s.user.id)return{token:s.access_token,userId:s.user.id,email:(s.user.email||'')};}}catch(e){}return null;}` +
     `function peHeaders(token,extra){var h={'apikey':ANON,'Authorization':'Bearer '+(token||ANON),'Accept':'application/json'};` +
     `if(extra){for(var k in extra)if(Object.prototype.hasOwnProperty.call(extra,k))h[k]=extra[k];}return h;}` +
     `function pePromptLogin(msgEl,text){if(msgEl){msgEl.style.color='#a93226';msgEl.innerHTML='<a href="/" style="color:#c0392b;font-weight:700;text-decoration:underline">Войдите</a> '+text;}` +
     `try{window.dispatchEvent(new CustomEvent('sovetydoma:open-auth'));}catch(e){}}`
   )
+}
+
+/**
+ * Header auth-button island. On dynamic (renderer-served) pages the React
+ * AuthButton is dead (hydration stripped), so a logged-in user still sees
+ * "Войти". This typed inline script reflects the GoTrue session: logged-in →
+ * shows the user's name and links to /moy-kabinet/; logged-out → makes the
+ * otherwise-dead button navigate home (where the live modal exists).
+ */
+export function buildHeaderAuthHtml(): string {
+  return `<script type="text/javascript">(function(){`
+    + `function pgs(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);`
+    + `if(!k||k.indexOf('-auth-token')<0)continue;var raw=localStorage.getItem(k);if(!raw)continue;`
+    + `var d=JSON.parse(raw);var s=d&&(d.currentSession||d);`
+    + `if(s&&s.access_token&&s.user&&s.user.id)return{email:(s.user.email||'')};}}catch(e){}return null;}`
+    + `var btn=document.querySelector('button[aria-label="Войти или зарегистрироваться"]');`
+    + `if(!btn||btn.dataset.peHdr)return;btn.dataset.peHdr='1';var s=pgs();`
+    + `if(s){var name=(s.email||'').split('@')[0]||'Кабинет';`
+    + `while(btn.firstChild)btn.removeChild(btn.firstChild);`
+    + `var ic=document.createElement('span');ic.setAttribute('aria-hidden','true');ic.textContent='👤';btn.appendChild(ic);`
+    + `btn.appendChild(document.createTextNode(' '+name));`
+    + `btn.setAttribute('aria-label','Личный кабинет');`
+    + `btn.addEventListener('click',function(){window.location.href='/moy-kabinet/';});}`
+    + `else{btn.addEventListener('click',function(){window.location.href='/';});}`
+    + `})();</script>`
 }
 
 const REACTIONS: Array<{ emoji: string; label: string }> = [

@@ -225,7 +225,7 @@ const worker = {
     if (req.method === 'OPTIONS' && url.pathname.startsWith('/contact')) {
       return new Response('ok', { headers: contactCors(req, env) })
     }
-    if (req.method === 'OPTIONS' && (url.pathname === '/article-question' || url.pathname === '/article-questions' || url.pathname === '/article-comment')) {
+    if (req.method === 'OPTIONS' && (url.pathname === '/article-question' || url.pathname === '/article-questions' || url.pathname === '/article-comment' || url.pathname === '/article-count')) {
       return new Response('ok', { headers: articleQuestionCors(req, env) })
     }
     if (req.method === 'OPTIONS') return new Response('ok', { headers: h })
@@ -489,6 +489,35 @@ const worker = {
       const rows = await res.json().catch(() => null) as null | Array<{ id: string }>
       const id = rows?.[0]?.id
       return json({ success: true, id: id || null }, 200, aqHeaders)
+    }
+
+    if (url.pathname === '/article-count') {
+      const acHeaders = articleQuestionCors(req, env)
+      if (req.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, acHeaders)
+      if (!env.SUPABASE_SERVICE_ROLE_KEY) return json({ error: 'not_configured' }, 503, acHeaders)
+      // Count published dynamic articles (content_matrix). Anon can't read the
+      // table, so use the service role + a HEAD-style count via Content-Range.
+      const res = await fetch(
+        `${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/content_matrix?select=id&text_status=eq.published`,
+        {
+          method: 'GET',
+          headers: {
+            apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+            Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+            'Range-Unit': 'items',
+            Range: '0-0',
+            Prefer: 'count=exact',
+          },
+        },
+      )
+      const range = res.headers.get('content-range') || ''
+      const m = range.match(/\/(\d+)$/)
+      const published = m ? parseInt(m[1], 10) : 0
+      // Cache at the edge for 1h; the number moves slowly.
+      return new Response(JSON.stringify({ published }), {
+        status: 200,
+        headers: { ...acHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' },
+      })
     }
 
     if (url.pathname === '/article-questions') {

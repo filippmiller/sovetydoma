@@ -33,6 +33,7 @@ import {
 } from './ugc'
 import {
   buildFavoriteHtml,
+  buildHeaderAuthHtml,
   buildPushHtml,
   buildRatingHtml,
   buildReactionsHtml,
@@ -400,6 +401,7 @@ function buildTransformer(
     rating: string
     favorite: string
     push: string
+    headerAuth: string
   },
 ) {
   const categoryName = CATEGORY_NAMES[row.category] ?? row.category
@@ -417,6 +419,7 @@ function buildTransformer(
   const dateRelative = relativeDate(dateIso)
   // Push PE is injected once next to the /podpiski text CTA (SSR-null on template).
   let pushInjected = false
+  let headerAuthInjected = false
 
   // Build tag links HTML
   const tagLinksHtml = (Array.isArray(row.tags) ? row.tags : [])
@@ -818,6 +821,15 @@ function buildTransformer(
         pushInjected = true
       },
     })
+    .on('header.site-header', {
+      element(el) {
+        // Reflect the logged-in session in the header on dynamic pages (the
+        // React AuthButton is dead here). Appended once, inside the header.
+        if (headerAuthInjected) return
+        headerAuthInjected = true
+        el.append(ugcHtml.headerAuth, { html: true })
+      },
+    })
 }
 
 // ---------------------------------------------------------------------------
@@ -892,6 +904,7 @@ async function handleArticle(req: Request, env: Env, category: string, slug: str
     rating: buildRatingHtml(row.slug),
     favorite: buildFavoriteHtml(row.slug),
     push: buildPushHtml(row.category),
+    headerAuth: buildHeaderAuthHtml(),
   }
 
   // Fetch template HTML (cached 10 min)

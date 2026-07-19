@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import AdminShell from './AdminShell'
 import { useAdminAuth } from '@/lib/admin-auth'
+import { listArticles } from '@/lib/admin-api'
 
 interface Props {
   articles: (ArticleFrontmatter & { wordCount: number })[]
@@ -30,10 +32,22 @@ function StatCard({ icon, value, label, color }: { icon: string; value: string |
 export default function AdminDashboard({ articles, categories }: Props) {
   const authState = useAdminAuth()
 
+  // The static prop only counts the MDX corpus (~486). The manageable total is
+  // the runtime content_matrix count (~2500), fetched from the admin API.
+  const [runtimeTotal, setRuntimeTotal] = useState<number | null>(null)
+  useEffect(() => {
+    if (authState !== 'authed') return
+    let cancelled = false
+    listArticles({ per_page: 1 })
+      .then((r) => { if (!cancelled) setRuntimeTotal(r.total) })
+      .catch(() => { /* keep the static fallback */ })
+    return () => { cancelled = true }
+  }, [authState])
+
   if (authState !== 'authed') return null
 
   // Compute stats
-  const totalArticles = articles.length
+  const totalArticles = runtimeTotal ?? articles.length
   const totalCategories = Object.keys(categories).length
   const allTags = new Set(articles.flatMap(a => a.tags))
   const totalTags = allTags.size
