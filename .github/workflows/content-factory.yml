@@ -65,9 +65,13 @@ jobs:
           EXIT=0
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then DRY=--dry-run; else DRY=; fi
           SEL="${{ github.event.inputs.categories }}"
-          CATS=(kulinaria dom-i-uborka dacha-i-ogorod layfkhaki ekonomiya rybalka zdorovie-i-bezopasnost semya-i-deti krasota-i-uhod otdyh-i-puteshestviya pokupki-i-tehnika avto)
+          # Weighted rotation: kulinaria + dacha-i-ogorod appear 3x each (priority
+          # verticals per owner request 2026-07-20), the other 10 once. Interleaved
+          # so the same category never runs back-to-back. 16 slots total.
+          CATS=(kulinaria dacha-i-ogorod dom-i-uborka kulinaria dacha-i-ogorod layfkhaki ekonomiya kulinaria dacha-i-ogorod rybalka zdorovie-i-bezopasnost semya-i-deti krasota-i-uhod otdyh-i-puteshestviya pokupki-i-tehnika avto)
           if [ -z "$SEL" ] || [ "$SEL" = "auto" ]; then
-            # Rotate one category every 5h (epoch / 18000 mod 12) — covers all over ~60h.
+            # Rotate one category every 5h (epoch / 18000 mod N) — cycles the
+            # weighted list (~80h full cycle; priority verticals hit ~3x as often).
             IDX=$(( ($(date +%s) / 18000) % ${#CATS[@]} ))
             CAT=${CATS[$IDX]}
             echo "Rotating category -> $CAT"
