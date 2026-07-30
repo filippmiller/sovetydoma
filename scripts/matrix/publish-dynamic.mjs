@@ -188,6 +188,7 @@ let skipped = 0
 let indexFailures = 0
 const skipReasons = []
 const indexFailReasons = []
+const publishedUrls = []
 
 for (const r of picked) {
   const imagePath = path.join(IMAGES_DIR, r.image_filename)
@@ -311,6 +312,31 @@ for (const r of picked) {
 
   console.log(`  ✓ Published ${r.slug}`)
   published++
+  publishedUrls.push(`https://${DOMAIN}/${r.category}/${r.slug}/`)
+}
+
+// Actively ping Yandex/Bing via IndexNow instead of waiting for the next
+// passive crawl — indexation was found to be stalled (27/2700+ pages in
+// Yandex, shrinking) partly because new dynamic articles have no inbound
+// links from the static site and only surface via sitemap-dynamic.xml on
+// Yandex's own schedule. Non-fatal: an IndexNow hiccup must never turn a
+// successful DB+R2 publish into a failed run.
+if (publishedUrls.length > 0 && !dryRun) {
+  const indexNowKey = process.env.INDEXNOW_KEY || env.INDEXNOW_KEY
+  if (indexNowKey) {
+    console.log(`\nSubmitting ${publishedUrls.length} URL(s) to IndexNow...`)
+    try {
+      execFileSync('node', ['scripts/submit-indexnow.mjs', ...publishedUrls], {
+        cwd: ROOT,
+        stdio: 'inherit',
+        env: { ...process.env, INDEXNOW_KEY: indexNowKey },
+      })
+    } catch (err) {
+      console.error(`  IndexNow submission failed (non-fatal): ${err.message}`)
+    }
+  } else {
+    console.log('\nSkipping IndexNow submission: INDEXNOW_KEY not set.')
+  }
 }
 
 console.log(`\n${'='.repeat(60)}`)

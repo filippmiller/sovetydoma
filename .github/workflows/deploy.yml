@@ -68,6 +68,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate IndexNow key file
+        if: ${{ secrets.INDEXNOW_KEY != '' }}
+        run: node scripts/generate-indexnow-key.mjs
+        env:
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+
       - name: Typecheck
         run: pnpm exec tsc --noEmit
 
