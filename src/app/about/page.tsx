@@ -1,10 +1,12 @@
 ﻿import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getAllArticles, CATEGORIES } from '@/lib/articles'
+import { canonicalPath } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: 'О сайте',
   description: 'СоветыДома — сайт с практичными советами для дома, кухни, дачи и экономии для жителей России',
+  alternates: { canonical: canonicalPath('/about/') },
 }
 
 export default function AboutPage() {

@@ -1,10 +1,12 @@
 ﻿import { getAllTags } from '@/lib/articles'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { canonicalPath } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: 'Все теги — СоветыДома',
   description: 'Полный список тем и тегов на СоветыДома — выберите интересующую вас тему',
+  alternates: { canonical: canonicalPath('/tag/') },
 }
 
 export default function TagIndexPage() {

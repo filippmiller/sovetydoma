@@ -5,6 +5,7 @@ import PodpiskiClient from './PodpiskiClient'
 export const metadata: Metadata = {
   title: 'Подписки',
   description: 'Подписка на категории, каналы доставки и управление подтверждением.',
+  robots: { index: false },
 }
 
 export default function PodpiskiPage() {
