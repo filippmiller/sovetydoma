@@ -84,6 +84,10 @@ export type Env = {
   FB_API_VERSION?: string
   FB_API_BASE_URL?: string
   FB_AUTOPOST_MAX_DAILY?: string
+  // Kill switch: set to 'true' to stop the hourly cron from calling the FB API at all
+  // (e.g. while the Page is stuck behind Facebook's "confirm your identity" wall — repeated
+  // failed API calls don't help and we'd rather not hammer it while that's unresolved).
+  FB_AUTOPOST_DISABLED?: string
   FB_PAGES_BY_CATEGORY?: string
   // {"<pageId>":"<pageAccessToken>"} — responder picks the token for the page an event arrived on
   FB_PAGE_TOKENS_BY_ID?: string

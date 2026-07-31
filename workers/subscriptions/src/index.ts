@@ -1478,6 +1478,10 @@ export async function scheduled(_event: ScheduledEvent, env: Env): Promise<void>
   }
 
   // Run Facebook autopost independently as well
+  if (env.FB_AUTOPOST_DISABLED === 'true') {
+    console.log('fb_autopost_skipped', 'disabled_via_FB_AUTOPOST_DISABLED')
+    return
+  }
   try {
     const fbResult = await processFbAutopost(env)
     if (fbResult.ran) {
