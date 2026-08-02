@@ -106,8 +106,14 @@ export function getArticlesByCategory(category: string): (ArticleFrontmatter & {
  * articles instead, then re-sort the picks by actual date so the widget still
  * reads top-to-bottom as "most recent first" — just mixed across sections.
  */
-export function getJustNowArticles(limit = 8, poolSize = 60): (ArticleFrontmatter & { wordCount: number })[] {
-  const pool = getAllArticles().slice(0, poolSize)
+export function getJustNowArticles(
+  limit = 8,
+  poolSize = 60,
+  excludeSlugs?: Set<string>,
+): (ArticleFrontmatter & { wordCount: number })[] {
+  const pool = getAllArticles()
+    .filter((a) => !excludeSlugs?.has(a.slug))
+    .slice(0, poolSize)
   const queues = new Map<string, (ArticleFrontmatter & { wordCount: number })[]>()
   for (const article of pool) {
     const queue = queues.get(article.category)

@@ -5,6 +5,7 @@ import SeasonalBanner from '@/components/SeasonalBanner'
 import PopularArticles from '@/components/PopularArticles'
 import ReadingNow from '@/components/ReadingNow'
 import CategoryTiles from '@/components/CategoryTiles'
+import FunWidget from '@/components/FunWidget'
 import PersonalisedSection from '@/components/PersonalisedSection'
 import StartHereSection from '@/components/StartHereSection'
 import Link from 'next/link'
@@ -52,11 +53,20 @@ const JUST_NOW_LIMIT = 8
 const JUST_NOW_POOL = 60
 const READING_NOW_LIMIT = 5
 const ARTICLES_PER_CATEGORY_TILE = 3
+const LATEST_ARTICLES_POOL = 300
 
 export default function HomePage() {
   const allArticles = getAllArticles()
-  const articles = allArticles.slice(0, HOMEPAGE_ARTICLE_LIMIT)
   const justNowArticles = getJustNowArticles(JUST_NOW_LIMIT, JUST_NOW_POOL)
+  // "Последние статьи" gets the same round-robin-by-category treatment as
+  // "Только что" (otherwise it's still just a wall of whichever category
+  // publishes most), excluding what's already shown above it so the two
+  // sections don't repeat the same cards.
+  const articles = getJustNowArticles(
+    HOMEPAGE_ARTICLE_LIMIT,
+    LATEST_ARTICLES_POOL,
+    new Set(justNowArticles.map((a) => a.slug)),
+  )
   const categoryTiles = Object.keys(CATEGORIES).map((slug) => ({
     slug,
     articles: getArticlesByCategory(slug).slice(0, ARTICLES_PER_CATEGORY_TILE),
@@ -156,6 +166,15 @@ export default function HomePage() {
             in the "Разделы" dropdown menu, now surfaced directly on the page */}
         <CategoryTiles tiles={categoryTiles} />
 
+        {/* F7: Popular articles (localStorage view tracking) — moved up from
+            the very bottom of the page, where nobody used to scroll far
+            enough to see it */}
+        <PopularArticles articles={popularArticleData} />
+
+        {/* Small daily entertainment widget — a reason to linger besides
+            "another how-to" */}
+        <FunWidget />
+
         {/* Latest articles */}
         {articles.length > 0 && (
           <section style={{ marginBottom: '2.5rem' }}>
@@ -170,9 +189,6 @@ export default function HomePage() {
             <ArticleCatalogGrid articles={articles} />
           </section>
         )}
-
-        {/* F7: Popular articles (localStorage view tracking) */}
-        <PopularArticles articles={popularArticleData} />
 
         {/* Personalised "Для вас" section */}
         <PersonalisedSection articles={articlesForClient} />
