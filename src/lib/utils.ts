@@ -33,6 +33,17 @@ export function relativeDate(dateStr: string): string {
   return `${years} г. назад`
 }
 
+// Was this article actually published recently? Used to gate the "Новое"
+// badge — it used to be tied to array position (first card in any grid),
+// so a month-old article could get tagged "Новое" just for being first in
+// a round-robin'd list. Real recency, not position.
+export function isRecentArticle(dateStr: string, thresholdDays = 14): boolean {
+  const now = new Date()
+  const date = new Date(dateStr)
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+  return diffDays >= 0 && diffDays < thresholdDays
+}
+
 // Full date in Russian
 export function formatDate(dateStr: string): string {
   const d = new Date(dateStr)

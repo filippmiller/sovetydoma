@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import { CATEGORIES } from '@/lib/categories'
-import { readingTime, relativeDate, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
+import { readingTime, relativeDate, isRecentArticle, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
 import { resolveArticlePreviewImage } from '@/lib/cloudinary'
 import CardFavoriteButton from '@/components/CardFavoriteButton'
 import CardShareButton from '@/components/CardShareButton'
@@ -21,6 +21,7 @@ export default function ArticleCard({ article, wordCount, featured = false, view
   const color = CATEGORY_COLOR[article.category] || '#888'
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
   const time = wordCount ? readingTime('x '.repeat(wordCount)) : '~3 минуты'
+  const isNew = isRecentArticle(article.date)
   const imageSrc = resolveArticlePreviewImage(article.image, article.slug, { width: 240, height: 240 })
   const cardImageSrc = imageSrc?.startsWith('/images/') ? `${imageSrc}?v=20260531-previews` : imageSrc
   const href = `/${article.category}/${article.slug}`
@@ -53,7 +54,7 @@ export default function ArticleCard({ article, wordCount, featured = false, view
         }}>
           <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.55rem', flexWrap: 'wrap' }}>
-              {featured && (
+              {isNew && (
                 <span style={{
                   background: `${color}14`, color,
                   fontSize: '0.62rem', fontWeight: 800,
