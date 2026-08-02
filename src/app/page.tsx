@@ -1,8 +1,10 @@
-import { getAllArticles, getJustNowArticles } from '@/lib/articles'
+import { getAllArticles, getArticlesByCategory, getJustNowArticles } from '@/lib/articles'
+import { CATEGORIES } from '@/lib/categories'
 import ArticleCatalogGrid from '@/components/ArticleCatalogGrid'
 import SeasonalBanner from '@/components/SeasonalBanner'
 import PopularArticles from '@/components/PopularArticles'
 import ReadingNow from '@/components/ReadingNow'
+import CategoryTiles from '@/components/CategoryTiles'
 import PersonalisedSection from '@/components/PersonalisedSection'
 import StartHereSection from '@/components/StartHereSection'
 import Link from 'next/link'
@@ -49,11 +51,16 @@ const PERSONALISED_ARTICLE_LIMIT = 100
 const JUST_NOW_LIMIT = 8
 const JUST_NOW_POOL = 60
 const READING_NOW_LIMIT = 5
+const ARTICLES_PER_CATEGORY_TILE = 3
 
 export default function HomePage() {
   const allArticles = getAllArticles()
   const articles = allArticles.slice(0, HOMEPAGE_ARTICLE_LIMIT)
   const justNowArticles = getJustNowArticles(JUST_NOW_LIMIT, JUST_NOW_POOL)
+  const categoryTiles = Object.keys(CATEGORIES).map((slug) => ({
+    slug,
+    articles: getArticlesByCategory(slug).slice(0, ARTICLES_PER_CATEGORY_TILE),
+  }))
 
   const popularArticleData = allArticles
     .slice(0, POPULAR_ARTICLE_LIMIT)
@@ -144,6 +151,10 @@ export default function HomePage() {
             <ArticleCatalogGrid articles={justNowArticles} />
           </section>
         )}
+
+        {/* "По разделам" — the 12-category structure previously only visible
+            in the "Разделы" dropdown menu, now surfaced directly on the page */}
+        <CategoryTiles tiles={categoryTiles} />
 
         {/* Latest articles */}
         {articles.length > 0 && (
