@@ -162,9 +162,9 @@ export default function CategoryArticleBrowser({ articles }: Props) {
       <style jsx>{`
         .category-browser {
           display: grid;
-          gap: 0.75rem;
-          margin: 0 0 1.25rem;
-          padding: 0.85rem;
+          gap: 0.5rem;
+          margin: 0 0 1rem;
+          padding: 0.55rem 0.6rem;
           border: 1px solid #ebe2db;
           border-radius: 8px;
           background: #fff;
@@ -172,8 +172,8 @@ export default function CategoryArticleBrowser({ articles }: Props) {
         }
         .category-browser-search {
           display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(150px, 210px);
-          gap: 0.6rem;
+          grid-template-columns: minmax(0, 300px) minmax(130px, 170px);
+          gap: 0.5rem;
         }
         .category-browser-search label {
           position: relative;
@@ -190,20 +190,20 @@ export default function CategoryArticleBrowser({ articles }: Props) {
         .category-browser-search input,
         .category-browser-search select {
           width: 100%;
-          height: 38px;
+          height: 32px;
           border: 1px solid #ded4cc;
           border-radius: 7px;
           background: #fff;
           color: #222;
           font: inherit;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
           outline: none;
         }
         .category-browser-search input {
-          padding: 0 0.8rem 0 2.3rem;
+          padding: 0 0.7rem 0 2.1rem;
         }
         .category-browser-search select {
-          padding: 0 0.65rem;
+          padding: 0 0.55rem;
         }
         .category-browser-search input:focus,
         .category-browser-search select:focus,
@@ -212,31 +212,32 @@ export default function CategoryArticleBrowser({ articles }: Props) {
           box-shadow: 0 0 0 3px #c0392b14;
         }
         .category-browser-filters {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 0.6rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
         }
         .category-browser-filters select {
-          width: 100%;
-          height: 38px;
+          width: auto;
+          min-width: 130px;
+          height: 32px;
           border: 1px solid #ded4cc;
           border-radius: 7px;
           background: #fff;
           color: #222;
           font: inherit;
-          font-size: 0.9rem;
-          padding: 0 0.65rem;
+          font-size: 0.83rem;
+          padding: 0 0.55rem;
           outline: none;
         }
         @media (max-width: 680px) {
-          .category-browser-filters {
-            grid-template-columns: 1fr;
+          .category-browser-filters select {
+            flex: 1 1 auto;
           }
         }
         .category-browser-tags {
           display: flex;
           flex-wrap: wrap;
-          gap: 0.45rem;
+          gap: 0.35rem;
         }
         .category-browser-tags button {
           border: 1px solid #e3d9d1;
@@ -244,9 +245,9 @@ export default function CategoryArticleBrowser({ articles }: Props) {
           background: #faf8f6;
           color: #555;
           font: inherit;
-          font-size: 0.8rem;
+          font-size: 0.76rem;
           font-weight: 700;
-          padding: 0.32rem 0.7rem;
+          padding: 0.24rem 0.6rem;
           cursor: pointer;
         }
         .category-browser-tags button.active,

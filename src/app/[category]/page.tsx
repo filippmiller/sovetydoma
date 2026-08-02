@@ -8,10 +8,6 @@ import CategoryPushSubscribe from '@/components/CategoryPushSubscribe'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath } from '@/lib/seo'
-const CATEGORY_EMOJI: Record<string, string> = {
-  kulinaria: '🍲', 'dom-i-uborka': '🧹', 'dacha-i-ogorod': '🌱', layfkhaki: '💡', ekonomiya: '💰', rybalka: '🎣',
-  'zdorovie-i-bezopasnost': '🛡️', 'semya-i-deti': '👨‍👩‍👧‍👦', 'krasota-i-uhod': '🌸', 'otdyh-i-puteshestviya': '🧳', 'pokupki-i-tehnika': '📦',
-}
 
 interface Props { params: Promise<{ category: string }> }
 
@@ -38,7 +34,6 @@ export default async function CategoryPage({ params }: Props) {
   if (!cat) notFound()
 
   const articles = getArticlesByCategory(category)
-  const emoji = CATEGORY_EMOJI[category] || '📄'
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
@@ -55,22 +50,27 @@ export default async function CategoryPage({ params }: Props) {
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
         <Breadcrumb items={[{ name: cat.name }]} />
 
-        <header style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '2.5rem' }}>{emoji}</span>
+        <header style={{ marginBottom: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`/images/categories/${category}.jpg`}
+            alt=""
+            width={52}
+            height={52}
+            style={{ width: '52px', height: '52px', flexShrink: 0, borderRadius: '12px', objectFit: 'cover' }}
+          />
           <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#1a1a1a', marginBottom: '0.3rem' }}>{cat.name}</h1>
-            <p style={{ color: '#777', fontSize: '0.95rem', margin: 0 }}>
+            <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.15rem' }}>{cat.name}</h1>
+            <p style={{ color: '#888', fontSize: '0.82rem', margin: 0 }}>
               {cat.description} · {articles.length} {articles.length === 1 ? 'статья' : articles.length < 5 ? 'статьи' : 'статей'}
             </p>
-            <div style={{ marginTop: '0.75rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
               <CategorySubscriptionCta
                 categorySlug={category}
                 categoryName={cat.name}
                 placement="category-header"
               />
-              <div style={{ marginTop: '0.5rem' }}>
-                <CategoryPushSubscribe category={category} />
-              </div>
+              <CategoryPushSubscribe category={category} />
             </div>
           </div>
         </header>

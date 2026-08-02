@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { CATEGORIES } from '@/lib/categories'
-import { CATEGORY_COLOR, CATEGORY_EMOJI } from '@/lib/utils'
+import { CATEGORY_COLOR } from '@/lib/utils'
 import type { ArticleFrontmatter } from '@/lib/articles'
 
 export interface CategoryTile {
@@ -33,7 +33,6 @@ export default function CategoryTiles({ tiles }: Props) {
         {visible.map(({ slug, articles }) => {
           const cat = CATEGORIES[slug]
           const color = CATEGORY_COLOR[slug] || '#888'
-          const emoji = CATEGORY_EMOJI[slug] || '📄'
           return (
             <div
               key={slug}
@@ -49,14 +48,18 @@ export default function CategoryTiles({ tiles }: Props) {
             >
               <Link href={`/${slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-                  <span style={{
-                    fontSize: '1.1rem', width: '32px', height: '32px', flexShrink: 0,
-                    borderRadius: '8px',
-                    background: `linear-gradient(135deg, ${color}cc, ${color}66)`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {emoji}
-                  </span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/images/categories/${slug}.jpg`}
+                    alt=""
+                    width={36}
+                    height={36}
+                    style={{
+                      width: '36px', height: '36px', flexShrink: 0,
+                      borderRadius: '9px', objectFit: 'cover',
+                      boxShadow: `inset 0 0 0 1px ${color}33`,
+                    }}
+                  />
                   <span style={{ fontSize: '0.98rem', fontWeight: 800, color: '#1a1a1a' }}>
                     {cat.name}
                   </span>

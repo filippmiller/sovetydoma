@@ -56,6 +56,7 @@ import {
   categoryRowsCacheUrl,
   dzenFeedCacheUrl,
   hubCacheUrl,
+  latestArticlesCacheUrl,
   siteBaseUrl,
   sitemapCacheUrl,
 } from './cacheKeys'
@@ -256,6 +257,98 @@ async function fetchCategoryRows(env: Env, category: string): Promise<RelatedCan
   })
   cache.put(cacheKey, cacheResp).catch(() => {/* ignore */})
   return rows
+}
+
+/**
+ * Latest-published-articles JSON API (GET /api/latest.json?limit=N). The
+ * static homepage build (src/app/page.tsx) only sees the MDX corpus in
+ * src/content/articles, which can go stale for weeks while the content
+ * factory keeps publishing straight into content_matrix (see
+ * docs/NO-REDEPLOY-PUBLISHING.md) — anon/authenticated grants on that table
+ * were revoked for security, so there is no public read path into it. This
+ * gives the homepage's "Только что" widget a narrow, read-only, cached view
+ * of just the most recent published rows across every category.
+ */
+const LATEST_ARTICLES_CACHE_TTL = 300 // seconds
+
+async function fetchLatestPublished(env: Env, limit: number): Promise<RelatedCandidate[]> {
+  const cacheKey = new Request(latestArticlesCacheUrl(siteBaseUrl(env), limit))
+  const cache = caches.default
+  const cached = await cache.match(cacheKey)
+  if (cached) return cached.json() as Promise<RelatedCandidate[]>
+
+  const base = env.SUPABASE_URL.replace(/\/+$/, '')
+  const params = new URLSearchParams({
+    text_status: 'eq.published',
+    disposition: 'eq.active',
+    domain: 'eq.1001sovet.ru',
+    select: 'slug,category,title,description,tags,image_filename,published_at,text_status,published_via:frontmatter->>published_via',
+    order: 'published_at.desc',
+    limit: String(limit),
+  })
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
+  let resp: Response
+  try {
+    resp = await fetch(`${base}/rest/v1/content_matrix?${params.toString()}`, {
+      signal: controller.signal,
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        Accept: 'application/json',
+      },
+    })
+  } catch (err) {
+    clearTimeout(timer)
+    throw new Error(`db_fetch_failed: ${String(err)}`)
+  }
+  clearTimeout(timer)
+
+  if (!resp.ok) throw new Error(`db_fetch_${resp.status}`)
+  const rows = await resp.json() as RelatedCandidate[]
+
+  const cacheResp = new Response(JSON.stringify(rows), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': `public, max-age=${LATEST_ARTICLES_CACHE_TTL}`,
+    },
+  })
+  cache.put(cacheKey, cacheResp).catch(() => {/* ignore */})
+  return rows
+}
+
+async function handleLatest(env: Env, limit: number): Promise<Response> {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': env.SITE_URL || 'https://1001sovet.ru',
+    'Vary': 'Origin',
+  }
+  let rows: RelatedCandidate[]
+  try {
+    rows = await fetchLatestPublished(env, limit)
+  } catch {
+    return new Response(JSON.stringify({ error: 'unavailable' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json', 'Retry-After': '30', ...corsHeaders },
+    })
+  }
+
+  const payload = rows.map((r) => ({
+    slug: r.slug,
+    category: r.category,
+    title: r.title,
+    description: r.description,
+    image: r.image_filename,
+    publishedAt: r.published_at,
+  }))
+
+  return new Response(JSON.stringify(payload), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': `public, max-age=${LATEST_ARTICLES_CACHE_TTL}`,
+      ...corsHeaders,
+    },
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -1352,6 +1445,14 @@ const worker = {
     // /stati/… — crawlable hub pages (also proxied by Caddy)
     if (pathname === '/zen.xml') {
       return handleDzenFeed(env)
+    }
+
+    // GET /api/latest.json?limit=N — homepage "Только что" widget (see
+    // fetchLatestPublished above). Read-only, cached, CORS-open to the site.
+    if (pathname === '/api/latest.json') {
+      const requested = parseInt(url.searchParams.get('limit') || '20', 10)
+      const limit = Number.isFinite(requested) ? Math.min(30, Math.max(1, requested)) : 20
+      return handleLatest(env, limit)
     }
 
     const hubMatch = pathname.match(/^\/stati(?:\/([a-z0-9-]+)(?:\/(\d+))?)?(\/?)$/)

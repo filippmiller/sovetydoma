@@ -5,6 +5,7 @@ import SeasonalBanner from '@/components/SeasonalBanner'
 import PopularArticles from '@/components/PopularArticles'
 import ReadingNow from '@/components/ReadingNow'
 import CategoryTiles from '@/components/CategoryTiles'
+import LatestPublished from '@/components/LatestPublished'
 import FunWidget from '@/components/FunWidget'
 import PersonalisedSection from '@/components/PersonalisedSection'
 import StartHereSection from '@/components/StartHereSection'
@@ -143,6 +144,13 @@ export default function HomePage() {
         {/* FIX 6: "С чего начать" for first-time visitors */}
         <StartHereSection />
 
+        {/* "Новое" — genuinely just-published articles, pulled live from the
+            content factory's Supabase table via a small renderer-worker API
+            (the static build below can't see today's dynamic publishes at
+            all — see LatestPublished.tsx for why). This is real "new", not
+            positional. */}
+        <LatestPublished />
+
         {/* "Читают сейчас" — trending among recently published articles (Supabase view counts) */}
         <ReadingNow articles={readingNowArticleData} limit={READING_NOW_LIMIT} />
 
@@ -152,7 +160,7 @@ export default function HomePage() {
           <section style={{ marginBottom: '2.5rem' }}>
             <div style={{ marginBottom: '1.25rem' }}>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.2rem' }}>
-                🆕 Только что
+                🔀 Только что
               </h2>
               <p style={{ fontSize: '0.83rem', color: '#999', margin: 0 }}>
                 Свежее из разных разделов — не только из одной рубрики
