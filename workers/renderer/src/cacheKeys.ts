@@ -42,3 +42,11 @@ export function dzenFeedCacheUrl(base: string): string {
 export function latestArticlesCacheUrl(base: string, limit: number): string {
   return `${base}/api/latest.json?limit=${limit}&generator=v1`
 }
+
+/** Per-category latest-published JSON API — lets the static category page's
+ * client-side sort/search/filter (CategoryArticleBrowser) see dynamically
+ * published articles for that one category, same gap as latestArticlesCacheUrl
+ * above but scoped to a single rubric. */
+export function categoryLatestCacheUrl(base: string, category: string, limit: number): string {
+  return `${base}/api/category-latest.json?category=${category}&limit=${limit}&generator=v1`
+}
