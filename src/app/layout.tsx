@@ -15,6 +15,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import AdminChromeGate from '@/components/AdminChromeGate'
 import YandexMetrika from '@/components/YandexMetrika'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 import BackToTop from '@/components/BackToTop'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import AnalyticsTracker from '@/components/AnalyticsTracker'
@@ -91,6 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', margin: 0 }}>
         <a href="#main-content" className="skip-link">Перейти к содержимому</a>
         <YandexMetrika />
+        <GoogleAnalytics />
         <AdminChromeGate><Header /></AdminChromeGate>
         <main id="main-content" style={{ flex: 1 }}>{children}</main>
         <AdminChromeGate><Footer /></AdminChromeGate>

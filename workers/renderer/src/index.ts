@@ -108,6 +108,11 @@ const ARTICLE_RESPONSE_CACHE_TTL = 300 // seconds
 const YM_ID = '109804586'
 const METRIKA_HTML = `<script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(${YM_ID},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/${YM_ID}" style="position:absolute;left:-9999px" alt=""/></div></noscript>`
 
+// Same GA4 property as the static Next.js site's src/components/GoogleAnalytics.tsx.
+// Re-injected explicitly for the same reason as METRIKA_HTML above.
+const GA_ID = 'G-C9SG2YD2V7'
+const GA_HTML = `<script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());gtag("config","${GA_ID}");</script>`
+
 // ---------------------------------------------------------------------------
 // Supabase REST fetch
 // ---------------------------------------------------------------------------
@@ -453,6 +458,7 @@ function buildTransformer(
     + extraScripts
     + `<style>${BAKED_CSS}</style>`
     + METRIKA_HTML
+    + GA_HTML
 
   // TOC entries from our h2 headings (ids must match md.ts renderBlock)
   const tocLinks = (row.body_md ?? '')
