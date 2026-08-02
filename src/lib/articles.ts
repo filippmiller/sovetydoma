@@ -98,6 +98,39 @@ export function getArticlesByCategory(category: string): (ArticleFrontmatter & {
   return getAllArticles().filter((a) => a.category === category)
 }
 
+/**
+ * "Только что" homepage widget: the plain newest-first list is dominated by
+ * whichever category happens to publish most often (e.g. a batch of Avto
+ * articles), so a reader interested in other sections never sees them on the
+ * homepage. Round-robin across categories within the most recent `poolSize`
+ * articles instead, then re-sort the picks by actual date so the widget still
+ * reads top-to-bottom as "most recent first" — just mixed across sections.
+ */
+export function getJustNowArticles(limit = 8, poolSize = 60): (ArticleFrontmatter & { wordCount: number })[] {
+  const pool = getAllArticles().slice(0, poolSize)
+  const queues = new Map<string, (ArticleFrontmatter & { wordCount: number })[]>()
+  for (const article of pool) {
+    const queue = queues.get(article.category)
+    if (queue) queue.push(article)
+    else queues.set(article.category, [article])
+  }
+  const queueList = Array.from(queues.values())
+  const picked: (ArticleFrontmatter & { wordCount: number })[] = []
+  for (let round = 0; picked.length < limit && round < poolSize; round++) {
+    let addedInRound = false
+    for (const queue of queueList) {
+      if (picked.length >= limit) break
+      const article = queue[round]
+      if (article) {
+        picked.push(article)
+        addedInRound = true
+      }
+    }
+    if (!addedInRound) break
+  }
+  return picked.sort((a, b) => (a.date < b.date ? 1 : -1))
+}
+
 export function getArticle(category: string, slug: string): Article | null {
   return loadCache().byKey.get(articleKey(category, slug)) ?? null
 }
