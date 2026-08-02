@@ -111,7 +111,7 @@ export default function SearchClient({ articles }: Props) {
         Поиск
       </h1>
       <p style={{ color: '#888', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-        {articles.length} статей на сайте
+        {allArticles.length} статей на сайте
       </p>
 
       {/* Search input */}
@@ -271,7 +271,7 @@ export default function SearchClient({ articles }: Props) {
               {Object.values(CATEGORIES).map((cat) => {
                 const color = CATEGORY_COLOR[cat.slug] || '#888'
                 const emoji = CATEGORY_EMOJI[cat.slug] || '📄'
-                const count = articles.filter((a) => a.category === cat.slug).length
+                const count = allArticles.filter((a) => a.category === cat.slug).length
                 return (
                   <Link key={cat.slug} href={`/${cat.slug}`} style={{
                     padding: '0.5rem 1rem', borderRadius: '8px', border: `1.5px solid ${color}44`,
@@ -285,7 +285,7 @@ export default function SearchClient({ articles }: Props) {
             </div>
           </div>
           <div style={{ fontSize: '0.85rem', color: '#aaa', textAlign: 'center', padding: '1rem' }}>
-            Начните вводить запрос для поиска по {articles.length} статьям
+            Начните вводить запрос для поиска по {allArticles.length} статьям
           </div>
         </div>
       )}

@@ -5,6 +5,7 @@ import HamburgerMenu from '@/components/HamburgerMenu'
 import AuthButton from '@/components/auth/AuthButton'
 import HeaderMegaMenu from '@/components/HeaderMegaMenu'
 import HeaderQuickLinks from '@/components/HeaderQuickLinks'
+import HeaderSearchAutocomplete from '@/components/HeaderSearchAutocomplete'
 
 /**
  * Server component. The two route-aware pieces (mega-menu active state +
@@ -25,15 +26,10 @@ export default function Header() {
 
           <HeaderMegaMenu />
 
-          <form className="header-search" action="/search/" method="get" role="search">
+          <form className="header-search" action="/search/" method="get" role="search" autoComplete="off">
             <label>
               <span aria-hidden="true">🔍</span>
-              <input
-                type="search"
-                name="q"
-                placeholder="Найти совет..."
-                aria-label="Поиск по статьям"
-              />
+              <HeaderSearchAutocomplete />
             </label>
             <select name="category" aria-label="Раздел поиска" defaultValue="">
               <option value="">Все разделы</option>
