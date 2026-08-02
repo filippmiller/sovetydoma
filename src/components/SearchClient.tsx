@@ -21,6 +21,24 @@ interface Props {
   articles: ArticleData[]
 }
 
+// The static build only ever sees src/content/articles (MDX committed to the
+// repo). Every article published via the no-redeploy dynamic path
+// (content_matrix, see docs/NO-REDEPLOY-PUBLISHING.md) is otherwise invisible
+// to on-site search, even for an exact-title query. Mirrors LatestPublished.tsx:
+// a narrow, cached, read-only JSON view fetched from the renderer worker and
+// merged client-side (workers/renderer/src/index.ts handleSearchIndex).
+const SEARCH_INDEX_API_URL = 'https://sovetydoma-renderer.filippmiller.workers.dev/api/search-index.json'
+
+interface SearchIndexRow {
+  slug: string
+  category: string
+  title: string
+  description: string
+  tags: string[]
+  date: string
+  wordCount?: number
+}
+
 function getUrlQuery(): string {
   if (typeof window === 'undefined') return ''
   return new URLSearchParams(window.location.search).get('q') || ''
@@ -35,6 +53,7 @@ export default function SearchClient({ articles }: Props) {
   const [query, setQuery] = useState(getUrlQuery)
   const [debouncedQuery, setDebouncedQuery] = useState(getUrlQuery)
   const [category] = useState(getUrlCategory)
+  const [dynamicArticles, setDynamicArticles] = useState<ArticleData[]>([])
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const articleJson = JSON.stringify(articles).replace(/</g, '\\u003c')
 
@@ -46,9 +65,36 @@ export default function SearchClient({ articles }: Props) {
     return () => { if (timerRef.current) clearTimeout(timerRef.current) }
   }, [query])
 
+  useEffect(() => {
+    let active = true
+    fetch(SEARCH_INDEX_API_URL)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((rows: SearchIndexRow[]) => {
+        if (!active || !Array.isArray(rows)) return
+        const staticSlugs = new Set(articles.map((a) => a.slug))
+        const merged = rows
+          .filter((r) => !staticSlugs.has(r.slug))
+          .map((r) => ({
+            title: r.title,
+            description: r.description,
+            tags: r.tags,
+            category: r.category,
+            categoryName: CATEGORIES[r.category]?.name ?? r.category,
+            slug: r.slug,
+            date: r.date,
+            wordCount: r.wordCount,
+          }))
+        setDynamicArticles(merged)
+      })
+      .catch(() => { if (active) setDynamicArticles([]) })
+    return () => { active = false }
+  }, [articles])
+
+  const allArticles = useMemo(() => [...articles, ...dynamicArticles], [articles, dynamicArticles])
+
   const filteredArticles = useMemo(() => {
-    return category ? articles.filter((article) => article.category === category) : articles
-  }, [articles, category])
+    return category ? allArticles.filter((article) => article.category === category) : allArticles
+  }, [allArticles, category])
 
   const results = useMemo(() => {
     if (!debouncedQuery.trim()) {

@@ -4,7 +4,7 @@ interface CostBadgeProps {
 
 export default function CostBadge({ cost }: CostBadgeProps) {
   return (
-    <span style={{
+    <span data-cost-badge="true" style={{
       display: 'inline-flex',
       alignItems: 'center',
       gap: '3px',

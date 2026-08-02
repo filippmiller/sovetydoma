@@ -96,6 +96,24 @@ function articleHaystack(article: SearchableArticle): {
   return { title, description, tags, category, all }
 }
 
+// Word-level containment: is `token` a whole word (or a prefix of a whole
+// word) inside `text`? Plain `text.includes(token)` matches short tokens as
+// substrings of unrelated words — e.g. "вода" inside "провода" — which
+// pollutes results with irrelevant articles. Splitting on whitespace and
+// checking each word avoids that without needing Cyrillic-aware \b regex
+// (JS word boundaries don't work reliably on Cyrillic).
+function hasWordMatch(text: string, token: string): boolean {
+  if (!token) return false
+  return text.split(' ').some((word) => word === token || word.startsWith(token))
+}
+
+// Same idea for a full (possibly multi-word) phrase: pad both sides with a
+// space so the phrase must sit on word boundaries in `text`, not mid-word.
+function hasPhraseMatch(text: string, phrase: string): boolean {
+  if (!phrase) return false
+  return ` ${text} `.includes(` ${phrase} `)
+}
+
 function stemmedHaystack(value: string): string[] {
   return Array.from(new Set(
     value
@@ -114,18 +132,18 @@ export function scoreArticle(article: SearchableArticle, query: string): number 
   let score = 0
 
   for (const token of queryTokens) {
-    if (haystack.title.includes(token)) score += 24
-    if (haystack.tags.includes(token)) score += 20
-    if (haystack.description.includes(token)) score += 12
-    if (haystack.category.includes(token)) score += 5
+    if (hasWordMatch(haystack.title, token)) score += 24
+    if (hasWordMatch(haystack.tags, token)) score += 20
+    if (hasWordMatch(haystack.description, token)) score += 12
+    if (hasWordMatch(haystack.category, token)) score += 5
 
     if (stems.includes(token)) score += 12
-    else if (stems.some((stem) => stem.includes(token) || token.includes(stem))) score += 7
+    else if (stems.some((stem) => stem === token || stem.startsWith(token) || token.startsWith(stem))) score += 7
   }
 
-  const matched = queryTokens.filter((token) => haystack.all.includes(token) || stems.some((stem) => stem.includes(token) || token.includes(stem)))
+  const matched = queryTokens.filter((token) => hasWordMatch(haystack.all, token) || stems.some((stem) => stem === token || stem.startsWith(token) || token.startsWith(stem)))
   if (matched.length === queryTokens.length) score += 15
-  if (haystack.title.includes(normalizeText(query))) score += 30
+  if (hasPhraseMatch(haystack.title, normalizeText(query))) score += 30
 
   return score
 }

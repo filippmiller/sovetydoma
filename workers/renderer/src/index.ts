@@ -318,6 +318,114 @@ async function fetchLatestPublished(env: Env, limit: number): Promise<RelatedCan
   return rows
 }
 
+// ---------------------------------------------------------------------------
+// Dynamic-articles search index (GET /api/search-index.json)
+//
+// src/app/search/page.tsx only ever sees src/content/articles (static MDX,
+// build-time), so every article published via the no-redeploy dynamic path
+// (content_matrix, see docs/NO-REDEPLOY-PUBLISHING.md) is invisible to
+// on-site search no matter how exact the query is. This mirrors handleLatest
+// above: a narrow, cached, read-only JSON view the client merges with the
+// static list (src/components/SearchClient.tsx).
+// ---------------------------------------------------------------------------
+
+const SEARCH_INDEX_CACHE_TTL = 600 // seconds
+
+interface SearchIndexRow {
+  slug: string
+  category: string
+  title: string
+  description: string | null
+  tags: string[] | null
+  published_at: string
+  word_count: number | null
+}
+
+async function fetchSearchIndexRows(env: Env): Promise<SearchIndexRow[]> {
+  const base = env.SUPABASE_URL.replace(/\/+$/, '')
+  const pageSize = 1000
+  const hardCap = 20_000
+  const rows: SearchIndexRow[] = []
+
+  while (rows.length < hardCap) {
+    const params = new URLSearchParams({
+      text_status: 'eq.published',
+      disposition: 'eq.active',
+      domain: 'eq.1001sovet.ru',
+      select: 'slug,category,title,description,tags,published_at,word_count',
+      order: 'published_at.desc',
+      limit: String(pageSize),
+      offset: String(rows.length),
+    })
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
+    let resp: Response
+    try {
+      resp = await fetch(`${base}/rest/v1/content_matrix?${params.toString()}`, {
+        signal: controller.signal,
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+          Accept: 'application/json',
+        },
+      })
+    } finally {
+      clearTimeout(timer)
+    }
+    if (!resp.ok) throw new Error(`db_fetch_${resp.status}`)
+    const page = await resp.json() as SearchIndexRow[]
+    rows.push(...page)
+    if (page.length < pageSize) break
+  }
+  return rows
+}
+
+async function handleSearchIndex(env: Env): Promise<Response> {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': env.SITE_URL || 'https://1001sovet.ru',
+    'Vary': 'Origin',
+  }
+  const siteUrl = siteBaseUrl(env)
+  const cacheKey = new Request(`${siteUrl}/__cache/search-index-v1`)
+  const cache = caches.default
+  const cached = await cache.match(cacheKey)
+  if (cached) {
+    const headers = new Headers(cached.headers)
+    for (const [k, v] of Object.entries(corsHeaders)) headers.set(k, v)
+    return new Response(cached.body, { status: cached.status, headers })
+  }
+
+  let rows: SearchIndexRow[]
+  try {
+    rows = await fetchSearchIndexRows(env)
+  } catch {
+    return new Response(JSON.stringify({ error: 'unavailable' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json', 'Retry-After': '30', ...corsHeaders },
+    })
+  }
+
+  const payload = rows.map((r) => ({
+    slug: r.slug,
+    category: r.category,
+    title: r.title,
+    description: r.description ?? '',
+    tags: Array.isArray(r.tags) ? r.tags : [],
+    date: (r.published_at || '').slice(0, 10),
+    wordCount: r.word_count ?? undefined,
+  }))
+
+  const response = new Response(JSON.stringify(payload), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': `public, max-age=${SEARCH_INDEX_CACHE_TTL}`,
+      ...corsHeaders,
+    },
+  })
+  cache.put(cacheKey, response.clone()).catch(() => {/* ignore */})
+  return response
+}
+
 async function handleLatest(env: Env, limit: number): Promise<Response> {
   const corsHeaders = {
     'Access-Control-Allow-Origin': env.SITE_URL || 'https://1001sovet.ru',
@@ -806,6 +914,14 @@ function buildTransformer(
     .on('.article-meta-badges', {
       element(el) {
         el.setInnerContent(metaBadgesHtml, { html: true })
+      },
+    })
+    // ── Cost badge — content_matrix has no cost field, so this is always the
+    // TEMPLATE article's own "от 300 ₽" leaking onto every dynamic article
+    // regardless of topic. Strip it unconditionally. ─────────────────────
+    .on('[data-cost-badge]', {
+      element(el) {
+        el.remove()
       },
     })
     // ── TOC (both nav.toc instances: sidebar + inline) ────────────────────
@@ -1453,6 +1569,12 @@ const worker = {
       const requested = parseInt(url.searchParams.get('limit') || '20', 10)
       const limit = Number.isFinite(requested) ? Math.min(30, Math.max(1, requested)) : 20
       return handleLatest(env, limit)
+    }
+
+    // GET /api/search-index.json — dynamic-articles view for on-site search
+    // (see handleSearchIndex above / src/components/SearchClient.tsx).
+    if (pathname === '/api/search-index.json') {
+      return handleSearchIndex(env)
     }
 
     const hubMatch = pathname.match(/^\/stati(?:\/([a-z0-9-]+)(?:\/(\d+))?)?(\/?)$/)
