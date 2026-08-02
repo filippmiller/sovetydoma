@@ -101,9 +101,9 @@
         "error": null
       },
       "google_submission": {
-        "submitted_at": null,
-        "account": null,
-        "status": "pending — needs GSC URL Inspection via browser",
+        "submitted_at": "2026-08-02T08:2*Z (owner GSC session)",
+        "account": "GSC URL Inspection - Request Indexing (owner-authenticated)",
+        "status": "requested",
         "error": null
       },
       "social": {
@@ -164,9 +164,9 @@
         "error": null
       },
       "google_submission": {
-        "submitted_at": null,
-        "account": null,
-        "status": "pending — needs GSC URL Inspection via browser",
+        "submitted_at": "2026-08-02T08:2*Z (owner GSC session)",
+        "account": "GSC URL Inspection - Request Indexing (owner-authenticated)",
+        "status": "requested",
         "error": null
       },
       "social": {
@@ -229,8 +229,8 @@
       "google_submission": {
         "submitted_at": null,
         "account": null,
-        "status": "pending — needs GSC URL Inspection via browser",
-        "error": null
+        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
+        "error": "Quota Exceeded"
       },
       "social": {
         "dzen": null,
@@ -288,8 +288,8 @@
       "google_submission": {
         "submitted_at": null,
         "account": null,
-        "status": "pending — needs GSC URL Inspection via browser",
-        "error": null
+        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
+        "error": "Quota Exceeded"
       },
       "social": {
         "dzen": null,
@@ -350,8 +350,8 @@
       "google_submission": {
         "submitted_at": null,
         "account": null,
-        "status": "pending — needs GSC URL Inspection via browser",
-        "error": null
+        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
+        "error": "Quota Exceeded"
       },
       "social": {
         "dzen": null,
@@ -412,8 +412,8 @@
       "google_submission": {
         "submitted_at": null,
         "account": null,
-        "status": "pending — needs GSC URL Inspection via browser",
-        "error": null
+        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
+        "error": "Quota Exceeded"
       },
       "social": {
         "dzen": null,
@@ -472,8 +472,8 @@
       "google_submission": {
         "submitted_at": null,
         "account": null,
-        "status": "pending — needs GSC URL Inspection via browser",
-        "error": null
+        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
+        "error": "Quota Exceeded"
       },
       "social": {
         "dzen": null,
@@ -533,8 +533,8 @@
       "google_submission": {
         "submitted_at": null,
         "account": null,
-        "status": "pending — needs GSC URL Inspection via browser",
-        "error": null
+        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
+        "error": "Quota Exceeded"
       },
       "social": {
         "dzen": null,
@@ -593,8 +593,8 @@
       "google_submission": {
         "submitted_at": null,
         "account": null,
-        "status": "pending — needs GSC URL Inspection via browser",
-        "error": null
+        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
+        "error": "Quota Exceeded"
       },
       "social": {
         "dzen": null,
@@ -653,9 +653,9 @@
         "error": null
       },
       "google_submission": {
-        "submitted_at": null,
-        "account": null,
-        "status": "pending — needs GSC URL Inspection via browser",
+        "submitted_at": "2026-08-02T08:2*Z (owner GSC session)",
+        "account": "GSC URL Inspection - Request Indexing (owner-authenticated)",
+        "status": "requested",
         "error": null
       },
       "social": {
