@@ -4,23 +4,68 @@
   "domain": "1001sovet.ru",
   "beads_epic": "sovetydoma-9nb",
   "historical_control_cohort": [
-    { "slug": "ekonomiya-na-produktakh", "category": "ekonomiya", "published_at": "2026-05-02" },
-    { "slug": "starye-dzhinsy", "category": "layfkhaki", "published_at": "2026-05-05" },
-    { "slug": "ogurcy-ot-tli", "category": "dacha-i-ogorod", "published_at": "2026-05-08" },
-    { "slug": "kogda-sazhat-pomidory-2026", "category": "dacha-i-ogorod", "published_at": "2026-05-10" },
-    { "slug": "skovoroda-ot-zhira", "category": "dom-i-uborka", "published_at": "2026-05-12" },
-    { "slug": "nakip-v-chaynike", "category": "dom-i-uborka", "published_at": "2026-05-15" },
-    { "slug": "klubnika-na-podokonnike", "category": "dacha-i-ogorod", "published_at": "2026-05-17" },
-    { "slug": "testo-dlya-pelmeney", "category": "kulinaria", "published_at": "2026-05-18" },
-    { "slug": "podkormka-pomidorov", "category": "dacha-i-ogorod", "published_at": "2026-05-18" },
-    { "slug": "kompost-bystro", "category": "dacha-i-ogorod", "published_at": "2026-05-19" }
+    {
+      "slug": "ekonomiya-na-produktakh",
+      "category": "ekonomiya",
+      "published_at": "2026-05-02"
+    },
+    {
+      "slug": "starye-dzhinsy",
+      "category": "layfkhaki",
+      "published_at": "2026-05-05"
+    },
+    {
+      "slug": "ogurcy-ot-tli",
+      "category": "dacha-i-ogorod",
+      "published_at": "2026-05-08"
+    },
+    {
+      "slug": "kogda-sazhat-pomidory-2026",
+      "category": "dacha-i-ogorod",
+      "published_at": "2026-05-10"
+    },
+    {
+      "slug": "skovoroda-ot-zhira",
+      "category": "dom-i-uborka",
+      "published_at": "2026-05-12"
+    },
+    {
+      "slug": "nakip-v-chaynike",
+      "category": "dom-i-uborka",
+      "published_at": "2026-05-15"
+    },
+    {
+      "slug": "klubnika-na-podokonnike",
+      "category": "dacha-i-ogorod",
+      "published_at": "2026-05-17"
+    },
+    {
+      "slug": "testo-dlya-pelmeney",
+      "category": "kulinaria",
+      "published_at": "2026-05-18"
+    },
+    {
+      "slug": "podkormka-pomidorov",
+      "category": "dacha-i-ogorod",
+      "published_at": "2026-05-18"
+    },
+    {
+      "slug": "kompost-bystro",
+      "category": "dacha-i-ogorod",
+      "published_at": "2026-05-19"
+    }
   ],
   "articles": [
     {
       "topic_id": 1,
       "topic": "Фитофтора на помидорах: как распознать и что сделать в первые 24 часа",
       "primary_query": "фитофтора на помидорах",
-      "secondary_queries": ["что делать", "фото", "в теплице", "в открытом грунте"],
+      "secondary_queries": [
+        "что делать",
+        "фото",
+        "в теплице",
+        "в открытом грунте"
+      ],
       "demand_type": "запросы со словами (Вордстат)",
       "baseline_frequency": 223891,
       "baseline_trend_note": "июль 2026 примерно на 68% выше июля 2025",
@@ -30,28 +75,61 @@
       "category": "dacha-i-ogorod",
       "canonical_url": "https://1001sovet.ru/dacha-i-ogorod/fitoftora-tomaty-profilaktika-obrabotka/",
       "seasonal_priority": "urgent",
-      "published_at": null,
-      "last_major_update_at": null,
+      "published_at": "2026-06-12",
+      "last_major_update_at": "2026-08-02",
       "author": "Редакция SovetyDoma",
       "reviewer": "SovetыDoma Dev (владелец)",
-      "sources": ["Россельхозцентр — рекомендации по фитофторозу томата", "региональные с/х памятки по обработке медьсодержащими препаратами"],
+      "sources": [
+        "Россельхозцентр — рекомендации по фитофторозу томата",
+        "региональные с/х памятки по обработке медьсодержащими препаратами"
+      ],
       "has_original_artifact": "чек-лист действий по часам + таблица признаков (лист/стебель/плод) с решением",
-      "outbound_internal_links": [],
-      "http_status": null,
-      "indexability": null,
-      "canonical_self_ref": null,
-      "in_sitemap": null,
-      "yandex_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "google_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "social": { "dzen": null, "vk": null, "facebook": null, "wave": null },
-      "checkpoints": { "d7": null, "d14": null, "d30": null, "d60": null, "d90": null },
+      "outbound_internal_links": [
+        "fungitsidy-fitoftora-kartofel-khlorokis-ridomi",
+        "kogda-sazhat-pomidory-2026",
+        "ogurcy-ot-tli",
+        "kabachki-gniut-pri-khranenii-prichiny"
+      ],
+      "http_status": 200,
+      "indexability": "indexable",
+      "canonical_self_ref": true,
+      "in_sitemap": "sitemap-dynamic.xml",
+      "yandex_submission": {
+        "submitted_at": "2026-08-02T07:41Z",
+        "account": "IndexNow (Yandex+Bing shared endpoint)",
+        "status": "202 accepted",
+        "error": null
+      },
+      "google_submission": {
+        "submitted_at": null,
+        "account": null,
+        "status": "pending — needs GSC URL Inspection via browser",
+        "error": null
+      },
+      "social": {
+        "dzen": null,
+        "vk": null,
+        "facebook": null,
+        "wave": null
+      },
+      "checkpoints": {
+        "d7": "2026-06-19",
+        "d14": "2026-06-26",
+        "d30": "2026-07-12",
+        "d60": "2026-08-11",
+        "d90": "2026-09-10"
+      },
       "notes": []
     },
     {
       "topic_id": 2,
       "topic": "Стерилизация банок: духовка, микроволновка, пар — таблица времени",
       "primary_query": "стерилизация банок",
-      "secondary_queries": ["в духовке", "в микроволновке", "крышки"],
+      "secondary_queries": [
+        "в духовке",
+        "в микроволновке",
+        "крышки"
+      ],
       "demand_type": "запросы со словами (Вордстат)",
       "baseline_frequency": 240703,
       "baseline_trend_note": "сезонный пик в августе–сентябре",
@@ -61,28 +139,62 @@
       "category": "kulinaria",
       "canonical_url": "https://1001sovet.ru/kulinaria/sterilizatsiya-banok-ogurtsy-dukhovka-par/",
       "seasonal_priority": "urgent",
-      "published_at": null,
-      "last_major_update_at": null,
+      "published_at": "2026-06-12",
+      "last_major_update_at": "2026-08-02",
       "author": "Редакция SovetyDoma",
       "reviewer": "SovetыDoma Dev (владелец)",
-      "sources": ["Роспотребнадзор — общие требования пищевой безопасности при консервировании", "стандартные кулинарные рекомендации по режимам стерилизации тары"],
+      "sources": [
+        "Роспотребнадзор — общие требования пищевой безопасности при консервировании",
+        "стандартные кулинарные рекомендации по режимам стерилизации тары"
+      ],
       "has_original_artifact": "таблица: способ / время / объём банки / плюсы-минусы",
-      "outbound_internal_links": [],
-      "http_status": null,
-      "indexability": null,
-      "canonical_self_ref": null,
-      "in_sitemap": null,
-      "yandex_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "google_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "social": { "dzen": null, "vk": null, "facebook": null, "wave": null },
-      "checkpoints": { "d7": null, "d14": null, "d30": null, "d60": null, "d90": null },
-      "notes": ["title/description в content_matrix обновлены с узкого 'для огурцов' на общий запрос"]
+      "outbound_internal_links": [
+        "fitoftora-tomaty-profilaktika-obrabotka",
+        "kabachki-gniut-pri-khranenii-prichiny",
+        "idealnyy-borshch"
+      ],
+      "http_status": 200,
+      "indexability": "indexable",
+      "canonical_self_ref": true,
+      "in_sitemap": "sitemap-dynamic.xml",
+      "yandex_submission": {
+        "submitted_at": "2026-08-02T07:41Z",
+        "account": "IndexNow (Yandex+Bing shared endpoint)",
+        "status": "202 accepted",
+        "error": null
+      },
+      "google_submission": {
+        "submitted_at": null,
+        "account": null,
+        "status": "pending — needs GSC URL Inspection via browser",
+        "error": null
+      },
+      "social": {
+        "dzen": null,
+        "vk": null,
+        "facebook": null,
+        "wave": null
+      },
+      "checkpoints": {
+        "d7": "2026-06-19",
+        "d14": "2026-06-26",
+        "d30": "2026-07-12",
+        "d60": "2026-08-11",
+        "d90": "2026-09-10"
+      },
+      "notes": [
+        "title/description в content_matrix обновлены с узкого 'для огурцов' на общий запрос"
+      ]
     },
     {
       "topic_id": 3,
       "topic": "Стиральная машина не сливает воду: безопасная проверка по шагам",
       "primary_query": "стиральная машина не сливает воду",
-      "secondary_queries": ["причины", "гудит", "что делать"],
+      "secondary_queries": [
+        "причины",
+        "гудит",
+        "что делать"
+      ],
       "demand_type": "запросы со словами (Вордстат)",
       "baseline_frequency": 16157,
       "baseline_trend_note": "стабильный спрос",
@@ -92,28 +204,57 @@
       "category": "pokupki-i-tehnika",
       "canonical_url": "https://1001sovet.ru/pokupki-i-tehnika/stiralnaya-mashina-ne-slivaet-vodu-proverka/",
       "seasonal_priority": "evergreen",
-      "published_at": null,
-      "last_major_update_at": null,
+      "published_at": "2026-08-02",
+      "last_major_update_at": "2026-08-02",
       "author": "Редакция SovetyDoma",
       "reviewer": "SovetыDoma Dev (владелец)",
-      "sources": ["типовые сервисные памятки производителей стиральных машин по самопроверке перед вызовом мастера"],
+      "sources": [
+        "типовые сервисные памятки производителей стиральных машин по самопроверке перед вызовом мастера"
+      ],
       "has_original_artifact": "дерево решений: где искать причину по симптому",
-      "outbound_internal_links": [],
-      "http_status": null,
-      "indexability": null,
-      "canonical_self_ref": null,
-      "in_sitemap": null,
-      "yandex_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "google_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "social": { "dzen": null, "vk": null, "facebook": null, "wave": null },
-      "checkpoints": { "d7": null, "d14": null, "d30": null, "d60": null, "d90": null },
+      "outbound_internal_links": [
+        "holodilnik-ne-holodit-chto-proverit",
+        "posudomoika-belyy-nalet-prichiny"
+      ],
+      "http_status": 200,
+      "indexability": "indexable",
+      "canonical_self_ref": true,
+      "in_sitemap": "sitemap-dynamic.xml (published_via=dynamic)",
+      "yandex_submission": {
+        "submitted_at": "2026-08-02T08:05Z",
+        "account": "IndexNow (Yandex+Bing shared endpoint, auto by publish-dynamic.mjs, retried manually after transient 403)",
+        "status": "202 accepted",
+        "error": null
+      },
+      "google_submission": {
+        "submitted_at": null,
+        "account": null,
+        "status": "pending — needs GSC URL Inspection via browser",
+        "error": null
+      },
+      "social": {
+        "dzen": null,
+        "vk": null,
+        "facebook": null,
+        "wave": null
+      },
+      "checkpoints": {
+        "d7": "2026-08-09",
+        "d14": "2026-08-16",
+        "d30": "2026-09-01",
+        "d60": "2026-10-01",
+        "d90": "2026-10-31"
+      },
       "notes": []
     },
     {
       "topic_id": 4,
       "topic": "Холодильник работает, но не холодит: что проверить до вызова мастера",
       "primary_query": "холодильник не морозит",
-      "secondary_queries": ["морозилка работает", "No Frost"],
+      "secondary_queries": [
+        "морозилка работает",
+        "No Frost"
+      ],
       "demand_type": "запросы со словами (Вордстат)",
       "baseline_frequency": 49596,
       "baseline_trend_note": "стабильный спрос",
@@ -123,28 +264,57 @@
       "category": "pokupki-i-tehnika",
       "canonical_url": "https://1001sovet.ru/pokupki-i-tehnika/holodilnik-ne-holodit-chto-proverit/",
       "seasonal_priority": "evergreen",
-      "published_at": null,
-      "last_major_update_at": null,
+      "published_at": "2026-08-02",
+      "last_major_update_at": "2026-08-02",
       "author": "Редакция SovetyDoma",
       "reviewer": "SovetыDoma Dev (владелец)",
-      "sources": ["типовые сервисные памятки производителей холодильников"],
+      "sources": [
+        "типовые сервисные памятки производителей холодильников"
+      ],
       "has_original_artifact": "чек-лист самопроверки перед вызовом мастера",
-      "outbound_internal_links": [],
-      "http_status": null,
-      "indexability": null,
-      "canonical_self_ref": null,
-      "in_sitemap": null,
-      "yandex_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "google_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "social": { "dzen": null, "vk": null, "facebook": null, "wave": null },
-      "checkpoints": { "d7": null, "d14": null, "d30": null, "d60": null, "d90": null },
+      "outbound_internal_links": [
+        "voda-pod-yashchikami-holodilnika-sliv"
+      ],
+      "http_status": 200,
+      "indexability": "indexable",
+      "canonical_self_ref": true,
+      "in_sitemap": "sitemap-dynamic.xml (published_via=dynamic)",
+      "yandex_submission": {
+        "submitted_at": "2026-08-02T08:05Z",
+        "account": "IndexNow (Yandex+Bing shared endpoint)",
+        "status": "202 accepted",
+        "error": null
+      },
+      "google_submission": {
+        "submitted_at": null,
+        "account": null,
+        "status": "pending — needs GSC URL Inspection via browser",
+        "error": null
+      },
+      "social": {
+        "dzen": null,
+        "vk": null,
+        "facebook": null,
+        "wave": null
+      },
+      "checkpoints": {
+        "d7": "2026-08-09",
+        "d14": "2026-08-16",
+        "d30": "2026-09-01",
+        "d60": "2026-10-01",
+        "d90": "2026-10-31"
+      },
       "notes": []
     },
     {
       "topic_id": 5,
       "topic": "Пищевая моль на кухне: как найти источник и избавиться без опасной химии",
       "primary_query": "пищевая моль",
-      "secondary_queries": ["личинки", "в крупе", "откуда берется"],
+      "secondary_queries": [
+        "личинки",
+        "в крупе",
+        "откуда берется"
+      ],
       "demand_type": "запросы со словами (Вордстат)",
       "baseline_frequency": 13147,
       "baseline_trend_note": "стабильный спрос",
@@ -154,28 +324,59 @@
       "category": "dom-i-uborka",
       "canonical_url": "https://1001sovet.ru/dom-i-uborka/pishchevaya-mol-kukhnya/",
       "seasonal_priority": "evergreen",
-      "published_at": null,
-      "last_major_update_at": null,
+      "published_at": "2026-06-12",
+      "last_major_update_at": "2026-08-02",
       "author": "Редакция SovetyDoma",
       "reviewer": "SovetыDoma Dev (владелец)",
-      "sources": ["общепринятые практики без пестицидов: ревизия, феромонные ловушки, лаврушка/гвоздика"],
+      "sources": [
+        "общепринятые практики без пестицидов: ревизия, феромонные ловушки, лаврушка/гвоздика"
+      ],
       "has_original_artifact": "чек-лист ревизии кухни по зонам риска",
-      "outbound_internal_links": [],
-      "http_status": null,
-      "indexability": null,
-      "canonical_self_ref": null,
-      "in_sitemap": null,
-      "yandex_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "google_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "social": { "dzen": null, "vk": null, "facebook": null, "wave": null },
-      "checkpoints": { "d7": null, "d14": null, "d30": null, "d60": null, "d90": null },
+      "outbound_internal_links": [
+        "voda-pod-yashchikami-holodilnika-sliv",
+        "skovoroda-ot-zhira",
+        "nakip-v-chaynike"
+      ],
+      "http_status": 200,
+      "indexability": "indexable",
+      "canonical_self_ref": true,
+      "in_sitemap": "sitemap-dynamic.xml",
+      "yandex_submission": {
+        "submitted_at": "2026-08-02T07:58Z",
+        "account": "IndexNow (Yandex+Bing shared endpoint)",
+        "status": "202 accepted",
+        "error": null
+      },
+      "google_submission": {
+        "submitted_at": null,
+        "account": null,
+        "status": "pending — needs GSC URL Inspection via browser",
+        "error": null
+      },
+      "social": {
+        "dzen": null,
+        "vk": null,
+        "facebook": null,
+        "wave": null
+      },
+      "checkpoints": {
+        "d7": "2026-06-19",
+        "d14": "2026-06-26",
+        "d30": "2026-07-12",
+        "d60": "2026-08-11",
+        "d90": "2026-09-10"
+      },
       "notes": []
     },
     {
       "topic_id": 6,
       "topic": "Как хранить чеснок после уборки: сушка, температура и способы для квартиры",
       "primary_query": "как хранить чеснок",
-      "secondary_queries": ["после уборки", "до весны", "в квартире"],
+      "secondary_queries": [
+        "после уборки",
+        "до весны",
+        "в квартире"
+      ],
       "demand_type": "запросы со словами (Вордстат)",
       "baseline_frequency": 28570,
       "baseline_trend_note": "сезонный спрос",
@@ -185,28 +386,59 @@
       "category": "dacha-i-ogorod",
       "canonical_url": "https://1001sovet.ru/dacha-i-ogorod/khranenie-chesnoka-sushka-pletyonki/",
       "seasonal_priority": "urgent",
-      "published_at": null,
-      "last_major_update_at": null,
+      "published_at": "2026-06-12",
+      "last_major_update_at": "2026-08-02",
       "author": "Редакция SovetyDoma",
       "reviewer": "SovetыDoma Dev (владелец)",
-      "sources": ["агротехнические рекомендации по просушке и хранению озимого/ярового чеснока"],
+      "sources": [
+        "агротехнические рекомендации по просушке и хранению озимого/ярового чеснока"
+      ],
       "has_original_artifact": "таблица способов хранения по условиям квартиры/погреба/балкона",
-      "outbound_internal_links": [],
-      "http_status": null,
-      "indexability": null,
-      "canonical_self_ref": null,
-      "in_sitemap": null,
-      "yandex_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "google_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "social": { "dzen": null, "vk": null, "facebook": null, "wave": null },
-      "checkpoints": { "d7": null, "d14": null, "d30": null, "d60": null, "d90": null },
+      "outbound_internal_links": [
+        "sterilizatsiya-banok-ogurtsy-dukhovka-par",
+        "zamorozka-petrushki-sokhr-arom",
+        "fitoftora-tomaty-profilaktika-obrabotka"
+      ],
+      "http_status": 200,
+      "indexability": "indexable",
+      "canonical_self_ref": true,
+      "in_sitemap": "sitemap-dynamic.xml",
+      "yandex_submission": {
+        "submitted_at": "2026-08-02T07:41Z",
+        "account": "IndexNow (Yandex+Bing shared endpoint)",
+        "status": "202 accepted",
+        "error": null
+      },
+      "google_submission": {
+        "submitted_at": null,
+        "account": null,
+        "status": "pending — needs GSC URL Inspection via browser",
+        "error": null
+      },
+      "social": {
+        "dzen": null,
+        "vk": null,
+        "facebook": null,
+        "wave": null
+      },
+      "checkpoints": {
+        "d7": "2026-06-19",
+        "d14": "2026-06-26",
+        "d30": "2026-07-12",
+        "d60": "2026-08-11",
+        "d90": "2026-09-10"
+      },
       "notes": []
     },
     {
       "topic_id": 7,
       "topic": "Вода под ящиками холодильника: где слив и как безопасно его прочистить",
       "primary_query": "вода в холодильнике под ящиками",
-      "secondary_queries": ["под овощным ящиком", "слив", "причины"],
+      "secondary_queries": [
+        "под овощным ящиком",
+        "слив",
+        "причины"
+      ],
       "demand_type": "запросы со словами (Вордстат)",
       "baseline_frequency": 3027,
       "baseline_trend_note": "стабильный спрос",
@@ -216,28 +448,57 @@
       "category": "pokupki-i-tehnika",
       "canonical_url": "https://1001sovet.ru/pokupki-i-tehnika/voda-pod-yashchikami-holodilnika-sliv/",
       "seasonal_priority": "evergreen",
-      "published_at": null,
-      "last_major_update_at": null,
+      "published_at": "2026-08-02",
+      "last_major_update_at": "2026-08-02",
       "author": "Редакция SovetyDoma",
       "reviewer": "SovetыDoma Dev (владелец)",
-      "sources": ["типовые сервисные памятки по дренажному отверстию холодильников с капельной системой"],
+      "sources": [
+        "типовые сервисные памятки по дренажному отверстию холодильников с капельной системой"
+      ],
       "has_original_artifact": "пошаговая безопасная схема прочистки слива без вскрытия контура",
-      "outbound_internal_links": [],
-      "http_status": null,
-      "indexability": null,
-      "canonical_self_ref": null,
-      "in_sitemap": null,
-      "yandex_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "google_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "social": { "dzen": null, "vk": null, "facebook": null, "wave": null },
-      "checkpoints": { "d7": null, "d14": null, "d30": null, "d60": null, "d90": null },
+      "outbound_internal_links": [
+        "holodilnik-ne-holodit-chto-proverit"
+      ],
+      "http_status": 200,
+      "indexability": "indexable",
+      "canonical_self_ref": true,
+      "in_sitemap": "sitemap-dynamic.xml (published_via=dynamic)",
+      "yandex_submission": {
+        "submitted_at": "2026-08-02T08:05Z",
+        "account": "IndexNow (Yandex+Bing shared endpoint)",
+        "status": "202 accepted",
+        "error": null
+      },
+      "google_submission": {
+        "submitted_at": null,
+        "account": null,
+        "status": "pending — needs GSC URL Inspection via browser",
+        "error": null
+      },
+      "social": {
+        "dzen": null,
+        "vk": null,
+        "facebook": null,
+        "wave": null
+      },
+      "checkpoints": {
+        "d7": "2026-08-09",
+        "d14": "2026-08-16",
+        "d30": "2026-09-01",
+        "d60": "2026-10-01",
+        "d90": "2026-10-31"
+      },
       "notes": []
     },
     {
       "topic_id": 8,
       "topic": "Как заморозить петрушку на зиму: четыре способа и результат после разморозки",
       "primary_query": "как заморозить петрушку на зиму",
-      "secondary_queries": ["в морозилке", "с укропом", "кубиками"],
+      "secondary_queries": [
+        "в морозилке",
+        "с укропом",
+        "кубиками"
+      ],
       "demand_type": "запросы со словами (Вордстат)",
       "baseline_frequency": 1449,
       "baseline_trend_note": "сезонный узкий запрос",
@@ -247,28 +508,57 @@
       "category": "kulinaria",
       "canonical_url": "https://1001sovet.ru/kulinaria/zamorozka-petrushki-sokhr-arom/",
       "seasonal_priority": "evergreen",
-      "published_at": null,
-      "last_major_update_at": null,
+      "published_at": "2026-06-12",
+      "last_major_update_at": "2026-08-02",
       "author": "Редакция SovetyDoma",
       "reviewer": "SovetыDoma Dev (владелец)",
-      "sources": ["стандартные кулинарные рекомендации по бланшировке/заморозке зелени"],
+      "sources": [
+        "стандартные кулинарные рекомендации по бланшировке/заморозке зелени"
+      ],
       "has_original_artifact": "сравнительная таблица 4 способов заморозки: результат, срок хранения, трудозатраты",
-      "outbound_internal_links": [],
-      "http_status": null,
-      "indexability": null,
-      "canonical_self_ref": null,
-      "in_sitemap": null,
-      "yandex_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "google_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "social": { "dzen": null, "vk": null, "facebook": null, "wave": null },
-      "checkpoints": { "d7": null, "d14": null, "d30": null, "d60": null, "d90": null },
+      "outbound_internal_links": [
+        "khranenie-chesnoka-sushka-pletyonki",
+        "sterilizatsiya-banok-ogurtsy-dukhovka-par"
+      ],
+      "http_status": 200,
+      "indexability": "indexable",
+      "canonical_self_ref": true,
+      "in_sitemap": "sitemap-dynamic.xml",
+      "yandex_submission": {
+        "submitted_at": "2026-08-02T07:58Z",
+        "account": "IndexNow (Yandex+Bing shared endpoint)",
+        "status": "202 accepted",
+        "error": null
+      },
+      "google_submission": {
+        "submitted_at": null,
+        "account": null,
+        "status": "pending — needs GSC URL Inspection via browser",
+        "error": null
+      },
+      "social": {
+        "dzen": null,
+        "vk": null,
+        "facebook": null,
+        "wave": null
+      },
+      "checkpoints": {
+        "d7": "2026-06-19",
+        "d14": "2026-06-26",
+        "d30": "2026-07-12",
+        "d60": "2026-08-11",
+        "d90": "2026-09-10"
+      },
       "notes": []
     },
     {
       "topic_id": 9,
       "topic": "Посудомойка оставляет белый налет: накипь, соль или повреждение стекла?",
       "primary_query": "посудомоечная машина оставляет белый налет",
-      "secondary_queries": ["на посуде", "почему"],
+      "secondary_queries": [
+        "на посуде",
+        "почему"
+      ],
       "demand_type": "запросы со словами (Вордстат)",
       "baseline_frequency": 151,
       "baseline_trend_note": "узкий стабильный запрос со сравнительно слабой выдачей",
@@ -278,28 +568,58 @@
       "category": "pokupki-i-tehnika",
       "canonical_url": "https://1001sovet.ru/pokupki-i-tehnika/posudomoika-belyy-nalet-prichiny/",
       "seasonal_priority": "evergreen",
-      "published_at": null,
-      "last_major_update_at": null,
+      "published_at": "2026-08-02",
+      "last_major_update_at": "2026-08-02",
       "author": "Редакция SovetyDoma",
       "reviewer": "SovetыDoma Dev (владелец)",
-      "sources": ["производственные рекомендации по умягчению воды и дозировке соли/ополаскивателя"],
+      "sources": [
+        "производственные рекомендации по умягчению воды и дозировке соли/ополаскивателя"
+      ],
       "has_original_artifact": "дерево диагностики: накипь vs соль vs травление стекла (etching) — как отличить и что делать",
-      "outbound_internal_links": [],
-      "http_status": null,
-      "indexability": null,
-      "canonical_self_ref": null,
-      "in_sitemap": null,
-      "yandex_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "google_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "social": { "dzen": null, "vk": null, "facebook": null, "wave": null },
-      "checkpoints": { "d7": null, "d14": null, "d30": null, "d60": null, "d90": null },
+      "outbound_internal_links": [
+        "holodilnik-ne-holodit-chto-proverit",
+        "stiralnaya-mashina-ne-slivaet-vodu-proverka"
+      ],
+      "http_status": 200,
+      "indexability": "indexable",
+      "canonical_self_ref": true,
+      "in_sitemap": "sitemap-dynamic.xml (published_via=dynamic)",
+      "yandex_submission": {
+        "submitted_at": "2026-08-02T08:05Z",
+        "account": "IndexNow (Yandex+Bing shared endpoint)",
+        "status": "202 accepted",
+        "error": null
+      },
+      "google_submission": {
+        "submitted_at": null,
+        "account": null,
+        "status": "pending — needs GSC URL Inspection via browser",
+        "error": null
+      },
+      "social": {
+        "dzen": null,
+        "vk": null,
+        "facebook": null,
+        "wave": null
+      },
+      "checkpoints": {
+        "d7": "2026-08-09",
+        "d14": "2026-08-16",
+        "d30": "2026-09-01",
+        "d60": "2026-10-01",
+        "d90": "2026-10-31"
+      },
       "notes": []
     },
     {
       "topic_id": 10,
       "topic": "Почему маленькие кабачки гниют на кусте: определяем причину по месту гнили",
       "primary_query": "почему кабачки гниют на кусте",
-      "secondary_queries": ["завязи", "кончики", "что делать"],
+      "secondary_queries": [
+        "завязи",
+        "кончики",
+        "что делать"
+      ],
       "demand_type": "запросы со словами (Вордстат)",
       "baseline_frequency": 2507,
       "baseline_trend_note": "сезонный спрос",
@@ -309,21 +629,48 @@
       "category": "dacha-i-ogorod",
       "canonical_url": "https://1001sovet.ru/dacha-i-ogorod/kabachki-gniyut-na-kuste-zavyazi-prichina/",
       "seasonal_priority": "urgent",
-      "published_at": null,
-      "last_major_update_at": null,
+      "published_at": "2026-08-02",
+      "last_major_update_at": "2026-08-02",
       "author": "Редакция SovetyDoma",
       "reviewer": "SovetыDoma Dev (владелец)",
-      "sources": ["агротехнические рекомендации по опылению/вершинной гнили тыквенных культур"],
+      "sources": [
+        "агротехнические рекомендации по опылению/вершинной гнили тыквенных культур"
+      ],
       "has_original_artifact": "таблица: место гнили на завязи → вероятная причина → действие",
-      "outbound_internal_links": ["kabachki-gniut-pri-khranenii-prichiny"],
-      "http_status": null,
-      "indexability": null,
-      "canonical_self_ref": null,
-      "in_sitemap": null,
-      "yandex_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "google_submission": { "submitted_at": null, "account": null, "status": null, "error": null },
-      "social": { "dzen": null, "vk": null, "facebook": null, "wave": null },
-      "checkpoints": { "d7": null, "d14": null, "d30": null, "d60": null, "d90": null },
+      "outbound_internal_links": [
+        "fitoftora-tomaty-profilaktika-obrabotka",
+        "kabachki-gniut-pri-khranenii-prichiny",
+        "sterilizatsiya-banok-ogurtsy-dukhovka-par"
+      ],
+      "http_status": 200,
+      "indexability": "indexable",
+      "canonical_self_ref": true,
+      "in_sitemap": "sitemap-dynamic.xml",
+      "yandex_submission": {
+        "submitted_at": "2026-08-02T07:39Z",
+        "account": "IndexNow (Yandex+Bing shared endpoint)",
+        "status": "202 accepted",
+        "error": null
+      },
+      "google_submission": {
+        "submitted_at": null,
+        "account": null,
+        "status": "pending — needs GSC URL Inspection via browser",
+        "error": null
+      },
+      "social": {
+        "dzen": null,
+        "vk": null,
+        "facebook": null,
+        "wave": null
+      },
+      "checkpoints": {
+        "d7": "2026-08-09",
+        "d14": "2026-08-16",
+        "d30": "2026-09-01",
+        "d60": "2026-10-01",
+        "d90": "2026-10-31"
+      },
       "notes": []
     }
   ]
