@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import helpers from './lib.mjs'
 const DOMAIN = '1001sovet.ru'
-const DIR = path.join('C:/DEV/sovetydoma', '.matrix-ideas', 'drafts')
+const DIR = path.join(process.cwd(), '.matrix-ideas', 'drafts')
 const sb = helpers.getServiceClient()
 const files = fs.readdirSync(DIR).filter(f => f.endsWith('.md'))
 let ok = 0, skipShort = 0, skipNoRow = 0, skipAlready = 0

@@ -12,6 +12,37 @@ import { spawn } from 'node:child_process'
 import helpers from './lib.mjs'
 
 const DOMAIN = '1001sovet.ru'
+
+// House style (2026-08-02, owner request): every article opens with a warm
+// greeting and closes with a warm sign-off, rotated so the same pair never
+// repeats back-to-back. Keeps quality-gate dedup safe (see promote-drafts.mjs /
+// quality-gate.mjs boilerplate_intro/outro checks) because each greeting/
+// farewell is short and immediately followed by topic-specific text.
+export const GREETINGS = [
+  'Приветствуем вас, дорогие читатели!',
+  'Здравствуйте, дорогие друзья!',
+  'Приветствуем вас, любимые читатели!',
+  'С добрым днём, наши читатели!',
+  'Рады снова видеть вас, дорогие друзья!',
+  'Здравствуйте, уважаемые читатели!',
+  'Добро пожаловать, дорогие гости нашего сайта!',
+  'Приветствуем всех, кто заглянул к нам сегодня!',
+  'Здравствуйте, наши верные читатели!',
+  'Рады приветствовать вас на страницах «1001 совета»!',
+]
+export const FAREWELLS = [
+  'С наилучшими пожеланиями, ваша редакция.',
+  'С наилучшими пожеланиями, ваша редакция сайта «1001 совет».',
+  'Желаем вам всего самого доброго, удачи и хорошего настроения!',
+  'Берегите себя и своих близких — до новых встреч!',
+  'Желаем вам здоровья, удачи и хорошего урожая!',
+  'До новых встреч на страницах нашего сайта!',
+  'Пусть всё получится с первого раза — удачи вам!',
+  'Ваша редакция «1001 совета» всегда рада помочь!',
+  'Желаем тепла в доме и порядка во всех делах!',
+  'Всего доброго и до скорых встреч, дорогие читатели!',
+]
+
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
 const limit = parseInt(arg('--limit', '50'), 10)
 const concurrency = Math.max(1, parseInt(arg('--concurrency', '4'), 10))
@@ -41,8 +72,10 @@ async function pick() {
   return data || []
 }
 
-function buildPrompt(row) {
+function buildPrompt(row, idx = 0) {
   const wc = row.frontmatter?.target_wc || 800
+  const greeting = GREETINGS[idx % GREETINGS.length]
+  const farewell = FAREWELLS[idx % FAREWELLS.length]
   return `Напиши ПОЛНУЮ практичную статью на русском языке для портала бытовых советов SovetyDoma (1001sovet.ru).
 
 ЗАГОЛОВОК: ${row.title}
@@ -52,11 +85,14 @@ function buildPrompt(row) {
 
 ТРЕБОВАНИЯ К СОДЕРЖАНИЮ:
 - Выведи ТОЛЬКО тело статьи в формате Markdown. БЕЗ frontmatter, БЕЗ заголовка H1, без комментариев, без \`\`\`.
-- Короткий вводный абзац (1-2 предложения), затем несколько подзаголовков ## с практичным содержанием.
+- Первая строка — ровно эта фраза-приветствие, отдельным абзацем: "${greeting}"
+- Сразу после неё — короткий вводный абзац (1-2 предложения) по теме статьи, затем несколько подзаголовков ## с практичным содержанием.
 - Списки, конкретные числа, шаги, пропорции, сроки — где уместно.
+- Последний абзац статьи — ровно эта фраза-прощание, отдельным абзацем: "${farewell}"
 - НЕ ищи в интернете, не читай репозиторий, не запускай инструменты — просто напиши текст и заверши.
 
 СТИЛЬ — ПИШИ КАК ЖИВОЙ ЧЕЛОВЕК, НЕ КАК НЕЙРОСЕТЬ:
+- Тема бытовая (дом, дача, кухня, техника) — пиши тёплым, человеческим, разговорным языком, как для соседа или знакомого, а не сухим канцелярским или наукообразным тоном.
 - Разнообразь длину предложений: короткие и длинные вперемешку. Не делай все предложения одинаковыми.
 - ЗАПРЕЩЕНЫ штампы: «важно отметить», «стоит учитывать», «несомненно», «актуально», «в современном мире», «давайте рассмотрим», «не забудьте», «в заключение можно сказать».
 - ЗАПРЕЩЕНЫ тройные перечисления ради красоты: «быстро, удобно и эффективно» — выбери одно нужное слово.
@@ -100,8 +136,8 @@ function clean(raw) {
   return body.trim()
 }
 
-async function draftRow(row) {
-  const raw = await runKimi(buildPrompt(row))
+async function draftRow(row, idx = 0) {
+  const raw = await runKimi(buildPrompt(row, idx))
   const body = clean(raw)
   const w = helpers.wordCount(body)
   if (w < minWords) throw new Error(`too short (${w}w)`)
@@ -127,7 +163,7 @@ async function runPool(rows) {
       const row = rows[idx++]
       const n = idx
       try {
-        const w = await draftRow(row)
+        const w = await draftRow(row, n - 1)
         ok++
         console.log(`  [w${wid}] (${n}/${rows.length}) ${row.slug} OK (${w}w)`)
       } catch (e) {

@@ -7,6 +7,35 @@ import { spawnSync } from 'node:child_process'
 import helpers from './lib.mjs'
 
 const DOMAIN = '1001sovet.ru'
+
+// House style (2026-08-02, owner request): every article opens with a warm
+// greeting and closes with a warm sign-off, rotated so the same pair never
+// repeats back-to-back. Mirrors gen-drafts-kimi.mjs — keep both in sync.
+const GREETINGS = [
+  'Приветствуем вас, дорогие читатели!',
+  'Здравствуйте, дорогие друзья!',
+  'Приветствуем вас, любимые читатели!',
+  'С добрым днём, наши читатели!',
+  'Рады снова видеть вас, дорогие друзья!',
+  'Здравствуйте, уважаемые читатели!',
+  'Добро пожаловать, дорогие гости нашего сайта!',
+  'Приветствуем всех, кто заглянул к нам сегодня!',
+  'Здравствуйте, наши верные читатели!',
+  'Рады приветствовать вас на страницах «1001 совета»!',
+]
+const FAREWELLS = [
+  'С наилучшими пожеланиями, ваша редакция.',
+  'С наилучшими пожеланиями, ваша редакция сайта «1001 совет».',
+  'Желаем вам всего самого доброго, удачи и хорошего настроения!',
+  'Берегите себя и своих близких — до новых встреч!',
+  'Желаем вам здоровья, удачи и хорошего урожая!',
+  'До новых встреч на страницах нашего сайта!',
+  'Пусть всё получится с первого раза — удачи вам!',
+  'Ваша редакция «1001 совета» всегда рада помочь!',
+  'Желаем тепла в доме и порядка во всех делах!',
+  'Всего доброго и до скорых встреч, дорогие читатели!',
+]
+
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
 const limit = parseInt(arg('--limit', '50'), 10)
 const verticals = (arg('--verticals', '') || '').split(',').filter(Boolean)
@@ -29,9 +58,11 @@ async function pick() {
   return data || []
 }
 
-function grokDraft(row) {
+function grokDraft(row, idx = 0) {
   const wc = row.frontmatter?.target_wc || 800
   const mdRel = `.matrix-ideas/drafts/${row.slug}.md`
+  const greeting = GREETINGS[idx % GREETINGS.length]
+  const farewell = FAREWELLS[idx % FAREWELLS.length]
   const prompt = `Напиши ПОЛНУЮ практичную статью на русском языке для портала бытовых советов SovetyDoma (1001sovet.ru).
 
 ЗАГОЛОВОК: ${row.title}
@@ -41,9 +72,12 @@ function grokDraft(row) {
 
 ТРЕБОВАНИЯ:
 - Только тело статьи в формате Markdown. БЕЗ frontmatter, БЕЗ заголовка H1.
-- Короткий вводный абзац (1-2 предложения), затем несколько подзаголовков ## с практичным содержанием.
+- Первая строка — ровно эта фраза-приветствие, отдельным абзацем: "${greeting}"
+- Сразу после неё — короткий вводный абзац (1-2 предложения) по теме, затем несколько подзаголовков ## с практичным содержанием.
 - Списки, конкретные числа, шаги, пропорции, сроки — где уместно.
-- Живой русский язык, без воды, без рекламы, без упоминания ИИ/нейросетей. Начни сразу с пользы.
+- Последний абзац статьи — ровно эта фраза-прощание, отдельным абзацем: "${farewell}"
+- Тема бытовая — пиши тёплым, человеческим, разговорным языком, как для соседа, а не сухим наукообразным тоном.
+- Живой русский язык, без воды, без рекламы, без упоминания ИИ/нейросетей.
 
 Запиши ТОЛЬКО markdown-текст статьи (без комментариев) в файл ${mdRel} в этом репозитории с помощью инструмента записи файла. Не ищи в интернете, не исследуй репозиторий, не запускай другие команды. После записи выведи: SAVED ${row.slug}`
   const pf = path.join(PROMPT_DIR, `${row.slug}.txt`)
@@ -59,10 +93,10 @@ async function main() {
   const rows = await pick()
   console.log(`Picked ${rows.length} image-ready rows to draft with Grok.`)
   let ok = 0, fail = 0
-  for (const row of rows) {
+  for (const [idx, row] of rows.entries()) {
     process.stdout.write(`  [${row.slug}] drafting... `)
     let md = null
-    try { md = grokDraft(row) } catch (e) { console.log('error ' + e.message) }
+    try { md = grokDraft(row, idx) } catch (e) { console.log('error ' + e.message) }
     if (!md) { fail++; console.log('FAILED (no file)'); continue }
     let body = fs.readFileSync(md, 'utf8').replace(/^﻿/, '').trim()
     body = body.replace(/^```(?:markdown|md)?\s*/i, '').replace(/\s*```$/i, '').replace(/^#\s+.*\n+/, '').trim()
