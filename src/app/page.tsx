@@ -186,7 +186,7 @@ export default function HomePage() {
         {/* Latest articles */}
         {articles.length > 0 && (
           <section style={{ marginBottom: '2.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.2rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>
                 Последние статьи
               </h2>
@@ -194,6 +194,9 @@ export default function HomePage() {
                 Все статьи →
               </Link>
             </div>
+            <p style={{ fontSize: '0.83rem', color: '#999', margin: '0 0 1.25rem' }}>
+              Продолжение ленты — то, что не попало в «Только что» выше
+            </p>
             <ArticleCatalogGrid articles={articles} />
           </section>
         )}

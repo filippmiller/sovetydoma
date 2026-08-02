@@ -14,9 +14,20 @@ interface Props {
   viewCount?: number
   ratingAverage?: number | null
   likeCount?: number
+  hideCategoryBadge?: boolean
+  hideShareButton?: boolean
 }
 
-export default function ArticleCard({ article, wordCount, featured = false, viewCount = 0, ratingAverage = null, likeCount = 0 }: Props) {
+export default function ArticleCard({
+  article,
+  wordCount,
+  featured = false,
+  viewCount = 0,
+  ratingAverage = null,
+  likeCount = 0,
+  hideCategoryBadge = false,
+  hideShareButton = false,
+}: Props) {
   const cat = CATEGORIES[article.category]
   const color = CATEGORY_COLOR[article.category] || '#888'
   const emoji = CATEGORY_EMOJI[article.category] || '📄'
@@ -64,22 +75,24 @@ export default function ArticleCard({ article, wordCount, featured = false, view
                   Новое
                 </span>
               )}
-              <span style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                backgroundColor: `${color}12`,
-                color,
-                borderRadius: '5px',
-                padding: '3px 8px',
-                fontSize: '0.68rem',
-                fontWeight: 750,
-                width: 'fit-content',
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
-              }}>
-                <span aria-hidden="true">{emoji}</span> {cat?.name || article.categoryName}
-              </span>
+              {!hideCategoryBadge && (
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  backgroundColor: `${color}12`,
+                  color,
+                  borderRadius: '5px',
+                  padding: '3px 8px',
+                  fontSize: '0.68rem',
+                  fontWeight: 750,
+                  width: 'fit-content',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                }}>
+                  <span aria-hidden="true">{emoji}</span> {cat?.name || article.categoryName}
+                </span>
+              )}
             </div>
 
             <h2 style={{
@@ -120,7 +133,7 @@ export default function ArticleCard({ article, wordCount, featured = false, view
             boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
           }}>
             <CardFavoriteButton slug={article.slug} />
-            <CardShareButton url={shareUrl} title={shareTitle} />
+            {!hideShareButton && <CardShareButton url={shareUrl} title={shareTitle} />}
             <div style={{ display: 'block', width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
               {cardImageSrc ? (
                 <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={featured ? '2rem' : '1.65rem'} />
@@ -148,15 +161,21 @@ export default function ArticleCard({ article, wordCount, featured = false, view
           <time dateTime={article.date} suppressHydrationWarning style={{ fontSize: '0.74rem', color: '#aaa' }}>
             {relativeDate(article.date)}
           </time>
-          <span aria-label="Просмотры" title="Просмотры" style={{ whiteSpace: 'nowrap' }}>
-            👁 {viewCount}
-          </span>
-          <span aria-label="Оценка" title="Оценка" style={{ whiteSpace: 'nowrap' }}>
-            ★ {ratingAverage ? ratingAverage.toFixed(1) : '0.0'}
-          </span>
-          <span aria-label="Нравится" title="Нравится" style={{ whiteSpace: 'nowrap' }}>
-            ❤ {likeCount}
-          </span>
+          {viewCount > 0 && (
+            <span aria-label="Просмотры" title="Просмотры" style={{ whiteSpace: 'nowrap' }}>
+              👁 {viewCount}
+            </span>
+          )}
+          {!!ratingAverage && (
+            <span aria-label="Оценка" title="Оценка" style={{ whiteSpace: 'nowrap' }}>
+              ★ {ratingAverage.toFixed(1)}
+            </span>
+          )}
+          {likeCount > 0 && (
+            <span aria-label="Нравится" title="Нравится" style={{ whiteSpace: 'nowrap' }}>
+              ❤ {likeCount}
+            </span>
+          )}
           <span title="Время чтения" style={{ whiteSpace: 'nowrap', marginLeft: 'auto' }}>
             ⏱ {time}
           </span>

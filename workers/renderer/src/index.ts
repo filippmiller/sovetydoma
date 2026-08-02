@@ -53,6 +53,7 @@ import {
 import {
   RENDER_VERSION,
   articleCacheUrl,
+  categoryLatestCacheUrl,
   categoryRowsCacheUrl,
   dzenFeedCacheUrl,
   hubCacheUrl,
@@ -457,6 +458,61 @@ async function handleLatest(env: Env, limit: number): Promise<Response> {
       ...corsHeaders,
     },
   })
+}
+
+/**
+ * GET /api/category-latest.json?category=X&limit=N — the category page
+ * equivalent of /api/latest.json above. The static category page
+ * (src/app/[category]/page.tsx) and its client-side sort/search/filter
+ * (CategoryArticleBrowser) only ever see the .mdx corpus baked in at the last
+ * full rebuild, so a dynamically-published article never shows up there even
+ * though it's already live on its own URL and on the homepage's "Новое"
+ * widget — "Сначала новые" silently lies. This reuses fetchCategoryRows (the
+ * same cached rows /stati/<category>/ and /__purge already use) so there is
+ * one query path and one cache entry to invalidate on publish.
+ */
+async function handleCategoryLatest(env: Env, category: string, limit: number): Promise<Response> {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': env.SITE_URL || 'https://1001sovet.ru',
+    'Vary': 'Origin',
+  }
+
+  const cacheKey = new Request(categoryLatestCacheUrl(siteBaseUrl(env), category, limit))
+  const cache = caches.default
+  const cached = await cache.match(cacheKey)
+  if (cached) return cached
+
+  let rows: RelatedCandidate[]
+  try {
+    rows = await fetchCategoryRows(env, category)
+  } catch {
+    return new Response(JSON.stringify({ error: 'unavailable' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json', 'Retry-After': '30', ...corsHeaders },
+    })
+  }
+
+  const payload = rows
+    .filter((r) => r.published_via === 'dynamic')
+    .slice(0, limit)
+    .map((r) => ({
+      slug: r.slug,
+      category: r.category,
+      title: r.title,
+      description: r.description,
+      tags: r.tags || [],
+      publishedAt: r.published_at,
+    }))
+
+  const response = new Response(JSON.stringify(payload), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': `public, max-age=${LATEST_ARTICLES_CACHE_TTL}`,
+      ...corsHeaders,
+    },
+  })
+  cache.put(cacheKey, response.clone()).catch(() => {/* ignore */})
+  return response
 }
 
 // ---------------------------------------------------------------------------
@@ -1575,6 +1631,21 @@ const worker = {
     // (see handleSearchIndex above / src/components/SearchClient.tsx).
     if (pathname === '/api/search-index.json') {
       return handleSearchIndex(env)
+    }
+
+    // GET /api/category-latest.json?category=X&limit=N — category page's
+    // "Сначала новые"/search fix (see handleCategoryLatest above).
+    if (pathname === '/api/category-latest.json') {
+      const category = categoryParam(url.searchParams.get('category') || '')
+      if (!category || !CATEGORY_NAMES[category]) {
+        return new Response(JSON.stringify({ error: 'unknown_category' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      const requested = parseInt(url.searchParams.get('limit') || '40', 10)
+      const limit = Number.isFinite(requested) ? Math.min(100, Math.max(1, requested)) : 40
+      return handleCategoryLatest(env, category, limit)
     }
 
     const hubMatch = pathname.match(/^\/stati(?:\/([a-z0-9-]+)(?:\/(\d+))?)?(\/?)$/)

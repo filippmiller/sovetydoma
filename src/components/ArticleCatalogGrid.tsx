@@ -8,9 +8,11 @@ import { ArticleStatsMap, buildArticleStatsMap } from '@/lib/article-stats'
 
 interface Props {
   articles: (ArticleFrontmatter & { wordCount?: number })[]
+  hideCategoryBadge?: boolean
+  hideShareButton?: boolean
 }
 
-export default function ArticleCatalogGrid({ articles }: Props) {
+export default function ArticleCatalogGrid({ articles, hideCategoryBadge = false, hideShareButton = false }: Props) {
   const [stats, setStats] = useState<ArticleStatsMap>({})
   const slugs = useMemo(() => articles.map((article) => article.slug), [articles])
 
@@ -55,6 +57,8 @@ export default function ArticleCatalogGrid({ articles }: Props) {
             viewCount={articleStats?.viewCount}
             ratingAverage={articleStats?.ratingAverage}
             likeCount={articleStats?.likeCount}
+            hideCategoryBadge={hideCategoryBadge}
+            hideShareButton={hideShareButton}
           />
         )
       })}

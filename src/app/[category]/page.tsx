@@ -3,8 +3,7 @@ export const revalidate = false
 import { getArticlesByCategory, CATEGORIES } from '@/lib/articles'
 import CategoryArticleBrowser from '@/components/CategoryArticleBrowser'
 import Breadcrumb from '@/components/Breadcrumb'
-import CategorySubscriptionCta from '@/components/subscriptions/CategorySubscriptionCta'
-import CategoryPushSubscribe from '@/components/CategoryPushSubscribe'
+import CategoryFollowControl from '@/components/CategoryFollowControl'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath } from '@/lib/seo'
@@ -65,12 +64,7 @@ export default async function CategoryPage({ params }: Props) {
               {cat.description} · {articles.length} {articles.length === 1 ? 'статья' : articles.length < 5 ? 'статьи' : 'статей'}
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-              <CategorySubscriptionCta
-                categorySlug={category}
-                categoryName={cat.name}
-                placement="category-header"
-              />
-              <CategoryPushSubscribe category={category} />
+              <CategoryFollowControl categorySlug={category} categoryName={cat.name} />
             </div>
           </div>
         </header>
@@ -78,7 +72,7 @@ export default async function CategoryPage({ params }: Props) {
         {articles.length === 0 ? (
           <p style={{ color: '#888' }}>Статьи в этом разделе появятся скоро.</p>
         ) : (
-          <CategoryArticleBrowser articles={articles} />
+          <CategoryArticleBrowser category={category} articles={articles} />
         )}
 
         {/* Server-rendered crawlable link to the full dynamic listing of this
