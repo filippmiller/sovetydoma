@@ -6395,5 +6395,13 @@
     "height": 240,
     "quality": 72,
     "generatedAt": "2026-06-16T18:56:09.983524+00:00"
+  },
+  "previews/pivnoy-marinad-dlya-shashlyka": {
+    "provider": "local-preview",
+    "source": "pivnoy-marinad-dlya-shashlyka.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-08-03T07:51:57.345201+00:00"
   }
 }
