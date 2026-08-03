@@ -227,10 +227,10 @@
         "error": null
       },
       "google_submission": {
-        "submitted_at": null,
-        "account": null,
-        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
-        "error": "Quota Exceeded"
+        "submitted_at": "2026-08-03T14:11Z",
+        "account": "GSC URL Inspection - Request Indexing (owner-authenticated)",
+        "status": "requested",
+        "error": null
       },
       "social": {
         "dzen": null,
@@ -286,10 +286,10 @@
         "error": null
       },
       "google_submission": {
-        "submitted_at": null,
-        "account": null,
-        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
-        "error": "Quota Exceeded"
+        "submitted_at": "2026-08-03T14:11Z",
+        "account": "GSC URL Inspection - Request Indexing (owner-authenticated)",
+        "status": "requested",
+        "error": null
       },
       "social": {
         "dzen": null,
@@ -348,10 +348,10 @@
         "error": null
       },
       "google_submission": {
-        "submitted_at": null,
-        "account": null,
-        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
-        "error": "Quota Exceeded"
+        "submitted_at": "2026-08-03T14:11Z",
+        "account": "GSC URL Inspection - Request Indexing (owner-authenticated)",
+        "status": "requested",
+        "error": null
       },
       "social": {
         "dzen": null,
@@ -410,10 +410,10 @@
         "error": null
       },
       "google_submission": {
-        "submitted_at": null,
-        "account": null,
-        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
-        "error": "Quota Exceeded"
+        "submitted_at": "2026-08-03T14:11Z",
+        "account": "GSC URL Inspection - Request Indexing (owner-authenticated)",
+        "status": "requested",
+        "error": null
       },
       "social": {
         "dzen": null,
@@ -472,7 +472,7 @@
       "google_submission": {
         "submitted_at": null,
         "account": null,
-        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
+        "status": "blocked — GSC daily Request Indexing quota exceeded again on 2026-08-03 after 4 submissions this run; retry tomorrow",
         "error": "Quota Exceeded"
       },
       "social": {
@@ -533,7 +533,7 @@
       "google_submission": {
         "submitted_at": null,
         "account": null,
-        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
+        "status": "blocked — GSC daily Request Indexing quota exceeded again on 2026-08-03 after 4 submissions this run; retry tomorrow",
         "error": "Quota Exceeded"
       },
       "social": {
@@ -593,7 +593,7 @@
       "google_submission": {
         "submitted_at": null,
         "account": null,
-        "status": "blocked — GSC daily Request Indexing quota exceeded after 3 submissions; retry tomorrow",
+        "status": "blocked — GSC daily Request Indexing quota exceeded again on 2026-08-03 after 4 submissions this run; retry tomorrow",
         "error": "Quota Exceeded"
       },
       "social": {
