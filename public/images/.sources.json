@@ -6403,5 +6403,21 @@
     "height": 240,
     "quality": 72,
     "generatedAt": "2026-08-03T07:51:57.345201+00:00"
+  },
+  "previews/recepty-s-lisichkami": {
+    "provider": "local-preview",
+    "source": "recepty-s-lisichkami.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-08-03T13:05:11.305660+00:00"
+  },
+  "previews/kak-zharit-lisichki": {
+    "provider": "local-preview",
+    "source": "kak-zharit-lisichki.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-08-03T13:05:13.591401+00:00"
   }
 }
