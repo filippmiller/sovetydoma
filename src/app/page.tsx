@@ -1,6 +1,11 @@
-import { getJustNowArticles } from '@/lib/articles'
+import { getAllArticles, getArticlesByCategory, getJustNowArticles } from '@/lib/articles'
+import { CATEGORIES } from '@/lib/categories'
 import ArticleCatalogGrid from '@/components/ArticleCatalogGrid'
+import CategoryTiles from '@/components/CategoryTiles'
 import LatestPublished from '@/components/LatestPublished'
+import PopularArticles from '@/components/PopularArticles'
+import SeasonalBanner from '@/components/SeasonalBanner'
+import StartHereSection from '@/components/StartHereSection'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath, absoluteUrl } from '@/lib/seo'
@@ -43,19 +48,39 @@ const HOMEPAGE_ARTICLE_LIMIT = 30
 const JUST_NOW_LIMIT = 12
 const JUST_NOW_POOL = 60
 const LATEST_ARTICLES_POOL = 300
+const ARTICLES_PER_CATEGORY_TILE = 3
+const POPULAR_ARTICLE_LIMIT = 100
 
 export default function HomePage() {
+  const allArticles = getAllArticles()
   const justNowArticles = getJustNowArticles(JUST_NOW_LIMIT, JUST_NOW_POOL)
   const articles = getJustNowArticles(
     HOMEPAGE_ARTICLE_LIMIT,
     LATEST_ARTICLES_POOL,
     new Set(justNowArticles.map((a) => a.slug)),
   )
+  const categoryTiles = Object.keys(CATEGORIES).map((slug) => ({
+    slug,
+    articles: getArticlesByCategory(slug).slice(0, ARTICLES_PER_CATEGORY_TILE),
+  }))
+  const popularArticleData = allArticles
+    .slice(0, POPULAR_ARTICLE_LIMIT)
+    .map((a) => ({
+      title: a.title,
+      slug: a.slug,
+      category: a.category,
+      categoryName: a.categoryName,
+      date: a.date,
+    }))
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+
+        <SeasonalBanner />
+
+        <StartHereSection />
 
         {/* Dynamic latest articles from the content factory */}
         <LatestPublished />
@@ -70,6 +95,8 @@ export default function HomePage() {
           </section>
         )}
 
+        <CategoryTiles tiles={categoryTiles} />
+
         {articles.length > 0 && (
           <section style={{ marginBottom: '2rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
@@ -83,6 +110,8 @@ export default function HomePage() {
             <ArticleCatalogGrid articles={articles} />
           </section>
         )}
+
+        <PopularArticles articles={popularArticleData} />
     </>
   )
 }

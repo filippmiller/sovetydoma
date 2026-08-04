@@ -168,7 +168,7 @@ export const LEGACY_ARTICLE_MOVES: Record<string, { oldCategory: string; newCate
   'supy-dlya-zdorovya-semi': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
   'travyanye-chai-doma-prigotovlenie': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
   'zagotovki-bez-sahara-sohranyaem-vitaminy': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
-  'zdorovye-zavtrki-na-kazhdyy-den': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
+  'zdorovye-zavtraki-na-kazhdyy-den': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
   // zdorovie-i-bezopasnost
   'bezopasnost-doma-dlya-rebenka': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
   'domashnyaya-aptechka-bez-lishnego': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
