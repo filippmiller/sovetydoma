@@ -1,4 +1,8 @@
 {
+  "_grok-test.jpg": {
+    "w": 1408,
+    "h": 768
+  },
   "agrovolokno-pod-klubniku-vesnoy.jpg": {
     "w": 1408,
     "h": 768
