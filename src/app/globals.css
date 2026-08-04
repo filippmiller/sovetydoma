@@ -844,6 +844,23 @@ footer a:hover { color: #fff !important; }
   font-size: 0.75rem;
 }
 
+.feed-left-nav-seasonal {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.65rem;
+  border: 1px solid #efe3cc;
+  border-radius: 10px;
+  background: #fffaf0;
+}
+.feed-left-nav-seasonal-link {
+  color: #77552c;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  text-decoration: none;
+}
+.feed-left-nav-seasonal-link::before { content: '• '; color: #c28a3c; }
+.feed-left-nav-seasonal-link:hover { color: #a93226; text-decoration: underline; }
+
 /* Subscribe CTA */
 .feed-left-nav-plan {
   display: grid;
@@ -908,7 +925,8 @@ footer a:hover { color: #fff !important; }
     max-height: none;
   }
   .feed-left-nav-brand,
-  .feed-left-nav-plan { display: none; }
+  .feed-left-nav-plan,
+  .feed-left-nav-seasonal { display: none; }
   .feed-left-nav-cats {
     display: flex;
     flex-wrap: wrap;

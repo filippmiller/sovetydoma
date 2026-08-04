@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { CATEGORIES, getSubcategoriesFor } from '@/lib/categories'
@@ -25,10 +25,46 @@ const myLinks = [
   { href: '/podpiski/', label: 'Подписки', icon: '✉' },
 ]
 
+const seasonalLinks = [
+  [
+    { href: '/dom-i-uborka/#ezhednevnaya-uborka', label: 'Уют и порядок дома' },
+    { href: '/kulinaria/#zagotovki', label: 'Домашние заготовки' },
+  ],
+  [
+    { href: '/dacha-i-ogorod/#rassada-teplitsy', label: 'Рассада и теплицы' },
+    { href: '/dom-i-uborka/#generalnaya-uborka', label: 'Весенняя уборка' },
+  ],
+  [
+    { href: '/dacha-i-ogorod/#ogorod', label: 'Дача и огород' },
+    { href: '/kulinaria/#zagotovki', label: 'Сезонные заготовки' },
+  ],
+  [
+    { href: '/kulinaria/#zagotovki', label: 'Заготовки на зиму' },
+    { href: '/avto/#uhod-za-avto', label: 'Подготовка авто к сезону' },
+  ],
+] as const
+
+function seasonalLinkGroup(month: number) {
+  if (month === 11 || month <= 1) return seasonalLinks[0]
+  if (month <= 4) return seasonalLinks[1]
+  if (month <= 7) return seasonalLinks[2]
+  return seasonalLinks[3]
+}
+
 export default function FeedLeftNav() {
   const pathname = usePathname() || '/'
   const currentPath = pathname.replace(/\/$/, '') || '/'
   const [openCat, setOpenCat] = useState<string | null>(null)
+  const [todayLinks, setTodayLinks] = useState<readonly { href: string; label: string }[] | null>(null)
+
+  // Read the local month only after hydration so a static export built near a
+  // month boundary never produces different server/client markup.
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setTodayLinks(seasonalLinkGroup(new Date().getMonth()))
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [])
 
   const toggleCategory = useCallback((slug: string) => {
     setOpenCat((prev) => (prev === slug ? null : slug))
@@ -112,6 +148,17 @@ export default function FeedLeftNav() {
           )
         })}
       </div>
+
+      {todayLinks && (
+        <div className="feed-left-nav-seasonal" aria-label="Сегодня полезно">
+          <h2 className="feed-left-nav-title">Сегодня полезно</h2>
+          {todayLinks.map((item) => (
+            <Link key={item.href} href={item.href} className="feed-left-nav-seasonal-link">
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* My section */}
       <div className="feed-left-nav-group">

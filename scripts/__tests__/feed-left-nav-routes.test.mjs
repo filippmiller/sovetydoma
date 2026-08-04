@@ -14,3 +14,10 @@ test('left-nav subcategory links stay on the canonical category hash route', () 
     assert.ok(CATEGORIES[subcategory.parentSlug], `${subcategory.slug} must have a real category route`)
   }
 })
+
+test('left nav includes client-safe seasonal links for desktop readers', () => {
+  const nav = fs.readFileSync(path.join(root, 'src/components/FeedLeftNav.tsx'), 'utf8')
+
+  assert.match(nav, /aria-label="Сегодня полезно"/)
+  assert.match(nav, /setTodayLinks\(seasonalLinkGroup\(new Date\(\)\.getMonth\(\)\)\)/)
+})
