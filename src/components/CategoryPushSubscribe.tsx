@@ -20,13 +20,18 @@ interface Props {
 }
 
 export default function CategoryPushSubscribe({ category }: Props) {
-  const supported = typeof window !== 'undefined' && 'PushManager' in window && 'serviceWorker' in navigator
-  const [subscribed, setSubscribed] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return localStorage.getItem(`push_subscribed_${category}`) === '1'
-  })
+  // Keep the server and the very first browser render identical.  Reading
+  // navigator/localStorage during render produced an empty SSR shell but a
+  // button in the browser, which made React abandon hydration (#418).
+  const [supported, setSupported] = useState(false)
+  const [subscribed, setSubscribed] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setSupported('PushManager' in window && 'serviceWorker' in navigator)
+    setSubscribed(localStorage.getItem(`push_subscribed_${category}`) === '1')
+  }, [category])
 
   useEffect(() => {
     if (typeof window === 'undefined') return

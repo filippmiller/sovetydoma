@@ -29,14 +29,18 @@ interface Props {
  * competing for space on first paint.
  */
 export default function CategoryFollowControl({ categorySlug, categoryName }: Props) {
-  const supported = typeof window !== 'undefined' && 'PushManager' in window && 'serviceWorker' in navigator
-  const [subscribed, setSubscribed] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return localStorage.getItem(`push_subscribed_${categorySlug}`) === '1'
-  })
+  // Browser-only capabilities and saved state must be loaded after hydration;
+  // otherwise a returning visitor can receive different server/client markup.
+  const [supported, setSupported] = useState(false)
+  const [subscribed, setSubscribed] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setSupported('PushManager' in window && 'serviceWorker' in navigator)
+    setSubscribed(localStorage.getItem(`push_subscribed_${categorySlug}`) === '1')
+  }, [categorySlug])
 
   useEffect(() => {
     if (typeof window === 'undefined' || !supported) return
