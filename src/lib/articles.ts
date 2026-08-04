@@ -161,6 +161,8 @@ export function getAllTags(): { tag: string; count: number }[] {
  * Old /oldcat/slug/ should 301/soft-redirect to /newcat/slug/ to avoid dead links.
  */
 export const LEGACY_ARTICLE_MOVES: Record<string, { oldCategory: string; newCategory: string }> = {
+  // Legacy healthy-eating taxonomy
+  'rastitelny-belok-chem-zamenit-myaso': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
   // zdorovie-i-bezopasnost
   'bezopasnost-doma-dlya-rebenka': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
   'domashnyaya-aptechka-bez-lishnego': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },

@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CATEGORIES, SUBCATEGORIES, getSubcategoriesFor } from '@/lib/categories'
+import { CATEGORIES, getSubcategoriesFor } from '@/lib/categories'
 
 const CATEGORY_EMOJI: Record<string, string> = {
   'dacha-i-ogorod': '🌱', 'dom-i-uborka': '🏠', 'ekonomiya': '💰',
@@ -11,6 +11,7 @@ const CATEGORY_EMOJI: Record<string, string> = {
   'otdyh-i-puteshestviya': '✈️', 'pokupki-i-tehnika': '🛒',
   'rybalka': '🎣', 'semya-i-deti': '👨‍👩‍👧', 'zdorovie-i-bezopasnost': '🏥',
   'zdorovoe-pitanie': '🥗',
+  'avto': '🚗',
 }
 
 const topLinks = [
@@ -28,18 +29,24 @@ const myLinks = [
 export default function FeedLeftNav() {
   const pathname = usePathname() || '/'
   const currentPath = pathname.replace(/\/$/, '') || '/'
-  const [openCat, setOpenCat] = useState<string | null>(null)
+  const catSlugs = Object.keys(CATEGORIES)
+  const activeCategorySlug = catSlugs.find((slug) => currentPath === `/${slug}` || currentPath.startsWith(`/${slug}/`)) || null
+  // `undefined` means no manual choice yet, so the current route determines
+  // the initial open section. `null` represents an explicit collapse.
+  const [openCat, setOpenCat] = useState<string | null | undefined>(undefined)
+  const resolvedOpenCat = openCat === undefined ? activeCategorySlug : openCat
 
-  const toggleCategory = useCallback((slug: string) => {
-    setOpenCat((prev) => (prev === slug ? null : slug))
-  }, [])
+  const toggleCategory = (slug: string) => {
+    setOpenCat((prev) => {
+      const current = prev === undefined ? activeCategorySlug : prev
+      return current === slug ? null : slug
+    })
+  }
 
   const isActive = (href: string) => {
     const p = href.split('#', 1)[0].replace(/\/$/, '') || '/'
     return currentPath === p || currentPath.startsWith(`${p}/`)
   }
-
-  const catSlugs = Object.keys(CATEGORIES)
 
   return (
     <nav className="feed-left-nav" aria-label="Разделы СоветыДома">
@@ -76,7 +83,7 @@ export default function FeedLeftNav() {
         {catSlugs.map((slug) => {
           const cat = CATEGORIES[slug]
           const emoji = CATEGORY_EMOJI[slug] || '📄'
-          const isOpen = openCat === slug
+          const isOpen = resolvedOpenCat === slug
           const subs = getSubcategoriesFor(slug)
           const catActive = currentPath === `/${slug}` || currentPath.startsWith(`/${slug}/`)
 

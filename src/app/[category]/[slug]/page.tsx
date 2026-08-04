@@ -38,24 +38,31 @@ import CategoryPushSubscribe from '@/components/CategoryPushSubscribe'
 import CategorySubscriptionCta from '@/components/subscriptions/CategorySubscriptionCta'
 import ArticleSeasonalBadge from '@/components/ArticleSeasonalBadge'
 import { ArticleH2, ArticleH3 } from '@/components/ArticleHeading'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import type { Metadata } from 'next'
 import { readingTime, formatDate, relativeDate, CATEGORY_COLOR, CATEGORY_EMOJI } from '@/lib/utils'
 import { resolveArticleImage } from '@/lib/cloudinary'
 import { SITE_NAME, SITE_URL, articleCanonicalUrl, articleImageUrl, truncateForMeta } from '@/lib/seo'
 import { getMoreInterestingArticles, getSimilarArticles } from '@/lib/article-recommendations'
+import { SUBCATEGORIES } from '@/lib/categories'
 
 interface Props { params: Promise<{ category: string; slug: string }> }
 
 export async function generateStaticParams() {
   const current = getAllSlugs()
-  // Include legacy paths for moved articles so they can serve soft-redirects instead of hard 404
+  // Include legacy paths for moved articles and taxonomy subcategory routes.
+  // Subcategory routes redirect to their canonical category hash filter below.
   const legacy = Object.entries(LEGACY_ARTICLE_MOVES).map(([slug, m]) => ({ category: m.oldCategory, slug }))
-  // Dedupe just in case
-  const seen = new Set(current.map((s) => `${s.category}/${s.slug}`))
-  const extras = legacy.filter((s) => !seen.has(`${s.category}/${s.slug}`))
-  return [...current, ...extras]
+  const subcategories = Object.values(SUBCATEGORIES).map(({ parentSlug, slug }) => ({ category: parentSlug, slug }))
+  // Dedupe just in case. Existing article pages take precedence over aliases.
+  const seen = new Set<string>()
+  return [...current, ...legacy, ...subcategories].filter(({ category, slug }) => {
+    const key = `${category}/${slug}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -74,7 +81,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       }
     }
   }
-  if (!article) return {}
+  if (!article) {
+    const subcategory = SUBCATEGORIES[slug]
+    if (subcategory?.parentSlug === category) {
+      return { robots: { index: false, follow: true } }
+    }
+    return {}
+  }
   const { frontmatter: fm } = article
   const cat = CATEGORIES[category] || CATEGORIES[article.frontmatter.category]
   const url = canonicalOverride || articleCanonicalUrl(fm)
@@ -134,28 +147,14 @@ export default async function ArticlePage({ params }: Props) {
       }
     }
   }
+  const subcategory = SUBCATEGORIES[slug]
+  if (!article && subcategory?.parentSlug === category) {
+    redirect(`/${category}/#${slug}`)
+  }
   if (!article) notFound()
 
   if (legacyRedirectTo) {
-    const newCatName = CATEGORIES[article.frontmatter.category]?.name || article.frontmatter.categoryName || article.frontmatter.category
-    return (
-      <div style={{ maxWidth: '680px', margin: '4rem auto', padding: '2rem 1rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔄</div>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>Статья перемещена</h1>
-        <p style={{ color: '#555', marginBottom: '1rem' }}>
-          Этот материал теперь в разделе <strong>«{newCatName}»</strong>.
-        </p>
-        <p style={{ marginBottom: '1.5rem' }}>
-          <a href={legacyRedirectTo} style={{ color: '#c0392b', fontWeight: 700, textDecoration: 'underline' }}>
-            Перейти к актуальной версии статьи →
-          </a>
-        </p>
-        <p style={{ fontSize: '0.85rem', color: '#888' }}>
-          Если пришли по старой ссылке — обновите закладку. Новый адрес: <code>{legacyRedirectTo}</code>
-        </p>
-        <script dangerouslySetInnerHTML={{ __html: `setTimeout(function(){ if (location.pathname !== ${JSON.stringify(legacyRedirectTo)}) location.replace(${JSON.stringify(legacyRedirectTo)}); }, 900);` }} />
-      </div>
-    )
+    redirect(legacyRedirectTo)
   }
 
   const { frontmatter: fm, content, wordCount } = article
