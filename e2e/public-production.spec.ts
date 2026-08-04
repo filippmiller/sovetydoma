@@ -36,7 +36,8 @@ function failuresFor(page: Page) {
   page.on('pageerror', (error) => pageErrors.push(error.message))
   page.on('requestfailed', (request) => {
     const url = new URL(request.url())
-    if (url.origin === new URL(page.url() || 'https://1001sovet.ru').origin && request.method() === 'GET') {
+    const abortedRscPrefetch = request.failure()?.errorText === 'net::ERR_ABORTED' && url.pathname.endsWith('/__next._tree.txt')
+    if (!abortedRscPrefetch && url.origin === new URL(page.url() || 'https://1001sovet.ru').origin && request.method() === 'GET') {
       failedSameOrigin.push(`${request.method()} ${url.pathname}: ${request.failure()?.errorText || 'failed'}`)
     }
   })
@@ -141,6 +142,9 @@ test.describe('public production journeys (read-only)', () => {
   test('search autocomplete and keyboard navigation expose actual article suggestions', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'desktop', 'desktop header autocomplete journey')
     await goto(page, '/')
+    // The production page is static HTML first; wait until client islands are
+    // active before asserting a React onChange-driven autocomplete journey.
+    await page.waitForLoadState('networkidle')
     const input = page.getByRole('combobox', { name: 'Поиск по статьям' })
     await input.fill('белок')
     await expect(page.getByRole('listbox')).toBeVisible()
