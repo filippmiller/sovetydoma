@@ -78,6 +78,7 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
 
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1rem' }}>
         <SeasonalBanner />
 
         <StartHereSection />
@@ -87,8 +88,8 @@ export default function HomePage() {
 
         {/* Main feed */}
         {justNowArticles.length > 0 && (
-          <section style={{ marginBottom: '2rem' }}>
-            <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.8rem' }}>
+          <section style={{ marginBottom: '1.5rem' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.6rem' }}>
               Свежие советы
             </h2>
             <ArticleCatalogGrid articles={justNowArticles} />
@@ -98,12 +99,12 @@ export default function HomePage() {
         <CategoryTiles tiles={categoryTiles} />
 
         {articles.length > 0 && (
-          <section style={{ marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
-              <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>
+          <section style={{ marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>
                 Ещё советы
               </h2>
-              <Link href="/articles" style={{ fontSize: '0.85rem', color: '#c0392b', textDecoration: 'none', fontWeight: 600 }}>
+              <Link href="/articles" style={{ fontSize: '0.82rem', color: '#c0392b', textDecoration: 'none', fontWeight: 600 }}>
                 Все статьи →
               </Link>
             </div>
@@ -112,6 +113,7 @@ export default function HomePage() {
         )}
 
         <PopularArticles articles={popularArticleData} />
+      </div>
     </>
   )
 }

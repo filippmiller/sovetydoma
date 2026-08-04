@@ -76,12 +76,12 @@ export default function LatestPublished({
   }
 
   return (
-    <section style={{ marginBottom: '2.5rem' }}>
-      <div style={{ marginBottom: '1.25rem' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.2rem' }}>
+    <section style={{ marginBottom: '1.5rem' }}>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.15rem' }}>
           {title}
         </h2>
-        <p style={{ fontSize: '0.83rem', color: '#999', margin: 0 }}>
+        <p style={{ fontSize: '0.78rem', color: '#999', margin: 0 }}>
           {subtitle}
         </p>
       </div>

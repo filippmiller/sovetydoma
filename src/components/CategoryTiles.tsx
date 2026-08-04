@@ -20,13 +20,13 @@ export default function CategoryTiles({ tiles }: Props) {
   if (visible.length === 0) return null
 
   return (
-    <section style={{ marginBottom: '2.5rem' }}>
-      <div style={{ marginBottom: '1.25rem' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.2rem' }}>
+    <section style={{ marginBottom: '1.5rem' }}>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.15rem' }}>
           По разделам
         </h2>
-        <p style={{ fontSize: '0.83rem', color: '#999', margin: 0 }}>
-          Весь сайт по темам — не только то, что попало в ленту
+        <p style={{ fontSize: '0.78rem', color: '#999', margin: 0 }}>
+          Весь сайт по темам
         </p>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>

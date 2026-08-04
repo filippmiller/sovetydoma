@@ -51,12 +51,12 @@ export default function StartHereSection() {
   if (!show) return null
 
   return (
-    <section style={{ marginBottom: '2.5rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-        <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>
+    <section style={{ marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+        <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>
           С чего начать
         </h2>
-        <span style={{ fontSize: '0.78rem', color: '#aaa', fontWeight: 500 }}>— специально для новых читателей</span>
+        <span style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: 500 }}>— для новых читателей</span>
       </div>
       <div style={{
         display: 'grid',

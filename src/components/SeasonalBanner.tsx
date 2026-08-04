@@ -35,33 +35,32 @@ export default function SeasonalBanner() {
       href={`/${season.category}`}
       suppressHydrationWarning
       style={{
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
-        gap: '0.75rem',
-        padding: '0.85rem 1.25rem',
-        marginBottom: '2rem',
-        borderRadius: '10px',
-        background: `linear-gradient(135deg, ${season.color}18, ${season.color}08)`,
-        border: `1.5px solid ${season.color}33`,
+        gap: '0.5rem',
+        padding: '0.4rem 0.75rem',
+        marginBottom: '1rem',
+        borderRadius: '6px',
+        background: `${season.color}10`,
+        border: `1px solid ${season.color}25`,
         textDecoration: 'none',
         color: 'inherit',
         transition: 'background 0.15s',
+        fontSize: '0.82rem',
       }}
       aria-label={`${season.text} — перейти в раздел ${season.categoryName}`}
     >
-      <span style={{ fontSize: '1.5rem', flexShrink: 0 }} aria-hidden="true">
+      <span style={{ fontSize: '1rem', flexShrink: 0 }} aria-hidden="true">
         {season.emoji}
       </span>
-      <div style={{ flex: 1 }}>
-        <span style={{ fontSize: '0.93rem', fontWeight: 700, color: season.color }}>
-          {season.text}
-        </span>
-      </div>
+      <span style={{ fontWeight: 600, color: season.color }}>
+        {season.text}
+      </span>
       <span style={{
-        fontSize: '0.8rem',
+        fontSize: '0.72rem',
         fontWeight: 600,
         color: season.color,
-        opacity: 0.85,
+        opacity: 0.8,
         whiteSpace: 'nowrap',
       }}>
         {season.categoryName} →
