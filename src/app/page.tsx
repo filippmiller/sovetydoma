@@ -1,11 +1,13 @@
 import { getAllArticles, getArticlesByCategory, getJustNowArticles } from '@/lib/articles'
 import { CATEGORIES } from '@/lib/categories'
+import ArticleCard from '@/components/ArticleCard'
 import ArticleCatalogGrid from '@/components/ArticleCatalogGrid'
 import CategoryTiles from '@/components/CategoryTiles'
 import LatestPublished from '@/components/LatestPublished'
 import PopularArticles from '@/components/PopularArticles'
 import SeasonalBanner from '@/components/SeasonalBanner'
 import StartHereSection from '@/components/StartHereSection'
+import ArticlePageShell from '@/components/ArticlePageShell'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath, absoluteUrl } from '@/lib/seo'
@@ -74,7 +76,7 @@ export default function HomePage() {
     }))
 
   return (
-    <>
+    <ArticlePageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
 
@@ -92,7 +94,15 @@ export default function HomePage() {
             <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.6rem' }}>
               Свежие советы
             </h2>
-            <ArticleCatalogGrid articles={justNowArticles} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+              {justNowArticles.map((article, i) => (
+                <ArticleCard
+                  key={article.slug}
+                  article={article}
+                  featured={i === 0}
+                />
+              ))}
+            </div>
           </section>
         )}
 
@@ -108,12 +118,19 @@ export default function HomePage() {
                 Все статьи →
               </Link>
             </div>
-            <ArticleCatalogGrid articles={articles} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+              {articles.map((article) => (
+                <ArticleCard
+                  key={article.slug}
+                  article={article}
+                />
+              ))}
+            </div>
           </section>
         )}
 
         <PopularArticles articles={popularArticleData} />
       </div>
-    </>
+    </ArticlePageShell>
   )
 }
