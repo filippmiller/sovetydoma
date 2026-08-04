@@ -1,10 +1,12 @@
 ﻿import { getAllArticles } from '@/lib/articles'
 import SearchClient from '@/components/SearchClient'
 import type { Metadata } from 'next'
+import { canonicalPath } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: 'Поиск по сайту — СоветыДома',
   description: 'Найдите нужную статью на СоветыДома — поиск по рубрикам и тегам',
+  alternates: { canonical: canonicalPath('/search/') },
   robots: { index: false },
 }
 
