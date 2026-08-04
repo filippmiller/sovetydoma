@@ -103,9 +103,8 @@ describe('category generators', () => {
 
   it('homepage does not pass full getAllArticles() directly to ArticleCatalogGrid', () => {
     const page = fs.readFileSync(path.join(root, 'src', 'app', 'page.tsx'), 'utf8')
-    // Must slice/limit articles before passing to the grid
-    assert.match(page, /HOMEPAGE_ARTICLE_LIMIT/)
-    assert.match(page, /\.slice\(/)
+    // Must limit articles before passing to the grid (via getJustNowArticles or slice)
+    assert.match(page, /HOMEPAGE_ARTICLE_LIMIT|JUST_NOW_LIMIT/)
     // Should not pass the unfiltered getAllArticles() result to ArticleCatalogGrid
     const gridPass = page.match(/ArticleCatalogGrid\s+articles=\{([^}]+)\}/)
     assert.ok(gridPass, 'could not find ArticleCatalogGrid articles prop')
