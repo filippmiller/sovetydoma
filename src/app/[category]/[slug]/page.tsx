@@ -28,6 +28,7 @@ import ArticleMetaBadges from '@/components/ArticleMetaBadges'
 import ArticleActionSummary from '@/components/ArticleActionSummary'
 import ArticlePersonaCard from '@/components/ArticlePersonaCard'
 import ArticleFeedback from '@/components/ArticleFeedback'
+import ArticlePageShell from '@/components/ArticlePageShell'
 import ArticlePhotoSubmissionCTA from '@/components/ArticlePhotoSubmissionCTA'
 import ArticleQuestionsBlock from '@/components/ArticleQuestionsBlock'
 import ArticleInternalLinks from '@/components/ArticleInternalLinks'
@@ -192,7 +193,7 @@ export default async function ArticlePage({ params }: Props) {
   const additionalSchemas = buildAdditionalSchema(fm, imageUrl, content)
 
   return (
-    <>
+    <ArticlePageShell>
       {/* F2: Reading progress bar */}
       <ReadingProgress show />
 
@@ -387,6 +388,6 @@ export default async function ArticlePage({ params }: Props) {
             <RelatedArticles articles={similarArticles} compact />
           </div>
         </div>
-    </>
+    </ArticlePageShell>
   )
 }

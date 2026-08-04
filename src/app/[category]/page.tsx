@@ -6,6 +6,7 @@ import { CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
 import CategoryArticleBrowser from '@/components/CategoryArticleBrowser'
 import Breadcrumb from '@/components/Breadcrumb'
 import CategoryFollowControl from '@/components/CategoryFollowControl'
+import ArticlePageShell from '@/components/ArticlePageShell'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { SITE_NAME, SITE_URL, canonicalPath } from '@/lib/seo'
@@ -47,7 +48,7 @@ export default async function CategoryPage({ params }: Props) {
   }
 
   return (
-    <>
+    <ArticlePageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
         <Breadcrumb items={[{ name: cat.name }]} />
 
@@ -124,6 +125,6 @@ export default async function CategoryPage({ params }: Props) {
             Полный хронологический список опубликованных статей рубрики с пагинацией.
           </p>
         </nav>
-    </>
+    </ArticlePageShell>
   )
 }
