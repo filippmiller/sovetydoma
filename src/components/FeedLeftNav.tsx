@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CATEGORIES, SUBCATEGORIES, getSubcategoriesFor } from '@/lib/categories'
+import { CATEGORIES, getSubcategoriesFor } from '@/lib/categories'
 
 const CATEGORY_EMOJI: Record<string, string> = {
   'dacha-i-ogorod': '🌱', 'dom-i-uborka': '🏠', 'ekonomiya': '💰',
@@ -97,7 +97,7 @@ export default function FeedLeftNav() {
                   {subs.map((sub) => (
                     <Link
                       key={sub.slug}
-                      href={`/${slug}/${sub.slug}/`}
+                      href={`/${slug}/#${sub.slug}`}
                       className="feed-left-nav-sub-link"
                     >
                       {sub.name}
