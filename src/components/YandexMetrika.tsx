@@ -28,16 +28,11 @@ export default function YandexMetrika() {
           `,
         }}
       />
-      <noscript>
-        <div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`https://mc.yandex.ru/watch/${YM_ID}`}
-            style={{ position: 'absolute', left: '-9999px' }}
-            alt=""
-          />
-        </div>
-      </noscript>
+      {/* HTML parsers keep a noscript body as text when JavaScript is enabled.
+          Nested JSX therefore causes React hydration error #418. */}
+      <noscript dangerouslySetInnerHTML={{
+        __html: `<img src="https://mc.yandex.ru/watch/${YM_ID}" style="position:absolute;left:-9999px" alt="" />`,
+      }} />
     </>
   )
 }

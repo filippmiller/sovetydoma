@@ -19,6 +19,10 @@
     "test:subscriptions:handlers": "npx tsx --test workers/subscriptions/src/*.handler.test.ts",
     "test:subscriptions:social": "npx tsx --test workers/subscriptions/src/social/*.test.ts",
     "test:subscriptions": "pnpm run test:subscriptions:validation && pnpm run test:subscriptions:index && pnpm run test:subscriptions:worker && pnpm run test:subscriptions:handlers && pnpm run test:subscriptions:social",
+    "e2e:production": "node scripts/real-service-e2e.mjs",
+    "e2e:production:strict": "node scripts/real-service-e2e.mjs --strict",
+    "e2e:browser": "playwright test",
+    "e2e:browser:ui": "playwright test --ui",
     "sync:subscriptions:index": "node scripts/sync-subscription-publication-index.mjs",
     "validate:articles": "node scripts/validate-articles.mjs",
     "validate:style": "node scripts/validate-style.mjs",
@@ -57,6 +61,7 @@
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

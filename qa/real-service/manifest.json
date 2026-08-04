@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 2,
+  "name": "1001sovet.ru fail-closed production certification",
+  "principles": [
+    "Public production probes are read-only and earn PASS only from a named live service response.",
+    "Mocks, fixtures, local emulators, dry-runs and simulated provider callbacks never certify a production journey.",
+    "Missing QA identity, provider sandbox, cleanup authority or proof is BLOCKED, never silently skipped.",
+    "State-changing tests require dedicated owned resources and an explicit E2E_ALLOW_ACTIVE=1 approval."
+  ],
+  "services": {
+    "site": "https://1001sovet.ru",
+    "renderer": "https://sovetydoma-renderer.filippmiller.workers.dev",
+    "subscriptions": "https://sovetydoma-subscriptions.filippmiller.workers.dev",
+    "photo": "https://sovetydoma-photo-upload.filippmiller.workers.dev",
+    "admin": "https://sovetydoma-admin-api.filippmiller.workers.dev"
+  }
+}
