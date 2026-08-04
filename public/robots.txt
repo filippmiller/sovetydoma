@@ -9,15 +9,31 @@ Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid
 
 User-agent: Googlebot
 Allow: /
+Disallow: /admin/
+Disallow: /moy-kabinet/
+Disallow: /napisat/
+Disallow: /api/
 
 User-agent: Googlebot-Image
 Allow: /
+Disallow: /admin/
+Disallow: /moy-kabinet/
+Disallow: /napisat/
+Disallow: /api/
 
 User-agent: Googlebot-Video
 Allow: /
+Disallow: /admin/
+Disallow: /moy-kabinet/
+Disallow: /napisat/
+Disallow: /api/
 
 User-agent: AdsBot-Google
 Allow: /
+Disallow: /admin/
+Disallow: /moy-kabinet/
+Disallow: /napisat/
+Disallow: /api/
 
 User-agent: Yandex
 Allow: /

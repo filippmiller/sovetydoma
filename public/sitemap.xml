@@ -44,6 +44,7 @@
 <url><loc>https://1001sovet.ru/articles/page/21/</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/archive/2026-05/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/archive/2026-06/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://1001sovet.ru/archive/2026-08/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 <url><loc>https://1001sovet.ru/sezon/1/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
 <url><loc>https://1001sovet.ru/sezon/2/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
 <url><loc>https://1001sovet.ru/sezon/3/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
@@ -3337,6 +3338,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/kulinaria/rastitelny-belok-chem-zamenit-myaso/</loc>
+  <lastmod>2026-08-04</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/rastitelny-belok-chem-zamenit-myaso.jpg</image:loc>
+    <image:title>Растительный белок: чем заменить мясо в повседневном меню</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/layfkhaki/razvyazat-uzel/</loc>
   <lastmod>2026-05-31</lastmod>
   <changefreq>monthly</changefreq>
@@ -3857,6 +3868,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/kulinaria/supy-dlya-zdorovya-semi/</loc>
+  <lastmod>2026-08-04</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/supy-dlya-zdorovya-semi.jpg</image:loc>
+    <image:title>5 супов, которые стоит готовить для здоровья всей семьи</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/sushka-yablok-v-duhovke/</loc>
   <lastmod>2026-06-04</lastmod>
   <changefreq>monthly</changefreq>
@@ -4014,6 +4035,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/tomaty-bolezni.jpg</image:loc>
     <image:title>Болезни томатов: почему желтеют, скручиваются и чернеют листья</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/kulinaria/travyanye-chai-doma-prigotovlenie/</loc>
+  <lastmod>2026-08-04</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/travyanye-chai-doma-prigotovlenie.jpg</image:loc>
+    <image:title>Травяные чаи дома: как собирать, сушить и заваривать</image:title>
   </image:image>
 </url>
 <url>
@@ -4627,6 +4658,16 @@
   </image:image>
 </url>
 <url>
+  <loc>https://1001sovet.ru/kulinaria/zagotovki-bez-sahara-sohranyaem-vitaminy/</loc>
+  <lastmod>2026-08-04</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zagotovki-bez-sahara-sohranyaem-vitaminy.jpg</image:loc>
+    <image:title>Заготовки без сахара: сохраняем витамины и экономим</image:title>
+  </image:image>
+</url>
+<url>
   <loc>https://1001sovet.ru/dacha-i-ogorod/zamachivanie-semyan-svekly/</loc>
   <lastmod>2026-06-04</lastmod>
   <changefreq>monthly</changefreq>
@@ -4854,6 +4895,16 @@
   <image:image>
     <image:loc>https://1001sovet.ru/images/zatochka-lopaty-dlya-kopki.jpg</image:loc>
     <image:title>Как заточить лопату для копки огорода в домашних условиях</image:title>
+  </image:image>
+</url>
+<url>
+  <loc>https://1001sovet.ru/kulinaria/zdorovye-zavtrki-na-kazhdyy-den/</loc>
+  <lastmod>2026-08-04</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.7</priority>
+  <image:image>
+    <image:loc>https://1001sovet.ru/images/zdorovye-zavtrki-na-kazhdyy-den.jpg</image:loc>
+    <image:title>Здоровые завтраки на каждый день: быстро, вкусно и недорого</image:title>
   </image:image>
 </url>
 <url>

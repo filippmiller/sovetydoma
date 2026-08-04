@@ -1648,6 +1648,18 @@ const worker = {
       return handleCategoryLatest(env, category, limit)
     }
 
+    // The original public navigation used /{category}/hub/. The canonical
+    // renderer route is /stati/{category}/, so retain a permanent redirect
+    // rather than leaving previously shared or crawled hub links as 404s.
+    const legacyHubMatch = pathname.match(/^\/([a-z0-9-]+)\/hub(\/?)$/)
+    if (legacyHubMatch) {
+      const category = categoryParam(legacyHubMatch[1])
+      if (category && CATEGORY_NAMES[category]) {
+        const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')
+        return Response.redirect(`${siteUrl}/stati/${category}/`, 301)
+      }
+    }
+
     const hubMatch = pathname.match(/^\/stati(?:\/([a-z0-9-]+)(?:\/(\d+))?)?(\/?)$/)
     if (hubMatch) {
       const siteUrl = (env.SITE_URL || 'https://1001sovet.ru').replace(/\/+$/, '')

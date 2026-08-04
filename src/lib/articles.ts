@@ -161,6 +161,14 @@ export function getAllTags(): { tag: string; count: number }[] {
  * Old /oldcat/slug/ should 301/soft-redirect to /newcat/slug/ to avoid dead links.
  */
 export const LEGACY_ARTICLE_MOVES: Record<string, { oldCategory: string; newCategory: string }> = {
+  // Healthy-eating was published as the "Здоровая еда" subcategory of
+  // Кулинария. Keep the originally announced top-level URLs alive so shared
+  // links never become 404s while preserving one canonical article URL.
+  'rastitelny-belok-chem-zamenit-myaso': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
+  'supy-dlya-zdorovya-semi': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
+  'travyanye-chai-doma-prigotovlenie': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
+  'zagotovki-bez-sahara-sohranyaem-vitaminy': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
+  'zdorovye-zavtrki-na-kazhdyy-den': { oldCategory: 'zdorovoe-pitanie', newCategory: 'kulinaria' },
   // zdorovie-i-bezopasnost
   'bezopasnost-doma-dlya-rebenka': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },
   'domashnyaya-aptechka-bez-lishnego': { oldCategory: 'layfkhaki', newCategory: 'zdorovie-i-bezopasnost' },

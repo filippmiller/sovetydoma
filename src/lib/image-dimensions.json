@@ -1,8 +1,4 @@
 {
-  "_grok-test.jpg": {
-    "w": 1408,
-    "h": 768
-  },
   "agrovolokno-pod-klubniku-vesnoy.jpg": {
     "w": 1408,
     "h": 768
@@ -595,6 +591,10 @@
     "w": 1280,
     "h": 960
   },
+  "kak-zharit-lisichki.jpg": {
+    "w": 1280,
+    "h": 960
+  },
   "kapelnyy-poliv-iz-butylok.jpg": {
     "w": 1408,
     "h": 768
@@ -1047,6 +1047,10 @@
     "w": 1280,
     "h": 960
   },
+  "pivnoy-marinad-dlya-shashlyka.jpg": {
+    "w": 1536,
+    "h": 1024
+  },
   "plesen-v-vannoy.jpg": {
     "w": 1280,
     "h": 960
@@ -1323,9 +1327,17 @@
     "w": 1280,
     "h": 960
   },
+  "rastitelny-belok-chem-zamenit-myaso.jpg": {
+    "w": 1024,
+    "h": 576
+  },
   "razvyazat-uzel.jpg": {
     "w": 1200,
     "h": 558
+  },
+  "recepty-s-lisichkami.jpg": {
+    "w": 1280,
+    "h": 960
   },
   "remont-kvartiry-byudzhet.jpg": {
     "w": 1280,
@@ -1531,6 +1543,10 @@
     "w": 1408,
     "h": 768
   },
+  "supy-dlya-zdorovya-semi.jpg": {
+    "w": 1024,
+    "h": 576
+  },
   "sushka-yablok-v-duhovke.jpg": {
     "w": 1408,
     "h": 768
@@ -1594,6 +1610,10 @@
   "tomaty-bolezni.jpg": {
     "w": 1280,
     "h": 960
+  },
+  "travyanye-chai-doma-prigotovlenie.jpg": {
+    "w": 1024,
+    "h": 576
   },
   "treshchina-v-fundamente-bytovki.jpg": {
     "w": 1408,
@@ -1839,6 +1859,10 @@
     "w": 1280,
     "h": 960
   },
+  "zagotovki-bez-sahara-sohranyaem-vitaminy.jpg": {
+    "w": 1024,
+    "h": 576
+  },
   "zamachivanie-semyan-svekly.jpg": {
     "w": 1408,
     "h": 768
@@ -1930,6 +1954,10 @@
   "zatochka-lopaty-dlya-kopki.jpg": {
     "w": 1408,
     "h": 768
+  },
+  "zdorovye-zavtrki-na-kazhdyy-den.jpg": {
+    "w": 1024,
+    "h": 576
   },
   "zelen-na-podokonnike.jpg": {
     "w": 1280,

@@ -92,7 +92,6 @@ describe('auth-gated PE islands for dynamic pages', () => {
         count += 1
         const body = m[1]
         assert.doesNotThrow(() => {
-          // eslint-disable-next-line no-new-func
           new Function(body)
         }, `${name} inline script #${count} must be valid JS`)
       }

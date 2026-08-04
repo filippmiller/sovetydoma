@@ -110,13 +110,24 @@ export default function CategoryArticleBrowser({ category, articles: staticArtic
   const tags = useMemo(() => uniqueTags(allArticles), [allArticles])
   const topicOptions = usingThemes ? themes.map((t) => t.label) : tags
 
-  // Read URL hash on mount to auto-select a subcategory theme
+  // Keep the article filter in sync with subcategory hash links. The initial
+  // read is scheduled after paint and later changes arrive through the browser
+  // event, avoiding a synchronous state update while React is running effects.
   useEffect(() => {
-    if (!usingThemes || themes.length === 0) return
-    const hash = window.location.hash.slice(1)
-    if (!hash) return
-    const match = themes.find((t) => t.slug === hash)
-    if (match) setTopic(match.label)
+    const syncTopicFromHash = () => {
+      if (!usingThemes || themes.length === 0) return
+      const hash = window.location.hash.slice(1)
+      if (!hash) return
+      const match = themes.find((t) => t.slug === hash)
+      if (match) setTopic((current) => current === match.label ? current : match.label)
+    }
+
+    const frame = window.requestAnimationFrame(syncTopicFromHash)
+    window.addEventListener('hashchange', syncTopicFromHash)
+    return () => {
+      window.cancelAnimationFrame(frame)
+      window.removeEventListener('hashchange', syncTopicFromHash)
+    }
   }, [usingThemes, themes])
 
   const topicMatch = useMemo(() => {
