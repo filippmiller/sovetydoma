@@ -36,7 +36,6 @@ export default function AllArticlesPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
         <Breadcrumb items={[{ name: 'Все статьи' }]} />
 
         <header style={{ marginBottom: '1.5rem' }}>
@@ -71,7 +70,6 @@ export default function AllArticlesPage() {
         <p style={{ marginTop: '1.5rem', fontSize: '0.8rem', color: '#888' }}>
           Полная лента доступна для поиска и архивов. Для фильтров по разделам используйте <Link href="/search/" style={{ color: '#c0392b' }}>поиск</Link>.
         </p>
-      </div>
     </>
   )
 }

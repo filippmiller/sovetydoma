@@ -104,7 +104,6 @@ export default function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem 1rem 2rem' }}>
 
         {/* Hero */}
         <section style={{
@@ -206,10 +205,9 @@ export default function HomePage() {
 
         {/* RSS link — compact */}
         <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.8rem', color: '#aaa' }}>
-          📡 <Link href="/feed.xml" style={{ color: '#aaa' }}>RSS-лента</Link>
+           <Link href="/feed.xml" style={{ color: '#aaa' }}>RSS-лента</Link>
         </div>
 
-      </div>
     </>
   )
 }

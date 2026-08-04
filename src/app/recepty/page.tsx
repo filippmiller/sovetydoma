@@ -30,12 +30,12 @@ export default function ReceptyPage() {
     }))
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
+    <>
       <Breadcrumb items={[{ name: 'Кулинария', href: '/kulinaria' }, { name: 'Рецепты' }]} />
 
       <header style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.4rem' }}>
-          <span style={{ fontSize: '2rem' }}>🍳</span>
+          <span style={{ fontSize: '2rem' }}></span>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#1a1a1a', margin: 0 }}>
             Рецепты
           </h1>
@@ -46,6 +46,6 @@ export default function ReceptyPage() {
       </header>
 
       <RecipeFilter recipes={recipes} />
-    </div>
+    </>
   )
 }

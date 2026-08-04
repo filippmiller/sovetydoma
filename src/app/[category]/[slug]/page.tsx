@@ -217,7 +217,6 @@ export default async function ArticlePage({ params }: Props) {
       {/* Category color stripe */}
       <div style={{ height: '4px', background: `linear-gradient(90deg, ${color}, ${color}88)` }} />
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
         <div className="article-layout">
           <div className="article-main">
             <Breadcrumb items={[
@@ -388,7 +387,6 @@ export default async function ArticlePage({ params }: Props) {
             <RelatedArticles articles={similarArticles} compact />
           </div>
         </div>
-      </div>
     </>
   )
 }

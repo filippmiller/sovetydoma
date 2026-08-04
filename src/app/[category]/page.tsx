@@ -49,7 +49,6 @@ export default async function CategoryPage({ params }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
         <Breadcrumb items={[{ name: cat.name }]} />
 
         <header style={{ marginBottom: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
@@ -125,7 +124,6 @@ export default async function CategoryPage({ params }: Props) {
             Полный хронологический список опубликованных статей рубрики с пагинацией.
           </p>
         </nav>
-      </div>
     </>
   )
 }

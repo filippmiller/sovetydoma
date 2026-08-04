@@ -19,6 +19,7 @@ import GoogleAnalytics from '@/components/GoogleAnalytics'
 import BackToTop from '@/components/BackToTop'
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration'
 import AnalyticsTracker from '@/components/AnalyticsTracker'
+import ArticlePageShell from '@/components/ArticlePageShell'
 import { SITE_NAME, SITE_URL, DEFAULT_OG_IMAGE } from '@/lib/seo'
 import { CATEGORIES } from '@/lib/categories'
 
@@ -94,7 +95,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <YandexMetrika />
         <GoogleAnalytics />
         <AdminChromeGate><Header /></AdminChromeGate>
-        <main id="main-content" style={{ flex: 1 }}>{children}</main>
+        <main id="main-content" style={{ flex: 1 }}>
+          <ArticlePageShell>{children}</ArticlePageShell>
+        </main>
         <AdminChromeGate><Footer /></AdminChromeGate>
         <BackToTop />
         <ServiceWorkerRegistration />
