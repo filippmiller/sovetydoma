@@ -133,7 +133,7 @@ export default function FeedLeftNav() {
                   {subs.map((sub) => (
                     <Link
                       key={sub.slug}
-                      href={`/${slug}/#${sub.slug}`}
+                      href={currentPath === `/${slug}` ? `#${sub.slug}` : `/${slug}/#${sub.slug}`}
                       className="feed-left-nav-sub-link"
                     >
                       {sub.name}
