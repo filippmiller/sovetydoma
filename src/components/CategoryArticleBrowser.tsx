@@ -110,6 +110,15 @@ export default function CategoryArticleBrowser({ category, articles: staticArtic
   const tags = useMemo(() => uniqueTags(allArticles), [allArticles])
   const topicOptions = usingThemes ? themes.map((t) => t.label) : tags
 
+  // Read URL hash on mount to auto-select a subcategory theme
+  useEffect(() => {
+    if (!usingThemes || themes.length === 0) return
+    const hash = window.location.hash.slice(1)
+    if (!hash) return
+    const match = themes.find((t) => t.slug === hash)
+    if (match) setTopic(match.label)
+  }, [usingThemes, themes])
+
   const topicMatch = useMemo(() => {
     if (!topic) return null
     if (usingThemes) {

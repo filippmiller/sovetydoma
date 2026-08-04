@@ -1,6 +1,8 @@
 export const dynamicParams = false
 export const revalidate = false
 import { getArticlesByCategory, CATEGORIES } from '@/lib/articles'
+import { getSubcategoriesFor } from '@/lib/categories'
+import { CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
 import CategoryArticleBrowser from '@/components/CategoryArticleBrowser'
 import Breadcrumb from '@/components/Breadcrumb'
 import CategoryFollowControl from '@/components/CategoryFollowControl'
@@ -33,6 +35,7 @@ export default async function CategoryPage({ params }: Props) {
   if (!cat) notFound()
 
   const articles = getArticlesByCategory(category)
+  const subcategories = getSubcategoriesFor(category)
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
@@ -68,6 +71,41 @@ export default async function CategoryPage({ params }: Props) {
             </div>
           </div>
         </header>
+
+        {/* Subcategory tiles */}
+        {subcategories.length > 0 && (
+          <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              {subcategories.map((sub) => {
+                const emoji = CATEGORY_EMOJI[sub.slug] || '📄'
+                const color = CATEGORY_COLOR[sub.slug] || '#888'
+                return (
+                  <a
+                    key={sub.slug}
+                    href={`#${sub.slug}`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      padding: '0.4rem 0.75rem',
+                      borderRadius: '20px',
+                      border: `1.5px solid ${color}33`,
+                      backgroundColor: `${color}0a`,
+                      color: color,
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      transition: 'background 0.15s, border-color 0.15s',
+                    }}
+                  >
+                    <span>{emoji}</span>
+                    <span>{sub.name}</span>
+                  </a>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {articles.length === 0 ? (
           <p style={{ color: '#888' }}>Статьи в этом разделе появятся скоро.</p>

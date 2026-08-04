@@ -1,0 +1,14 @@
+{
+  "beadId": "BEAD-OPS-DA6",
+  "title": "VK/FB 12-category autopost — complete group/page maps",
+  "status": "running",
+  "priority": "P1",
+  "branch": "master",
+  "worktree": "C:\\DEV\\sovetydoma",
+  "owner": "Philip (operator)",
+  "createdAt": "2026-06-25T16:09:14Z",
+  "updatedAt": "2026-06-25T16:09:14Z",
+  "dependsOn": ["sovetydoma-da1"],
+  "blockedBy": [],
+  "summary": "Create missing VK communities and FB pages, collect IDs/tokens, upload full 12-category maps via wrangler secret bulk, verify inventory endpoint shows 12/12 for both."
+}

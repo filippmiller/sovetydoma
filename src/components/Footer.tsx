@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { CATEGORIES, getAllArticles } from '@/lib/articles'
+import { getSubcategoriesFor } from '@/lib/categories'
 import NewsletterForm from './NewsletterForm'
 import FooterArticleCount from './FooterArticleCount'
 
@@ -48,13 +49,27 @@ export default function Footer() {
           <div>
             <div style={{ color: '#fff', fontWeight: 700, marginBottom: '0.85rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Разделы</div>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {Object.values(CATEGORIES).map((cat) => (
-                <li key={cat.slug} style={{ marginBottom: '0.45rem' }}>
-                  <Link href={`/${cat.slug}`} style={{ color: '#c0bdb8', textDecoration: 'none', fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                    <span>{cat.name}</span>
-                  </Link>
-                </li>
-              ))}
+              {Object.values(CATEGORIES).map((cat) => {
+                const subs = getSubcategoriesFor(cat.slug)
+                return (
+                  <li key={cat.slug} style={{ marginBottom: '0.45rem' }}>
+                    <Link href={`/${cat.slug}`} style={{ color: '#c0bdb8', textDecoration: 'none', fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <span>{cat.name}</span>
+                    </Link>
+                    {subs.length > 0 && (
+                      <ul style={{ listStyle: 'none', padding: '0.15rem 0 0 0.8rem', margin: 0 }}>
+                        {subs.map((sub) => (
+                          <li key={sub.slug} style={{ marginBottom: '0.2rem' }}>
+                            <Link href={`/${cat.slug}#${sub.slug}`} style={{ color: '#888', textDecoration: 'none', fontSize: '0.78rem' }}>
+                              {sub.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
           </div>
 

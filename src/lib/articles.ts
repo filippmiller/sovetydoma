@@ -10,6 +10,7 @@ export interface ArticleFrontmatter {
   slug: string
   category: string
   categoryName: string
+  subcategory?: string
   description: string
   date: string
   updated?: string

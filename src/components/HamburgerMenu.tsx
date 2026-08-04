@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CATEGORIES } from '@/lib/categories'
+import { CATEGORIES, getSubcategoriesFor } from '@/lib/categories'
 
 export default function HamburgerMenu() {
   const [open, setOpen] = useState(false)
@@ -69,11 +69,16 @@ export default function HamburgerMenu() {
     }
   }, [open])
 
-  const navLinks = [
-    ...Object.values(CATEGORIES).map((cat) => ({ href: `/${cat.slug}`, label: cat.name })),
-    { href: '/recepty', label: '🍳 Рецепты' },
-    { href: '/search', label: '🔍 Поиск' },
-  ]
+  // Build nav with subcategories nested under their parent
+  const navLinks: { href: string; label: string; isSub?: boolean; parentSlug?: string }[] = []
+  for (const cat of Object.values(CATEGORIES)) {
+    navLinks.push({ href: `/${cat.slug}`, label: cat.name })
+    for (const sub of getSubcategoriesFor(cat.slug)) {
+      navLinks.push({ href: `/${cat.slug}#${sub.slug}`, label: `  ${sub.name}`, isSub: true, parentSlug: cat.slug })
+    }
+  }
+  navLinks.push({ href: '/recepty', label: '🍳 Рецепты' })
+  navLinks.push({ href: '/search', label: '🔍 Поиск' })
 
   return (
     <>
@@ -156,20 +161,21 @@ export default function HamburgerMenu() {
           <nav aria-label="Мобильная навигация">
             {navLinks.map((link, index) => {
               const isActive = pathname === link.href || pathname.startsWith(link.href + '/')
+              const isSub = link.isSub
               return (
                 <Link
-                  key={link.href}
+                  key={link.href + link.label}
                   href={link.href}
                   ref={index === 0 ? firstLinkRef : undefined}
                   aria-current={isActive ? 'page' : undefined}
                   style={{
                     display: 'block',
-                    padding: '1rem 2rem',
-                    fontSize: '1.4rem',
+                    padding: isSub ? '0.6rem 2rem 0.6rem 3.5rem' : '1rem 2rem',
+                    fontSize: isSub ? '1.15rem' : '1.4rem',
                     fontWeight: isActive ? 700 : 400,
-                    color: isActive ? '#c0392b' : '#f0ede8',
+                    color: isActive ? '#c0392b' : isSub ? '#aaa' : '#f0ede8',
                     textDecoration: 'none',
-                    borderBottom: '1px solid #2a2a2a',
+                    borderBottom: isSub ? '1px solid #222' : '1px solid #2a2a2a',
                     transition: 'background 0.15s, color 0.15s',
                   }}
                   onMouseEnter={(e) => {
