@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import type { Profile } from '@/lib/supabase'
 import { getArticleMeta } from '@/lib/article-index'
+import { photoPublicUrl } from '@/lib/photos'
 import ArticlePageShell from '@/components/ArticlePageShell'
+import LatestPublished from '@/components/LatestPublished'
 
 interface SavedArticle {
   article_slug: string
@@ -19,30 +20,34 @@ interface UserArticle {
   status: 'draft' | 'pending' | 'approved' | 'rejected'
   created_at: string
   category: string
+  photo_path?: string | null
 }
 
+type CabinetTab = 'feed' | 'recipes' | 'lifehacks' | 'saved' | 'articles'
+
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  draft:    { label: 'Черновик',      color: '#666',    bg: '#f0ede8' },
-  pending:  { label: 'На проверке',   color: '#e67e22', bg: '#fef3e2' },
-  approved: { label: 'Опубликовано',  color: '#27ae60', bg: '#e9f7ef' },
-  rejected: { label: 'Отклонено',     color: '#c0392b', bg: '#fdecea' },
+  draft: { label: 'Черновик', color: '#666', bg: '#f0ede8' },
+  pending: { label: 'На проверке', color: '#e67e22', bg: '#fef3e2' },
+  approved: { label: 'Опубликовано', color: '#27ae60', bg: '#e9f7ef' },
+  rejected: { label: 'Отклонено', color: '#c0392b', bg: '#fdecea' },
 }
+
+const TABS: Array<{ id: CabinetTab; label: string }> = [
+  { id: 'feed', label: 'Лента' },
+  { id: 'recipes', label: 'Рецепты' },
+  { id: 'lifehacks', label: 'Лайфхаки' },
+  { id: 'saved', label: 'Сохранённое' },
+  { id: 'articles', label: 'Мои статьи' },
+]
 
 export default function MoyKabinetPage() {
   const router = useRouter()
-  const [profile, setProfile] = useState<Profile | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
-  const [tab, setTab] = useState<'saved' | 'articles'>('saved')
+  const [tab, setTab] = useState<CabinetTab>('feed')
   const [saved, setSaved] = useState<SavedArticle[]>([])
   const [articles, setArticles] = useState<UserArticle[]>([])
   const [loading, setLoading] = useState(true)
-  const [editMode, setEditMode] = useState(false)
-  const [editName, setEditName] = useState('')
-  const [editBio, setEditBio] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [profileSaved, setProfileSaved] = useState(false)
   const [loadingError, setLoadingError] = useState<string | null>(null)
-  const profileSavedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -50,316 +55,215 @@ export default function MoyKabinetPage() {
       try {
         const { data } = await supabase.auth.getUser()
         if (cancelled) return
-        const u = data.user
-        if (!u) { router.replace('/'); return }
-        setUserId(u.id)
-
-        // P1 profile reliability: use maybeSingle + repair fallback instead of brittle .single()
-        let { data: p } = await supabase.from('profiles').select('*').eq('id', u.id).maybeSingle()
-        if (!p) {
-          // fallback upsert to guarantee row (idempotent, respects RLS for owner)
-          const display_name = (u as any).user_metadata?.display_name || u.email?.split('@')[0] || 'Пользователь' // eslint-disable-line @typescript-eslint/no-explicit-any
-          await supabase.from('profiles').upsert({
-            id: u.id,
-            display_name,
-            bio: '',
-            avatar_url: '',
-            role: 'user' as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-            articles_count: 0,
-          }, { onConflict: 'id' })
-          const { data: repaired } = await supabase.from('profiles').select('*').eq('id', u.id).maybeSingle()
-          p = repaired
+        const user = data.user
+        if (!user) {
+          router.replace('/')
+          return
         }
-        if (p) {
-          setProfile(p as Profile)
-          setEditName((p as Profile).display_name || '')
-          setEditBio((p as Profile).bio || '')
-        } else {
-          // last resort default so UI doesn't break
-          setProfile({ id: u.id, display_name: u.email?.split('@')[0] || 'Пользователь', bio: '', avatar_url: '', role: 'user', articles_count: 0 } as Profile)
-          setEditName(u.email?.split('@')[0] || 'Пользователь')
-        }
+        setUserId(user.id)
 
-        const { data: s } = await supabase
-          .from('saved_articles')
-          .select('*')
-          .eq('user_id', u.id)
-          .order('saved_at', { ascending: false })
-        if (!cancelled) setSaved((s as SavedArticle[]) || [])
-
-        const { data: a } = await supabase
-          .from('user_articles')
-          .select('*')
-          .eq('author_id', u.id)
-          .order('created_at', { ascending: false })
-        if (!cancelled) setArticles((a as UserArticle[]) || [])
+        const [savedResult, articlesResult] = await Promise.all([
+          supabase
+            .from('saved_articles')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('saved_at', { ascending: false }),
+          supabase
+            .from('user_articles')
+            .select('*')
+            .eq('author_id', user.id)
+            .order('created_at', { ascending: false }),
+        ])
 
         if (!cancelled) {
+          setSaved((savedResult.data as SavedArticle[]) || [])
+          setArticles((articlesResult.data as UserArticle[]) || [])
           setLoading(false)
           setLoadingError(null)
         }
-      } catch (e) {
+      } catch (error) {
         if (!cancelled) {
-          console.error('moy-kabinet load error', e)
-          setLoadingError('Не удалось загрузить данные кабинета. Попробуйте обновить страницу.')
+          console.error('moy-kabinet load error', error)
+          setLoadingError('Не удалось загрузить ленту. Попробуйте обновить страницу.')
           setLoading(false)
         }
       }
     })()
-    return () => {
-      cancelled = true
-      if (profileSavedTimerRef.current) {
-        clearTimeout(profileSavedTimerRef.current)
-      }
-    }
-  }, [router])
 
-  const saveProfile = async () => {
-    if (!userId) return
-    setSaving(true)
-    await supabase
-      .from('profiles')
-      .update({ display_name: editName, bio: editBio })
-      .eq('id', userId)
-    setProfile((prev) => prev ? { ...prev, display_name: editName, bio: editBio } : prev)
-    setSaving(false)
-    setEditMode(false)
-    setProfileSaved(true)
-    if (profileSavedTimerRef.current) {
-      clearTimeout(profileSavedTimerRef.current)
-    }
-    profileSavedTimerRef.current = setTimeout(() => {
-      setProfileSaved(false)
-      profileSavedTimerRef.current = null
-    }, 1800)
-  }
+    return () => { cancelled = true }
+  }, [router])
 
   const removeSaved = async (slug: string) => {
     if (!userId) return
     await supabase.from('saved_articles').delete().eq('user_id', userId).eq('article_slug', slug)
-    setSaved((prev) => prev.filter((s) => s.article_slug !== slug))
+    setSaved((prev) => prev.filter((article) => article.article_slug !== slug))
   }
 
   if (loading) {
-    return (
-      <div style={{ maxWidth: '800px', margin: '4rem auto', padding: '0 1rem', textAlign: 'center', color: '#aaa' }}>
-        Загрузка…
-      </div>
-    )
+    return <div style={pageMessageStyle}>Загрузка ленты…</div>
   }
 
   if (loadingError) {
     return (
-      <div style={{ maxWidth: '800px', margin: '4rem auto', padding: '0 1rem', textAlign: 'center' }}>
+      <div style={pageMessageStyle}>
         <p style={{ color: '#c0392b', marginBottom: '1rem' }}>{loadingError}</p>
-        <button onClick={() => window.location.reload()} style={redBtnStyle as React.CSSProperties}>
-          Обновить страницу
-        </button>
+        <button onClick={() => window.location.reload()} style={redBtnStyle}>Обновить страницу</button>
       </div>
     )
   }
 
-  const displayName = profile?.display_name || 'Пользователь'
-  const initials = displayName.slice(0, 2).toUpperCase()
-
   return (
     <ArticlePageShell>
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem 4rem' }}>
-      {/* Profile header */}
-      <div style={{
-        background: '#fff', border: '1px solid #e8e4df', borderRadius: '12px',
-        padding: '1.5rem', marginBottom: '2rem', display: 'flex', gap: '1.25rem', alignItems: 'flex-start',
-      }}>
-        <div style={{
-          width: '60px', height: '60px', borderRadius: '50%',
-          backgroundColor: '#c0392b', color: '#fff',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.3rem', fontWeight: 800, flexShrink: 0,
-        }}>
-          {initials}
-        </div>
-        <div style={{ flex: 1 }}>
-          {editMode ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div>
-                <label style={labelStyle}>Имя пользователя</label>
-                <input
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  style={inputStyle}
-                />
-              </div>
-              <div>
-                <label style={labelStyle}>О себе</label>
-                <textarea
-                  value={editBio}
-                  onChange={(e) => setEditBio(e.target.value)}
-                  rows={3}
-                  style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }}
-                />
-              </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button onClick={saveProfile} disabled={saving} style={redBtnStyle}>
-                  {saving ? 'Сохраняем…' : 'Сохранить'}
-                </button>
-                <button onClick={() => setEditMode(false)} style={outlineBtnStyle}>Отмена</button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.25rem' }}>
-                    {displayName}
-                  </h1>
-                  {profile?.bio && (
-                    <p style={{ fontSize: '0.9rem', color: '#666', margin: '0 0 0.4rem', lineHeight: 1.5 }}>
-                      {profile.bio}
-                    </p>
-                  )}
-                  <span style={{
-                    display: 'inline-block', fontSize: '0.75rem', color: '#aaa',
-                    backgroundColor: '#f5f3f0', borderRadius: '4px', padding: '2px 8px',
-                  }}>
-                    {profile?.role === 'admin' ? '🛡 Администратор' : profile?.role === 'moderator' ? '⚡ Модератор' : '👤 Пользователь'}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.35rem' }}>
-                  <button onClick={() => setEditMode(true)} style={outlineBtnStyle}>
-                    Редактировать
-                  </button>
-                  {profileSaved && (
-                    <span style={{ color: '#27ae60', fontSize: '0.8rem', fontWeight: 600 }}>
-                      Сохранено!
-                    </span>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
+      <main style={{ maxWidth: '1040px', margin: '0 auto', padding: '2rem 1rem 4rem' }}>
+        <header style={{ marginBottom: '1.25rem' }}>
+          <h1 style={{ fontSize: '1.55rem', fontWeight: 850, color: '#1a1a1a', margin: '0 0 0.3rem' }}>
+            Моя лента
+          </h1>
+          <p style={{ color: '#777', fontSize: '0.93rem', margin: 0, lineHeight: 1.5 }}>
+            Самые свежие рецепты, лайфхаки и полезные советы.
+          </p>
+        </header>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', borderBottom: '2px solid #f0ede8', marginBottom: '1.5rem' }}>
-        {(['saved', 'articles'] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              padding: '0.6rem 1.2rem', fontSize: '0.93rem', fontWeight: 600,
-              color: tab === t ? '#c0392b' : '#888',
-              borderBottom: `2px solid ${tab === t ? '#c0392b' : 'transparent'}`,
-              marginBottom: '-2px',
-            }}
-          >
-            {t === 'saved' ? `Сохранённые статьи (${saved.length})` : `Мои статьи (${articles.length})`}
-          </button>
-        ))}
-      </div>
+        <nav aria-label="Разделы кабинета" style={tabBarStyle}>
+          {TABS.map((item) => {
+            const active = tab === item.id
+            const count = item.id === 'saved' ? saved.length : item.id === 'articles' ? articles.length : null
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setTab(item.id)}
+                aria-current={active ? 'page' : undefined}
+                style={{ ...tabStyle, color: active ? '#c0392b' : '#666', borderBottomColor: active ? '#c0392b' : 'transparent' }}
+              >
+                {item.label}{count === null ? '' : ` (${count})`}
+              </button>
+            )
+          })}
+        </nav>
 
-      {tab === 'saved' && (
-        saved.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#aaa', padding: '3rem 0' }}>
-            <p style={{ marginBottom: '1rem' }}>Нет сохранённых статей</p>
-            <Link href="/" style={{ color: '#c0392b', fontWeight: 600 }}>Читать статьи →</Link>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {saved.map((s) => {
-              const meta = getArticleMeta(s.article_slug)
-              const href = meta?.category ? `/${meta.category}/${s.article_slug}/` : `/search/?q=${encodeURIComponent(s.article_slug)}`
-              return (
-              <div key={s.article_slug} style={{
-                background: '#fff', border: '1px solid #e8e4df', borderRadius: '8px',
-                padding: '0.9rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem',
-              }}>
-                <span style={{ fontSize: '1.1rem' }}>🔖</span>
-                <Link
-                  href={href}
-                  style={{ flex: 1, color: '#1a1a1a', textDecoration: 'none', fontWeight: 600, fontSize: '0.93rem' }}
-                >
-                  {meta?.title || s.article_slug}
-                </Link>
-                <button
-                  onClick={() => removeSaved(s.article_slug)}
-                  title="Удалить"
-                  style={{
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    color: '#bbb', fontSize: '1rem', padding: '2px 6px',
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-              )
-            })}
-          </div>
-        )
-      )}
+        {tab === 'feed' && (
+          <LatestPublished
+            limit={12}
+            title="Самое свежее"
+            subtitle="Только что опубликованные материалы со всего сайта"
+            showEmpty
+          />
+        )}
 
-      {tab === 'articles' && (
-        <>
-          <div style={{ marginBottom: '1rem', textAlign: 'right' }}>
-            <Link href="/napisat/" style={redBtnStyle as React.CSSProperties}>
-              ✏️ Написать статью
-            </Link>
-          </div>
-          {articles.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#aaa', padding: '3rem 0' }}>
-              <p>Вы ещё не писали статей</p>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {articles.map((a) => {
-                const st = STATUS_LABELS[a.status] || STATUS_LABELS.draft
-                return (
-                  <div key={a.id} style={{
-                    background: '#fff', border: '1px solid #e8e4df', borderRadius: '8px',
-                    padding: '0.9rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem',
-                  }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: '0.93rem', color: '#1a1a1a', marginBottom: '0.25rem' }}>
-                        {a.title}
-                      </div>
-                      <div style={{ fontSize: '0.78rem', color: '#aaa' }}>
-                        {a.category} · {new Date(a.created_at).toLocaleDateString('ru-RU')}
-                      </div>
-                    </div>
-                    <span style={{
-                      padding: '3px 10px', borderRadius: '20px',
-                      fontSize: '0.78rem', fontWeight: 700,
-                      color: st.color, backgroundColor: st.bg,
-                    }}>
-                      {st.label}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </>
-      )}
-    </div>
+        {tab === 'recipes' && (
+          <LatestPublished
+            category="kulinaria"
+            limit={12}
+            title="Свежие рецепты"
+            subtitle="Новые блюда, заготовки и кулинарные советы"
+            showEmpty
+            emptyHref="/kulinaria/"
+            emptyLinkLabel="Открыть все рецепты →"
+          />
+        )}
+
+        {tab === 'lifehacks' && (
+          <LatestPublished
+            category="layfkhaki"
+            limit={12}
+            title="Свежие лайфхаки"
+            subtitle="Новые практичные идеи для дома и повседневной жизни"
+            showEmpty
+            emptyHref="/layfkhaki/"
+            emptyLinkLabel="Открыть все лайфхаки →"
+          />
+        )}
+
+        {tab === 'saved' && <SavedArticles saved={saved} onRemove={removeSaved} />}
+        {tab === 'articles' && <AuthoredArticles articles={articles} />}
+      </main>
     </ArticlePageShell>
   )
 }
 
-const labelStyle: React.CSSProperties = {
-  display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#555', marginBottom: '0.3rem',
+function SavedArticles({ saved, onRemove }: { saved: SavedArticle[]; onRemove: (slug: string) => void }) {
+  if (saved.length === 0) {
+    return (
+      <EmptyState message="Пока нет сохранённых статей" href="/" linkLabel="Открыть ленту →" />
+    )
+  }
+
+  return (
+    <section aria-label="Сохранённые статьи" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      {saved.map((item) => {
+        const meta = getArticleMeta(item.article_slug)
+        const href = meta?.category ? `/${meta.category}/${item.article_slug}/` : `/search/?q=${encodeURIComponent(item.article_slug)}`
+        return (
+          <article key={item.article_slug} style={savedCardStyle}>
+            <span aria-hidden="true" style={{ fontSize: '1.1rem' }}>🔖</span>
+            <Link href={href} style={{ flex: 1, color: '#1a1a1a', textDecoration: 'none', fontWeight: 650, fontSize: '0.95rem' }}>
+              {meta?.title || item.article_slug}
+            </Link>
+            <button type="button" onClick={() => onRemove(item.article_slug)} aria-label="Удалить из сохранённого" style={removeButtonStyle}>×</button>
+          </article>
+        )
+      })}
+    </section>
+  )
 }
-const inputStyle: React.CSSProperties = {
-  width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px',
-  border: '1.5px solid #ddd', fontSize: '0.93rem', outline: 'none', boxSizing: 'border-box',
+
+function AuthoredArticles({ articles }: { articles: UserArticle[] }) {
+  if (articles.length === 0) {
+    return <EmptyState message="Вы ещё не писали статей" href="/napisat/" linkLabel="Написать статью →" />
+  }
+
+  return (
+    <section aria-label="Мои статьи">
+      <div style={{ marginBottom: '1rem', textAlign: 'right' }}>
+        <Link href="/napisat/" style={redBtnStyle}>✏️ Написать статью</Link>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {articles.map((article) => {
+          const status = STATUS_LABELS[article.status] || STATUS_LABELS.draft
+          return (
+            <article key={article.id} style={savedCardStyle}>
+              {article.photo_path && (
+                // eslint-disable-next-line @next/next/no-img-element -- private R2 key is resolved at runtime.
+                <img src={photoPublicUrl(article.photo_path)} alt="Фотография рецепта" style={{ width: '54px', height: '54px', objectFit: 'cover', borderRadius: '7px', flexShrink: 0 }} />
+              )}
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 650, fontSize: '0.95rem', color: '#1a1a1a', marginBottom: '0.25rem' }}>{article.title}</div>
+                <div style={{ fontSize: '0.78rem', color: '#888' }}>{article.category} · {new Date(article.created_at).toLocaleDateString('ru-RU')}</div>
+              </div>
+              <span style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '0.78rem', fontWeight: 700, color: status.color, backgroundColor: status.bg }}>{status.label}</span>
+            </article>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
+function EmptyState({ message, href, linkLabel }: { message: string; href: string; linkLabel: string }) {
+  return (
+    <div style={{ textAlign: 'center', color: '#888', padding: '3rem 0' }}>
+      <p style={{ marginBottom: '1rem' }}>{message}</p>
+      <Link href={href} style={{ color: '#c0392b', fontWeight: 650 }}>{linkLabel}</Link>
+    </div>
+  )
+}
+
+const pageMessageStyle: React.CSSProperties = {
+  maxWidth: '800px', margin: '4rem auto', padding: '0 1rem', textAlign: 'center', color: '#888',
+}
+const tabBarStyle: React.CSSProperties = {
+  display: 'flex', flexWrap: 'wrap', gap: '0 0.35rem', borderBottom: '2px solid #f0ede8', marginBottom: '1.75rem',
+}
+const tabStyle: React.CSSProperties = {
+  background: 'none', border: 'none', borderBottom: '2px solid transparent', cursor: 'pointer', padding: '0.65rem 0.8rem', marginBottom: '-2px', fontSize: '0.92rem', fontWeight: 700, fontFamily: 'inherit',
+}
+const savedCardStyle: React.CSSProperties = {
+  background: '#fff', border: '1px solid #e8e4df', borderRadius: '10px', padding: '0.95rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem',
+}
+const removeButtonStyle: React.CSSProperties = {
+  background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', fontSize: '1.25rem', lineHeight: 1, padding: '2px 6px',
 }
 const redBtnStyle: React.CSSProperties = {
-  display: 'inline-flex', alignItems: 'center', gap: '5px',
-  backgroundColor: '#c0392b', color: '#fff', border: 'none',
-  borderRadius: '7px', padding: '0.5rem 1.1rem',
-  fontSize: '0.88rem', fontWeight: 700, cursor: 'pointer', textDecoration: 'none',
-}
-const outlineBtnStyle: React.CSSProperties = {
-  background: 'none', border: '1.5px solid #ddd', borderRadius: '7px',
-  padding: '0.45rem 1rem', fontSize: '0.85rem', cursor: 'pointer', color: '#555',
+  display: 'inline-flex', alignItems: 'center', gap: '5px', backgroundColor: '#c0392b', color: '#fff', border: 'none', borderRadius: '7px', padding: '0.5rem 1.1rem', fontSize: '0.88rem', fontWeight: 700, cursor: 'pointer', textDecoration: 'none',
 }
