@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/lib/supabase'
 import { getArticleMeta } from '@/lib/article-index'
+import ArticlePageShell from '@/components/ArticlePageShell'
 
 interface SavedArticle {
   article_slug: string
@@ -162,6 +163,7 @@ export default function MoyKabinetPage() {
   const initials = displayName.slice(0, 2).toUpperCase()
 
   return (
+    <ArticlePageShell>
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem 4rem' }}>
       {/* Profile header */}
       <div style={{
@@ -340,6 +342,7 @@ export default function MoyKabinetPage() {
         </>
       )}
     </div>
+    </ArticlePageShell>
   )
 }
 
