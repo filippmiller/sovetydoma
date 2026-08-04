@@ -81,6 +81,9 @@ HANDOFF-RESUME.md
 # Codex QA screenshots / scratch artifacts
 .codex-artifacts/
 
+# Redacted but run-specific real-service E2E evidence (produce on demand; never commit)
+qa/real-service/artifacts/
+
 # content-matrix idea-gen scratch (JSON batches from Kimi)
 .matrix-ideas/
 matrix-exports/

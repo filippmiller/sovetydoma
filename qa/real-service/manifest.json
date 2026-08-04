@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "name": "1001sovet.ru real-service certification",
+  "principles": [
+    "A test earns PASS only after a response from the named live service is validated.",
+    "Mocks, fixtures, local emulators, dry-runs, and simulated provider callbacks never count toward certification.",
+    "A missing credential, test identity, provider sandbox, callback, or cleanup proof is BLOCKED, not skipped or passed.",
+    "The default runner is read-only. State-changing tests require a dedicated owned QA resource and an explicit run approval."
+  ],
+  "services": {
+    "site": "https://1001sovet.ru",
+    "renderer": "https://sovetydoma-renderer.filippmiller.workers.dev",
+    "subscriptions": "https://sovetydoma-subscriptions.filippmiller.workers.dev",
+    "photo": "https://sovetydoma-photo-upload.filippmiller.workers.dev",
+    "admin": "https://sovetydoma-admin-api.filippmiller.workers.dev"
+  },
+  "requiredActiveProof": [
+    "email-password registration, confirmation, login, reload persistence, logout, reset, and QA-account cleanup",
+    "VK and Yandex login with separate owned provider accounts, callback, reload persistence, logout, and identity replay",
+    "subscription double opt-in through a dedicated inbox, category selection, delivery, management, unsubscribe, and database cleanup",
+    "browser push permission, subscribe/unsubscribe HTTP responses, a real sandbox fan-out, receipt, and subscription cleanup",
+    "contact, question, comment, rating, reaction, save, collection, user article, photo upload, moderation, and exact cleanup using a dedicated QA identity",
+    "admin article edit/publish/unpublish/version/rollback with optimistic-conflict and idempotency cases; renderer/cache/sitemap/search propagation; exact restoration",
+    "R2 object upload, public retrieval, metadata verification, purge propagation, and version/object cleanup",
+    "Telegram, MAX, WhatsApp, Resend, VK, Facebook, and social-responder real provider callbacks and outbound delivery against private owned QA channels only",
+    "cron/digest/autopost execution with correlation IDs, provider-side receipts, duplicate prevention, and cleanup",
+    "analytics delivery verified in the live provider dashboards from an unblocked independent network"
+  ]
+}
