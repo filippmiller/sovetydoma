@@ -15,7 +15,7 @@ import { CATEGORY_COLOR, CATEGORY_EMOJI, isRecentArticle, relativeDate } from '@
 // (workers/renderer/src/index.ts handleLatest) — genuinely new content, not
 // just "whatever ended up first after shuffling the static corpus"
 // (that's what "Только что" below does).
-const LATEST_API_URL = 'https://sovetydoma-renderer.filippmiller.workers.dev/api/latest.json?limit=8'
+const API_ORIGIN = 'https://sovetydoma-renderer.filippmiller.workers.dev'
 
 interface LatestRow {
   slug: string
@@ -26,12 +26,33 @@ interface LatestRow {
   publishedAt: string
 }
 
-export default function LatestPublished() {
+interface LatestPublishedProps {
+  category?: string
+  limit?: number
+  title?: string
+  subtitle?: string
+  showEmpty?: boolean
+  emptyHref?: string
+  emptyLinkLabel?: string
+}
+
+export default function LatestPublished({
+  category,
+  limit = 8,
+  title = '🆕 Новое',
+  subtitle = 'Только что опубликовано на сайте',
+  showEmpty = false,
+  emptyHref,
+  emptyLinkLabel,
+}: LatestPublishedProps) {
   const [rows, setRows] = useState<LatestRow[] | null>(null)
 
   useEffect(() => {
     let active = true
-    fetch(LATEST_API_URL)
+    const url = category
+      ? `${API_ORIGIN}/api/category-latest.json?category=${encodeURIComponent(category)}&limit=${limit}`
+      : `${API_ORIGIN}/api/latest.json?limit=${limit}`
+    fetch(url)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: LatestRow[]) => {
         if (active) setRows(Array.isArray(data) ? data : [])
@@ -40,18 +61,28 @@ export default function LatestPublished() {
         if (active) setRows([])
       })
     return () => { active = false }
-  }, [])
+  }, [category, limit])
 
-  if (!rows || rows.length === 0) return null
+  if (!rows) return null
+
+  if (rows.length === 0) {
+    if (!showEmpty) return null
+    return (
+      <section style={{ textAlign: 'center', color: '#888', padding: '2.5rem 0' }}>
+        <p style={{ margin: '0 0 1rem' }}>Новых материалов в этом разделе пока нет.</p>
+        {emptyHref && emptyLinkLabel && <Link href={emptyHref} style={{ color: '#c0392b', fontWeight: 650 }}>{emptyLinkLabel}</Link>}
+      </section>
+    )
+  }
 
   return (
     <section style={{ marginBottom: '2.5rem' }}>
       <div style={{ marginBottom: '1.25rem' }}>
         <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1a1a1a', margin: '0 0 0.2rem' }}>
-          🆕 Новое
+          {title}
         </h2>
         <p style={{ fontSize: '0.83rem', color: '#999', margin: 0 }}>
-          Только что опубликовано на сайте
+          {subtitle}
         </p>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
