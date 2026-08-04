@@ -119,7 +119,17 @@ export default function CategoryArticleBrowser({ category, articles: staticArtic
       const hash = window.location.hash.slice(1)
       if (!hash) return
       const match = themes.find((t) => t.slug === hash)
-      if (match) setTopic((current) => current === match.label ? current : match.label)
+      if (!match) return
+
+      setTopic((current) => current === match.label ? current : match.label)
+
+      // Category tiles link to a theme hash. This browser is a single filtered
+      // section rather than one DOM section per theme, so native anchor
+      // navigation has no target to scroll to. Move readers to the filtered
+      // results after the topic has been applied.
+      window.requestAnimationFrame(() => {
+        document.getElementById('category-browser-results')?.scrollIntoView({ block: 'start' })
+      })
     }
 
     const frame = window.requestAnimationFrame(syncTopicFromHash)
@@ -198,7 +208,7 @@ export default function CategoryArticleBrowser({ category, articles: staticArtic
   const totalShown = filtered.length + heroArticles.length
 
   return (
-    <section aria-label="Подбор статей раздела">
+    <section id="category-browser-results" aria-label="Подбор статей раздела">
       {heroArticles.length > 0 && (
         <div className="category-browser-hero" aria-label="Новое в рубрике">
           <h2 className="category-browser-hero-title">🆕 Новое в рубрике</h2>
