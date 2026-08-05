@@ -324,8 +324,12 @@ body {
 
 /* Mobile nav scroll */
 @media (max-width: 768px) {
-  nav { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  nav::-webkit-scrollbar { display: none; }
+  /* :not(.feed-left-nav) — this bare `nav` selector predates FeedLeftNav's
+     accordion. Its overflow-x:auto forces overflow-y to auto too (CSS
+     overflow-x/y coupling), which clipped the subcategory dropdown that
+     needs to overflow vertically past the horizontally-scrolling strip. */
+  nav:not(.feed-left-nav) { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  nav:not(.feed-left-nav)::-webkit-scrollbar { display: none; }
 }
 
 /* Mobile: hide header tagline on very small screens */
@@ -923,6 +927,7 @@ footer a:hover { color: #fff !important; }
     padding: 0.45rem;
     border-radius: 16px;
     max-height: none;
+    overflow-y: visible;
   }
   .feed-left-nav-brand,
   .feed-left-nav-plan,
@@ -934,12 +939,22 @@ footer a:hover { color: #fff !important; }
   }
   .feed-left-nav-cat { position: relative; }
   .feed-left-nav-cat-btn { min-height: 32px; padding: 0.25rem 0.5rem; font-size: 0.78rem; }
+  /* position: fixed (not absolute) — .article-page-rail is the horizontal
+     scroll strip and needs overflow-x: auto, which forces its overflow-y to
+     auto too (CSS couples the two axes once either is non-visible). An
+     absolutely-positioned dropdown taller than the 55px strip was getting
+     clipped to a sliver. Fixed positioning as a bottom sheet escapes that
+     ancestor's overflow entirely. */
   .feed-left-nav-subs {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 10;
-    min-width: 200px;
+    position: fixed;
+    top: auto;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 50;
+    min-width: 0;
     background: #fff;
     border: 1px solid #e8e4df;
     border-radius: 12px;
