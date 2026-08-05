@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
 import type { ArticleFrontmatter } from '@/lib/articles'
 import { CATEGORIES } from '@/lib/categories'
 import { readingTime, relativeDate, isRecentArticle, CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
@@ -44,6 +45,7 @@ export default function ArticleCard({
     <article
       className="article-card"
       style={{
+        '--card-accent': color,
         backgroundColor: '#fff',
         borderRadius: '12px',
         overflow: 'hidden',
@@ -54,7 +56,7 @@ export default function ArticleCard({
         border: featured ? `2px solid ${color}44` : '1px solid #f0ece7',
         padding: featured ? '1rem' : '0.9rem',
         cursor: 'pointer',
-      }}
+      } as CSSProperties}
     >
         <div style={{
           display: 'grid',
@@ -95,7 +97,7 @@ export default function ArticleCard({
               )}
             </div>
 
-            <h2 style={{
+            <h2 className="article-card-title" style={{
               fontSize: featured ? '1.12rem' : '0.98rem',
               fontWeight: 750,
               lineHeight: 1.35,
@@ -134,7 +136,7 @@ export default function ArticleCard({
           }}>
             <CardFavoriteButton slug={article.slug} />
             {!hideShareButton && <CardShareButton url={shareUrl} title={shareTitle} />}
-            <div style={{ display: 'block', width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
+            <div className="article-card-image" style={{ display: 'block', width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
               {cardImageSrc ? (
                 <ArticleImage src={cardImageSrc} alt={article.title} emoji={emoji} fallbackSize={featured ? '2rem' : '1.65rem'} />
               ) : (

@@ -147,10 +147,20 @@ body {
 }
 
 /* Article card hover */
-.article-card { transition: box-shadow 0.2s, transform 0.2s; }
+.article-card { transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s; }
 .article-card:hover {
   box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
   transform: translateY(-3px);
+  border-color: var(--card-accent, #c0392b) !important;
+}
+.article-card-title { transition: color 0.15s; }
+.article-card:hover .article-card-title { color: var(--card-accent, #c0392b); }
+.article-card-image { transition: transform 0.35s ease; }
+.article-card:hover .article-card-image { transform: scale(1.05); }
+@media (prefers-reduced-motion: reduce) {
+  .article-card, .article-card-image { transition: none; }
+  .article-card:hover { transform: none; }
+  .article-card:hover .article-card-image { transform: none; }
 }
 
 /* Nav link hover */
