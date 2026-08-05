@@ -1,7 +1,7 @@
 export const dynamicParams = false
 export const revalidate = false
 import { getArticlesByCategory, CATEGORIES } from '@/lib/articles'
-import { getSubcategoriesFor } from '@/lib/categories'
+import { themesForCategory } from '@/lib/categoryThemes'
 import { CATEGORY_EMOJI, CATEGORY_COLOR } from '@/lib/utils'
 import CategoryArticleBrowser from '@/components/CategoryArticleBrowser'
 import Breadcrumb from '@/components/Breadcrumb'
@@ -36,7 +36,14 @@ export default async function CategoryPage({ params }: Props) {
   if (!cat) notFound()
 
   const articles = getArticlesByCategory(category)
-  const subcategories = getSubcategoriesFor(category)
+  // Only tile subcategories that actually have matching articles — a tile
+  // whose theme has zero matches is filtered out of themesForCategory, so
+  // clicking it would set a hash the article browser never recognizes and
+  // silently do nothing (sovetydoma-2du).
+  const subcategories = themesForCategory(category, articles).map((theme) => ({
+    slug: theme.slug,
+    name: theme.label,
+  }))
 
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
