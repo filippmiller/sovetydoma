@@ -5,7 +5,7 @@
 > Operational detail with secret-file paths lives in the **gitignored**
 > `DEPLOY-TIMEWEB.md` (project root) and `C:\dev\knowledge\sovetydoma-deploy.md`.
 
-Last updated: 2026-06-10 (infra consolidation: prod moved to shared-prod-host 89.169.44.37; old VPS deleted — see §0).
+Last updated: 2026-08-05 (homepage VK лента layout + deploy.yml tarball removal).
 
 ---
 
@@ -103,26 +103,14 @@ Current hosting mode:
 
 **Just `git push` to master.** `.github/workflows/deploy.yml` does:
 `pnpm install --frozen-lockfile` → `tsc --noEmit` → `pnpm run build` (static export)
-→ sanity-check `out/index.html`. Production deploy is then pulled by the VPS:
-`1001sovet-pull-deploy.timer` runs every minute, fetches `origin/master`, builds
-the static export on the VPS with Node 24/pnpm, and calls
-`/opt/deploy/activate.sh <release>` (atomic symlink swap, keeps last 5).
+→ sanity-check `out/index.html` → push `out/` to `dist` branch.
+Production is then activated by the VPS:
+`1001sovet-pull-deploy.timer` runs every minute, pulls `origin/dist`, copies to a release dir, swaps the symlink atomically, healthchecks.
 
-Why pull-based: on 2026-06-02 GitHub-hosted runners could not reliably reach the
-Timeweb VPS over inbound IPv4 (`ssh-keyscan` on 22 and HTTPS upload on 443 both
-timed out), while VPS outbound access to GitHub worked. Live verification must
-therefore be done from an operator machine or over SSH/IPv6 until Timeweb fixes
-the IPv4 reachability issue.
-
-Installed VPS deploy units:
-- `1001sovet-pull-deploy.timer` → `1001sovet-pull-deploy.service`
-  → `/opt/deploy/pull-build-deploy.sh`.
-- Emergency HTTPS receiver: `1001sovet-deploy-webhook.service` running
-  `/usr/local/sbin/1001sovet-deploy-webhook.py` on `127.0.0.1:9101`, proxied by
-  nginx at `/__deploy/health` and `/__deploy/upload` with bearer token.
+**2026-08-05 change:** the tarball upload step was REMOVED from deploy.yml (it was the cause of the 413 errors). Now deploy.yml only pushes the `dist` branch — the VPS pull-deploy timer handles activation. The webhook 413 issue is OBSOLETE.
 
 - Manual run: `gh workflow run deploy.yml --repo filippmiller/sovetydoma`
-- **Rollback:** `ssh -i ~/.ssh/timeweb_1001sovet root@188.225.86.238 /opt/deploy/activate.sh <older-release-dirname>`
+- **Rollback:** `ssh -i ~/.ssh/timeweb_1001sovet root@89.169.44.37 /opt/deploy/activate.sh <older-release-dirname>`
 - Also: `.github/workflows/ci.yml` (build + typecheck on PRs) and
   `telegram-notify.yml` (pings Telegram when new article .mdx land).
 - Actions pinned to **v6 majors + Node 24**.
@@ -250,6 +238,36 @@ GitHub Actions secrets are set in the repo (see §4). `.env.local`, `DEPLOY-*.md
 4. Begin Этап 2 when ready (self-host Supabase + Timeweb S3 + GigaChat).
 5. Optional: build Этап-2 only after confirming a Russian payment method for GigaChat.
 6. (ongoing) When adding batches via Kimi, run fetch/generate previews + fix:image-frontmatter + audit:images + validate before push.
+7. **2026-08-05: Homepage layout** — wrapped in `ArticlePageShell` with left sidebar (`FeedLeftNav`: categories accordion, subcategories, seasonal links, Моё). Content area: compact VK лента style (smaller SeasonalBanner, tighter spacing, denser card grid). deploy.yml tarball step removed (413 fix).
+
+## 11. What to do next (suggested roadmap)
+
+### P0 — Security
+- Rotate Anthropic API key (exposed in chat history) — tracked in bead `sovetydoma-csv`
+- Audit remaining exposed secrets in codebase
+
+### P1 — Content growth
+- Continue content factory: publish approved articles via `publish-dynamic.mjs`
+- Run content quality audits on existing corpus (29 short articles <300w, 2 mojibake-corrupted — tracked in beads)
+- Build out category pages with more subcategories and internal linking
+
+### P1 — UX / Design
+- Polish homepage VK лента layout (current session work) — verify mobile responsiveness
+- Add "load more" / infinite scroll to homepage feed
+- Improve article card hover states and micro-interactions
+- Add breadcrumbs to homepage (currently only on category pages)
+
+### P2 — Technical debt
+- Fold-in: nightly DB → MDX sync to restore JS widgets on dynamic articles
+- Audit template-page components for renderer leaks (only CostBadge fixed so far)
+- Migrate remaining hardcoded paths in scripts (ingest-drafts-batch.mjs keeps reverting)
+- Clean up stale numbers in reports/HANDOFF (180 vs 491 articles)
+
+### Этап 2 — Backend migration to Russia (PLANNED, not started)
+- Self-host Supabase via Docker on VPS (152-ФЗ compliance)
+- Migrate photos: Cloudflare R2 → Timeweb S3
+- Migrate AI moderation: Anthropic → GigaChat 2 Max
+- See §7 for full details
 ## Recent forensic review (2026-06-02)
 Full codebase forensic review executed (structure, gates, security deep-dive on both workers, auth/admin/UGC, subscriptions feature, content pipeline, CI/deploy, prior audits reconciled).
 
