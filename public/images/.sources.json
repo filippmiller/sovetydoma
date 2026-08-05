@@ -6907,5 +6907,45 @@
     "height": 240,
     "quality": 72,
     "generatedAt": "2026-08-04T12:48:36.035128+00:00"
+  },
+  "previews/zakryt-dachu-zima-bez-elektrichestva": {
+    "provider": "local-preview",
+    "source": "zakryt-dachu-zima-bez-elektrichestva.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-08-05T06:47:03.418352+00:00"
+  },
+  "previews/zakryt-dachu-zima-sibir-moroz-40": {
+    "provider": "local-preview",
+    "source": "zakryt-dachu-zima-sibir-moroz-40.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-08-05T06:47:05.845538+00:00"
+  },
+  "previews/chistka-stekla-dveri-duhovki-nagara-sposoby": {
+    "provider": "local-preview",
+    "source": "chistka-stekla-dveri-duhovki-nagara-sposoby.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-08-05T06:47:08.053142+00:00"
+  },
+  "previews/snyat-staryy-uplotnitel-teplitsy": {
+    "provider": "local-preview",
+    "source": "snyat-staryy-uplotnitel-teplitsy.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-08-05T06:47:09.837344+00:00"
+  },
+  "previews/vysokie-gryadki-iz-dosok-razmery-poroda": {
+    "provider": "local-preview",
+    "source": "vysokie-gryadki-iz-dosok-razmery-poroda.jpg",
+    "width": 240,
+    "height": 240,
+    "quality": 72,
+    "generatedAt": "2026-08-05T06:47:11.379641+00:00"
   }
 }
