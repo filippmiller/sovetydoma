@@ -980,6 +980,37 @@ function buildTransformer(
         el.remove()
       },
     })
+    // ── More template-article leaks (same root cause as the cost badge:
+    // content_matrix has no equivalent field / no PE island built yet, so
+    // without an explicit strip the TEMPLATE's own value — wrong series
+    // links, wrong recipe ingredients, wrong category name, wrong "similar
+    // articles" — silently rides along on every dynamic article). Strip all
+    // of them unconditionally rather than show data that belongs to a
+    // different article. ─────────────────────────────────────────────────
+    .on('[aria-label="Партнёрский материал"]', {         // SponsoredBadge
+      element(el) { el.remove() },
+    })
+    .on('[aria-label="Серия статей"]', {                  // ArticleSeries
+      element(el) { el.remove() },
+    })
+    .on('[aria-label="Карточка рецепта"]', {               // RecipeCard
+      element(el) { el.remove() },
+    })
+    .on('[aria-label="Распечатать рецепт"]', {             // PrintRecipeButton
+      element(el) { el.remove() },
+    })
+    .on('[aria-label="Может пригодиться"]', {              // MoreArticles
+      element(el) { el.remove() },
+    })
+    .on('[aria-label="Покажите, что получилось"]', {       // ArticlePhotoSubmissionCTA (no hydration = dead upload form anyway)
+      element(el) { el.remove() },
+    })
+    .on('[aria-label="Похожие материалы"]', {              // ArticleInternalLinks
+      element(el) { el.remove() },
+    })
+    .on('[aria-label^="Подписаться на категорию"]', {      // CategorySubscriptionCta (x2: header + footer)
+      element(el) { el.remove() },
+    })
     // ── TOC (both nav.toc instances: sidebar + inline) ────────────────────
     .on('nav.toc', {
       element(el) {

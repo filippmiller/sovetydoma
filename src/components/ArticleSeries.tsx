@@ -26,7 +26,7 @@ export default function ArticleSeries({ seriesName, currentSlug, allArticles }: 
   const next = currentIndex < seriesArticles.length - 1 ? seriesArticles[currentIndex + 1] : null
 
   return (
-    <div style={{
+    <div aria-label="Серия статей" style={{
       backgroundColor: '#fff',
       border: '1px solid #e8e4df',
       borderRadius: '8px',

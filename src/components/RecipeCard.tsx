@@ -62,7 +62,7 @@ export default function RecipeCard({
   if (!hasStats && !hasIngredients && !hasSteps) return null
 
   return (
-    <div style={{
+    <div aria-label="Карточка рецепта" style={{
       backgroundColor: '#faf8f4',
       border: '1px solid #e8e4df',
       borderRadius: '10px',
