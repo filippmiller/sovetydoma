@@ -1,0 +1,6 @@
+1:"$Sreact.fragment"
+2:I[5450,["5450","static/chunks/5450-bf0301db98b35d84.js","5784","static/chunks/app/zdorovoe-pitanie/page-804e460357fbb8e2.js"],""]
+3:I[2794,[],"OutletBoundary"]
+4:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","main",null,{"style":{"maxWidth":"680px","margin":"4rem auto","padding":"2rem 1rem","textAlign":"center"},"children":[["$","div",null,{"aria-hidden":"true","style":{"fontSize":"3rem","marginBottom":"1rem"},"children":"🔄"}],["$","h1",null,{"style":{"fontSize":"1.5rem","fontWeight":800,"marginBottom":"0.5rem"},"children":"Раздел переехал"}],["$","p",null,{"style":{"color":"#555","marginBottom":"1.5rem"},"children":"Материалы о здоровом питании теперь находятся в разделе «Кулинария»."}],["$","$L2",null,{"href":"/kulinaria/","style":{"color":"#c0392b","fontWeight":700},"children":"Перейти к актуальному разделу →"}],["$","script",null,{"dangerouslySetInnerHTML":{"__html":"setTimeout(function(){ if (location.pathname !== \"/kulinaria/\") location.replace(\"/kulinaria/\"); }, 900);"}}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"BklwmmVtVi_ehyvkUTPNB"}
+5:null
