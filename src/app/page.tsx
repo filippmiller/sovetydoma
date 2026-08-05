@@ -1,8 +1,8 @@
 import { getAllArticles, getArticlesByCategory, getJustNowArticles } from '@/lib/articles'
 import { CATEGORIES } from '@/lib/categories'
 import ArticleCard from '@/components/ArticleCard'
-import ArticleCatalogGrid from '@/components/ArticleCatalogGrid'
 import CategoryTiles from '@/components/CategoryTiles'
+import HomepageMoreFeed from '@/components/HomepageMoreFeed'
 import LatestPublished from '@/components/LatestPublished'
 import PopularArticles from '@/components/PopularArticles'
 import SeasonalBanner from '@/components/SeasonalBanner'
@@ -46,7 +46,7 @@ const organizationJsonLd = {
   logo: absoluteUrl('/icon-512.png'),
 }
 
-const HOMEPAGE_ARTICLE_LIMIT = 30
+const HOMEPAGE_ARTICLE_LIMIT = 120
 const JUST_NOW_LIMIT = 12
 const JUST_NOW_POOL = 60
 const LATEST_ARTICLES_POOL = 300
@@ -118,14 +118,7 @@ export default function HomePage() {
                 Все статьи →
               </Link>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
-              {articles.map((article) => (
-                <ArticleCard
-                  key={article.slug}
-                  article={article}
-                />
-              ))}
-            </div>
+            <HomepageMoreFeed articles={articles} />
           </section>
         )}
 
