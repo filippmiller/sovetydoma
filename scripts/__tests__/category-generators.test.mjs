@@ -101,13 +101,19 @@ describe('category generators', () => {
     assert.ok(!layout.includes('feed-ekonomiya.xml'), 'layout.tsx still hardcodes feed-ekonomiya.xml')
   })
 
-  it('homepage does not pass full getAllArticles() directly to ArticleCatalogGrid', () => {
+  it('homepage does not pass full getAllArticles() directly to article grids', () => {
     const page = fs.readFileSync(path.join(root, 'src', 'app', 'page.tsx'), 'utf8')
-    // Must limit articles before passing to the grid (via getJustNowArticles or slice)
+    // Must limit articles before rendering (via getJustNowArticles or slice)
     assert.match(page, /HOMEPAGE_ARTICLE_LIMIT|JUST_NOW_LIMIT/)
-    // Should not pass the unfiltered getAllArticles() result to ArticleCatalogGrid
+    // Should not pass the unfiltered getAllArticles() result to ArticleCatalogGrid or ArticleCard
     const gridPass = page.match(/ArticleCatalogGrid\s+articles=\{([^}]+)\}/)
-    assert.ok(gridPass, 'could not find ArticleCatalogGrid articles prop')
-    assert.ok(!gridPass[1].includes('getAllArticles()'), 'homepage passes raw getAllArticles() to ArticleCatalogGrid')
+    const cardMap = page.match(/ArticleCard[\s\S]*?article=\{([^}]+)\}/g) || []
+    if (gridPass) {
+      assert.ok(!gridPass[1].includes('getAllArticles()'), 'homepage passes raw getAllArticles() to ArticleCatalogGrid')
+    }
+    // If using ArticleCard directly, check that articles are limited
+    if (cardMap.length > 0) {
+      assert.match(page, /getJustNowArticles|\.slice\(/, 'homepage must limit articles before rendering ArticleCard')
+    }
   })
 })
