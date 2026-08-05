@@ -1008,9 +1008,11 @@ function buildTransformer(
     .on('[aria-label="Похожие материалы"]', {              // ArticleInternalLinks
       element(el) { el.remove() },
     })
-    .on('[aria-label^="Подписаться на категорию"]', {      // CategorySubscriptionCta (x2: header + footer)
-      element(el) { el.remove() },
-    })
+    // NOTE: CategorySubscriptionCta is NOT stripped — its <a href="/podpiski/
+    // ?category=..."> is already corrected to the dynamic row's real category
+    // (href + aria-label) by the a[href^="/podpiski/?category="] handler
+    // below, and it's a plain link that works with no hydration. Stripping it
+    // would delete an already-fixed, functional subscription CTA.
     // ── TOC (both nav.toc instances: sidebar + inline) ────────────────────
     .on('nav.toc', {
       element(el) {
