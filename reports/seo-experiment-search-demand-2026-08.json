@@ -113,7 +113,25 @@
         "wave": null
       },
       "checkpoints": {
-        "d7": "2026-08-09",
+        "d7": {
+          "due": "2026-08-09",
+          "completed_at": "2026-08-09",
+          "google_indexed": true,
+          "google_status": "indexed (URL Inspection: Page is indexed)",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": true,
+          "yandex_status": "indexed (Проверка страницы: cached version dated 2026-08-06, title/description match, HTTP 200)",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
+        },
         "d14": "2026-08-16",
         "d30": "2026-09-01",
         "d60": "2026-10-01",
@@ -176,7 +194,25 @@
         "wave": null
       },
       "checkpoints": {
-        "d7": "2026-08-09",
+        "d7": {
+          "due": "2026-08-09",
+          "completed_at": "2026-08-09",
+          "google_indexed": true,
+          "google_status": "indexed (URL Inspection: Page is indexed)",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": true,
+          "yandex_status": "indexed (Проверка страницы: cached version dated 2026-08-06, title/description match, HTTP 200)",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
+        },
         "d14": "2026-08-16",
         "d30": "2026-09-01",
         "d60": "2026-10-01",
@@ -239,7 +275,25 @@
         "wave": null
       },
       "checkpoints": {
-        "d7": "2026-08-09",
+        "d7": {
+          "due": "2026-08-09",
+          "completed_at": "2026-08-09",
+          "google_indexed": true,
+          "google_status": "indexed (URL Inspection: Page is indexed, last crawl 2026-08-03)",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually verified — Яндекс.Вебмастер \"Проверка страницы\" tool stopped returning new results after 2 checks this session (likely per-session/quota limit on that tool); IndexNow submission was 202 Accepted on 2026-08-02 and site-wide crawl activity confirmed active (Yandexbot hit two control-cohort articles same day)",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
+        },
         "d14": "2026-08-16",
         "d30": "2026-09-01",
         "d60": "2026-10-01",
@@ -298,7 +352,25 @@
         "wave": null
       },
       "checkpoints": {
-        "d7": "2026-08-09",
+        "d7": {
+          "due": "2026-08-09",
+          "completed_at": "2026-08-09",
+          "google_indexed": true,
+          "google_status": "indexed (URL Inspection: Page is indexed)",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually verified — see stiralnaya-mashina note on tool limit",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
+        },
         "d14": "2026-08-16",
         "d30": "2026-09-01",
         "d60": "2026-10-01",
@@ -360,7 +432,25 @@
         "wave": null
       },
       "checkpoints": {
-        "d7": "2026-08-09",
+        "d7": {
+          "due": "2026-08-09",
+          "completed_at": "2026-08-09",
+          "google_indexed": true,
+          "google_status": "indexed (URL Inspection: Page is indexed)",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually verified — see stiralnaya-mashina note on tool limit",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
+        },
         "d14": "2026-08-16",
         "d30": "2026-09-01",
         "d60": "2026-10-01",
@@ -422,7 +512,25 @@
         "wave": null
       },
       "checkpoints": {
-        "d7": "2026-08-09",
+        "d7": {
+          "due": "2026-08-09",
+          "completed_at": "2026-08-09",
+          "google_indexed": true,
+          "google_status": "indexed (URL Inspection: Page is indexed)",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually verified — see stiralnaya-mashina note on tool limit",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
+        },
         "d14": "2026-08-16",
         "d30": "2026-09-01",
         "d60": "2026-10-01",
@@ -482,7 +590,25 @@
         "wave": null
       },
       "checkpoints": {
-        "d7": "2026-08-09",
+        "d7": {
+          "due": "2026-08-09",
+          "completed_at": "2026-08-09",
+          "google_indexed": false,
+          "google_status": "NOT indexed — \"Discovered - currently not indexed\". Referring page found: /dom-i-uborka/zapakh-v-holodilnike/. This was one of the articles whose initial GSC Request Indexing was blocked by daily quota on 2026-08-03 per registry notes.",
+          "google_indexing_requested_this_session": true,
+          "yandex_indexed": null,
+          "yandex_status": "not individually verified — see stiralnaya-mashina note on tool limit",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
+        },
         "d14": "2026-08-16",
         "d30": "2026-09-01",
         "d60": "2026-10-01",
@@ -543,7 +669,25 @@
         "wave": null
       },
       "checkpoints": {
-        "d7": "2026-08-09",
+        "d7": {
+          "due": "2026-08-09",
+          "completed_at": "2026-08-09",
+          "google_indexed": false,
+          "google_status": "NOT indexed — \"Discovered - currently not indexed\". No referring page detected yet. This was one of the articles whose initial GSC Request Indexing was blocked by daily quota on 2026-08-03 per registry notes.",
+          "google_indexing_requested_this_session": true,
+          "yandex_indexed": null,
+          "yandex_status": "not individually verified — see stiralnaya-mashina note on tool limit",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
+        },
         "d14": "2026-08-16",
         "d30": "2026-09-01",
         "d60": "2026-10-01",
@@ -603,7 +747,25 @@
         "wave": null
       },
       "checkpoints": {
-        "d7": "2026-08-09",
+        "d7": {
+          "due": "2026-08-09",
+          "completed_at": "2026-08-09",
+          "google_indexed": true,
+          "google_status": "indexed (URL Inspection: Page is indexed) — note: this article was also quota-blocked on 2026-08-03 but got indexed anyway via organic sitemap discovery/crawl before this checkpoint",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually verified — see stiralnaya-mashina note on tool limit",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
+        },
         "d14": "2026-08-16",
         "d30": "2026-09-01",
         "d60": "2026-10-01",
@@ -665,7 +827,25 @@
         "wave": null
       },
       "checkpoints": {
-        "d7": "2026-08-09",
+        "d7": {
+          "due": "2026-08-09",
+          "completed_at": "2026-08-09",
+          "google_indexed": true,
+          "google_status": "indexed (URL Inspection: Page is indexed)",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually verified — see stiralnaya-mashina note on tool limit",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
+        },
         "d14": "2026-08-16",
         "d30": "2026-09-01",
         "d60": "2026-10-01",
