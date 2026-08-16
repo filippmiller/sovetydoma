@@ -132,7 +132,26 @@
           },
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
         },
-        "d14": "2026-08-16",
+        "d14": {
+          "due": "2026-08-16",
+          "completed_at": "2026-08-16",
+          "google_indexed": null,
+          "google_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
+        },
         "d30": "2026-09-01",
         "d60": "2026-10-01",
         "d90": "2026-10-31"
@@ -213,7 +232,26 @@
           },
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
         },
-        "d14": "2026-08-16",
+        "d14": {
+          "due": "2026-08-16",
+          "completed_at": "2026-08-16",
+          "google_indexed": null,
+          "google_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
+        },
         "d30": "2026-09-01",
         "d60": "2026-10-01",
         "d90": "2026-10-31"
@@ -294,7 +332,26 @@
           },
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
         },
-        "d14": "2026-08-16",
+        "d14": {
+          "due": "2026-08-16",
+          "completed_at": "2026-08-16",
+          "google_indexed": null,
+          "google_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
+        },
         "d30": "2026-09-01",
         "d60": "2026-10-01",
         "d90": "2026-10-31"
@@ -371,7 +428,26 @@
           },
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
         },
-        "d14": "2026-08-16",
+        "d14": {
+          "due": "2026-08-16",
+          "completed_at": "2026-08-16",
+          "google_indexed": null,
+          "google_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
+        },
         "d30": "2026-09-01",
         "d60": "2026-10-01",
         "d90": "2026-10-31"
@@ -451,7 +527,26 @@
           },
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
         },
-        "d14": "2026-08-16",
+        "d14": {
+          "due": "2026-08-16",
+          "completed_at": "2026-08-16",
+          "google_indexed": null,
+          "google_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "Internal-linking gap found and fixed this checkpoint: article had 0 inbound internal links from other published content (data pulled via SQL scan of content_matrix.body_md for slug references). Added a contextual backlink from the DB-only article reviziya-kuhonnyh-yashikov-raz-v-sezon (Шаг 2, moth/pest check during the seasonal kitchen-drawer audit), verified live. A second candidate backlink site (hranenie-krup-muki-spetsiy) was attempted first but reverted — that article is served from a static legacy MDX file (src/content/articles/hranenie-krup-muki-spetsiy.mdx), not the DB content_matrix row, so a DB edit alone does not render live without a git-based rebuild+redeploy, which was out of scope for this unattended checkpoint.",
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
+        },
         "d30": "2026-09-01",
         "d60": "2026-10-01",
         "d90": "2026-10-31"
@@ -531,7 +626,26 @@
           },
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
         },
-        "d14": "2026-08-16",
+        "d14": {
+          "due": "2026-08-16",
+          "completed_at": "2026-08-16",
+          "google_indexed": null,
+          "google_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
+        },
         "d30": "2026-09-01",
         "d60": "2026-10-01",
         "d90": "2026-10-31"
@@ -609,7 +723,26 @@
           },
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
         },
-        "d14": "2026-08-16",
+        "d14": {
+          "due": "2026-08-16",
+          "completed_at": "2026-08-16",
+          "google_indexed": null,
+          "google_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
+        },
         "d30": "2026-09-01",
         "d60": "2026-10-01",
         "d90": "2026-10-31"
@@ -688,7 +821,26 @@
           },
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
         },
-        "d14": "2026-08-16",
+        "d14": {
+          "due": "2026-08-16",
+          "completed_at": "2026-08-16",
+          "google_indexed": null,
+          "google_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
+        },
         "d30": "2026-09-01",
         "d60": "2026-10-01",
         "d90": "2026-10-31"
@@ -766,7 +918,26 @@
           },
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
         },
-        "d14": "2026-08-16",
+        "d14": {
+          "due": "2026-08-16",
+          "completed_at": "2026-08-16",
+          "google_indexed": null,
+          "google_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
+        },
         "d30": "2026-09-01",
         "d60": "2026-10-01",
         "d90": "2026-10-31"
@@ -846,7 +1017,26 @@
           },
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-09 14:xx UTC). Site-wide context: 1296 total pageviews across 138 distinct articles in the same window, so the tracking pipeline is active — this cohort simply has not been visited yet, consistent with search-only discovery still ramping and two URLs not yet indexed by Google. Historical control cohort (10 articles live since May/June 2026) shows the same pattern: lifetime total pageviews per article range 0-3 (almost entirely bot hits) even after 2+ months live, so a d7 experiment-vs-control traffic comparison is not yet meaningful in either direction — both cohorts are still near the site-wide organic-traffic noise floor."
         },
-        "d14": "2026-08-16",
+        "d14": {
+          "due": "2026-08-16",
+          "completed_at": "2026-08-16",
+          "google_indexed": null,
+          "google_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "BLOCKED this checkpoint — this is an unattended scheduled run; claude-in-chrome extension is not connected (list_connected_browsers returned empty), so no authenticated GSC/Yandex Webmaster session is reachable. A non-authenticated fallback (public site: search on Google/Yandex) was attempted but both engines returned a bot/CAPTCHA challenge page; per policy this session does not attempt to bypass CAPTCHAs, so that fallback was abandoned rather than pursued. Individual per-URL indexed/not-indexed status is therefore NOT re-verified at d14 — last known status is d7's (8/10 Google-indexed, 2/10 Yandex-confirmed + IndexNow-accepted for all 10). IndexNow submission status is unchanged (202 Accepted, 2026-08-02). Recommend the owner (or a session with an authenticated claude-in-chrome browser) re-run the GSC/Yandex portion of this checkpoint when convenient — flagged in the journal and beads.",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "Internal-linking gap found and fixed this checkpoint: article had 0 inbound internal links from other published content. Added a disambiguating backlink from the sibling article kabachki-gniut-pri-khranenii-prichiny (post-harvest storage rot), pointing readers to this on-the-vine-rot article when their symptom doesn't match; verified live within ~15s (cache TTL).",
+          "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
+        },
         "d30": "2026-09-01",
         "d60": "2026-10-01",
         "d90": "2026-10-31"
