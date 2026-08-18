@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { hashIp, insertConsentEvent, isValidUuid } from './consent'
+import { hashEmailSubject, hasConsentEvent, hashIp, insertConsentEvent, isValidUuid } from './consent'
 
 const ENV = { SUPABASE_URL: 'https://example.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'service-role', PII_HASH_SECRET: 'pepper' }
 
@@ -100,5 +100,36 @@ describe('consent_events writer (152-FZ evidence)', () => {
       userAgent: 'test-agent',
     })
     assert.deepEqual(noPepper, { ok: false, error: 'not_configured' })
+  })
+
+  it('hashEmailSubject is stable (no timestamp) and salted (not a plain hash of the email) — 152-FZ audit 2026-08-18', async () => {
+    const first = await hashEmailSubject(ENV, 'user@example.com')
+    const second = await hashEmailSubject(ENV, 'USER@example.com') // case-insensitive
+    assert.equal(first, second, 'must be recomputable/lookupable from the same email later')
+    assert.match(first || '', /^[0-9a-f]{64}$/)
+
+    const differentPepper = await hashEmailSubject({ ...ENV, PII_HASH_SECRET: 'other-pepper' }, 'user@example.com')
+    assert.notEqual(first, differentPepper, 'must depend on the server-side pepper, not just the email')
+  })
+
+  it('hashEmailSubject fails closed without a configured pepper', async () => {
+    const hashed = await hashEmailSubject({ ...ENV, PII_HASH_SECRET: undefined }, 'user@example.com')
+    assert.equal(hashed, null)
+  })
+
+  it('hasConsentEvent reports whether a (user, purpose) row already exists — used to allow the fresh-signup /consent fallback at most once', async () => {
+    const found = await hasConsentEvent(ENV, '11111111-2222-3333-4444-555555555555', 'terms', async (url) => {
+      assert.match(String(url), /consent_events\?subject_user_id=eq\.11111111-2222-3333-4444-555555555555&purpose=eq\.terms&select=id&limit=1/)
+      return new Response(JSON.stringify([{ id: 'row-1' }]), { status: 200 })
+    })
+    assert.deepEqual(found, { ok: true, exists: true })
+
+    const notFound = await hasConsentEvent(ENV, '11111111-2222-3333-4444-555555555555', 'privacy_policy', async () => new Response(JSON.stringify([]), { status: 200 }))
+    assert.deepEqual(notFound, { ok: true, exists: false })
+  })
+
+  it('hasConsentEvent fails closed (ok: false) on a lookup error rather than treating an outage as "nothing recorded yet"', async () => {
+    const result = await hasConsentEvent(ENV, '11111111-2222-3333-4444-555555555555', 'terms', async () => new Response('boom', { status: 500 }))
+    assert.deepEqual(result, { ok: false, exists: false })
   })
 })

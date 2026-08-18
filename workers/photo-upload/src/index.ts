@@ -16,7 +16,7 @@ import {
   referrerDomain,
   parseUtm,
 } from './analytics'
-import { insertConsentEvent, hashIp, type ConsentPurpose, type ConsentMethod } from './consent'
+import { insertConsentEvent, hasConsentEvent, hashIp, hashEmailSubject, type ConsentPurpose, type ConsentMethod } from './consent'
 import { requestErasure, cancelErasure, getErasureStatus, finalizeErasureRequests } from './erasure'
 import { TERMS_VERSION, PRIVACY_POLICY_VERSION } from '../../../src/lib/legal/document-versions'
 
@@ -125,15 +125,17 @@ async function validateUser(env: Env, authHeader: string): Promise<string | null
 
 /**
  * Confirms a client-claimed user id is a real Supabase Auth user, via the
- * Admin API (service-role only). Used only for the /consent 'signup' path:
- * RegisterForm calls /consent immediately after supabase.auth.signUp()
- * resolves, and when email confirmation is required that call can have no
- * session yet (no bearer token to validateUser() against) — this is the
- * fallback that stops an unauthenticated caller from writing a consent_events
- * row against an arbitrary/forged user id.
+ * Admin API (service-role only), and returns its creation time. Used only by
+ * the /consent route's fresh-signup fallback (see SIGNUP_CONSENT_WINDOW_MS
+ * below) — by itself this ONLY proves the uuid belongs to *some* real
+ * account, never that the caller IS that account, so callers must not treat
+ * a truthy result alone as authorization (152-FZ audit 2026-08-18 P0: this
+ * used to be the only gate on /consent, which let anyone who harvested a
+ * user_id from a public comment or /kollekcii/<userId>/... URL forge a
+ * consent/non-consent row for that victim).
  */
-async function verifyUserExists(env: Env, userId: string): Promise<boolean> {
-  if (!env.SUPABASE_SERVICE_ROLE_KEY) return false
+async function verifyUserExists(env: Env, userId: string): Promise<{ id: string; createdAt: string } | null> {
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) return null
   try {
     const res = await fetch(
       `${env.SUPABASE_URL.replace(/\/+$/, '')}/auth/v1/admin/users/${encodeURIComponent(userId)}`,
@@ -144,11 +146,26 @@ async function verifyUserExists(env: Env, userId: string): Promise<boolean> {
         },
       },
     )
-    return res.ok
+    if (!res.ok) return null
+    const data = await res.json().catch(() => null) as null | { id?: string; created_at?: string }
+    if (!data?.id) return null
+    return { id: data.id, createdAt: data.created_at || '' }
   } catch {
-    return false
+    return null
   }
 }
+
+// Fresh-signup fallback window for /consent (152-FZ audit 2026-08-18 P0 fix).
+// RegisterForm calls /consent right after supabase.auth.signUp() resolves,
+// which can have no session yet when email confirmation is required — so an
+// unauthenticated bearer-less call must still be accepted for THAT narrow
+// case, but nothing else. We bound the blast radius of an id-harvesting
+// attacker to: only accounts created in the last 15 minutes, and only the
+// first consent row ever written for that (user, purpose) pair (see
+// hasConsentEvent) — an attacker can no longer forge consent/non-consent for
+// any *existing* account at all, and for a brand-new one gets exactly one
+// shot within a short window, not standing unlimited access.
+const SIGNUP_CONSENT_WINDOW_MS = 15 * 60 * 1000
 
 async function validateAdmin(env: Env, authHeader: string): Promise<boolean> {
   if (!env.SUPABASE_SERVICE_ROLE_KEY) return false
@@ -324,8 +341,12 @@ const worker = {
       // Best-effort evidence write: the email has already been sent, so a
       // consent_events insert failure here must not fail the user-visible
       // request (mirrors admin-api's insertAuditEvent "never throws" contract).
+      // subjectAnonId is a stable HMAC(pepper, email) — NOT sha256(email+now()),
+      // which was both unsalted (reversible via a rainbow table) and unique
+      // per millisecond (so the same person's row could never be found again
+      // by email, defeating its purpose as evidence) — 152-FZ audit 2026-08-18.
       await insertConsentEvent(env, {
-        subjectAnonId: await sha256Hex(`contact:${email}:${Date.now()}`),
+        subjectAnonId: await hashEmailSubject(env, email),
         purpose: 'pd_processing_general',
         documentVersion: PRIVACY_POLICY_VERSION,
         granted: true,
@@ -353,11 +374,31 @@ const worker = {
         return json({ error: 'bad_purpose' }, 400, accountHeaders)
       }
 
-      // The caller (RegisterForm, right after supabase.auth.signUp()) may not
-      // have a session yet when email confirmation is required — verify the
-      // claimed id is a real user via the Admin API instead of trusting a
-      // bearer token that might not exist yet.
-      if (!(await verifyUserExists(env, payload.userId))) return json({ error: 'unknown_user' }, 400, accountHeaders)
+      // Identity check (152-FZ audit 2026-08-18, P0 fix). Two accepted paths:
+      //  1. Authenticated: the caller's own bearer session matches the
+      //     claimed userId (settings re-accept, or signup when a session
+      //     already exists).
+      //  2. Fresh-signup fallback: RegisterForm calls this right after
+      //     supabase.auth.signUp() resolves, which can have NO session yet
+      //     when email confirmation is required. Accepted ONLY when the
+      //     claimed id is a real account created within the last
+      //     SIGNUP_CONSENT_WINDOW_MS AND no consent_events row for this
+      //     exact (user, purpose) exists yet — so harvesting an *existing*
+      //     user's id from a public comment/collection URL no longer works
+      //     at all, and a brand-new id can be abused at most once, within
+      //     minutes of creation, not indefinitely.
+      const authUserId = await validateUser(env, req.headers.get('Authorization') || '')
+      let verified = Boolean(authUserId && authUserId === payload.userId)
+      if (!verified) {
+        const user = await verifyUserExists(env, payload.userId)
+        const createdAtMs = user ? Date.parse(user.createdAt) : NaN
+        const isFreshSignup = user !== null && Number.isFinite(createdAtMs) && (Date.now() - createdAtMs) <= SIGNUP_CONSENT_WINDOW_MS
+        if (isFreshSignup) {
+          const already = await hasConsentEvent(env, payload.userId, payload.purpose)
+          verified = already.ok && !already.exists
+        }
+      }
+      if (!verified) return json({ error: 'unauthorized' }, 401, accountHeaders)
 
       const documentVersion = payload.purpose === 'terms' ? TERMS_VERSION : PRIVACY_POLICY_VERSION
       const result = await insertConsentEvent(env, {
@@ -371,6 +412,27 @@ const worker = {
       })
       if (!result.ok) return json({ error: result.error }, 502, accountHeaders)
       return json({ ok: true }, 200, accountHeaders)
+    }
+
+    // Authenticated-only status check used by the OAuth (VK ID / Yandex)
+    // sign-in callback (152-FZ audit 2026-08-18, P1 fix): those flows never
+    // show the terms/privacy checkboxes RegisterForm shows, so a social
+    // account could otherwise reach a live session with zero consent_events
+    // evidence. The callback page calls this right after establishing a
+    // session and shows a one-time consent gate if anything is missing.
+    if (url.pathname === '/account/consent-status') {
+      const accountHeaders = accountCors(req, env)
+      if (req.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, accountHeaders)
+
+      const userId = await validateUser(env, req.headers.get('Authorization') || '')
+      if (!userId) return json({ error: 'unauthorized' }, 401, accountHeaders)
+
+      const [terms, privacyPolicy] = await Promise.all([
+        hasConsentEvent(env, userId, 'terms'),
+        hasConsentEvent(env, userId, 'privacy_policy'),
+      ])
+      if (!terms.ok || !privacyPolicy.ok) return json({ error: 'lookup_failed' }, 502, accountHeaders)
+      return json({ ok: true, terms: terms.exists, privacy_policy: privacyPolicy.exists }, 200, accountHeaders)
     }
 
     if (url.pathname === '/account/erasure/request') {

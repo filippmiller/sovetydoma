@@ -53,6 +53,56 @@ export function isValidUuid(value: string): boolean {
   return UUID_RE.test(value)
 }
 
+export type HasConsentResult = { ok: true; exists: boolean } | { ok: false; exists: false }
+
+/**
+ * Used by the /consent route's fresh-signup fallback path (index.ts) to
+ * enforce "at most once, and only when nothing is recorded yet" for a given
+ * (user, purpose) pair. Fails CLOSED: a lookup failure (network error,
+ * Supabase outage, missing service-role key) returns `ok: false`, which the
+ * caller must treat as "cannot verify — refuse the write", not as "no prior
+ * row found — allow it". Otherwise an outage would turn into a bypass.
+ */
+export async function hasConsentEvent(
+  env: ConsentEnv,
+  subjectUserId: string,
+  purpose: ConsentPurpose,
+  fetcher: Fetcher = fetch,
+): Promise<HasConsentResult> {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return { ok: false, exists: false }
+  try {
+    const res = await fetcher(
+      `${env.SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/consent_events?subject_user_id=eq.${encodeURIComponent(subjectUserId)}&purpose=eq.${encodeURIComponent(purpose)}&select=id&limit=1`,
+      {
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    if (!res.ok) return { ok: false, exists: false }
+    const rows = await res.json().catch(() => null) as null | Array<{ id: string }>
+    return { ok: true, exists: Array.isArray(rows) && rows.length > 0 }
+  } catch {
+    return { ok: false, exists: false }
+  }
+}
+
+/**
+ * Stable (non-timestamped) HMAC subject id for the anonymous contact-form
+ * consent write — same pepper/HMAC construction as hashIp, so the result is
+ * neither the raw email nor a plain unsalted hash of it (152-FZ audit
+ * 2026-08-18: the previous sha256(email + Date.now()) was both unsalted and
+ * unique-per-millisecond, so it could never be recomputed/looked up from the
+ * email again, defeating its purpose as evidence). Fails closed like hashIp.
+ */
+export async function hashEmailSubject(env: ConsentEnv, email: string): Promise<string | null> {
+  const secret = String(env.PII_HASH_SECRET || '').trim()
+  if (!secret) return null
+  return hmacSha256Hex(secret, `email:${email.trim().toLowerCase()}`)
+}
+
 export type InsertConsentResult =
   | { ok: true }
   | { ok: false; error: 'not_configured' | 'bad_subject' | 'insert_failed' }

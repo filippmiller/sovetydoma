@@ -5,6 +5,7 @@ import { getSupabase } from '@/lib/supabase'
 import { safeAssign } from '@/lib/auth/safe-redirect'
 import { verifyOAuthState } from '@/lib/auth/oauth-state'
 import { readAuthHash, getAuthHashParams, clearAuthHash } from '@/lib/auth/recovery-hash'
+import { getConsentStatus, submitAuthenticatedConsent } from '@/lib/privacy/privacy-worker-client'
 
 /**
  * OAuth callback page for Supabase Auth providers (Yandex, VK, Google, etc.).
@@ -16,11 +17,37 @@ import { readAuthHash, getAuthHashParams, clearAuthHash } from '@/lib/auth/recov
 const YANDEX_STATE_KEY = 'sovetydoma_yandex_oauth_state'
 
 export default function AuthCallbackPage() {
-  const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing')
+  const [status, setStatus] = useState<'processing' | 'success' | 'error' | 'consent-required'>('processing')
   const [message, setMessage] = useState('Завершаем вход…')
+  const [consentChecked, setConsentChecked] = useState(false)
+  const [consentBusy, setConsentBusy] = useState(false)
+  const [consentError, setConsentError] = useState('')
 
   useEffect(() => {
     let cancelled = false
+
+    // 152-FZ (canon §1.1, audit 2026-08-18 P1 fix): VK ID / Yandex sign-in
+    // never shows the terms/privacy checkboxes RegisterForm shows for email
+    // signup, so a social-auth account could otherwise reach a live session
+    // with zero consent_events evidence. Called right after a session is
+    // established (PKCE exchange or the hash-based fallback below) — shows
+    // a one-time consent gate only when something is actually missing.
+    // Fails OPEN on our own status-check failure (network blip, worker
+    // down): we redirect the user through rather than block login on it,
+    // trading a small residual evidence gap for not locking legitimate
+    // users out of their own account.
+    async function proceedAfterSession() {
+      const s = await getConsentStatus()
+      if (!cancelled) {
+        if (s.ok && !(s.terms && s.privacyPolicy)) {
+          setStatus('consent-required')
+          return
+        }
+        setStatus('success')
+        setMessage('Вход выполнен! Перенаправляем…')
+        redirectToDestination()
+      }
+    }
 
     async function handleCallback() {
       try {
@@ -88,11 +115,7 @@ export default function AuthCallbackPage() {
               throw new Error('session_not_found')
             }
             clearAuthHash()
-            if (!cancelled) {
-              setStatus('success')
-              setMessage('Вход выполнен! Перенаправляем…')
-              redirectToDestination()
-            }
+            if (!cancelled) await proceedAfterSession()
             return
           }
           throw new Error('authorization_code_missing')
@@ -116,11 +139,7 @@ export default function AuthCallbackPage() {
                 : await sb.auth.getSession()
               if (!sessionError && data.session) {
                 clearAuthHash()
-                if (!cancelled) {
-                  setStatus('success')
-                  setMessage('Вход выполнен! Перенаправляем…')
-                  redirectToDestination()
-                }
+                if (!cancelled) await proceedAfterSession()
                 return
               }
             }
@@ -128,11 +147,7 @@ export default function AuthCallbackPage() {
           throw exchangeError
         }
 
-        if (!cancelled) {
-          setStatus('success')
-          setMessage('Вход выполнен! Перенаправляем…')
-          redirectToDestination()
-        }
+        if (!cancelled) await proceedAfterSession()
       } catch (err) {
         console.error('oauth_callback_error', err)
         if (!cancelled) {
@@ -146,6 +161,24 @@ export default function AuthCallbackPage() {
 
     return () => { cancelled = true }
   }, [])
+
+  const handleConsentAccept = async () => {
+    if (!consentChecked) return
+    setConsentBusy(true)
+    setConsentError('')
+    const [termsOk, privacyOk] = await Promise.all([
+      submitAuthenticatedConsent('terms'),
+      submitAuthenticatedConsent('privacy_policy'),
+    ])
+    setConsentBusy(false)
+    if (!termsOk || !privacyOk) {
+      setConsentError('Не удалось сохранить согласие. Попробуйте ещё раз.')
+      return
+    }
+    setStatus('success')
+    setMessage('Вход выполнен! Перенаправляем…')
+    redirectToDestination()
+  }
 
   return (
     <div style={{
@@ -166,14 +199,54 @@ export default function AuthCallbackPage() {
         boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
       }}>
         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-          {status === 'processing' ? '⏳' : status === 'success' ? '✅' : '⚠️'}
+          {status === 'processing' ? '⏳' : status === 'success' ? '✅' : status === 'consent-required' ? '📋' : '⚠️'}
         </div>
         <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 0.5rem', color: '#1a1a1a' }}>
-          {status === 'processing' ? 'Вход через соцсеть' : status === 'success' ? 'Готово' : 'Не удалось войти'}
+          {status === 'processing' ? 'Вход через соцсеть' : status === 'success' ? 'Готово' : status === 'consent-required' ? 'Ещё один шаг' : 'Не удалось войти'}
         </h1>
-        <p style={{ fontSize: '0.9rem', color: '#666', margin: '0 0 1.5rem', lineHeight: 1.5 }}>
-          {message}
-        </p>
+        {status !== 'consent-required' && (
+          <p style={{ fontSize: '0.9rem', color: '#666', margin: '0 0 1.5rem', lineHeight: 1.5 }}>
+            {message}
+          </p>
+        )}
+        {status === 'consent-required' && (
+          <div style={{ textAlign: 'left' }}>
+            <p style={{ fontSize: '0.88rem', color: '#666', margin: '0 0 1rem', lineHeight: 1.5 }}>
+              Прежде чем продолжить, подтвердите согласие с условиями использования сайта и обработкой персональных данных.
+            </p>
+            <label style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', fontSize: '0.85rem', color: '#444', marginBottom: '1rem', lineHeight: 1.4 }}>
+              <input
+                type="checkbox"
+                checked={consentChecked}
+                onChange={(e) => setConsentChecked(e.target.checked)}
+                style={{ marginTop: '0.2rem' }}
+              />
+              <span>
+                Я согласен(а) с <a href="/terms" target="_blank">Условиями использования</a> и даю согласие
+                на обработку персональных данных в соответствии с <a href="/privacy" target="_blank">Политикой конфиденциальности</a>.
+              </span>
+            </label>
+            {consentError && <p style={{ color: '#c0392b', fontSize: '0.85rem', marginBottom: '0.75rem' }} role="alert">{consentError}</p>}
+            <button
+              type="button"
+              onClick={handleConsentAccept}
+              disabled={!consentChecked || consentBusy}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                background: consentChecked ? '#2e7d32' : '#9db99f',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                cursor: consentChecked ? 'pointer' : 'not-allowed',
+              }}
+            >
+              {consentBusy ? 'Сохраняем…' : 'Продолжить'}
+            </button>
+          </div>
+        )}
         {status === 'error' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <button

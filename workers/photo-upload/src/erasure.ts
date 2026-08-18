@@ -9,17 +9,32 @@
  * no PII is touched yet, so the user can still cancel.
  * Phase 2 (finalizeErasureRequests, called from the retention cron in
  * index.ts's scheduled() handler): once grace_period_ends_at has passed,
- * anonymize public.profiles / public.comments / public.saved_articles /
- * public.user_articles for that user_id and flip the request to 'completed'.
+ * anonymize public.profiles / public.comments / public.saved_articles for
+ * that user_id (plus delete any R2-stored comment photos — see
+ * anonymizeUser) and flip the request to 'completed'.
+ *
+ * public.user_articles is intentionally NOT touched — see the comment at its
+ * call site below for why (152-FZ audit 2026-08-18: an earlier version of
+ * this header comment incorrectly listed user_articles here too; the code
+ * never anonymized it — fixed to match what the code actually does).
+ *
+ * Race safety: between the due-rows SELECT and this loop reaching a given
+ * row, the user may call POST /account/erasure/cancel. Each row is claimed
+ * with an atomic conditional PATCH (status=eq.pending → 'processing') before
+ * any PII is touched; if the claim affects zero rows (already cancelled, or
+ * claimed by an overlapping cron run), the row is skipped untouched instead
+ * of being anonymized and then silently flipped back to 'completed' over the
+ * user's cancellation.
  *
  * Scope boundary (deliberate — see task scope, flagged in the session
  * report): this DOES NOT delete, ban, or sign out the auth.users row. The
- * account remains loggable-in after erasure; only the four PII-bearing
- * tables above are anonymized. LEGAL: a user who re-authenticates after
- * erasure gets a fresh blank profile (handle_new_user's ON CONFLICT DO
- * NOTHING trigger only fires on INSERT, so no auto-recreate happens, but
- * they could re-fill display_name/bio manually) — full account deletion
- * (auth.users) was out of the stated task scope and is left as follow-up.
+ * account remains loggable-in after erasure; only the PII-bearing tables
+ * above are anonymized. LEGAL: a user who re-authenticates after erasure
+ * gets a fresh blank profile (handle_new_user's ON CONFLICT DO NOTHING
+ * trigger only fires on INSERT, so no auto-recreate happens, but they could
+ * re-fill display_name/bio manually) — full account deletion (auth.users)
+ * was out of the stated task scope and is left as follow-up (⚠️ЮР — see
+ * COMPLIANCE_152FZ_ROLLOUT_STATUS.md tech-debt section for this branch).
  */
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -31,6 +46,10 @@ export const ANONYMIZED_COMMENT_TEXT = '[комментарий удалён п�
 export interface ErasureEnv {
   SUPABASE_URL: string
   SUPABASE_SERVICE_ROLE_KEY?: string
+  // Optional so existing unit tests (and any caller that only exercises the
+  // Postgres side) keep working without a binding. index.ts's Env always
+  // provides it in production — see anonymizeUser's R2 purge step.
+  PHOTOS?: R2Bucket
 }
 
 type Fetcher = (input: string | URL | Request, init?: RequestInit) => Promise<Response>
@@ -38,7 +57,7 @@ type Fetcher = (input: string | URL | Request, init?: RequestInit) => Promise<Re
 export interface ErasureRequestRow {
   id: string
   user_id: string
-  status: 'pending' | 'completed' | 'cancelled'
+  status: 'pending' | 'processing' | 'completed' | 'cancelled'
   requested_at: string
   grace_period_ends_at: string
   completed_at: string | null
@@ -157,9 +176,38 @@ export async function cancelErasure(
   }
 }
 
-/** Anonymizes the four in-scope PII tables for one user. Best-effort per table — a single table failing does not stop the others, and the request is only marked 'completed' if every table succeeded. */
+/**
+ * Deletes any R2-stored comment photos for this user before the DB pointer
+ * is nulled (152-FZ audit 2026-08-18, P1 fix). Without this, GET /file/<key>
+ * is unauthenticated and served with `Cache-Control: public, max-age=31536000,
+ * immutable`, so the blob stayed fetchable forever after "erasure" — the DB
+ * said gone, the photo wasn't. Best-effort/fail-open on individual R2
+ * deletes (a stray undeletable object must not block the rest of erasure),
+ * but a failure to even list the rows fails this step (and therefore the
+ * whole anonymize) so we never silently skip the purge.
+ */
+async function purgeCommentPhotos(env: ErasureEnv, uid: string, fetcher: Fetcher): Promise<boolean> {
+  if (!env.PHOTOS) return true
+  try {
+    const res = await rest(env, `comments?user_id=eq.${uid}&photo_path=not.is.null&select=photo_path`, { method: 'GET' }, fetcher)
+    if (!res.ok) return false
+    const rows = await res.json().catch(() => []) as Array<{ photo_path: string | null }>
+    await Promise.all(
+      rows
+        .map((r) => r.photo_path)
+        .filter((key): key is string => Boolean(key))
+        .map((key) => env.PHOTOS!.delete(key).catch(() => { /* best-effort per object */ })),
+    )
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** Anonymizes the in-scope PII tables/storage for one user. Best-effort per table — a single table failing does not stop the others, and the request is only marked 'completed' if every step succeeded. */
 async function anonymizeUser(env: ErasureEnv, userId: string, fetcher: Fetcher): Promise<boolean> {
   const uid = encodeURIComponent(userId)
+  const photosOk = await purgeCommentPhotos(env, uid, fetcher)
   const results = await Promise.all([
     rest(env, `profiles?id=eq.${uid}`, {
       method: 'PATCH',
@@ -181,7 +229,39 @@ async function anonymizeUser(env: ErasureEnv, userId: string, fetcher: Fetcher):
     // scrub. Author identity is already severed for display purposes by the
     // profiles anonymization above (any join surfaces "Удалённый пользователь").
   ])
-  return results.every((res) => res.ok)
+  return photosOk && results.every((res) => res.ok)
+}
+
+/**
+ * Atomically claims one due row before touching any PII (152-FZ audit
+ * 2026-08-18, P1 TOCTOU fix). Without this, a row read as "due" by the
+ * SELECT in finalizeErasureRequests could be cancelled by the user via
+ * POST /account/erasure/cancel a moment later, and this loop — which
+ * previously anonymized unconditionally and then PATCHed straight to
+ * 'completed' with no status filter — would destroy the user's data and
+ * overwrite their 'cancelled' row back to 'completed' anyway. The claim is
+ * a conditional PATCH (status=eq.pending → 'processing'); if it affects zero
+ * rows, someone else (a concurrent cancel, or an overlapping cron run)
+ * already moved the row, so this call skips it untouched.
+ */
+async function claimErasureRequest(env: ErasureEnv, id: string, fetcher: Fetcher): Promise<boolean> {
+  try {
+    const res = await rest(
+      env,
+      `erasure_requests?id=eq.${encodeURIComponent(id)}&status=eq.pending`,
+      {
+        method: 'PATCH',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify({ status: 'processing' }),
+      },
+      fetcher,
+    )
+    if (!res.ok) return false
+    const rows = await res.json().catch(() => []) as Array<{ id: string }>
+    return rows.length > 0
+  } catch {
+    return false
+  }
 }
 
 export interface FinalizeSummary {
@@ -215,12 +295,20 @@ export async function finalizeErasureRequests(
 
   for (const request of due) {
     summary.processed += 1
-    const anonymized = await anonymizeUser(env, request.user_id, fetcher)
-    if (!anonymized) {
-      summary.failed += 1
-      continue
-    }
     try {
+      const claimed = await claimErasureRequest(env, request.id, fetcher)
+      if (!claimed) {
+        // Cancelled (or claimed by another run) between the SELECT above and
+        // now — skip without touching PII or the row (see claimErasureRequest).
+        continue
+      }
+
+      const anonymized = await anonymizeUser(env, request.user_id, fetcher)
+      if (!anonymized) {
+        summary.failed += 1
+        continue
+      }
+
       const res = await rest(
         env,
         `erasure_requests?id=eq.${encodeURIComponent(request.id)}`,
@@ -233,8 +321,14 @@ export async function finalizeErasureRequests(
       )
       if (res.ok) summary.completed += 1
       else summary.failed += 1
-    } catch {
+    } catch (err) {
+      // 152-FZ audit 2026-08-18, P1 fix: this used to be unguarded, so a
+      // single thrown network error (timeout/DNS/reset) aborted the entire
+      // cron run and every remaining due request silently missed its
+      // legally-mandated deadline until the next day's tick. Now one row's
+      // failure is isolated and the loop continues.
       summary.failed += 1
+      console.error(`[retention] erasure finalize threw for request ${request.id}:`, err)
     }
   }
 
