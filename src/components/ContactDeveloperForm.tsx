@@ -27,6 +27,10 @@ export default function ContactDeveloperForm({ initialTopic }: { initialTopic?: 
   const [startedAt] = useState(() => Date.now())
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  // 152-FZ: PD-processing consent is its own checkbox, never bundled with
+  // "send the message" (canon §1.1). Server also enforces this (see
+  // workers/photo-upload/src/index.ts's /contact route).
+  const [pdConsent, setPdConsent] = useState(false)
   const [selectedTopic, setSelectedTopic] = useState<string>(() => {
     const topicParam = searchParams.get('topic')
     if (topicParam === 'advertising' || topicParam === 'advert') return ADVERTISING_TOPIC
@@ -57,6 +61,11 @@ export default function ContactDeveloperForm({ initialTopic }: { initialTopic?: 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!canUseForm || !challenge) return
+    if (!pdConsent) {
+      setStatus('error')
+      setMessage('Подтвердите согласие на обработку персональных данных.')
+      return
+    }
 
     const form = new FormData(event.currentTarget)
     setStatus('loading')
@@ -79,6 +88,7 @@ export default function ContactDeveloperForm({ initialTopic }: { initialTopic?: 
           body: String(form.get('body') || ''),
           website: String(form.get('website') || ''),
           topic, // extra, worker may ignore if not expected
+          pdConsent,
         }),
       })
       const data = await res.json().catch(() => ({}))
@@ -87,6 +97,7 @@ export default function ContactDeveloperForm({ initialTopic }: { initialTopic?: 
       setStatus('sent')
       setMessage('Сообщение отправлено разработчику.')
       event.currentTarget.reset()
+      setPdConsent(false)
     } catch {
       setStatus('error')
       setMessage('Не удалось отправить форму. Напишите напрямую на email ниже.')
@@ -167,17 +178,32 @@ export default function ContactDeveloperForm({ initialTopic }: { initialTopic?: 
           />
         </label>
 
+        <label style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', fontSize: '0.88rem', color: '#444', lineHeight: 1.4 }}>
+          <input
+            type="checkbox"
+            name="pdConsent"
+            checked={pdConsent}
+            onChange={(e) => setPdConsent(e.target.checked)}
+            required
+            style={{ marginTop: '3px' }}
+          />
+          <span>
+            Согласен(а) на обработку персональных данных для ответа на обращение, в соответствии с{' '}
+            <a href="/privacy" target="_blank" style={{ color: '#c0392b' }}>Политикой конфиденциальности</a>.
+          </span>
+        </label>
+
         <button
           type="submit"
-          disabled={!canUseForm || !challenge || status === 'loading' || status === 'sent'}
+          disabled={!canUseForm || !challenge || !pdConsent || status === 'loading' || status === 'sent'}
           style={{
             minHeight: '44px',
             border: 'none',
             borderRadius: '6px',
-            background: !canUseForm || !challenge ? '#bbb' : '#c0392b',
+            background: !canUseForm || !challenge || !pdConsent ? '#bbb' : '#c0392b',
             color: '#fff',
             fontWeight: 800,
-            cursor: !canUseForm || !challenge ? 'not-allowed' : 'pointer',
+            cursor: !canUseForm || !challenge || !pdConsent ? 'not-allowed' : 'pointer',
           }}
         >
           {status === 'loading' ? 'Отправляем...' : 'Отправить сообщение'}

@@ -8,6 +8,7 @@ import AuthModal from './AuthModal'
 import { migrateLocalFavoritesToServer, clearLocalFavorites, processPendingFavoriteIntent } from '@/lib/favorites'
 import { OPEN_AUTH_EVENT } from '@/lib/auth-gate'
 import { readAuthHash, getAuthHashParams, clearAuthHash } from '@/lib/auth/recovery-hash'
+import { getConsentStatus, submitAuthenticatedConsent } from '@/lib/privacy/privacy-worker-client'
 
 export default function AuthButton() {
   const authConfigured = isSupabaseConfigured()
@@ -19,6 +20,21 @@ export default function AuthButton() {
   const [recovery, setRecovery] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  // 152-FZ (canon §1.1, audit 2026-08-18, P1 fix): VK ID / Yandex sign-in both
+  // land here (their Supabase magic link's redirect_to always resolves to a
+  // page rendering this header, not the dedicated /auth/callback/ page — VK's
+  // static callback page and Yandex's exchange both hand off to Supabase's
+  // action-link redirect, which this hash handler below is the single actual
+  // choke point for). Neither flow ever shows RegisterForm's terms/privacy
+  // checkboxes, so a social account could otherwise reach a live session with
+  // zero consent_events evidence. Gated here, once, only when something is
+  // actually missing for THIS user — an email/password signup already has
+  // both rows (RegisterForm writes them before the confirmation link is even
+  // followed), so this never re-prompts that path.
+  const [consentGate, setConsentGate] = useState(false)
+  const [consentChecked, setConsentChecked] = useState(false)
+  const [consentBusy, setConsentBusy] = useState(false)
+  const [consentError, setConsentError] = useState('')
 
   const closeModal = () => {
     setModalOpen(false)
@@ -70,15 +86,43 @@ export default function AuthButton() {
       }
 
       // Magic-link/signup/invite is complete: discard the one-time token copy
-      // and the pre-auth redirect hint, then land in the authenticated cabinet.
+      // and the pre-auth redirect hint, then land in the authenticated cabinet
+      // — unless this account is missing consent evidence (152-FZ P1 fix
+      // above), in which case show the gate first and redirect only after it
+      // resolves. Fails OPEN on our own status-check failure (network blip,
+      // worker down): never let this block a legitimate sign-in.
       clearAuthHash()
       try { window.sessionStorage.removeItem('auth_redirect_to') } catch { /* ignore */ }
+      const consent = await getConsentStatus()
+      if (!cancelled && consent.ok && !(consent.terms && consent.privacyPolicy)) {
+        setConsentGate(true)
+        return
+      }
       if (window.location.pathname !== '/moy-kabinet/') {
         window.location.replace('/moy-kabinet/')
       }
     })()
     return () => { cancelled = true }
   }, [authConfigured])
+
+  const handleConsentGateAccept = async () => {
+    if (!consentChecked) return
+    setConsentBusy(true)
+    setConsentError('')
+    const [termsOk, privacyOk] = await Promise.all([
+      submitAuthenticatedConsent('terms'),
+      submitAuthenticatedConsent('privacy_policy'),
+    ])
+    setConsentBusy(false)
+    if (!termsOk || !privacyOk) {
+      setConsentError('Не удалось сохранить согласие. Попробуйте ещё раз.')
+      return
+    }
+    setConsentGate(false)
+    if (window.location.pathname !== '/moy-kabinet/') {
+      window.location.replace('/moy-kabinet/')
+    }
+  }
 
   useEffect(() => {
     if (!authConfigured) return
@@ -181,6 +225,62 @@ export default function AuthButton() {
   }, [dropdownOpen])
 
   if (!authConfigured) return null
+
+  if (consentGate) {
+    return (
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Подтверждение согласия"
+        style={{
+          position: 'fixed', inset: 0, zIndex: 1000,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '1rem',
+        }}
+      >
+        <div style={{
+          background: '#fff', borderRadius: '14px', padding: '1.5rem',
+          maxWidth: '420px', width: '100%', textAlign: 'left',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+        }}>
+          <h2 style={{ fontSize: '1.05rem', fontWeight: 800, margin: '0 0 0.75rem', color: '#1a1a1a' }}>
+            Ещё один шаг
+          </h2>
+          <p style={{ fontSize: '0.88rem', color: '#666', margin: '0 0 1rem', lineHeight: 1.5 }}>
+            Прежде чем продолжить, подтвердите согласие с условиями использования сайта и обработкой персональных данных.
+          </p>
+          <label style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', fontSize: '0.85rem', color: '#444', marginBottom: '1rem', lineHeight: 1.4 }}>
+            <input
+              type="checkbox"
+              checked={consentChecked}
+              onChange={(e) => setConsentChecked(e.target.checked)}
+              style={{ marginTop: '0.2rem' }}
+            />
+            <span>
+              Я согласен(а) с <a href="/terms" target="_blank">Условиями использования</a> и даю согласие
+              на обработку персональных данных в соответствии с <a href="/privacy" target="_blank">Политикой конфиденциальности</a>.
+            </span>
+          </label>
+          {consentError && <p style={{ color: '#c0392b', fontSize: '0.85rem', marginBottom: '0.75rem' }} role="alert">{consentError}</p>}
+          <button
+            type="button"
+            onClick={handleConsentGateAccept}
+            disabled={!consentChecked || consentBusy}
+            style={{
+              width: '100%', padding: '0.75rem 1rem',
+              background: consentChecked ? '#2e7d32' : '#9db99f',
+              color: '#fff', border: 'none', borderRadius: '8px',
+              fontSize: '0.9rem', fontWeight: 600,
+              cursor: consentChecked ? 'pointer' : 'not-allowed',
+            }}
+          >
+            {consentBusy ? 'Сохраняем…' : 'Продолжить'}
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   if (!user) {
     return (
