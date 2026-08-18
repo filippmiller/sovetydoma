@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { canonicalPath } from '@/lib/seo'
+import { TERMS_VERSION } from '@/lib/legal/document-versions'
 
 export const metadata: Metadata = {
   title: 'Условия использования',
@@ -9,7 +10,6 @@ export const metadata: Metadata = {
 }
 
 export default function TermsPage() {
-  const year = new Date().getFullYear()
   return (
     <div style={{ maxWidth: '780px', margin: '2rem auto', padding: '0 1rem 4rem', lineHeight: 1.65 }}>
       <nav aria-label="Хлебные крошки" style={{ fontSize: '0.85rem', marginBottom: '1rem' }}>
@@ -19,7 +19,7 @@ export default function TermsPage() {
       </nav>
 
       <h1 style={{ fontSize: '1.7rem', fontWeight: 800, marginBottom: '0.5rem' }}>Условия использования</h1>
-      <p style={{ color: '#666', marginBottom: '1.25rem' }}>Последнее обновление: {year}. Информационный сайт практических советов.</p>
+      <p style={{ color: '#666', marginBottom: '1.25rem' }}>Версия документа: {TERMS_VERSION}. Информационный сайт практических советов.</p>
 
       <p style={{ color: '#444' }}>
         Используя сайт 1001sovet.ru (далее — Сайт), вы соглашаетесь с этими условиями. Сайт предназначен для личного некоммерческого использования.

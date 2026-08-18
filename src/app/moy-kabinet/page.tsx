@@ -8,6 +8,7 @@ import { getArticleMeta } from '@/lib/article-index'
 import { photoPublicUrl } from '@/lib/photos'
 import ArticlePageShell from '@/components/ArticlePageShell'
 import LatestPublished from '@/components/LatestPublished'
+import ErasureRequestPanel from '@/components/account/ErasureRequestPanel'
 
 interface SavedArticle {
   article_slug: string
@@ -23,7 +24,7 @@ interface UserArticle {
   photo_path?: string | null
 }
 
-type CabinetTab = 'feed' | 'recipes' | 'lifehacks' | 'saved' | 'articles'
+type CabinetTab = 'feed' | 'recipes' | 'lifehacks' | 'saved' | 'articles' | 'privacy'
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   draft: { label: 'Черновик', color: '#666', bg: '#f0ede8' },
@@ -38,6 +39,7 @@ const TABS: Array<{ id: CabinetTab; label: string }> = [
   { id: 'lifehacks', label: 'Лайфхаки' },
   { id: 'saved', label: 'Сохранённое' },
   { id: 'articles', label: 'Мои статьи' },
+  { id: 'privacy', label: 'Приватность' },
 ]
 
 export default function MoyKabinetPage() {
@@ -177,6 +179,7 @@ export default function MoyKabinetPage() {
 
         {tab === 'saved' && <SavedArticles saved={saved} onRemove={removeSaved} />}
         {tab === 'articles' && <AuthoredArticles articles={articles} />}
+        {tab === 'privacy' && <ErasureRequestPanel />}
       </main>
     </ArticlePageShell>
   )
