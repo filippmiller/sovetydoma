@@ -36,7 +36,7 @@ concurrency:
 
 jobs:
   factory:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, lan-ci-linux]
     timeout-minutes: 30
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
