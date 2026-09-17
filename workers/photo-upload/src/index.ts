@@ -1,4 +1,4 @@
-import { buildRateLimitBucket, checkIngestionRateLimit } from './rate-limit'
+import { buildRateLimitBucket, checkIngestionRateLimit, rateLimitKv } from './rate-limit'
 import { buildCors, parseOriginList } from './cors'
 import {
   createContactToken,
@@ -16,6 +16,9 @@ import {
   referrerDomain,
   parseUtm,
 } from './analytics'
+import { insertConsentEvent, hasConsentEvent, hashIp, hashEmailSubject, type ConsentPurpose, type ConsentMethod } from './consent'
+import { requestErasure, cancelErasure, getErasureStatus, finalizeErasureRequests } from './erasure'
+import { TERMS_VERSION, PRIVACY_POLICY_VERSION } from '../../../src/lib/legal/document-versions'
 
 // Cloudflare Worker: photo upload + serving backed by R2.
 // The static site cannot write to R2 directly, so this Worker:
@@ -40,6 +43,13 @@ interface Env {
   RESEND_API_KEY?: string
   RATE_LIMIT_KV?: KVNamespace
   TURNSTILE_SECRET_KEY?: string
+  // 152-FZ compliance (consent evidence + erasure/retention — canon at
+  // D:/DEV/CRM-INVITE/COMPLIANCE_152FZ_CANON.md). HMAC pepper for hashing IPs
+  // before they are stored in consent_events/erasure_requests; set via
+  // `wrangler secret put PII_HASH_SECRET` (same convention as the
+  // subscriptions worker's PII_HASH_SECRET, but configured independently —
+  // Workers secrets are per-worker, not shared).
+  PII_HASH_SECRET?: string
 }
 
 const MAX_BYTES = 5 * 1024 * 1024
@@ -77,6 +87,14 @@ function restrictedCors(req: Request, allowedValue: string | undefined, fallback
   })
 }
 
+function accountCors(req: Request, env: Env): Record<string, string> {
+  const origin = req.headers.get('Origin') || ''
+  const allowed = parseOriginList(env.CONTACT_ALLOWED_ORIGINS || env.ALLOWED_ORIGIN || 'https://1001sovet.ru')
+  return buildCors(origin, allowed, 'POST, GET, OPTIONS', {
+    'Access-Control-Allow-Headers': 'authorization, content-type',
+  })
+}
+
 function analyticsCors(req: Request, env: Env): Record<string, string> {
   const origin = req.headers.get('Origin') || ''
   const allowed = parseOriginList(
@@ -104,6 +122,50 @@ async function validateUser(env: Env, authHeader: string): Promise<string | null
     return null
   }
 }
+
+/**
+ * Confirms a client-claimed user id is a real Supabase Auth user, via the
+ * Admin API (service-role only), and returns its creation time. Used only by
+ * the /consent route's fresh-signup fallback (see SIGNUP_CONSENT_WINDOW_MS
+ * below) — by itself this ONLY proves the uuid belongs to *some* real
+ * account, never that the caller IS that account, so callers must not treat
+ * a truthy result alone as authorization (152-FZ audit 2026-08-18 P0: this
+ * used to be the only gate on /consent, which let anyone who harvested a
+ * user_id from a public comment or /kollekcii/<userId>/... URL forge a
+ * consent/non-consent row for that victim).
+ */
+async function verifyUserExists(env: Env, userId: string): Promise<{ id: string; createdAt: string } | null> {
+  if (!env.SUPABASE_SERVICE_ROLE_KEY) return null
+  try {
+    const res = await fetch(
+      `${env.SUPABASE_URL.replace(/\/+$/, '')}/auth/v1/admin/users/${encodeURIComponent(userId)}`,
+      {
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        },
+      },
+    )
+    if (!res.ok) return null
+    const data = await res.json().catch(() => null) as null | { id?: string; created_at?: string }
+    if (!data?.id) return null
+    return { id: data.id, createdAt: data.created_at || '' }
+  } catch {
+    return null
+  }
+}
+
+// Fresh-signup fallback window for /consent (152-FZ audit 2026-08-18 P0 fix).
+// RegisterForm calls /consent right after supabase.auth.signUp() resolves,
+// which can have no session yet when email confirmation is required — so an
+// unauthenticated bearer-less call must still be accepted for THAT narrow
+// case, but nothing else. We bound the blast radius of an id-harvesting
+// attacker to: only accounts created in the last 15 minutes, and only the
+// first consent row ever written for that (user, purpose) pair (see
+// hasConsentEvent) — an attacker can no longer forge consent/non-consent for
+// any *existing* account at all, and for a brand-new one gets exactly one
+// shot within a short window, not standing unlimited access.
+const SIGNUP_CONSENT_WINDOW_MS = 15 * 60 * 1000
 
 async function validateAdmin(env: Env, authHeader: string): Promise<boolean> {
   if (!env.SUPABASE_SERVICE_ROLE_KEY) return false
@@ -225,6 +287,9 @@ const worker = {
     if (req.method === 'OPTIONS' && url.pathname.startsWith('/contact')) {
       return new Response('ok', { headers: contactCors(req, env) })
     }
+    if (req.method === 'OPTIONS' && (url.pathname === '/consent' || url.pathname.startsWith('/account/'))) {
+      return new Response('ok', { headers: accountCors(req, env) })
+    }
     if (req.method === 'OPTIONS' && (url.pathname === '/article-question' || url.pathname === '/article-questions' || url.pathname === '/article-comment' || url.pathname === '/article-count')) {
       return new Response('ok', { headers: articleQuestionCors(req, env) })
     }
@@ -250,6 +315,7 @@ const worker = {
         subject?: string
         body?: string
         website?: string
+        pdConsent?: boolean
       }
       if (!payload) return json({ error: 'bad_json' }, 400, contactHeaders)
       if (cleanText(payload.website, 200)) return json({ ok: true }, 200, contactHeaders)
@@ -262,13 +328,156 @@ const worker = {
 
       if (name.length < 2 || subject.length < 4 || body.length < 20) return json({ error: 'too_short' }, 400, contactHeaders)
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'bad_email' }, 400, contactHeaders)
+      // 152-FZ: PD-processing consent is its own checkbox on the contact form
+      // (canon §1.1 — never bundled with sending the message itself). Server
+      // enforces this too, not just the UI, since the endpoint is public.
+      if (payload.pdConsent !== true) return json({ error: 'consent_required' }, 400, contactHeaders)
 
       try {
         await sendContactEmail(env, { name, email, subject, body, ip })
       } catch {
         return json({ error: 'email_delivery_failed' }, 502, contactHeaders)
       }
+      // Best-effort evidence write: the email has already been sent, so a
+      // consent_events insert failure here must not fail the user-visible
+      // request (mirrors admin-api's insertAuditEvent "never throws" contract).
+      // subjectAnonId is a stable HMAC(pepper, email) — NOT sha256(email+now()),
+      // which was both unsalted (reversible via a rainbow table) and unique
+      // per millisecond (so the same person's row could never be found again
+      // by email, defeating its purpose as evidence) — 152-FZ audit 2026-08-18.
+      await insertConsentEvent(env, {
+        subjectAnonId: await hashEmailSubject(env, email),
+        purpose: 'pd_processing_general',
+        documentVersion: PRIVACY_POLICY_VERSION,
+        granted: true,
+        method: 'lead_form',
+        ip,
+        userAgent: req.headers.get('user-agent') || '',
+      }).catch(() => {})
       return json({ ok: true }, 200, contactHeaders)
+    }
+
+    if (url.pathname === '/consent') {
+      const accountHeaders = accountCors(req, env)
+      if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, accountHeaders)
+
+      const ip = getClientIp(req)
+      if (!(await rateLimitKv(env, 'consent', ip, 20, 60))) return json({ error: 'rate_limited' }, 429, accountHeaders)
+
+      const payload = await req.json().catch(() => null) as null | {
+        userId?: string
+        purpose?: ConsentPurpose
+        granted?: boolean
+      }
+      if (!payload || !payload.userId || !payload.purpose) return json({ error: 'bad_json' }, 400, accountHeaders)
+      if (payload.purpose !== 'terms' && payload.purpose !== 'privacy_policy') {
+        return json({ error: 'bad_purpose' }, 400, accountHeaders)
+      }
+
+      // Identity check (152-FZ audit 2026-08-18, P0 fix). Two accepted paths:
+      //  1. Authenticated: the caller's own bearer session matches the
+      //     claimed userId (settings re-accept, or signup when a session
+      //     already exists).
+      //  2. Fresh-signup fallback: RegisterForm calls this right after
+      //     supabase.auth.signUp() resolves, which can have NO session yet
+      //     when email confirmation is required. Accepted ONLY when the
+      //     claimed id is a real account created within the last
+      //     SIGNUP_CONSENT_WINDOW_MS AND no consent_events row for this
+      //     exact (user, purpose) exists yet — so harvesting an *existing*
+      //     user's id from a public comment/collection URL no longer works
+      //     at all, and a brand-new id can be abused at most once, within
+      //     minutes of creation, not indefinitely.
+      const authUserId = await validateUser(env, req.headers.get('Authorization') || '')
+      let verified = Boolean(authUserId && authUserId === payload.userId)
+      if (!verified) {
+        const user = await verifyUserExists(env, payload.userId)
+        const createdAtMs = user ? Date.parse(user.createdAt) : NaN
+        const isFreshSignup = user !== null && Number.isFinite(createdAtMs) && (Date.now() - createdAtMs) <= SIGNUP_CONSENT_WINDOW_MS
+        if (isFreshSignup) {
+          const already = await hasConsentEvent(env, payload.userId, payload.purpose)
+          verified = already.ok && !already.exists
+        }
+      }
+      if (!verified) return json({ error: 'unauthorized' }, 401, accountHeaders)
+
+      const documentVersion = payload.purpose === 'terms' ? TERMS_VERSION : PRIVACY_POLICY_VERSION
+      const result = await insertConsentEvent(env, {
+        subjectUserId: payload.userId,
+        purpose: payload.purpose,
+        documentVersion,
+        granted: payload.granted !== false,
+        method: 'signup' as ConsentMethod,
+        ip,
+        userAgent: req.headers.get('user-agent') || '',
+      })
+      if (!result.ok) return json({ error: result.error }, 502, accountHeaders)
+      return json({ ok: true }, 200, accountHeaders)
+    }
+
+    // Authenticated-only status check used by the OAuth (VK ID / Yandex)
+    // sign-in callback (152-FZ audit 2026-08-18, P1 fix): those flows never
+    // show the terms/privacy checkboxes RegisterForm shows, so a social
+    // account could otherwise reach a live session with zero consent_events
+    // evidence. The callback page calls this right after establishing a
+    // session and shows a one-time consent gate if anything is missing.
+    if (url.pathname === '/account/consent-status') {
+      const accountHeaders = accountCors(req, env)
+      if (req.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, accountHeaders)
+
+      const userId = await validateUser(env, req.headers.get('Authorization') || '')
+      if (!userId) return json({ error: 'unauthorized' }, 401, accountHeaders)
+
+      const [terms, privacyPolicy] = await Promise.all([
+        hasConsentEvent(env, userId, 'terms'),
+        hasConsentEvent(env, userId, 'privacy_policy'),
+      ])
+      if (!terms.ok || !privacyPolicy.ok) return json({ error: 'lookup_failed' }, 502, accountHeaders)
+      return json({ ok: true, terms: terms.exists, privacy_policy: privacyPolicy.exists }, 200, accountHeaders)
+    }
+
+    if (url.pathname === '/account/erasure/request') {
+      const accountHeaders = accountCors(req, env)
+      if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, accountHeaders)
+
+      const userId = await validateUser(env, req.headers.get('Authorization') || '')
+      if (!userId) return json({ error: 'unauthorized' }, 401, accountHeaders)
+
+      const ip = getClientIp(req)
+      if (!(await rateLimitKv(env, 'erasure', ip, 5, 3600))) return json({ error: 'rate_limited' }, 429, accountHeaders)
+
+      const payload = await req.json().catch(() => null) as null | { confirm?: boolean }
+      if (!payload?.confirm) return json({ error: 'confirmation_required' }, 400, accountHeaders)
+
+      const ipHash = await hashIp(env, ip)
+      if (!ipHash) return json({ error: 'not_configured' }, 503, accountHeaders)
+
+      const result = await requestErasure(env, userId, ipHash, req.headers.get('user-agent') || '')
+      if (!result.ok) return json({ error: result.error }, 502, accountHeaders)
+      return json({ ok: true, request: result.request }, 200, accountHeaders)
+    }
+
+    if (url.pathname === '/account/erasure/cancel') {
+      const accountHeaders = accountCors(req, env)
+      if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, accountHeaders)
+
+      const userId = await validateUser(env, req.headers.get('Authorization') || '')
+      if (!userId) return json({ error: 'unauthorized' }, 401, accountHeaders)
+
+      const result = await cancelErasure(env, userId)
+      if (!result.ok) return json({ error: result.error }, result.error === 'not_found' ? 404 : 502, accountHeaders)
+      return json({ ok: true }, 200, accountHeaders)
+    }
+
+    if (url.pathname === '/account/erasure/status') {
+      const accountHeaders = accountCors(req, env)
+      if (req.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, accountHeaders)
+
+      const userId = await validateUser(env, req.headers.get('Authorization') || '')
+      if (!userId) return json({ error: 'unauthorized' }, 401, accountHeaders)
+
+      const result = await getErasureStatus(env, userId)
+      if (!result.ok) return json({ error: 'lookup_failed' }, 502, accountHeaders)
+      return json({ ok: true, request: result.request }, 200, accountHeaders)
     }
 
     if (url.pathname === '/analytics/event') {
@@ -623,6 +832,24 @@ const worker = {
     }
 
     return new Response('Not found', { status: 404, headers: h })
+  },
+
+  // 152-FZ retention job (canon §1.3). Finalizes erasure_requests whose
+  // grace period has elapsed — see erasure.ts's finalizeErasureRequests for
+  // the anonymize step. Cron schedule lives in wrangler.toml's [triggers].
+  //
+  // Scope note: canon §1.3 also asks for purging stale non-account lead/
+  // contact-form PD. This site's /contact route never persists submissions
+  // to Postgres — it only relays an email via Resend/EMAIL — so there is no
+  // lead-storage table to sweep here (see the contact-form audit finding).
+  // TODO(152-FZ canon §1.3): if a lead-persistence table is ever added for
+  // /contact, wire its purge into this same scheduled() handler rather than
+  // creating a new PD store with no retention job from day one.
+  async scheduled(_event: ScheduledEvent, env: Env): Promise<void> {
+    const summary = await finalizeErasureRequests(env)
+    if (summary.failed > 0) {
+      console.error(`[retention] erasure finalize: ${summary.completed}/${summary.processed} completed, ${summary.failed} failed`)
+    }
   },
 }
 

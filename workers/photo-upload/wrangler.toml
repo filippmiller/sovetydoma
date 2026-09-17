@@ -30,3 +30,13 @@ CONTACT_FROM_EMAIL = "noreply@vsedomatut.com"
 [[send_email]]
 name = "EMAIL"
 destination_address = "alexmiller.idothings@gmail.com"
+
+# 152-FZ retention job (canon at D:/DEV/CRM-INVITE/COMPLIANCE_152FZ_CANON.md
+# §1.3): daily at 03:00 UTC, finalizes erasure_requests whose 30-day grace
+# period has elapsed. See src/index.ts's scheduled() handler.
+[triggers]
+crons = ["0 3 * * *"]
+
+# Before deploying: `wrangler secret put PII_HASH_SECRET` (HMAC pepper for
+# ip_hash in consent_events/erasure_requests — independent from the
+# subscriptions worker's own PII_HASH_SECRET; Workers secrets are per-worker).
