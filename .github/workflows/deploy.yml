@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   build-publish:
-    runs-on: [self-hosted, lan-ci-linux]
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       NEXT_PUBLIC_SITE_URL: https://1001sovet.ru
