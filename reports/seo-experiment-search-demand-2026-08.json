@@ -152,8 +152,41 @@
           "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
         },
-        "d30": "2026-09-01",
-        "d60": "2026-10-01",
+        "d30": {
+          "due": "2026-09-01",
+          "completed_at": null,
+          "status": "MISSED — the scheduled task session (seo-search-demand-2026-08-d30, started 2026-09-02T03:35:08Z, ~13.5h after its 2026-09-01 fire time) crashed early: its transcript shows only a Bash call and a Glob call before going silent (Glob call matches the pattern that caused a 20s ripgrep timeout in this d60 session too). It produced no commits on content/seo-search-demand-2026-08-wt, no journal entry, no checkpoints.d30 data, and no beads update, despite being reported 'succeeded' by the scheduler (a false positive — session death after a tool timeout is not currently surfaced as a failure). Discovered during this d60 checkpoint (2026-10-01) via list_task_runs + list_events on the d30 session. Not retroactively backfilled: GSC/Yandex state as of 2026-09-01 is not recoverable after the fact, and the project rule restricts content edits to real query-gap data, which doesn't exist for that date. Net effect: no +30d indexation/performance snapshot or query-gap content review exists for this experiment. See journal entry and bead sovetydoma-9nb for follow-up."
+        },
+        "d60": {
+          "due": "2026-10-01",
+          "completed_at": "2026-10-01",
+          "google_indexed": true,
+          "google_status": "indexed — individually re-verified via URL Inspection for all 10 URLs this checkpoint (owner-authenticated GSC session via claude-in-chrome, connected this run unlike d14/d30). 10/10 now show \"URL is on Google / Page is indexed\", up from 8/10 at d7 (the 2 stragglers — voda-pod-yashchikami-holodilnika-sliv and zamorozka-petrushki-sokhr-arom — are both now indexed).",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually re-verified this checkpoint — the \"Проверка страницы\" (page check) tool accepted the URL and returned no result row after 15+ seconds of waiting (same session-limit behavior documented at d7/d14), and the \"Все страницы\"/\"Исключённые страницы\" filtered-search views in Индексирование → Страницы в поиске returned \"Нет подходящих страниц\" (no match) for all 10 slugs tried — most likely because those views are sampled rather than exhaustive at this low a traffic level (403 pages in search total, sampled lists show dozens, not all), not necessarily evidence of exclusion. Site-wide context has improved substantially since d7/d14: \"Страниц в поиске\" (pages in search) for 1001sovet.ru grew from 101 (d7) to 403 (this checkpoint, per Мои сайты dashboard) — a ~4x increase — against 1,047 total pages added (ИКС site score, \"Клики в поиске\" shows 6 clicks in the last 28 days). Nothing in the excluded-pages sample or diagnostics flags any of the 10 experiment URLs. IndexNow submission status unchanged (202 Accepted, 2026-08-02).",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No new gap found. SQL scan of content_matrix.body_md (published+active articles, excluding self) confirms all 10 experiment articles have ≥1 inbound internal link: the two d14 fixes (pishchevaya-mol-kukhnya ← reviziya-kuhonnyh-yashikov-raz-v-sezon; kabachki-gniyut-na-kuste-zavyazi-prichina ← kabachki-gniut-pri-khranenii-prichiny) are still live. No edits made this checkpoint.",
+          "gsc_performance": {
+            "window": "2026-07-31 to 2026-09-28 (GSC default 3-month view)",
+            "clicks": 0,
+            "impressions": 0,
+            "avg_position": null,
+            "top_queries": "no data — page has not appeared in any recorded Google search impression in this window.",
+            "ranking_bucket": "not ranking (no impressions)"
+          },
+          "cannibalization_note": "Garlic-storage cannibalization (sovetydoma-9nb.2, khranenie-chesnoka-sushka-pletyonki vs. chesnok-posle-uborki-kak-sushit-i-hranit-urozhai): UNCHANGED, not worsened. Both articles remain published/active, neither merged/redirected/superseded. Checked analytics_pageviews for both slugs: 0 pageviews for either since launch of this experiment, so there is no measurable traffic for the two to compete over yet — the cannibalization is structurally still present but not currently costing any real clicks or sessions. Still recommend the owner decide merge-vs-differentiate per the original bead before either article gains organic traction. Aside (out of scope, not acted on): a near-identical third slug, ekonomiya-na-produktah (no \"k\", vs. the unrelated control-cohort slug ekonomiya-na-produktakh with \"k\") was noticed in content_matrix during this checkpoint — looks like a second, unrelated near-duplicate-slug situation in the ekonomiya category, outside this experiment's scope; flagging for the owner, not touched.",
+          "social_utm_note": "Zero social referral traffic: 0 sessions in analytics_sessions with utm_campaign='content_test_2026q3' and 0 sessions with utm_source in (dzen, vk, facebook) in the 60-day window — expected and unchanged, since the social teaser queue (reports/seo-experiment-search-demand-2026-08-social-drafts.json) was never published (no Dzen/VK/Facebook Studio account access from any session to date, per Этап 6 of the journal). No UTM traffic exists for any campaign site-wide in this window, confirming this is an access gap, not a tracking bug.",
+          "analytics": "analytics_pageviews (self-hosted Supabase, prod, via SSH, 2026-08-02–2026-10-01 window): 0 pageviews of any classification (bot or likely_human) recorded for fitoftora-tomaty-profilaktika-obrabotka — unchanged from d7/d14, now across the full 60-day window. Site-wide context: 3,659 pageviews across 309 distinct article slugs in the same 60 days (3,400 sessions), so tracking is fully active — this cohort has simply never been visited. Control-cohort comparison (10 historical articles, live since May/June 2026, 4+ months old): 9 of 10 now show lifetime pageviews — ekonomiya-na-produktakh 5 (3 likely_human/2 bot), kompost-bystro 5 (1/4), nakip-v-chaynike 4 (1/3), klubnika-na-podokonnike 4 (2/2), ogurcy-ot-tli 3 (0/3), skovoroda-ot-zhira 2 (0/2), testo-dlya-pelmeney 2 (1/1), kogda-sazhat-pomidory-2026 1 (0/1), podkormka-pomidorov 1 (0/1), starye-dzhinsy 0 — a mix of \"likely_human\" and \"bot\" classifications, still 0–3 likely_human each. The experiment cohort (10 articles, 60 days old, deliberately chosen for confirmed Wordstat search demand, fully indexed in Google, internal-linked) has STRICTLY WORSE raw pageview counts than the uncurated control cohort at the same analytics layer — 0 vs 1–5 lifetime views per article. This is the clearest signal so far that indexation and on-page SEO hygiene are not the bottleneck; the site overall is pre-authority and organic discovery has not materialized for either cohort."
+        },
         "d90": "2026-10-31"
       },
       "notes": []
@@ -252,8 +285,41 @@
           "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
         },
-        "d30": "2026-09-01",
-        "d60": "2026-10-01",
+        "d30": {
+          "due": "2026-09-01",
+          "completed_at": null,
+          "status": "MISSED — the scheduled task session (seo-search-demand-2026-08-d30, started 2026-09-02T03:35:08Z, ~13.5h after its 2026-09-01 fire time) crashed early: its transcript shows only a Bash call and a Glob call before going silent (Glob call matches the pattern that caused a 20s ripgrep timeout in this d60 session too). It produced no commits on content/seo-search-demand-2026-08-wt, no journal entry, no checkpoints.d30 data, and no beads update, despite being reported 'succeeded' by the scheduler (a false positive — session death after a tool timeout is not currently surfaced as a failure). Discovered during this d60 checkpoint (2026-10-01) via list_task_runs + list_events on the d30 session. Not retroactively backfilled: GSC/Yandex state as of 2026-09-01 is not recoverable after the fact, and the project rule restricts content edits to real query-gap data, which doesn't exist for that date. Net effect: no +30d indexation/performance snapshot or query-gap content review exists for this experiment. See journal entry and bead sovetydoma-9nb for follow-up."
+        },
+        "d60": {
+          "due": "2026-10-01",
+          "completed_at": "2026-10-01",
+          "google_indexed": true,
+          "google_status": "indexed — individually re-verified via URL Inspection for all 10 URLs this checkpoint (owner-authenticated GSC session via claude-in-chrome, connected this run unlike d14/d30). 10/10 now show \"URL is on Google / Page is indexed\", up from 8/10 at d7 (the 2 stragglers — voda-pod-yashchikami-holodilnika-sliv and zamorozka-petrushki-sokhr-arom — are both now indexed).",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually re-verified this checkpoint — the \"Проверка страницы\" (page check) tool accepted the URL and returned no result row after 15+ seconds of waiting (same session-limit behavior documented at d7/d14), and the \"Все страницы\"/\"Исключённые страницы\" filtered-search views in Индексирование → Страницы в поиске returned \"Нет подходящих страниц\" (no match) for all 10 slugs tried — most likely because those views are sampled rather than exhaustive at this low a traffic level (403 pages in search total, sampled lists show dozens, not all), not necessarily evidence of exclusion. Site-wide context has improved substantially since d7/d14: \"Страниц в поиске\" (pages in search) for 1001sovet.ru grew from 101 (d7) to 403 (this checkpoint, per Мои сайты dashboard) — a ~4x increase — against 1,047 total pages added (ИКС site score, \"Клики в поиске\" shows 6 clicks in the last 28 days). Nothing in the excluded-pages sample or diagnostics flags any of the 10 experiment URLs. IndexNow submission status unchanged (202 Accepted, 2026-08-02).",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No new gap found. SQL scan of content_matrix.body_md (published+active articles, excluding self) confirms all 10 experiment articles have ≥1 inbound internal link: the two d14 fixes (pishchevaya-mol-kukhnya ← reviziya-kuhonnyh-yashikov-raz-v-sezon; kabachki-gniyut-na-kuste-zavyazi-prichina ← kabachki-gniut-pri-khranenii-prichiny) are still live. No edits made this checkpoint.",
+          "gsc_performance": {
+            "window": "2026-07-31 to 2026-09-28 (GSC default 3-month view)",
+            "clicks": 0,
+            "impressions": 4,
+            "avg_position": 1,
+            "top_queries": "suppressed by Google (query count below GSC’s low-volume privacy threshold, \"No data\" shown) — insufficient volume to identify any real query gap.",
+            "ranking_bucket": "top-10 (but on <5 total impressions — not a meaningful competitive ranking signal yet)"
+          },
+          "cannibalization_note": "Garlic-storage cannibalization (sovetydoma-9nb.2, khranenie-chesnoka-sushka-pletyonki vs. chesnok-posle-uborki-kak-sushit-i-hranit-urozhai): UNCHANGED, not worsened. Both articles remain published/active, neither merged/redirected/superseded. Checked analytics_pageviews for both slugs: 0 pageviews for either since launch of this experiment, so there is no measurable traffic for the two to compete over yet — the cannibalization is structurally still present but not currently costing any real clicks or sessions. Still recommend the owner decide merge-vs-differentiate per the original bead before either article gains organic traction. Aside (out of scope, not acted on): a near-identical third slug, ekonomiya-na-produktah (no \"k\", vs. the unrelated control-cohort slug ekonomiya-na-produktakh with \"k\") was noticed in content_matrix during this checkpoint — looks like a second, unrelated near-duplicate-slug situation in the ekonomiya category, outside this experiment's scope; flagging for the owner, not touched.",
+          "social_utm_note": "Zero social referral traffic: 0 sessions in analytics_sessions with utm_campaign='content_test_2026q3' and 0 sessions with utm_source in (dzen, vk, facebook) in the 60-day window — expected and unchanged, since the social teaser queue (reports/seo-experiment-search-demand-2026-08-social-drafts.json) was never published (no Dzen/VK/Facebook Studio account access from any session to date, per Этап 6 of the journal). No UTM traffic exists for any campaign site-wide in this window, confirming this is an access gap, not a tracking bug.",
+          "analytics": "analytics_pageviews (self-hosted Supabase, prod, via SSH, 2026-08-02–2026-10-01 window): 0 pageviews of any classification (bot or likely_human) recorded for sterilizatsiya-banok-ogurtsy-dukhovka-par — unchanged from d7/d14, now across the full 60-day window. Site-wide context: 3,659 pageviews across 309 distinct article slugs in the same 60 days (3,400 sessions), so tracking is fully active — this cohort has simply never been visited. Control-cohort comparison (10 historical articles, live since May/June 2026, 4+ months old): 9 of 10 now show lifetime pageviews — ekonomiya-na-produktakh 5 (3 likely_human/2 bot), kompost-bystro 5 (1/4), nakip-v-chaynike 4 (1/3), klubnika-na-podokonnike 4 (2/2), ogurcy-ot-tli 3 (0/3), skovoroda-ot-zhira 2 (0/2), testo-dlya-pelmeney 2 (1/1), kogda-sazhat-pomidory-2026 1 (0/1), podkormka-pomidorov 1 (0/1), starye-dzhinsy 0 — a mix of \"likely_human\" and \"bot\" classifications, still 0–3 likely_human each. The experiment cohort (10 articles, 60 days old, deliberately chosen for confirmed Wordstat search demand, fully indexed in Google, internal-linked) has STRICTLY WORSE raw pageview counts than the uncurated control cohort at the same analytics layer — 0 vs 1–5 lifetime views per article. This is the clearest signal so far that indexation and on-page SEO hygiene are not the bottleneck; the site overall is pre-authority and organic discovery has not materialized for either cohort."
+        },
         "d90": "2026-10-31"
       },
       "notes": [
@@ -352,8 +418,41 @@
           "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
         },
-        "d30": "2026-09-01",
-        "d60": "2026-10-01",
+        "d30": {
+          "due": "2026-09-01",
+          "completed_at": null,
+          "status": "MISSED — the scheduled task session (seo-search-demand-2026-08-d30, started 2026-09-02T03:35:08Z, ~13.5h after its 2026-09-01 fire time) crashed early: its transcript shows only a Bash call and a Glob call before going silent (Glob call matches the pattern that caused a 20s ripgrep timeout in this d60 session too). It produced no commits on content/seo-search-demand-2026-08-wt, no journal entry, no checkpoints.d30 data, and no beads update, despite being reported 'succeeded' by the scheduler (a false positive — session death after a tool timeout is not currently surfaced as a failure). Discovered during this d60 checkpoint (2026-10-01) via list_task_runs + list_events on the d30 session. Not retroactively backfilled: GSC/Yandex state as of 2026-09-01 is not recoverable after the fact, and the project rule restricts content edits to real query-gap data, which doesn't exist for that date. Net effect: no +30d indexation/performance snapshot or query-gap content review exists for this experiment. See journal entry and bead sovetydoma-9nb for follow-up."
+        },
+        "d60": {
+          "due": "2026-10-01",
+          "completed_at": "2026-10-01",
+          "google_indexed": true,
+          "google_status": "indexed — individually re-verified via URL Inspection for all 10 URLs this checkpoint (owner-authenticated GSC session via claude-in-chrome, connected this run unlike d14/d30). 10/10 now show \"URL is on Google / Page is indexed\", up from 8/10 at d7 (the 2 stragglers — voda-pod-yashchikami-holodilnika-sliv and zamorozka-petrushki-sokhr-arom — are both now indexed).",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually re-verified this checkpoint — the \"Проверка страницы\" (page check) tool accepted the URL and returned no result row after 15+ seconds of waiting (same session-limit behavior documented at d7/d14), and the \"Все страницы\"/\"Исключённые страницы\" filtered-search views in Индексирование → Страницы в поиске returned \"Нет подходящих страниц\" (no match) for all 10 slugs tried — most likely because those views are sampled rather than exhaustive at this low a traffic level (403 pages in search total, sampled lists show dozens, not all), not necessarily evidence of exclusion. Site-wide context has improved substantially since d7/d14: \"Страниц в поиске\" (pages in search) for 1001sovet.ru grew from 101 (d7) to 403 (this checkpoint, per Мои сайты dashboard) — a ~4x increase — against 1,047 total pages added (ИКС site score, \"Клики в поиске\" shows 6 clicks in the last 28 days). Nothing in the excluded-pages sample or diagnostics flags any of the 10 experiment URLs. IndexNow submission status unchanged (202 Accepted, 2026-08-02).",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No new gap found. SQL scan of content_matrix.body_md (published+active articles, excluding self) confirms all 10 experiment articles have ≥1 inbound internal link: the two d14 fixes (pishchevaya-mol-kukhnya ← reviziya-kuhonnyh-yashikov-raz-v-sezon; kabachki-gniyut-na-kuste-zavyazi-prichina ← kabachki-gniut-pri-khranenii-prichiny) are still live. No edits made this checkpoint.",
+          "gsc_performance": {
+            "window": "2026-07-31 to 2026-09-28 (GSC default 3-month view)",
+            "clicks": 0,
+            "impressions": 0,
+            "avg_position": null,
+            "top_queries": "no data — page has not appeared in any recorded Google search impression in this window.",
+            "ranking_bucket": "not ranking (no impressions)"
+          },
+          "cannibalization_note": "Garlic-storage cannibalization (sovetydoma-9nb.2, khranenie-chesnoka-sushka-pletyonki vs. chesnok-posle-uborki-kak-sushit-i-hranit-urozhai): UNCHANGED, not worsened. Both articles remain published/active, neither merged/redirected/superseded. Checked analytics_pageviews for both slugs: 0 pageviews for either since launch of this experiment, so there is no measurable traffic for the two to compete over yet — the cannibalization is structurally still present but not currently costing any real clicks or sessions. Still recommend the owner decide merge-vs-differentiate per the original bead before either article gains organic traction. Aside (out of scope, not acted on): a near-identical third slug, ekonomiya-na-produktah (no \"k\", vs. the unrelated control-cohort slug ekonomiya-na-produktakh with \"k\") was noticed in content_matrix during this checkpoint — looks like a second, unrelated near-duplicate-slug situation in the ekonomiya category, outside this experiment's scope; flagging for the owner, not touched.",
+          "social_utm_note": "Zero social referral traffic: 0 sessions in analytics_sessions with utm_campaign='content_test_2026q3' and 0 sessions with utm_source in (dzen, vk, facebook) in the 60-day window — expected and unchanged, since the social teaser queue (reports/seo-experiment-search-demand-2026-08-social-drafts.json) was never published (no Dzen/VK/Facebook Studio account access from any session to date, per Этап 6 of the journal). No UTM traffic exists for any campaign site-wide in this window, confirming this is an access gap, not a tracking bug.",
+          "analytics": "analytics_pageviews (self-hosted Supabase, prod, via SSH, 2026-08-02–2026-10-01 window): 0 pageviews of any classification (bot or likely_human) recorded for stiralnaya-mashina-ne-slivaet-vodu-proverka — unchanged from d7/d14, now across the full 60-day window. Site-wide context: 3,659 pageviews across 309 distinct article slugs in the same 60 days (3,400 sessions), so tracking is fully active — this cohort has simply never been visited. Control-cohort comparison (10 historical articles, live since May/June 2026, 4+ months old): 9 of 10 now show lifetime pageviews — ekonomiya-na-produktakh 5 (3 likely_human/2 bot), kompost-bystro 5 (1/4), nakip-v-chaynike 4 (1/3), klubnika-na-podokonnike 4 (2/2), ogurcy-ot-tli 3 (0/3), skovoroda-ot-zhira 2 (0/2), testo-dlya-pelmeney 2 (1/1), kogda-sazhat-pomidory-2026 1 (0/1), podkormka-pomidorov 1 (0/1), starye-dzhinsy 0 — a mix of \"likely_human\" and \"bot\" classifications, still 0–3 likely_human each. The experiment cohort (10 articles, 60 days old, deliberately chosen for confirmed Wordstat search demand, fully indexed in Google, internal-linked) has STRICTLY WORSE raw pageview counts than the uncurated control cohort at the same analytics layer — 0 vs 1–5 lifetime views per article. This is the clearest signal so far that indexation and on-page SEO hygiene are not the bottleneck; the site overall is pre-authority and organic discovery has not materialized for either cohort."
+        },
         "d90": "2026-10-31"
       },
       "notes": []
@@ -448,8 +547,41 @@
           "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
         },
-        "d30": "2026-09-01",
-        "d60": "2026-10-01",
+        "d30": {
+          "due": "2026-09-01",
+          "completed_at": null,
+          "status": "MISSED — the scheduled task session (seo-search-demand-2026-08-d30, started 2026-09-02T03:35:08Z, ~13.5h after its 2026-09-01 fire time) crashed early: its transcript shows only a Bash call and a Glob call before going silent (Glob call matches the pattern that caused a 20s ripgrep timeout in this d60 session too). It produced no commits on content/seo-search-demand-2026-08-wt, no journal entry, no checkpoints.d30 data, and no beads update, despite being reported 'succeeded' by the scheduler (a false positive — session death after a tool timeout is not currently surfaced as a failure). Discovered during this d60 checkpoint (2026-10-01) via list_task_runs + list_events on the d30 session. Not retroactively backfilled: GSC/Yandex state as of 2026-09-01 is not recoverable after the fact, and the project rule restricts content edits to real query-gap data, which doesn't exist for that date. Net effect: no +30d indexation/performance snapshot or query-gap content review exists for this experiment. See journal entry and bead sovetydoma-9nb for follow-up."
+        },
+        "d60": {
+          "due": "2026-10-01",
+          "completed_at": "2026-10-01",
+          "google_indexed": true,
+          "google_status": "indexed — individually re-verified via URL Inspection for all 10 URLs this checkpoint (owner-authenticated GSC session via claude-in-chrome, connected this run unlike d14/d30). 10/10 now show \"URL is on Google / Page is indexed\", up from 8/10 at d7 (the 2 stragglers — voda-pod-yashchikami-holodilnika-sliv and zamorozka-petrushki-sokhr-arom — are both now indexed).",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually re-verified this checkpoint — the \"Проверка страницы\" (page check) tool accepted the URL and returned no result row after 15+ seconds of waiting (same session-limit behavior documented at d7/d14), and the \"Все страницы\"/\"Исключённые страницы\" filtered-search views in Индексирование → Страницы в поиске returned \"Нет подходящих страниц\" (no match) for all 10 slugs tried — most likely because those views are sampled rather than exhaustive at this low a traffic level (403 pages in search total, sampled lists show dozens, not all), not necessarily evidence of exclusion. Site-wide context has improved substantially since d7/d14: \"Страниц в поиске\" (pages in search) for 1001sovet.ru grew from 101 (d7) to 403 (this checkpoint, per Мои сайты dashboard) — a ~4x increase — against 1,047 total pages added (ИКС site score, \"Клики в поиске\" shows 6 clicks in the last 28 days). Nothing in the excluded-pages sample or diagnostics flags any of the 10 experiment URLs. IndexNow submission status unchanged (202 Accepted, 2026-08-02).",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No new gap found. SQL scan of content_matrix.body_md (published+active articles, excluding self) confirms all 10 experiment articles have ≥1 inbound internal link: the two d14 fixes (pishchevaya-mol-kukhnya ← reviziya-kuhonnyh-yashikov-raz-v-sezon; kabachki-gniyut-na-kuste-zavyazi-prichina ← kabachki-gniut-pri-khranenii-prichiny) are still live. No edits made this checkpoint.",
+          "gsc_performance": {
+            "window": "2026-07-31 to 2026-09-28 (GSC default 3-month view)",
+            "clicks": 0,
+            "impressions": 0,
+            "avg_position": null,
+            "top_queries": "no data — page has not appeared in any recorded Google search impression in this window.",
+            "ranking_bucket": "not ranking (no impressions)"
+          },
+          "cannibalization_note": "Garlic-storage cannibalization (sovetydoma-9nb.2, khranenie-chesnoka-sushka-pletyonki vs. chesnok-posle-uborki-kak-sushit-i-hranit-urozhai): UNCHANGED, not worsened. Both articles remain published/active, neither merged/redirected/superseded. Checked analytics_pageviews for both slugs: 0 pageviews for either since launch of this experiment, so there is no measurable traffic for the two to compete over yet — the cannibalization is structurally still present but not currently costing any real clicks or sessions. Still recommend the owner decide merge-vs-differentiate per the original bead before either article gains organic traction. Aside (out of scope, not acted on): a near-identical third slug, ekonomiya-na-produktah (no \"k\", vs. the unrelated control-cohort slug ekonomiya-na-produktakh with \"k\") was noticed in content_matrix during this checkpoint — looks like a second, unrelated near-duplicate-slug situation in the ekonomiya category, outside this experiment's scope; flagging for the owner, not touched.",
+          "social_utm_note": "Zero social referral traffic: 0 sessions in analytics_sessions with utm_campaign='content_test_2026q3' and 0 sessions with utm_source in (dzen, vk, facebook) in the 60-day window — expected and unchanged, since the social teaser queue (reports/seo-experiment-search-demand-2026-08-social-drafts.json) was never published (no Dzen/VK/Facebook Studio account access from any session to date, per Этап 6 of the journal). No UTM traffic exists for any campaign site-wide in this window, confirming this is an access gap, not a tracking bug.",
+          "analytics": "analytics_pageviews (self-hosted Supabase, prod, via SSH, 2026-08-02–2026-10-01 window): 0 pageviews of any classification (bot or likely_human) recorded for holodilnik-ne-holodit-chto-proverit — unchanged from d7/d14, now across the full 60-day window. Site-wide context: 3,659 pageviews across 309 distinct article slugs in the same 60 days (3,400 sessions), so tracking is fully active — this cohort has simply never been visited. Control-cohort comparison (10 historical articles, live since May/June 2026, 4+ months old): 9 of 10 now show lifetime pageviews — ekonomiya-na-produktakh 5 (3 likely_human/2 bot), kompost-bystro 5 (1/4), nakip-v-chaynike 4 (1/3), klubnika-na-podokonnike 4 (2/2), ogurcy-ot-tli 3 (0/3), skovoroda-ot-zhira 2 (0/2), testo-dlya-pelmeney 2 (1/1), kogda-sazhat-pomidory-2026 1 (0/1), podkormka-pomidorov 1 (0/1), starye-dzhinsy 0 — a mix of \"likely_human\" and \"bot\" classifications, still 0–3 likely_human each. The experiment cohort (10 articles, 60 days old, deliberately chosen for confirmed Wordstat search demand, fully indexed in Google, internal-linked) has STRICTLY WORSE raw pageview counts than the uncurated control cohort at the same analytics layer — 0 vs 1–5 lifetime views per article. This is the clearest signal so far that indexation and on-page SEO hygiene are not the bottleneck; the site overall is pre-authority and organic discovery has not materialized for either cohort."
+        },
         "d90": "2026-10-31"
       },
       "notes": []
@@ -547,8 +679,41 @@
           "inbound_internal_links_action": "Internal-linking gap found and fixed this checkpoint: article had 0 inbound internal links from other published content (data pulled via SQL scan of content_matrix.body_md for slug references). Added a contextual backlink from the DB-only article reviziya-kuhonnyh-yashikov-raz-v-sezon (Шаг 2, moth/pest check during the seasonal kitchen-drawer audit), verified live. A second candidate backlink site (hranenie-krup-muki-spetsiy) was attempted first but reverted — that article is served from a static legacy MDX file (src/content/articles/hranenie-krup-muki-spetsiy.mdx), not the DB content_matrix row, so a DB edit alone does not render live without a git-based rebuild+redeploy, which was out of scope for this unattended checkpoint.",
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
         },
-        "d30": "2026-09-01",
-        "d60": "2026-10-01",
+        "d30": {
+          "due": "2026-09-01",
+          "completed_at": null,
+          "status": "MISSED — the scheduled task session (seo-search-demand-2026-08-d30, started 2026-09-02T03:35:08Z, ~13.5h after its 2026-09-01 fire time) crashed early: its transcript shows only a Bash call and a Glob call before going silent (Glob call matches the pattern that caused a 20s ripgrep timeout in this d60 session too). It produced no commits on content/seo-search-demand-2026-08-wt, no journal entry, no checkpoints.d30 data, and no beads update, despite being reported 'succeeded' by the scheduler (a false positive — session death after a tool timeout is not currently surfaced as a failure). Discovered during this d60 checkpoint (2026-10-01) via list_task_runs + list_events on the d30 session. Not retroactively backfilled: GSC/Yandex state as of 2026-09-01 is not recoverable after the fact, and the project rule restricts content edits to real query-gap data, which doesn't exist for that date. Net effect: no +30d indexation/performance snapshot or query-gap content review exists for this experiment. See journal entry and bead sovetydoma-9nb for follow-up."
+        },
+        "d60": {
+          "due": "2026-10-01",
+          "completed_at": "2026-10-01",
+          "google_indexed": true,
+          "google_status": "indexed — individually re-verified via URL Inspection for all 10 URLs this checkpoint (owner-authenticated GSC session via claude-in-chrome, connected this run unlike d14/d30). 10/10 now show \"URL is on Google / Page is indexed\", up from 8/10 at d7 (the 2 stragglers — voda-pod-yashchikami-holodilnika-sliv and zamorozka-petrushki-sokhr-arom — are both now indexed).",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually re-verified this checkpoint — the \"Проверка страницы\" (page check) tool accepted the URL and returned no result row after 15+ seconds of waiting (same session-limit behavior documented at d7/d14), and the \"Все страницы\"/\"Исключённые страницы\" filtered-search views in Индексирование → Страницы в поиске returned \"Нет подходящих страниц\" (no match) for all 10 slugs tried — most likely because those views are sampled rather than exhaustive at this low a traffic level (403 pages in search total, sampled lists show dozens, not all), not necessarily evidence of exclusion. Site-wide context has improved substantially since d7/d14: \"Страниц в поиске\" (pages in search) for 1001sovet.ru grew from 101 (d7) to 403 (this checkpoint, per Мои сайты dashboard) — a ~4x increase — against 1,047 total pages added (ИКС site score, \"Клики в поиске\" shows 6 clicks in the last 28 days). Nothing in the excluded-pages sample or diagnostics flags any of the 10 experiment URLs. IndexNow submission status unchanged (202 Accepted, 2026-08-02).",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No new gap found. SQL scan of content_matrix.body_md (published+active articles, excluding self) confirms all 10 experiment articles have ≥1 inbound internal link: the two d14 fixes (pishchevaya-mol-kukhnya ← reviziya-kuhonnyh-yashikov-raz-v-sezon; kabachki-gniyut-na-kuste-zavyazi-prichina ← kabachki-gniut-pri-khranenii-prichiny) are still live. No edits made this checkpoint.",
+          "gsc_performance": {
+            "window": "2026-07-31 to 2026-09-28 (GSC default 3-month view)",
+            "clicks": 0,
+            "impressions": 0,
+            "avg_position": null,
+            "top_queries": "no data — page has not appeared in any recorded Google search impression in this window.",
+            "ranking_bucket": "not ranking (no impressions)"
+          },
+          "cannibalization_note": "Garlic-storage cannibalization (sovetydoma-9nb.2, khranenie-chesnoka-sushka-pletyonki vs. chesnok-posle-uborki-kak-sushit-i-hranit-urozhai): UNCHANGED, not worsened. Both articles remain published/active, neither merged/redirected/superseded. Checked analytics_pageviews for both slugs: 0 pageviews for either since launch of this experiment, so there is no measurable traffic for the two to compete over yet — the cannibalization is structurally still present but not currently costing any real clicks or sessions. Still recommend the owner decide merge-vs-differentiate per the original bead before either article gains organic traction. Aside (out of scope, not acted on): a near-identical third slug, ekonomiya-na-produktah (no \"k\", vs. the unrelated control-cohort slug ekonomiya-na-produktakh with \"k\") was noticed in content_matrix during this checkpoint — looks like a second, unrelated near-duplicate-slug situation in the ekonomiya category, outside this experiment's scope; flagging for the owner, not touched.",
+          "social_utm_note": "Zero social referral traffic: 0 sessions in analytics_sessions with utm_campaign='content_test_2026q3' and 0 sessions with utm_source in (dzen, vk, facebook) in the 60-day window — expected and unchanged, since the social teaser queue (reports/seo-experiment-search-demand-2026-08-social-drafts.json) was never published (no Dzen/VK/Facebook Studio account access from any session to date, per Этап 6 of the journal). No UTM traffic exists for any campaign site-wide in this window, confirming this is an access gap, not a tracking bug.",
+          "analytics": "analytics_pageviews (self-hosted Supabase, prod, via SSH, 2026-08-02–2026-10-01 window): 0 pageviews of any classification (bot or likely_human) recorded for pishchevaya-mol-kukhnya — unchanged from d7/d14, now across the full 60-day window. Site-wide context: 3,659 pageviews across 309 distinct article slugs in the same 60 days (3,400 sessions), so tracking is fully active — this cohort has simply never been visited. Control-cohort comparison (10 historical articles, live since May/June 2026, 4+ months old): 9 of 10 now show lifetime pageviews — ekonomiya-na-produktakh 5 (3 likely_human/2 bot), kompost-bystro 5 (1/4), nakip-v-chaynike 4 (1/3), klubnika-na-podokonnike 4 (2/2), ogurcy-ot-tli 3 (0/3), skovoroda-ot-zhira 2 (0/2), testo-dlya-pelmeney 2 (1/1), kogda-sazhat-pomidory-2026 1 (0/1), podkormka-pomidorov 1 (0/1), starye-dzhinsy 0 — a mix of \"likely_human\" and \"bot\" classifications, still 0–3 likely_human each. The experiment cohort (10 articles, 60 days old, deliberately chosen for confirmed Wordstat search demand, fully indexed in Google, internal-linked) has STRICTLY WORSE raw pageview counts than the uncurated control cohort at the same analytics layer — 0 vs 1–5 lifetime views per article. This is the clearest signal so far that indexation and on-page SEO hygiene are not the bottleneck; the site overall is pre-authority and organic discovery has not materialized for either cohort."
+        },
         "d90": "2026-10-31"
       },
       "notes": []
@@ -646,8 +811,41 @@
           "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
         },
-        "d30": "2026-09-01",
-        "d60": "2026-10-01",
+        "d30": {
+          "due": "2026-09-01",
+          "completed_at": null,
+          "status": "MISSED — the scheduled task session (seo-search-demand-2026-08-d30, started 2026-09-02T03:35:08Z, ~13.5h after its 2026-09-01 fire time) crashed early: its transcript shows only a Bash call and a Glob call before going silent (Glob call matches the pattern that caused a 20s ripgrep timeout in this d60 session too). It produced no commits on content/seo-search-demand-2026-08-wt, no journal entry, no checkpoints.d30 data, and no beads update, despite being reported 'succeeded' by the scheduler (a false positive — session death after a tool timeout is not currently surfaced as a failure). Discovered during this d60 checkpoint (2026-10-01) via list_task_runs + list_events on the d30 session. Not retroactively backfilled: GSC/Yandex state as of 2026-09-01 is not recoverable after the fact, and the project rule restricts content edits to real query-gap data, which doesn't exist for that date. Net effect: no +30d indexation/performance snapshot or query-gap content review exists for this experiment. See journal entry and bead sovetydoma-9nb for follow-up."
+        },
+        "d60": {
+          "due": "2026-10-01",
+          "completed_at": "2026-10-01",
+          "google_indexed": true,
+          "google_status": "indexed — individually re-verified via URL Inspection for all 10 URLs this checkpoint (owner-authenticated GSC session via claude-in-chrome, connected this run unlike d14/d30). 10/10 now show \"URL is on Google / Page is indexed\", up from 8/10 at d7 (the 2 stragglers — voda-pod-yashchikami-holodilnika-sliv and zamorozka-petrushki-sokhr-arom — are both now indexed).",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually re-verified this checkpoint — the \"Проверка страницы\" (page check) tool accepted the URL and returned no result row after 15+ seconds of waiting (same session-limit behavior documented at d7/d14), and the \"Все страницы\"/\"Исключённые страницы\" filtered-search views in Индексирование → Страницы в поиске returned \"Нет подходящих страниц\" (no match) for all 10 slugs tried — most likely because those views are sampled rather than exhaustive at this low a traffic level (403 pages in search total, sampled lists show dozens, not all), not necessarily evidence of exclusion. Site-wide context has improved substantially since d7/d14: \"Страниц в поиске\" (pages in search) for 1001sovet.ru grew from 101 (d7) to 403 (this checkpoint, per Мои сайты dashboard) — a ~4x increase — against 1,047 total pages added (ИКС site score, \"Клики в поиске\" shows 6 clicks in the last 28 days). Nothing in the excluded-pages sample or diagnostics flags any of the 10 experiment URLs. IndexNow submission status unchanged (202 Accepted, 2026-08-02).",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No new gap found. SQL scan of content_matrix.body_md (published+active articles, excluding self) confirms all 10 experiment articles have ≥1 inbound internal link: the two d14 fixes (pishchevaya-mol-kukhnya ← reviziya-kuhonnyh-yashikov-raz-v-sezon; kabachki-gniyut-na-kuste-zavyazi-prichina ← kabachki-gniut-pri-khranenii-prichiny) are still live. No edits made this checkpoint.",
+          "gsc_performance": {
+            "window": "2026-07-31 to 2026-09-28 (GSC default 3-month view)",
+            "clicks": 0,
+            "impressions": 2,
+            "avg_position": 1,
+            "top_queries": "suppressed by Google (query count below GSC’s low-volume privacy threshold, \"No data\" shown) — insufficient volume to identify any real query gap.",
+            "ranking_bucket": "top-10 (but on <5 total impressions — not a meaningful competitive ranking signal yet)"
+          },
+          "cannibalization_note": "Garlic-storage cannibalization (sovetydoma-9nb.2, khranenie-chesnoka-sushka-pletyonki vs. chesnok-posle-uborki-kak-sushit-i-hranit-urozhai): UNCHANGED, not worsened. Both articles remain published/active, neither merged/redirected/superseded. Checked analytics_pageviews for both slugs: 0 pageviews for either since launch of this experiment, so there is no measurable traffic for the two to compete over yet — the cannibalization is structurally still present but not currently costing any real clicks or sessions. Still recommend the owner decide merge-vs-differentiate per the original bead before either article gains organic traction. Aside (out of scope, not acted on): a near-identical third slug, ekonomiya-na-produktah (no \"k\", vs. the unrelated control-cohort slug ekonomiya-na-produktakh with \"k\") was noticed in content_matrix during this checkpoint — looks like a second, unrelated near-duplicate-slug situation in the ekonomiya category, outside this experiment's scope; flagging for the owner, not touched.",
+          "social_utm_note": "Zero social referral traffic: 0 sessions in analytics_sessions with utm_campaign='content_test_2026q3' and 0 sessions with utm_source in (dzen, vk, facebook) in the 60-day window — expected and unchanged, since the social teaser queue (reports/seo-experiment-search-demand-2026-08-social-drafts.json) was never published (no Dzen/VK/Facebook Studio account access from any session to date, per Этап 6 of the journal). No UTM traffic exists for any campaign site-wide in this window, confirming this is an access gap, not a tracking bug.",
+          "analytics": "analytics_pageviews (self-hosted Supabase, prod, via SSH, 2026-08-02–2026-10-01 window): 0 pageviews of any classification (bot or likely_human) recorded for khranenie-chesnoka-sushka-pletyonki — unchanged from d7/d14, now across the full 60-day window. Site-wide context: 3,659 pageviews across 309 distinct article slugs in the same 60 days (3,400 sessions), so tracking is fully active — this cohort has simply never been visited. Control-cohort comparison (10 historical articles, live since May/June 2026, 4+ months old): 9 of 10 now show lifetime pageviews — ekonomiya-na-produktakh 5 (3 likely_human/2 bot), kompost-bystro 5 (1/4), nakip-v-chaynike 4 (1/3), klubnika-na-podokonnike 4 (2/2), ogurcy-ot-tli 3 (0/3), skovoroda-ot-zhira 2 (0/2), testo-dlya-pelmeney 2 (1/1), kogda-sazhat-pomidory-2026 1 (0/1), podkormka-pomidorov 1 (0/1), starye-dzhinsy 0 — a mix of \"likely_human\" and \"bot\" classifications, still 0–3 likely_human each. The experiment cohort (10 articles, 60 days old, deliberately chosen for confirmed Wordstat search demand, fully indexed in Google, internal-linked) has STRICTLY WORSE raw pageview counts than the uncurated control cohort at the same analytics layer — 0 vs 1–5 lifetime views per article. This is the clearest signal so far that indexation and on-page SEO hygiene are not the bottleneck; the site overall is pre-authority and organic discovery has not materialized for either cohort."
+        },
         "d90": "2026-10-31"
       },
       "notes": []
@@ -743,8 +941,41 @@
           "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
         },
-        "d30": "2026-09-01",
-        "d60": "2026-10-01",
+        "d30": {
+          "due": "2026-09-01",
+          "completed_at": null,
+          "status": "MISSED — the scheduled task session (seo-search-demand-2026-08-d30, started 2026-09-02T03:35:08Z, ~13.5h after its 2026-09-01 fire time) crashed early: its transcript shows only a Bash call and a Glob call before going silent (Glob call matches the pattern that caused a 20s ripgrep timeout in this d60 session too). It produced no commits on content/seo-search-demand-2026-08-wt, no journal entry, no checkpoints.d30 data, and no beads update, despite being reported 'succeeded' by the scheduler (a false positive — session death after a tool timeout is not currently surfaced as a failure). Discovered during this d60 checkpoint (2026-10-01) via list_task_runs + list_events on the d30 session. Not retroactively backfilled: GSC/Yandex state as of 2026-09-01 is not recoverable after the fact, and the project rule restricts content edits to real query-gap data, which doesn't exist for that date. Net effect: no +30d indexation/performance snapshot or query-gap content review exists for this experiment. See journal entry and bead sovetydoma-9nb for follow-up."
+        },
+        "d60": {
+          "due": "2026-10-01",
+          "completed_at": "2026-10-01",
+          "google_indexed": true,
+          "google_status": "indexed — individually re-verified via URL Inspection for all 10 URLs this checkpoint (owner-authenticated GSC session via claude-in-chrome, connected this run unlike d14/d30). 10/10 now show \"URL is on Google / Page is indexed\", up from 8/10 at d7 (the 2 stragglers — voda-pod-yashchikami-holodilnika-sliv and zamorozka-petrushki-sokhr-arom — are both now indexed).",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually re-verified this checkpoint — the \"Проверка страницы\" (page check) tool accepted the URL and returned no result row after 15+ seconds of waiting (same session-limit behavior documented at d7/d14), and the \"Все страницы\"/\"Исключённые страницы\" filtered-search views in Индексирование → Страницы в поиске returned \"Нет подходящих страниц\" (no match) for all 10 slugs tried — most likely because those views are sampled rather than exhaustive at this low a traffic level (403 pages in search total, sampled lists show dozens, not all), not necessarily evidence of exclusion. Site-wide context has improved substantially since d7/d14: \"Страниц в поиске\" (pages in search) for 1001sovet.ru grew from 101 (d7) to 403 (this checkpoint, per Мои сайты dashboard) — a ~4x increase — against 1,047 total pages added (ИКС site score, \"Клики в поиске\" shows 6 clicks in the last 28 days). Nothing in the excluded-pages sample or diagnostics flags any of the 10 experiment URLs. IndexNow submission status unchanged (202 Accepted, 2026-08-02).",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No new gap found. SQL scan of content_matrix.body_md (published+active articles, excluding self) confirms all 10 experiment articles have ≥1 inbound internal link: the two d14 fixes (pishchevaya-mol-kukhnya ← reviziya-kuhonnyh-yashikov-raz-v-sezon; kabachki-gniyut-na-kuste-zavyazi-prichina ← kabachki-gniut-pri-khranenii-prichiny) are still live. No edits made this checkpoint.",
+          "gsc_performance": {
+            "window": "2026-07-31 to 2026-09-28 (GSC default 3-month view)",
+            "clicks": 0,
+            "impressions": 3,
+            "avg_position": 7.3,
+            "top_queries": "suppressed by Google (query count below GSC’s low-volume privacy threshold, \"No data\" shown) — insufficient volume to identify any real query gap.",
+            "ranking_bucket": "top-10 (but on <5 total impressions — not a meaningful competitive ranking signal yet)"
+          },
+          "cannibalization_note": "Garlic-storage cannibalization (sovetydoma-9nb.2, khranenie-chesnoka-sushka-pletyonki vs. chesnok-posle-uborki-kak-sushit-i-hranit-urozhai): UNCHANGED, not worsened. Both articles remain published/active, neither merged/redirected/superseded. Checked analytics_pageviews for both slugs: 0 pageviews for either since launch of this experiment, so there is no measurable traffic for the two to compete over yet — the cannibalization is structurally still present but not currently costing any real clicks or sessions. Still recommend the owner decide merge-vs-differentiate per the original bead before either article gains organic traction. Aside (out of scope, not acted on): a near-identical third slug, ekonomiya-na-produktah (no \"k\", vs. the unrelated control-cohort slug ekonomiya-na-produktakh with \"k\") was noticed in content_matrix during this checkpoint — looks like a second, unrelated near-duplicate-slug situation in the ekonomiya category, outside this experiment's scope; flagging for the owner, not touched.",
+          "social_utm_note": "Zero social referral traffic: 0 sessions in analytics_sessions with utm_campaign='content_test_2026q3' and 0 sessions with utm_source in (dzen, vk, facebook) in the 60-day window — expected and unchanged, since the social teaser queue (reports/seo-experiment-search-demand-2026-08-social-drafts.json) was never published (no Dzen/VK/Facebook Studio account access from any session to date, per Этап 6 of the journal). No UTM traffic exists for any campaign site-wide in this window, confirming this is an access gap, not a tracking bug.",
+          "analytics": "analytics_pageviews (self-hosted Supabase, prod, via SSH, 2026-08-02–2026-10-01 window): 0 pageviews of any classification (bot or likely_human) recorded for voda-pod-yashchikami-holodilnika-sliv — unchanged from d7/d14, now across the full 60-day window. Site-wide context: 3,659 pageviews across 309 distinct article slugs in the same 60 days (3,400 sessions), so tracking is fully active — this cohort has simply never been visited. Control-cohort comparison (10 historical articles, live since May/June 2026, 4+ months old): 9 of 10 now show lifetime pageviews — ekonomiya-na-produktakh 5 (3 likely_human/2 bot), kompost-bystro 5 (1/4), nakip-v-chaynike 4 (1/3), klubnika-na-podokonnike 4 (2/2), ogurcy-ot-tli 3 (0/3), skovoroda-ot-zhira 2 (0/2), testo-dlya-pelmeney 2 (1/1), kogda-sazhat-pomidory-2026 1 (0/1), podkormka-pomidorov 1 (0/1), starye-dzhinsy 0 — a mix of \"likely_human\" and \"bot\" classifications, still 0–3 likely_human each. The experiment cohort (10 articles, 60 days old, deliberately chosen for confirmed Wordstat search demand, fully indexed in Google, internal-linked) has STRICTLY WORSE raw pageview counts than the uncurated control cohort at the same analytics layer — 0 vs 1–5 lifetime views per article. This is the clearest signal so far that indexation and on-page SEO hygiene are not the bottleneck; the site overall is pre-authority and organic discovery has not materialized for either cohort."
+        },
         "d90": "2026-10-31"
       },
       "notes": []
@@ -841,8 +1072,41 @@
           "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
         },
-        "d30": "2026-09-01",
-        "d60": "2026-10-01",
+        "d30": {
+          "due": "2026-09-01",
+          "completed_at": null,
+          "status": "MISSED — the scheduled task session (seo-search-demand-2026-08-d30, started 2026-09-02T03:35:08Z, ~13.5h after its 2026-09-01 fire time) crashed early: its transcript shows only a Bash call and a Glob call before going silent (Glob call matches the pattern that caused a 20s ripgrep timeout in this d60 session too). It produced no commits on content/seo-search-demand-2026-08-wt, no journal entry, no checkpoints.d30 data, and no beads update, despite being reported 'succeeded' by the scheduler (a false positive — session death after a tool timeout is not currently surfaced as a failure). Discovered during this d60 checkpoint (2026-10-01) via list_task_runs + list_events on the d30 session. Not retroactively backfilled: GSC/Yandex state as of 2026-09-01 is not recoverable after the fact, and the project rule restricts content edits to real query-gap data, which doesn't exist for that date. Net effect: no +30d indexation/performance snapshot or query-gap content review exists for this experiment. See journal entry and bead sovetydoma-9nb for follow-up."
+        },
+        "d60": {
+          "due": "2026-10-01",
+          "completed_at": "2026-10-01",
+          "google_indexed": true,
+          "google_status": "indexed — individually re-verified via URL Inspection for all 10 URLs this checkpoint (owner-authenticated GSC session via claude-in-chrome, connected this run unlike d14/d30). 10/10 now show \"URL is on Google / Page is indexed\", up from 8/10 at d7 (the 2 stragglers — voda-pod-yashchikami-holodilnika-sliv and zamorozka-petrushki-sokhr-arom — are both now indexed).",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually re-verified this checkpoint — the \"Проверка страницы\" (page check) tool accepted the URL and returned no result row after 15+ seconds of waiting (same session-limit behavior documented at d7/d14), and the \"Все страницы\"/\"Исключённые страницы\" filtered-search views in Индексирование → Страницы в поиске returned \"Нет подходящих страниц\" (no match) for all 10 slugs tried — most likely because those views are sampled rather than exhaustive at this low a traffic level (403 pages in search total, sampled lists show dozens, not all), not necessarily evidence of exclusion. Site-wide context has improved substantially since d7/d14: \"Страниц в поиске\" (pages in search) for 1001sovet.ru grew from 101 (d7) to 403 (this checkpoint, per Мои сайты dashboard) — a ~4x increase — against 1,047 total pages added (ИКС site score, \"Клики в поиске\" shows 6 clicks in the last 28 days). Nothing in the excluded-pages sample or diagnostics flags any of the 10 experiment URLs. IndexNow submission status unchanged (202 Accepted, 2026-08-02).",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No new gap found. SQL scan of content_matrix.body_md (published+active articles, excluding self) confirms all 10 experiment articles have ≥1 inbound internal link: the two d14 fixes (pishchevaya-mol-kukhnya ← reviziya-kuhonnyh-yashikov-raz-v-sezon; kabachki-gniyut-na-kuste-zavyazi-prichina ← kabachki-gniut-pri-khranenii-prichiny) are still live. No edits made this checkpoint.",
+          "gsc_performance": {
+            "window": "2026-07-31 to 2026-09-28 (GSC default 3-month view)",
+            "clicks": 0,
+            "impressions": 0,
+            "avg_position": null,
+            "top_queries": "no data — page has not appeared in any recorded Google search impression in this window.",
+            "ranking_bucket": "not ranking (no impressions)"
+          },
+          "cannibalization_note": "Garlic-storage cannibalization (sovetydoma-9nb.2, khranenie-chesnoka-sushka-pletyonki vs. chesnok-posle-uborki-kak-sushit-i-hranit-urozhai): UNCHANGED, not worsened. Both articles remain published/active, neither merged/redirected/superseded. Checked analytics_pageviews for both slugs: 0 pageviews for either since launch of this experiment, so there is no measurable traffic for the two to compete over yet — the cannibalization is structurally still present but not currently costing any real clicks or sessions. Still recommend the owner decide merge-vs-differentiate per the original bead before either article gains organic traction. Aside (out of scope, not acted on): a near-identical third slug, ekonomiya-na-produktah (no \"k\", vs. the unrelated control-cohort slug ekonomiya-na-produktakh with \"k\") was noticed in content_matrix during this checkpoint — looks like a second, unrelated near-duplicate-slug situation in the ekonomiya category, outside this experiment's scope; flagging for the owner, not touched.",
+          "social_utm_note": "Zero social referral traffic: 0 sessions in analytics_sessions with utm_campaign='content_test_2026q3' and 0 sessions with utm_source in (dzen, vk, facebook) in the 60-day window — expected and unchanged, since the social teaser queue (reports/seo-experiment-search-demand-2026-08-social-drafts.json) was never published (no Dzen/VK/Facebook Studio account access from any session to date, per Этап 6 of the journal). No UTM traffic exists for any campaign site-wide in this window, confirming this is an access gap, not a tracking bug.",
+          "analytics": "analytics_pageviews (self-hosted Supabase, prod, via SSH, 2026-08-02–2026-10-01 window): 0 pageviews of any classification (bot or likely_human) recorded for zamorozka-petrushki-sokhr-arom — unchanged from d7/d14, now across the full 60-day window. Site-wide context: 3,659 pageviews across 309 distinct article slugs in the same 60 days (3,400 sessions), so tracking is fully active — this cohort has simply never been visited. Control-cohort comparison (10 historical articles, live since May/June 2026, 4+ months old): 9 of 10 now show lifetime pageviews — ekonomiya-na-produktakh 5 (3 likely_human/2 bot), kompost-bystro 5 (1/4), nakip-v-chaynike 4 (1/3), klubnika-na-podokonnike 4 (2/2), ogurcy-ot-tli 3 (0/3), skovoroda-ot-zhira 2 (0/2), testo-dlya-pelmeney 2 (1/1), kogda-sazhat-pomidory-2026 1 (0/1), podkormka-pomidorov 1 (0/1), starye-dzhinsy 0 — a mix of \"likely_human\" and \"bot\" classifications, still 0–3 likely_human each. The experiment cohort (10 articles, 60 days old, deliberately chosen for confirmed Wordstat search demand, fully indexed in Google, internal-linked) has STRICTLY WORSE raw pageview counts than the uncurated control cohort at the same analytics layer — 0 vs 1–5 lifetime views per article. This is the clearest signal so far that indexation and on-page SEO hygiene are not the bottleneck; the site overall is pre-authority and organic discovery has not materialized for either cohort."
+        },
         "d90": "2026-10-31"
       },
       "notes": []
@@ -938,8 +1202,41 @@
           "inbound_internal_links_action": "No inbound-link gap found for this article this checkpoint (already had >=1 inbound link from other published content).",
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
         },
-        "d30": "2026-09-01",
-        "d60": "2026-10-01",
+        "d30": {
+          "due": "2026-09-01",
+          "completed_at": null,
+          "status": "MISSED — the scheduled task session (seo-search-demand-2026-08-d30, started 2026-09-02T03:35:08Z, ~13.5h after its 2026-09-01 fire time) crashed early: its transcript shows only a Bash call and a Glob call before going silent (Glob call matches the pattern that caused a 20s ripgrep timeout in this d60 session too). It produced no commits on content/seo-search-demand-2026-08-wt, no journal entry, no checkpoints.d30 data, and no beads update, despite being reported 'succeeded' by the scheduler (a false positive — session death after a tool timeout is not currently surfaced as a failure). Discovered during this d60 checkpoint (2026-10-01) via list_task_runs + list_events on the d30 session. Not retroactively backfilled: GSC/Yandex state as of 2026-09-01 is not recoverable after the fact, and the project rule restricts content edits to real query-gap data, which doesn't exist for that date. Net effect: no +30d indexation/performance snapshot or query-gap content review exists for this experiment. See journal entry and bead sovetydoma-9nb for follow-up."
+        },
+        "d60": {
+          "due": "2026-10-01",
+          "completed_at": "2026-10-01",
+          "google_indexed": true,
+          "google_status": "indexed — individually re-verified via URL Inspection for all 10 URLs this checkpoint (owner-authenticated GSC session via claude-in-chrome, connected this run unlike d14/d30). 10/10 now show \"URL is on Google / Page is indexed\", up from 8/10 at d7 (the 2 stragglers — voda-pod-yashchikami-holodilnika-sliv and zamorozka-petrushki-sokhr-arom — are both now indexed).",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually re-verified this checkpoint — the \"Проверка страницы\" (page check) tool accepted the URL and returned no result row after 15+ seconds of waiting (same session-limit behavior documented at d7/d14), and the \"Все страницы\"/\"Исключённые страницы\" filtered-search views in Индексирование → Страницы в поиске returned \"Нет подходящих страниц\" (no match) for all 10 slugs tried — most likely because those views are sampled rather than exhaustive at this low a traffic level (403 pages in search total, sampled lists show dozens, not all), not necessarily evidence of exclusion. Site-wide context has improved substantially since d7/d14: \"Страниц в поиске\" (pages in search) for 1001sovet.ru grew from 101 (d7) to 403 (this checkpoint, per Мои сайты dashboard) — a ~4x increase — against 1,047 total pages added (ИКС site score, \"Клики в поиске\" shows 6 clicks in the last 28 days). Nothing in the excluded-pages sample or diagnostics flags any of the 10 experiment URLs. IndexNow submission status unchanged (202 Accepted, 2026-08-02).",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No new gap found. SQL scan of content_matrix.body_md (published+active articles, excluding self) confirms all 10 experiment articles have ≥1 inbound internal link: the two d14 fixes (pishchevaya-mol-kukhnya ← reviziya-kuhonnyh-yashikov-raz-v-sezon; kabachki-gniyut-na-kuste-zavyazi-prichina ← kabachki-gniut-pri-khranenii-prichiny) are still live. No edits made this checkpoint.",
+          "gsc_performance": {
+            "window": "2026-07-31 to 2026-09-28 (GSC default 3-month view)",
+            "clicks": 0,
+            "impressions": 0,
+            "avg_position": null,
+            "top_queries": "no data — page has not appeared in any recorded Google search impression in this window.",
+            "ranking_bucket": "not ranking (no impressions)"
+          },
+          "cannibalization_note": "Garlic-storage cannibalization (sovetydoma-9nb.2, khranenie-chesnoka-sushka-pletyonki vs. chesnok-posle-uborki-kak-sushit-i-hranit-urozhai): UNCHANGED, not worsened. Both articles remain published/active, neither merged/redirected/superseded. Checked analytics_pageviews for both slugs: 0 pageviews for either since launch of this experiment, so there is no measurable traffic for the two to compete over yet — the cannibalization is structurally still present but not currently costing any real clicks or sessions. Still recommend the owner decide merge-vs-differentiate per the original bead before either article gains organic traction. Aside (out of scope, not acted on): a near-identical third slug, ekonomiya-na-produktah (no \"k\", vs. the unrelated control-cohort slug ekonomiya-na-produktakh with \"k\") was noticed in content_matrix during this checkpoint — looks like a second, unrelated near-duplicate-slug situation in the ekonomiya category, outside this experiment's scope; flagging for the owner, not touched.",
+          "social_utm_note": "Zero social referral traffic: 0 sessions in analytics_sessions with utm_campaign='content_test_2026q3' and 0 sessions with utm_source in (dzen, vk, facebook) in the 60-day window — expected and unchanged, since the social teaser queue (reports/seo-experiment-search-demand-2026-08-social-drafts.json) was never published (no Dzen/VK/Facebook Studio account access from any session to date, per Этап 6 of the journal). No UTM traffic exists for any campaign site-wide in this window, confirming this is an access gap, not a tracking bug.",
+          "analytics": "analytics_pageviews (self-hosted Supabase, prod, via SSH, 2026-08-02–2026-10-01 window): 0 pageviews of any classification (bot or likely_human) recorded for posudomoika-belyy-nalet-prichiny — unchanged from d7/d14, now across the full 60-day window. Site-wide context: 3,659 pageviews across 309 distinct article slugs in the same 60 days (3,400 sessions), so tracking is fully active — this cohort has simply never been visited. Control-cohort comparison (10 historical articles, live since May/June 2026, 4+ months old): 9 of 10 now show lifetime pageviews — ekonomiya-na-produktakh 5 (3 likely_human/2 bot), kompost-bystro 5 (1/4), nakip-v-chaynike 4 (1/3), klubnika-na-podokonnike 4 (2/2), ogurcy-ot-tli 3 (0/3), skovoroda-ot-zhira 2 (0/2), testo-dlya-pelmeney 2 (1/1), kogda-sazhat-pomidory-2026 1 (0/1), podkormka-pomidorov 1 (0/1), starye-dzhinsy 0 — a mix of \"likely_human\" and \"bot\" classifications, still 0–3 likely_human each. The experiment cohort (10 articles, 60 days old, deliberately chosen for confirmed Wordstat search demand, fully indexed in Google, internal-linked) has STRICTLY WORSE raw pageview counts than the uncurated control cohort at the same analytics layer — 0 vs 1–5 lifetime views per article. This is the clearest signal so far that indexation and on-page SEO hygiene are not the bottleneck; the site overall is pre-authority and organic discovery has not materialized for either cohort."
+        },
         "d90": "2026-10-31"
       },
       "notes": []
@@ -1037,8 +1334,41 @@
           "inbound_internal_links_action": "Internal-linking gap found and fixed this checkpoint: article had 0 inbound internal links from other published content. Added a disambiguating backlink from the sibling article kabachki-gniut-pri-khranenii-prichiny (post-harvest storage rot), pointing readers to this on-the-vine-rot article when their symptom doesn't match; verified live within ~15s (cache TTL).",
           "analytics": "analytics_pageviews/analytics_sessions (self-hosted Supabase, prod, via SSH): 0 pageviews (human or bot) recorded for this URL since launch (2026-08-02) as of checkpoint (2026-08-16 ~14:05 UTC) — unchanged from d7. Site-wide context: 3680 total pageviews, 364 distinct article slugs all-time; 2007 pageviews in the last 14 days, so the tracking pipeline is fully active — this cohort still simply has not been visited by anyone. Historical control cohort: still 0-3 lifetime pageviews per article, all bot classification, no human visits, unchanged from d7. Experiment-vs-control comparison remains uninformative at d14 — both cohorts are at the site-wide organic-traffic noise floor. Per project rule, meaningful conclusions are deferred to d30/d60/d90."
         },
-        "d30": "2026-09-01",
-        "d60": "2026-10-01",
+        "d30": {
+          "due": "2026-09-01",
+          "completed_at": null,
+          "status": "MISSED — the scheduled task session (seo-search-demand-2026-08-d30, started 2026-09-02T03:35:08Z, ~13.5h after its 2026-09-01 fire time) crashed early: its transcript shows only a Bash call and a Glob call before going silent (Glob call matches the pattern that caused a 20s ripgrep timeout in this d60 session too). It produced no commits on content/seo-search-demand-2026-08-wt, no journal entry, no checkpoints.d30 data, and no beads update, despite being reported 'succeeded' by the scheduler (a false positive — session death after a tool timeout is not currently surfaced as a failure). Discovered during this d60 checkpoint (2026-10-01) via list_task_runs + list_events on the d30 session. Not retroactively backfilled: GSC/Yandex state as of 2026-09-01 is not recoverable after the fact, and the project rule restricts content edits to real query-gap data, which doesn't exist for that date. Net effect: no +30d indexation/performance snapshot or query-gap content review exists for this experiment. See journal entry and bead sovetydoma-9nb for follow-up."
+        },
+        "d60": {
+          "due": "2026-10-01",
+          "completed_at": "2026-10-01",
+          "google_indexed": true,
+          "google_status": "indexed — individually re-verified via URL Inspection for all 10 URLs this checkpoint (owner-authenticated GSC session via claude-in-chrome, connected this run unlike d14/d30). 10/10 now show \"URL is on Google / Page is indexed\", up from 8/10 at d7 (the 2 stragglers — voda-pod-yashchikami-holodilnika-sliv and zamorozka-petrushki-sokhr-arom — are both now indexed).",
+          "google_indexing_requested_this_session": false,
+          "yandex_indexed": null,
+          "yandex_status": "not individually re-verified this checkpoint — the \"Проверка страницы\" (page check) tool accepted the URL and returned no result row after 15+ seconds of waiting (same session-limit behavior documented at d7/d14), and the \"Все страницы\"/\"Исключённые страницы\" filtered-search views in Индексирование → Страницы в поиске returned \"Нет подходящих страниц\" (no match) for all 10 slugs tried — most likely because those views are sampled rather than exhaustive at this low a traffic level (403 pages in search total, sampled lists show dozens, not all), not necessarily evidence of exclusion. Site-wide context has improved substantially since d7/d14: \"Страниц в поиске\" (pages in search) for 1001sovet.ru grew from 101 (d7) to 403 (this checkpoint, per Мои сайты dashboard) — a ~4x increase — against 1,047 total pages added (ИКС site score, \"Клики в поиске\" shows 6 clicks in the last 28 days). Nothing in the excluded-pages sample or diagnostics flags any of the 10 experiment URLs. IndexNow submission status unchanged (202 Accepted, 2026-08-02).",
+          "yandex_indexnow_status": "202 Accepted on 2026-08-02 (from registry, unchanged)",
+          "technical_checks": {
+            "http_status": 200,
+            "canonical_ok": true,
+            "robots_ok": "index, follow",
+            "in_sitemap": true,
+            "outbound_internal_links_ok": true,
+            "issues_found": []
+          },
+          "inbound_internal_links_action": "No new gap found. SQL scan of content_matrix.body_md (published+active articles, excluding self) confirms all 10 experiment articles have ≥1 inbound internal link: the two d14 fixes (pishchevaya-mol-kukhnya ← reviziya-kuhonnyh-yashikov-raz-v-sezon; kabachki-gniyut-na-kuste-zavyazi-prichina ← kabachki-gniut-pri-khranenii-prichiny) are still live. No edits made this checkpoint.",
+          "gsc_performance": {
+            "window": "2026-07-31 to 2026-09-28 (GSC default 3-month view)",
+            "clicks": 0,
+            "impressions": 0,
+            "avg_position": null,
+            "top_queries": "no data — page has not appeared in any recorded Google search impression in this window.",
+            "ranking_bucket": "not ranking (no impressions)"
+          },
+          "cannibalization_note": "Garlic-storage cannibalization (sovetydoma-9nb.2, khranenie-chesnoka-sushka-pletyonki vs. chesnok-posle-uborki-kak-sushit-i-hranit-urozhai): UNCHANGED, not worsened. Both articles remain published/active, neither merged/redirected/superseded. Checked analytics_pageviews for both slugs: 0 pageviews for either since launch of this experiment, so there is no measurable traffic for the two to compete over yet — the cannibalization is structurally still present but not currently costing any real clicks or sessions. Still recommend the owner decide merge-vs-differentiate per the original bead before either article gains organic traction. Aside (out of scope, not acted on): a near-identical third slug, ekonomiya-na-produktah (no \"k\", vs. the unrelated control-cohort slug ekonomiya-na-produktakh with \"k\") was noticed in content_matrix during this checkpoint — looks like a second, unrelated near-duplicate-slug situation in the ekonomiya category, outside this experiment's scope; flagging for the owner, not touched.",
+          "social_utm_note": "Zero social referral traffic: 0 sessions in analytics_sessions with utm_campaign='content_test_2026q3' and 0 sessions with utm_source in (dzen, vk, facebook) in the 60-day window — expected and unchanged, since the social teaser queue (reports/seo-experiment-search-demand-2026-08-social-drafts.json) was never published (no Dzen/VK/Facebook Studio account access from any session to date, per Этап 6 of the journal). No UTM traffic exists for any campaign site-wide in this window, confirming this is an access gap, not a tracking bug.",
+          "analytics": "analytics_pageviews (self-hosted Supabase, prod, via SSH, 2026-08-02–2026-10-01 window): 0 pageviews of any classification (bot or likely_human) recorded for kabachki-gniyut-na-kuste-zavyazi-prichina — unchanged from d7/d14, now across the full 60-day window. Site-wide context: 3,659 pageviews across 309 distinct article slugs in the same 60 days (3,400 sessions), so tracking is fully active — this cohort has simply never been visited. Control-cohort comparison (10 historical articles, live since May/June 2026, 4+ months old): 9 of 10 now show lifetime pageviews — ekonomiya-na-produktakh 5 (3 likely_human/2 bot), kompost-bystro 5 (1/4), nakip-v-chaynike 4 (1/3), klubnika-na-podokonnike 4 (2/2), ogurcy-ot-tli 3 (0/3), skovoroda-ot-zhira 2 (0/2), testo-dlya-pelmeney 2 (1/1), kogda-sazhat-pomidory-2026 1 (0/1), podkormka-pomidorov 1 (0/1), starye-dzhinsy 0 — a mix of \"likely_human\" and \"bot\" classifications, still 0–3 likely_human each. The experiment cohort (10 articles, 60 days old, deliberately chosen for confirmed Wordstat search demand, fully indexed in Google, internal-linked) has STRICTLY WORSE raw pageview counts than the uncurated control cohort at the same analytics layer — 0 vs 1–5 lifetime views per article. This is the clearest signal so far that indexation and on-page SEO hygiene are not the bottleneck; the site overall is pre-authority and organic discovery has not materialized for either cohort."
+        },
         "d90": "2026-10-31"
       },
       "notes": []
