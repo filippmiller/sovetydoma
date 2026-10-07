@@ -109,7 +109,7 @@ export function readResultFile(env) {
 export function runGate(env, io = {}) {
   const out = io.stdout || ((s) => console.log(s))
   const resultPath = resetResultFile(env)
-  const gate = checkPause({ eventName: env.GITHUB_EVENT_NAME || env.GITHUB_EVENT_NAME, pauseReason: env.FACTORY_PAUSE_REASON })
+  const gate = checkPause({ eventName: env.GITHUB_EVENT_NAME, pauseReason: env.FACTORY_PAUSE_REASON })
   if (!gate.paused) {
     out('No operator pause (FACTORY_PAUSE_REASON empty); continuing.')
     return { exitCode: 0, result: null }
@@ -210,7 +210,7 @@ function inputFailure(reason, action) {
   return emptyResult({ failure: { kind: 'config', provider: null, stage: 'config', reason, action } })
 }
 function persistResult(env, result) { const p = resolveResultPath(env); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, JSON.stringify(result, null, 2)) }
-function workflowSafeLine(s) { return String(s).replace(/[\r\n\0-\x1f\x7f]/g, ' ').replace(/%/g, '%25').replace(/:/g, '%3A').replace(/,/g, '%2C').slice(0, 500) }
+function workflowSafeLine(s) { return String(s).replace(/[\r\n\0-\x1f\x7f]/g, ' ').slice(0, 500) }
 
 export function runReport(env, io = {}) {
   const lines = []

@@ -79,6 +79,8 @@ export function classifyProviderBalanceError(err) {
 // it never contains the raw provider response body or credentials.
 export function classifyProviderFailure(err, { provider = 'unknown', stage = 'unknown' } = {}) {
   const msg = String(err?.message || err || '')
+  const errorName = String(err?.name || '')
+  const causeCode = String(err?.cause?.code || '')
   const status = err?.status ?? err?.statusCode ?? statusFromMessage(msg)
   let kind = 'unknown'
   if (status === 402 || BALANCE_PATTERNS.some((re) => re.test(msg))) {
@@ -90,8 +92,10 @@ export function classifyProviderFailure(err, { provider = 'unknown', stage = 'un
     kind = 'auth'
   } else if (status !== undefined && status >= 500 && status !== 524) {
     kind = 'unavailable'
-  } else if (status === 524 || TIMEOUT_PATTERNS.some((re) => re.test(msg))) {
+  } else if (status === 524 || /APIConnectionTimeoutError/i.test(errorName) || TIMEOUT_PATTERNS.some((re) => re.test(msg))) {
     kind = 'timeout'
+  } else if (/^(APIConnectionError|FetchError)$/i.test(errorName) || /^E(?:CONN|HOST|NET)/i.test(causeCode)) {
+    kind = 'unavailable'
   } else if (status !== undefined && status >= 400) {
     kind = 'request'
   }

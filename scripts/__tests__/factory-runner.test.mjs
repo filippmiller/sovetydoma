@@ -95,6 +95,20 @@ describe('runGate', () => {
     assert.match(result.failure.pauseReason, /credits low/)
   })
 
+  it('keeps pause reason punctuation readable while flattening controls to one line', () => {
+    const tmp = makeTmp()
+    const env = envFor(tmp, { GITHUB_EVENT_NAME: 'schedule', FACTORY_PAUSE_REASON: 'Check: alpha,beta\n::warning::not a command' })
+    const lines = []
+    runGate(env, { stdout: (s) => lines.push(s) })
+    assert.equal(lines[1], 'Reason: Check: alpha,beta ::warning::not a command')
+    const summaryPath = path.join(tmp, 'summary.md')
+    runReport({ ...env, GITHUB_STEP_SUMMARY: summaryPath }, { logger: { log() {} } })
+    const summary = fs.readFileSync(summaryPath, 'utf8')
+    assert.match(summary, /Pause reason: Check: alpha,beta ::warning::not a command/)
+    assert.ok(!summary.includes('%3A'))
+    assert.equal(summary.split('\n').filter((line) => line.includes('Pause reason:')).length, 1)
+  })
+
   it('no pause => exit 0 and the result file is reset (no stale self-hosted file)', () => {
     const tmp = makeTmp()
     // Pretend a previous run left a stale "success" file behind.

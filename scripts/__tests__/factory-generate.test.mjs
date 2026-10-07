@@ -96,6 +96,27 @@ function readResult(tmp) {
 }
 
 describe('runFactory — text provider outage', () => {
+  it('halts --all after a real SDK-shaped Anthropic connection error', async () => {
+    const tmp = makeTmp()
+    const connection = new Error('Connection error.')
+    connection.name = 'APIConnectionError'
+    const anthropic = makeAnthropic({ error: connection })
+    const { fetchImpl, calls: imageCalls } = makeFetch({ body: { images: [{ url: 'data:image/jpeg;base64,QUJD' }] } })
+    const { sb, calls: sbCalls } = makeSb()
+    const { logger } = makeLogger()
+    const result = await runFactory(['--all'], {
+      env: baseEnv(tmp), anthropic, fetchImpl, sb, logger, imagesDir: tmp, resultPath: path.join(tmp, 'result.json'),
+    })
+    assert.equal(result.exitCode, 1)
+    assert.equal(result.failure.kind, 'unavailable')
+    assert.equal(result.failure.provider, 'anthropic')
+    assert.equal(result.failure.stage, 'text')
+    assert.equal(result.counts.attempted, 1)
+    assert.equal(result.counts.generated, 0)
+    assert.equal(imageCalls.count, 0)
+    assert.equal(sbCalls.insert, 0)
+  })
+
   it('text balance error: exit 42, zero image calls, zero DB inserts, --all stops after one attempt', async () => {
     const tmp = makeTmp()
     const credit = new Error('400 {"error":{"message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."}}')

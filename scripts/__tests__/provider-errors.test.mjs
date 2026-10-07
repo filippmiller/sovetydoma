@@ -107,6 +107,12 @@ describe('classifyProviderFailure (structured)', () => {
     assert.match(f.action, /524|timed/i)
     const net = new Error('fetch failed')
     assert.equal(classifyProviderFailure(net, { provider: 'anthropic', stage: 'text' }).kind, 'timeout')
+    const sdkConnection = new Error('Connection error.')
+    sdkConnection.name = 'APIConnectionError'
+    const connectionFailure = classifyProviderFailure(sdkConnection, { provider: 'anthropic', stage: 'text' })
+    assert.equal(connectionFailure.kind, 'unavailable')
+    assert.equal(connectionFailure.provider, 'anthropic')
+    assert.equal(connectionFailure.stage, 'text')
   })
 
   it('does NOT attribute a generic DB error to the text provider even when quota is mentioned elsewhere', () => {
