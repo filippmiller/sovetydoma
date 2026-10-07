@@ -7,14 +7,33 @@ name: Content factory (every 5h — 1 article, rotating category)
 #
 # Required secrets (Settings → Secrets and variables → Actions):
 #   ANTHROPIC_API_KEY              — Claude text generation
-#   FAL_KEY                        — fal.ai image generation
+#   FAL_KEY                        — fal.ai image generation (image config only,
+#                                    NEVER counted as text provider config)
 #   MATRIX_SUPABASE_URL            — RU Supabase REST URL (https://api.1001sovet.ru)
 #   MATRIX_SUPABASE_SERVICE_ROLE_KEY
 #   R2_UPLOAD_SECRET               — shared secret for the renderer /__r2 upload endpoint
 #   TELEGRAM_BOT_TOKEN             — operator alert on factory failure (see last step)
 #   TELEGRAM_CHAT_ID               — operator alert chat
 #
-# Manual run: Actions → this workflow → Run workflow (dry_run toggles cost).
+# Optional repository VARIABLES (Settings → Secrets and variables → Actions → Variables):
+#   FACTORY_TEXT_PROVIDER          — text provider, default 'anthropic' (the ONLY
+#                                    supported provider; unknown values are rejected
+#                                    before any API/DB work). No fallback exists.
+#   FACTORY_MODEL                  — text model, default 'claude-sonnet-4-6'
+#   FAL_MODEL                      — image model, default 'fal-ai/flux/schnell'
+#   FACTORY_PAUSE_REASON           — NONEMPTY => scheduled runs stop with explicit
+#                                    exit 43 (operator pause). Manual runs still work
+#                                    (dry-run / publish=false canary). Setting it is a
+#                                    deliberate operator action; new failures alone do
+#                                    NOT write it. Clear it to resume the schedule.
+#
+# Relay: ANTHROPIC_BASE_URL/ANTHROPIC_RELAY_TOKEN route through the egress relay
+# when the runner IP is geo-blocked. The relay is TRANSPORT ONLY — it does not own
+# the credit balance. A direct call (local, ANTHROPIC_BASE_URL unset) and a relayed
+# call bill the SAME Anthropic account.
+#
+# Manual run: Actions → this workflow → Run workflow. dry_run toggles cost;
+# publish stays false unless explicitly enabled (recovery canary must not publish).
 
 on:
   schedule:
@@ -29,6 +48,11 @@ on:
         description: 'Dry run (no API cost / no writes)'
         required: false
         default: 'false'
+      publish:
+        description: 'Publish generated articles live (manual runs only; default false)'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: content-factory
@@ -51,72 +75,111 @@ jobs:
       # Pings Yandex/Bing after each publish so new dynamic articles get crawled
       # sooner instead of waiting on sitemap-dynamic.xml's own crawl schedule.
       INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+      # Text provider selection (repo vars). Anthropic is the only supported
+      # text provider; an unknown FACTORY_TEXT_PROVIDER fails before API/DB work.
+      FACTORY_TEXT_PROVIDER: ${{ vars.FACTORY_TEXT_PROVIDER || 'anthropic' }}
+      FACTORY_MODEL: ${{ vars.FACTORY_MODEL || 'claude-sonnet-4-6' }}
+      FAL_MODEL: ${{ vars.FAL_MODEL || 'fal-ai/flux/schnell' }}
+      # Operator pause gate: nonempty blocks SCHEDULED runs with exit 43.
+      FACTORY_PAUSE_REASON: ${{ vars.FACTORY_PAUSE_REASON }}
+      # Result path is derived by factory-runner from RUNNER_TEMP + run ids.
     steps:
       - uses: actions/checkout@v6
+        id: checkout
       - uses: pnpm/action-setup@v6
+        id: pnpm_setup
         with: { version: 10 }
       - uses: actions/setup-node@v6
+        id: node_setup
         with: { node-version: '24', cache: 'pnpm' }
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
-      - run: pnpm install --frozen-lockfile
-      - run: pip install pillow
 
+      # Operator pause gate BEFORE dependency install / any API calls. Runs the
+      # tested helper (scripts/factory/factory-runner.mjs gate): nonempty
+      # FACTORY_PAUSE_REASON + scheduled event => explicit blocked exit 43 and a
+      # machine-readable result. Manual runs pass through (dry-run / canary).
+      - name: Operator pause gate (scheduled runs)
+        id: gate
+        run: node scripts/factory/factory-runner.mjs gate
+
+      - name: Install Node dependencies
+        id: install
+        run: pnpm install --frozen-lockfile
+      - name: Install image dependency
+        id: python_setup
+        run: pip install pillow
+
+      # Inputs reach the runner via ENV (never inline ${{ }} shell interpolation)
+      # and are validated there. The runner resolves auto/all/list categories,
+      # spawns the generator, and propagates its exit code. Nonzero exit fails
+      # the step (never continue-on-error) so a failure can never look green.
       - name: Generate (1 article, rotating category)
         id: generate
-        run: |
-          EXIT=0
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then DRY=--dry-run; else DRY=; fi
-          SEL="${{ github.event.inputs.categories }}"
-          # Weighted rotation: kulinaria + dacha-i-ogorod appear 3x each (priority
-          # verticals per owner request 2026-07-20), the other 10 once. Interleaved
-          # so the same category never runs back-to-back. 16 slots total.
-          CATS=(kulinaria dacha-i-ogorod dom-i-uborka kulinaria dacha-i-ogorod layfkhaki ekonomiya kulinaria dacha-i-ogorod rybalka zdorovie-i-bezopasnost semya-i-deti krasota-i-uhod otdyh-i-puteshestviya pokupki-i-tehnika avto)
-          if [ -z "$SEL" ] || [ "$SEL" = "auto" ]; then
-            # Rotate one category every 5h (epoch / 18000 mod N) — cycles the
-            # weighted list (~80h full cycle; priority verticals hit ~3x as often).
-            IDX=$(( ($(date +%s) / 18000) % ${#CATS[@]} ))
-            CAT=${CATS[$IDX]}
-            echo "Rotating category -> $CAT"
-            node scripts/factory/generate-article.mjs --category "$CAT" $DRY || EXIT=$?
-          elif [ "$SEL" = "all" ]; then
-            CAT=all
-            node scripts/factory/generate-article.mjs --all $DRY || EXIT=$?
-          else
-            CAT="$SEL"
-            for c in $(echo "$SEL" | tr ',' ' '); do
-              node scripts/factory/generate-article.mjs --category "$c" $DRY || { EXIT=$?; if [ "$EXIT" = "42" ]; then break; fi; }
-            done
-          fi
-          # Exit code 42 = provider balance/quota exhausted (operator must top up).
-          echo "exit_code=$EXIT" >> "$GITHUB_OUTPUT"
-          echo "category=$CAT" >> "$GITHUB_OUTPUT"
-          exit $EXIT
+        env:
+          FACTORY_INPUT_CATEGORIES: ${{ inputs.categories }}
+          FACTORY_INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: node scripts/factory/factory-runner.mjs generate
 
-      # Gated on generation success so a failed run can never silently 'publish' a gap.
+      # Gated on FULL generation success so a failed (or partial, halted) run
+      # can never silently 'publish' a gap. Scheduled runs publish on success;
+      # manual runs publish only when the publish input is explicitly true.
       - name: Publish live (no rebuild — DB + R2)
-        if: ${{ github.event.inputs.dry_run != 'true' && steps.generate.outcome == 'success' }}
-        run: node scripts/matrix/publish-dynamic.mjs --limit 3
+        id: publish
+        if: ${{ steps.generate.outcome == 'success' && inputs.dry_run != 'true' && (github.event_name == 'schedule' || inputs.publish) }}
+        run: node scripts/factory/publish-generated.mjs
 
+      # Preserve the exact result and generated slug.jpg files from manual
+      # canaries and partial failed batches for operator inspection/recovery.
+      - name: Prepare factory recovery artifact
+        id: preserve
+        if: always()
+        run: node scripts/factory/preserve-artifact.mjs
+      - name: Preserve factory result and generated images
+        id: artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-factory-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/content-factory-artifacts-${{ github.run_id }}-${{ github.run_attempt }}/
+          if-no-files-found: warn
+          retention-days: 14
+
+      # ALWAYS runs: surfaces provider/reason/action from the result JSON in the
+      # GitHub step summary and as step outputs (provider/reason/action/exit_code),
+      # for both exit 42 (balance), exit 1, and the gate's exit 43 (operator pause).
+      - name: Factory report
+        id: report
+        if: always()
+        env:
+          CHECKOUT_OUTCOME: ${{ steps.checkout.outcome }}
+          PNPM_SETUP_OUTCOME: ${{ steps.pnpm_setup.outcome }}
+          NODE_SETUP_OUTCOME: ${{ steps.node_setup.outcome }}
+          GATE_OUTCOME: ${{ steps.gate.outcome }}
+          INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          PYTHON_SETUP_OUTCOME: ${{ steps.python_setup.outcome }}
+          GENERATE_OUTCOME: ${{ steps.generate.outcome }}
+          PUBLISH_OUTCOME: ${{ steps.publish.outcome }}
+          PRESERVE_OUTCOME: ${{ steps.preserve.outcome }}
+          ARTIFACT_OUTCOME: ${{ steps.artifact.outcome }}
+        run: node scripts/factory/factory-runner.mjs report
+
+      # Deliberate operator pauses (gate exit 43) do NOT alert — the summary
+      # already says so and re-alerting every 5h would be spam. Everything else
+      # that fails gets ONE alert. Missing Telegram config or a failed send is a
+      # loud ::warning::, never a silent ignore.
       - name: Alert operator (Telegram)
-        if: failure()
+        if: ${{ failure() && !(steps.gate.outcome == 'failure' && steps.report.outputs.reason == 'operator_pause') }}
         env:
           TG_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          # Pass step outputs via env (not inline ${{ }}) — same pattern as telegram-notify.yml.
-          GEN_EXIT: ${{ steps.generate.outputs.exit_code }}
-          GEN_CATEGORY: ${{ steps.generate.outputs.category }}
+          # Report-step outputs via env (not inline ${{ }}), same pattern as
+          # telegram-notify.yml.
+          GEN_EXIT: ${{ steps.report.outputs.exit_code }}
+          GEN_PROVIDER: ${{ steps.report.outputs.provider }}
+          GEN_REASON: ${{ steps.report.outputs.reason }}
+          GEN_ACTION: ${{ steps.report.outputs.action }}
+          GEN_OUTCOME: ${{ steps.generate.outcome }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          if [ "$GEN_EXIT" = "42" ]; then
-            REASON="Исчерпан баланс/квота провайдера (код 42). Действие: пополнить баланс Anthropic relay (или fal.ai). Тихого запасного провайдера нет — генерация остановлена до пополнения."
-          else
-            REASON="Сбой генерации (код ${GEN_EXIT:-unknown}) — смотрите логи запуска."
-          fi
-          MSG="🚨 Content factory: СБОЙ
-          Категория: ${GEN_CATEGORY:-?}
-          ${REASON}
-          Запуск: ${RUN_URL}"
-          curl -s -X POST "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${TG_CHAT_ID}" \
-            --data-urlencode "text=${MSG}" > /dev/null
+        run: node scripts/factory/telegram-alert.mjs

@@ -110,13 +110,17 @@ To unblock a fresh cron run after testing, clear the rate buckets:
 
 ## Provider failure & balance exhaustion
 
-The content factory (`.github/workflows/content-factory.yml`, every 5h) fails **loudly**, never silently:
+The content factory (`.github/workflows/content-factory.yml`, every 5h) uses Anthropic for text and fal.ai for images. There is no unattended text fallback. `FACTORY_TEXT_PROVIDER` must be `anthropic`; `FACTORY_MODEL` selects the text model and `FAL_MODEL` selects the image model. `FAL_KEY` is image-only configuration.
 
-- `scripts/factory/generate-article.mjs` exits **42** and prints one stderr line `PROVIDER_BALANCE_EXHAUSTED provider=<anthropic|fal>` when the Anthropic relay or fal.ai reports credit/quota/balance exhaustion (patterns in `scripts/factory/provider-errors.mjs`: /credit balance/i, /insufficient.?quota/i, HTTP 402, …). All other failures keep exit **1**.
-- The publish step is gated on generation success (`steps.generate.outcome == 'success'`), so a failed run can never silently "succeed" a publishing gap.
-- On any failure the workflow sends ONE Telegram alert (secrets `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID`) with the category, run URL, and whether it was balance exhaustion vs a generic failure.
+- Direct Anthropic calls and calls through `ANTHROPIC_BASE_URL` bill the same Anthropic API-key account. A relay provides transport only and does not own or restore credits.
+- Exit **42** means the called provider reported balance/quota exhaustion. HTTP 524 is a timeout, not evidence that credits were restored. Other provider, setup, validation, database, and publishing failures remain nonzero and are reported with their stage and operator action.
+- Scheduled runs pause only when an operator sets the repository variable `FACTORY_PAUSE_REASON`. A failure does not set this variable. The reason appears in the run summary. Clear it only after deciding the outage is resolved; successful retry evidence is still required.
+- Manual dry runs do not call providers or touch the database. For a recovery canary, run one category with `dry_run=false` and leave `publish=false`. This costs one Anthropic generation and one fal image generation and inserts an approved matrix row. It does not publish.
+- Inspect the run's `content-factory-<run>-<attempt>` artifact. It contains the result JSON and generated slug-named images, including partial failed batches. Before a separate manual publish, restore/inspect the intended image in `public/images` and use `publish-dynamic.mjs --slugs <slug> --limit 1 --require-all`; verify the publish result. Factory workflow publishing reads only the generated slugs and fails closed unless every requested slug passes readiness checks and publishes.
+- A 524 or other timeout is not credit-recovery proof. Do not clear a pause solely because a later request timed out or returned a generic error.
+- Publication is sequential. `--require-all` checks all intended articles before publishing and verifies completion; a later upload or database failure is reported without rolling back articles already published. Use a one-category canary for recovery and inspect the publish logs before retrying a multi-article run.
 
-**Operator action for exit 42:** top up the Anthropic relay balance (or fal.ai, per the alert), or explicitly approve a fallback provider. There is **NO silent fallback provider by design** — the pipeline stops until a human acts, so content gaps are always visible.
+**Operator action for exit 42:** check the account belonging to the provider named in the report (Anthropic API-key account for text; fal.ai account for images), confirm its billing state, then run an operator-invoked canary before clearing the scheduled pause. No fallback provider is enabled.
 
 ## Roadmap
 
