@@ -10,94 +10,86 @@
 // Cadence target: ONE article per category per day (safe for SEO + social caps).
 //
 // Env: ANTHROPIC_API_KEY, FAL_KEY, SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
-//      (or MATRIX_SUPABASE_URL / MATRIX_SUPABASE_SERVICE_ROLE_KEY).
+//      (or MATRIX_SUPABASE_URL / MATRIX_SUPABASE_SERVICE_ROLE_KEY),
+//      FACTORY_TEXT_PROVIDER (default anthropic — the ONLY supported provider),
+//      FACTORY_MODEL, FAL_MODEL, FACTORY_RESULT_PATH (machine-readable result).
 // Usage:
 //   node scripts/factory/generate-article.mjs --category dacha-i-ogorod
 //   node scripts/factory/generate-article.mjs --all            (1 per category)
 //   node scripts/factory/generate-article.mjs --all --dry-run  (no writes/cost)
 // Exit codes: 0 ok · 1 generic failure · 42 provider balance/quota exhausted
 // (prints `PROVIDER_BALANCE_EXHAUSTED provider=<name>` on stderr; see provider-errors.mjs).
+//
+// This module is import-safe: importing it reads NO env/secrets and performs NO
+// API/DB calls. Everything happens inside runFactory(argv, deps) so tests can
+// inject fakes; only the CLI main() path builds real clients.
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import Anthropic from '@anthropic-ai/sdk'
 import helpers from '../matrix/lib.mjs'
-import { EXIT_PROVIDER_BALANCE, classifyProviderBalanceError } from './provider-errors.mjs'
+import {
+  EXIT_PROVIDER_BALANCE,
+  ProviderFailureError,
+  asProviderError,
+  buildFailure,
+  classifyProviderBalanceError,
+  classifyProviderFailure,
+  isProviderWide,
+} from './provider-errors.mjs'
+import {
+  CATEGORIES,
+  DEFAULT_FAL_MODEL,
+  DEFAULT_TEXT_MODEL,
+  DEFAULT_TEXT_PROVIDER,
+  DOMAIN,
+  IMAGE_PROVIDER,
+  SUPPORTED_TEXT_PROVIDERS,
+} from './factory-config.mjs'
 
-export { EXIT_PROVIDER_BALANCE, classifyProviderBalanceError }
+export { EXIT_PROVIDER_BALANCE, classifyProviderBalanceError, classifyProviderFailure }
 
-const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
-const has = (k) => process.argv.includes(k)
-
-// Local runs read .env.local; CI provides real env vars which take priority.
-for (const [k, v] of Object.entries(helpers.loadEnv())) {
-  if (process.env[k] === undefined) process.env[k] = v
-}
-
-const DOMAIN = '1001sovet.ru'
-const ROOT = process.cwd()
-const IMAGES_DIR = path.join(ROOT, 'public', 'images')
-const dryRun = has('--dry-run')
-const MODEL = arg('--model', process.env.FACTORY_MODEL || 'claude-sonnet-4-6')
-const FAL_MODEL = process.env.FAL_MODEL || 'fal-ai/flux/schnell'
-
-// Category slug -> human name + persona voice. Mirrors src/lib/categories + personas.
-const CATEGORIES = {
-  'kulinaria': 'Кулинария',
-  'dom-i-uborka': 'Дом и уборка',
-  'dacha-i-ogorod': 'Дача и огород',
-  'layfkhaki': 'Лайфхаки',
-  'ekonomiya': 'Экономия',
-  'rybalka': 'Рыбалка',
-  'zdorovie-i-bezopasnost': 'Здоровье и безопасность',
-  'semya-i-deti': 'Семья и дети',
-  'krasota-i-uhod': 'Красота и уход',
-  'otdyh-i-puteshestviya': 'Отдых и путешествия',
-  'pokupki-i-tehnika': 'Покупки и техника',
-  'avto': 'Авто',
-}
-
-const FAL_KEY = process.env.FAL_KEY || process.env.FAL_API_KEY
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY
-
-function fail(msg) { console.error(msg); process.exit(1) }
-
-if (!dryRun && !ANTHROPIC_API_KEY) fail('Missing ANTHROPIC_API_KEY (set it as a secret/env to run the factory).')
-if (!dryRun && !FAL_KEY) fail('Missing FAL_KEY (fal.ai image generation).')
-
-const categories = has('--all')
-  ? Object.keys(CATEGORIES)
-  : [arg('--category', '')].filter(Boolean)
-if (categories.length === 0) fail('Specify --category <slug> or --all.')
-for (const c of categories) if (!CATEGORIES[c]) fail(`Unknown category: ${c}`)
-
-const sb = dryRun ? null : helpers.getServiceClient()
-// Relay-aware: if ANTHROPIC_BASE_URL points at an egress relay (the prod/CI IP
-// may be geo-blocked by Anthropic), route through it with the shared
-// X-Relay-Token header; the real key still rides in x-api-key. Falls back to a
-// direct api.anthropic.com call when no base URL/relay token is set.
-const anthropic = dryRun ? null : new Anthropic({
-  apiKey: ANTHROPIC_API_KEY,
-  ...(process.env.ANTHROPIC_BASE_URL ? { baseURL: process.env.ANTHROPIC_BASE_URL } : {}),
-  ...(process.env.ANTHROPIC_RELAY_TOKEN ? { defaultHeaders: { 'X-Relay-Token': process.env.ANTHROPIC_RELAY_TOKEN } } : {}),
-})
-
-// Pull recent titles/slugs in this category so Claude picks a genuinely NEW topic.
-async function recentForCategory(category) {
-  if (dryRun) return { titles: [], slugs: new Set() }
-  const { data } = await sb.from('content_matrix')
-    .select('title,slug')
-    .eq('domain', DOMAIN).eq('category', category)
-    .order('created_at', { ascending: false })
-    .limit(120)
-  const titles = (data || []).map((r) => r.title).filter(Boolean)
-  const slugs = new Set((data || []).map((r) => r.slug).filter(Boolean))
-  return { titles, slugs }
-}
+const TEXT_TIMEOUT_MS = 120_000
+const IMAGE_TIMEOUT_MS = 60_000
+const MAX_IMAGE_ATTEMPTS = 4
 
 const SYSTEM = `Ты — опытный русскоязычный автор практических бытовых статей для сайта СоветыДома (1001sovet.ru).
 Пиши как живой человек, который реально делал это руками: конкретno, по делу, с цифрами, без воды и канцелярита, без «в современном мире» и «как известно».
 Запрещено: маркетинговые штампы, общие фразы, выдуманные факты, опасные советы.
 Каждая статья — самостоятельная, полезная, с практическими шагами.`
+
+function parseArgs(argv) {
+  const arg = (k, d) => { const i = argv.indexOf(k); return i > -1 ? argv[i + 1] : d }
+  const has = (k) => argv.includes(k)
+  const all = has('--all')
+  const categories = all ? Object.keys(CATEGORIES) : [arg('--category', '')].filter(Boolean)
+  return { all, categories, dryRun: has('--dry-run'), model: arg('--model', null) }
+}
+
+// Rejects an unknown text provider BEFORE any API/DB work — even in dry-run.
+// FAL_KEY is image config and is never counted as text config.
+export function resolveTextProvider(env) {
+  const raw = String(env.FACTORY_TEXT_PROVIDER ?? '').trim().toLowerCase()
+  const provider = raw || DEFAULT_TEXT_PROVIDER
+  if (!SUPPORTED_TEXT_PROVIDERS.includes(provider)) {
+    const err = new Error(
+      `Unsupported FACTORY_TEXT_PROVIDER "${raw || '(empty)'}" (supported: ${SUPPORTED_TEXT_PROVIDERS.join(', ')}). No fallback provider exists.`,
+    )
+    err.failure = buildFailure('config', null, 'config', null)
+    err.failure.reason = 'unsupported_text_provider'
+    err.failure.action = 'Set the FACTORY_TEXT_PROVIDER repo var to a supported provider (anthropic). No fallback exists.'
+    throw err
+  }
+  return provider
+}
+
+function resolveModels(args, env) {
+  return {
+    textModel: args.model || env.FACTORY_MODEL || DEFAULT_TEXT_MODEL,
+    imageModel: env.FAL_MODEL || DEFAULT_FAL_MODEL,
+  }
+}
 
 function buildUserPrompt(category, categoryName, recentTitles) {
   return `Категория: ${categoryName} (${category}).
@@ -132,45 +124,101 @@ function cleanSlug(s) {
   return String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80)
 }
 
-async function genImage(imagePrompt, title, category, slug) {
-  const prompt = helpers.buildImagePrompt(imagePrompt, title, category)
-  for (let attempt = 1; attempt <= 4; attempt++) {
-    const res = await fetch(`https://fal.run/${FAL_MODEL}`, {
-      method: 'POST',
-      headers: { Authorization: `Key ${FAL_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, image_size: 'landscape_4_3', num_images: 1, num_inference_steps: 4, enable_safety_checker: true }),
-    })
-    if (!res.ok) {
-      if ((res.status === 429 || res.status >= 500) && attempt < 4) { await new Promise((r) => setTimeout(r, 2000 * attempt)); continue }
-      throw new Error(`fal ${res.status}: ${(await res.text()).slice(0, 200)}`)
-    }
-    const json = await res.json()
-    const url = json?.images?.[0]?.url
-    if (!url) throw new Error('fal: no image url')
-    const buf = url.startsWith('data:')
-      ? Buffer.from(url.slice(url.indexOf(',') + 1), 'base64')
-      : Buffer.from(await (await fetch(url)).arrayBuffer())
-    const filename = `${slug}.jpg`
-    fs.mkdirSync(IMAGES_DIR, { recursive: true })
-    fs.writeFileSync(path.join(IMAGES_DIR, filename), buf)
-    return filename
-  }
-  throw new Error('fal: exhausted retries')
+// Pull recent titles/slugs in this category so Claude picks a genuinely NEW topic.
+async function recentForCategory(sb, category) {
+  const { data, error } = await sb.from('content_matrix')
+    .select('title,slug')
+    .eq('domain', DOMAIN).eq('category', category)
+    .order('created_at', { ascending: false })
+    .limit(120)
+  if (error) throw new Error('matrix recent-title query failed')
+  const titles = (data || []).map((r) => r.title).filter(Boolean)
+  const slugs = new Set((data || []).map((r) => r.slug).filter(Boolean))
+  return { titles, slugs }
 }
 
-async function generateForCategory(category) {
+async function genImage(imagePrompt, title, category, slug, deps) {
+  const prompt = helpers.buildImagePrompt(imagePrompt, title, category)
+  for (let attempt = 1; attempt <= MAX_IMAGE_ATTEMPTS; attempt++) {
+    let res
+    try {
+      res = await deps.fetchImpl(`https://fal.run/${deps.imageModel}`, {
+        method: 'POST',
+        headers: { Authorization: `Key ${deps.falKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, image_size: 'landscape_4_3', num_images: 1, num_inference_steps: 4, enable_safety_checker: true }),
+        signal: AbortSignal.timeout(IMAGE_TIMEOUT_MS),
+      })
+    } catch (e) {
+      // Network-level failure — classify (balance first) before deciding to retry.
+      const failure = classifyProviderFailure(e, { provider: IMAGE_PROVIDER, stage: 'image' })
+      if (attempt < MAX_IMAGE_ATTEMPTS && failure.retryable) { await sleep(2000 * attempt); continue }
+      throw new ProviderFailureError(failure.kind === 'unknown' ? asProviderError(e, { provider: IMAGE_PROVIDER, stage: 'image' }).failure : failure)
+    }
+    if (!res.ok) {
+      const body = await res.text().catch(() => '')
+      const err = new Error(`fal ${res.status}: ${body.slice(0, 300)}`)
+      err.status = res.status
+      const failure = classifyProviderFailure(err, { provider: IMAGE_PROVIDER, stage: 'image' })
+      // Balance/auth (incl. quota-bearing 429) NEVER retries — fail fast with exit 42.
+      if (failure.kind === 'balance' || failure.kind === 'auth') throw new ProviderFailureError(failure)
+      if ((res.status === 429 || res.status >= 500 || failure.retryable) && attempt < MAX_IMAGE_ATTEMPTS) {
+        await sleep(2000 * attempt)
+        continue
+      }
+      // Never leak the raw provider payload into logs — status only.
+      throw new ProviderFailureError(failure)
+    }
+    const json = await res.json().catch(() => null)
+    const url = json?.images?.[0]?.url
+    if (!url) throw new ProviderFailureError(buildFailure('request', IMAGE_PROVIDER, 'image', null))
+    let buf
+    try {
+      if (url.startsWith('data:')) buf = Buffer.from(url.slice(url.indexOf(',') + 1), 'base64')
+      else {
+        const imageRes = await deps.fetchImpl(url, { signal: AbortSignal.timeout(IMAGE_TIMEOUT_MS) })
+        if (!imageRes.ok) {
+          const err = new Error(`fal image download HTTP ${imageRes.status}`)
+          err.status = imageRes.status
+          throw new ProviderFailureError(classifyProviderFailure(err, { provider: IMAGE_PROVIDER, stage: 'image' }))
+        }
+        buf = Buffer.from(await imageRes.arrayBuffer())
+      }
+    } catch (e) {
+      if (e instanceof ProviderFailureError) throw e
+      const failure = classifyProviderFailure(e, { provider: IMAGE_PROVIDER, stage: 'image' })
+      throw new ProviderFailureError(failure.kind === 'unknown' ? asProviderError(e, { provider: IMAGE_PROVIDER, stage: 'image' }).failure : failure)
+    }
+    const filename = `${slug}.jpg`
+    fs.mkdirSync(deps.imagesDir, { recursive: true })
+    fs.writeFileSync(path.join(deps.imagesDir, filename), buf)
+    return filename
+  }
+  throw new ProviderFailureError(buildFailure('unavailable', IMAGE_PROVIDER, 'image', 503))
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+async function generateForCategory(category, ctx) {
+  const { sb, deps, dryRun, models, textProvider } = ctx
   const categoryName = CATEGORIES[category]
-  const { titles, slugs } = await recentForCategory(category)
+  // Dry run never touches the DB (or any side effect) — no recent-titles pull.
+  const { titles, slugs } = dryRun ? { titles: [], slugs: new Set() } : await recentForCategory(sb, category)
 
   if (dryRun) {
-    console.log(`[dry-run] ${category}: would call Claude(${MODEL}) + fal(${FAL_MODEL}), insert 1 approved row.`)
+    deps.logger.log(`[dry-run] ${category}: would call ${textProvider}(${models.textModel}) + ${IMAGE_PROVIDER}(${models.imageModel}), insert 1 approved row.`)
     return { category, ok: true, dryRun: true }
   }
 
-  const msg = await anthropic.messages.create({
-    model: MODEL, max_tokens: 4000, system: SYSTEM,
-    messages: [{ role: 'user', content: buildUserPrompt(category, categoryName, titles) }],
-  })
+  // Text provider call site — attribution is by CALL SITE, not message guessing.
+  let msg
+  try {
+    msg = await deps.anthropic.messages.create({
+      model: models.textModel, max_tokens: 4000, system: SYSTEM,
+      messages: [{ role: 'user', content: buildUserPrompt(category, categoryName, titles) }],
+    })
+  } catch (e) {
+    throw asProviderError(e, { provider: textProvider, stage: 'text' })
+  }
   const text = msg.content.map((b) => (b.type === 'text' ? b.text : '')).join('')
   const art = extractJson(text)
 
@@ -182,7 +230,8 @@ async function generateForCategory(category) {
   if (helpers.hasMojibake(art.title) || helpers.hasMojibake(body)) throw new Error('mojibake in generated text')
   if (helpers.wordCount(body) < 250) throw new Error(`body too short (${helpers.wordCount(body)} words)`)
 
-  const imageFilename = await genImage(art.image_prompt, art.title, category, slug)
+  // Image provider call site.
+  const imageFilename = await genImage(art.image_prompt, art.title, category, slug, deps)
 
   const frontmatter = {
     quickAnswer: art.quickAnswer || undefined,
@@ -203,24 +252,236 @@ async function generateForCategory(category) {
   const { error } = await sb.from('content_matrix').insert(row)
   if (error) throw new Error(`matrix insert: ${error.message}`)
 
-  console.log(`✓ ${category}: "${art.title}" (${helpers.wordCount(body)}w, img ${imageFilename}) -> approved`)
-  return { category, ok: true, slug, title: art.title }
+  deps.logger.log(`✓ ${category}: "${art.title}" (${helpers.wordCount(body)}w, img ${imageFilename}) -> approved`)
+  return { category, ok: true, slug, title: art.title, imageFilename }
 }
 
-const results = []
-let balanceProvider = null
-for (const c of categories) {
-  try { results.push(await generateForCategory(c)) }
-  catch (e) {
-    console.error(`✗ ${c}: ${e.message}`)
-    balanceProvider = balanceProvider || classifyProviderBalanceError(e)
-    results.push({ category: c, ok: false, error: e.message })
+// Run the factory. deps injects every side effect so tests need no network/DB:
+//   env        — environment map (defaults to process.env ONLY in the CLI main path)
+//   anthropic  — client with .messages.create (SDK retries disabled: maxRetries 0)
+//   fetchImpl  — fetch implementation (fal.ai image calls)
+//   sb         — Supabase service client (null in dry-run)
+//   logger     — { log, error }
+//   resultPath — where the machine-readable result JSON is written
+export async function runFactory(argv, rawDeps) {
+  // Normalize optional deps once, so downstream helpers can rely on them.
+  const deps = { logger: console, ...rawDeps }
+  const logger = deps.logger
+  const env = deps.env || {}
+  const requested = parseArgs(argv)
+  const dryRun = requested.dryRun
+
+  // 1) Text provider gate — before ANY API/DB work, even dry-run. No fallback.
+  let textProvider
+  try {
+    textProvider = resolveTextProvider(env)
+  } catch (e) {
+    const result = baseResult({ env, argv: requested, textProvider: null, dryRun })
+    result.ok = false
+    result.exitCode = 1
+    result.failure = e.failure
+    result.categories = requested.categories.map((category) => ({
+      category, ok: false, reason: e.failure.reason, action: e.failure.action,
+    }))
+    writeResult(deps, result)
+    logger.error(e.failure.action)
+    return result
+  }
+  const models = resolveModels(requested, env)
+
+  logger.log(`[factory] text provider=${textProvider} model=${models.textModel} | image provider=${IMAGE_PROVIDER} model=${models.imageModel}${dryRun ? ' [dry-run]' : ''}`)
+
+  // 2) Validate categories.
+  if (requested.categories.length === 0) {
+    const failure = buildFailure('config', null, 'config', null)
+    failure.reason = 'missing_category'
+    failure.action = 'Specify --category <slug> or --all.'
+    const result = baseResult({ env, argv: requested, textProvider, dryRun })
+    result.ok = false; result.exitCode = 1; result.failure = failure
+    writeResult(deps, result)
+    logger.error(failure.action)
+    return result
+  }
+  for (const c of requested.categories) {
+    if (!CATEGORIES[c]) {
+      const failure = buildFailure('config', null, 'config', null)
+      failure.reason = 'unknown_category'
+      failure.action = `Unknown category: ${c}.`
+      const result = baseResult({ env, argv: requested, textProvider, dryRun })
+      result.ok = false; result.exitCode = 1; result.failure = failure
+      writeResult(deps, result)
+      logger.error(failure.action)
+      return result
+    }
+  }
+
+  // 3) Dry run — zero side effects: no text/image calls, no DB, no writes.
+  if (dryRun) {
+    const result = baseResult({ env, argv: requested, textProvider, dryRun })
+    result.categories = []
+    for (const category of requested.categories) {
+      const categoryResult = await generateForCategory(category, {
+        sb: null, deps: { ...deps, anthropic: null, fetchImpl: null }, dryRun: true, models, textProvider,
+      }).catch(() => ({ category, ok: false, reason: 'dry_run_failed', action: 'Inspect dry-run input and logger configuration.' }))
+      result.categories.push(categoryResult)
+    }
+    result.ok = result.categories.every((c) => c.ok)
+    result.exitCode = result.ok ? 0 : 1
+    if (!result.ok) result.failure = { kind: 'unknown', provider: null, stage: 'pipeline', reason: 'dry_run_failed', action: 'Inspect dry-run input and logger configuration.' }
+    result.counts.attempted = 0
+    result.counts.generated = result.categories.filter((c) => c.ok && !c.dryRun).length
+    writeResult(deps, result)
+    logger.log(`\nFactory: ${result.categories.filter((c) => c.ok).length}/${result.categories.length} categories [dry-run].`)
+    return result
+  }
+
+  // 4) Real run — require provider credentials (FAL_KEY is image-only config).
+  const falKey = env.FAL_KEY || env.FAL_API_KEY
+  const anthropicKey = env.ANTHROPIC_API_KEY
+  if (!anthropicKey || !falKey) {
+    const missing = [!anthropicKey && 'ANTHROPIC_API_KEY', !falKey && 'FAL_KEY'].filter(Boolean).join(', ')
+    const failure = buildFailure('config', null, 'config', null)
+    failure.reason = 'missing_config'
+    failure.action = `Missing required env: ${missing}.`
+    const result = baseResult({ env, argv: requested, textProvider, dryRun })
+    result.ok = false; result.exitCode = 1; result.failure = failure
+    writeResult(deps, result)
+    logger.error(failure.action)
+    return result
+  }
+
+  let sb
+  let anthropic
+  try {
+    sb = deps.sb || helpers.getServiceClient()
+    anthropic = deps.anthropic || new Anthropic({
+    apiKey: anthropicKey,
+    maxRetries: 0, // no hidden SDK retries — retries are ours, classified first
+    timeout: TEXT_TIMEOUT_MS,
+    ...(env.ANTHROPIC_BASE_URL ? { baseURL: env.ANTHROPIC_BASE_URL } : {}),
+    ...(env.ANTHROPIC_RELAY_TOKEN ? { defaultHeaders: { 'X-Relay-Token': env.ANTHROPIC_RELAY_TOKEN } } : {}),
+    })
+  } catch {
+    const result = baseResult({ env, argv: requested, textProvider, dryRun })
+    result.failure = buildFailure('unknown', null, 'setup', null)
+    result.failure.reason = 'client_setup_failed'
+    result.failure.action = 'Check service credentials and client configuration in the environment; CI reads repository secrets and does not load local .env files.'
+    result.exitCode = 1
+    writeResult(deps, result)
+    logger.error(result.failure.action)
+    return result
+  }
+  const deps2 = { ...deps, anthropic, fetchImpl: deps.fetchImpl || fetch, falKey, imagesDir: deps.imagesDir || path.join(process.cwd(), 'public', 'images') }
+
+  // 5) Batch loop — stop IMMEDIATELY on a provider-wide outage (balance/auth/
+  //    unavailable/timeout/rate_limited). Partial rows never signal publish:
+  //    the exit code stays non-zero and the workflow gates publish on exit 0.
+  const result = baseResult({ env, argv: requested, textProvider, dryRun })
+  let haltFailure = null
+  for (const category of requested.categories) {
+    if (haltFailure) break
+    result.counts.attempted++
+    try {
+      const r = await generateForCategory(category, { sb, deps: deps2, dryRun: false, models, textProvider })
+      result.counts.generated++
+      result.generated.push({ category, slug: r.slug, title: r.title, imageFilename: r.imageFilename })
+      result.categories.push({ category, ok: true, slug: r.slug, title: r.title, imageFilename: r.imageFilename })
+    } catch (e) {
+      if (e instanceof ProviderFailureError) {
+        result.categories.push({ category, ok: false, ...safeOutcome(e.failure) })
+        if (isProviderWide(e.failure)) haltFailure = e.failure
+      } else {
+        // Generic per-category failure (validation, DB, …) — keep going, exit 1.
+        const isDb = String(e?.message || '').startsWith('matrix') || String(e?.message || '').includes('Supabase')
+        const failure = buildFailure('unknown', null, isDb ? 'database' : 'validation', null)
+        failure.reason = isDb ? 'database_operation_failed' : 'content_validation_failed'
+        failure.action = isDb ? 'Inspect the Supabase query or insert logs, then retry after correcting the database issue.' : 'Inspect generated content validation and category input; correct the cause before retrying.'
+        result.categories.push({ category, ok: false, ...safeOutcome(failure) })
+      }
+    }
+  }
+
+  const balance = haltFailure?.kind === 'balance' ? haltFailure : null
+  result.failure = haltFailure || result.categories.find((c) => !c.ok) || null
+  if (result.failure && !result.failure.reason) result.failure = { kind: 'unknown', provider: null, stage: 'pipeline', reason: result.failure.reason || 'category_failed', action: result.failure.action || 'Inspect the failed category and workflow logs.' }
+  result.halted = !!haltFailure
+  result.ok = result.categories.every((c) => c.ok)
+  result.exitCode = balance ? EXIT_PROVIDER_BALANCE : (result.ok ? 0 : 1)
+
+  logger.log(`\nFactory: ${result.counts.generated}/${result.counts.attempted} attempted (${result.counts.requested} requested).`)
+  if (haltFailure) {
+    logger.error(`Provider-wide outage: provider=${haltFailure.provider} stage=${haltFailure.stage} reason=${haltFailure.reason}`)
+    logger.error(`Operator action: ${haltFailure.action}`)
+  }
+
+  writeResult(deps, result)
+  return result
+}
+
+function safeOutcome(failure) {
+  // Stable, machine-readable — never the raw provider payload.
+  return {
+    kind: failure.kind,
+    provider: failure.provider,
+    stage: failure.stage,
+    reason: failure.reason,
+    action: failure.action,
   }
 }
-const ok = results.filter((r) => r.ok).length
-console.log(`\nFactory: ${ok}/${results.length} categories generated${dryRun ? ' [dry-run]' : ''}.`)
-if (balanceProvider) {
-  console.error(`PROVIDER_BALANCE_EXHAUSTED provider=${balanceProvider}`)
-  process.exit(EXIT_PROVIDER_BALANCE)
+
+function baseResult({ env, argv, textProvider, dryRun }) {
+  const models = textProvider ? resolveModels(argv, env) : { textModel: null, imageModel: env.FAL_MODEL || DEFAULT_FAL_MODEL }
+  return {
+    schema: 1,
+    ok: false,
+    exitCode: 1,
+    dryRun,
+    halted: false,
+    textProvider,
+    textModel: models.textModel,
+    imageProvider: IMAGE_PROVIDER,
+    imageModel: models.imageModel,
+    counts: { requested: argv.categories.length, attempted: 0, generated: 0 },
+    failure: null,
+    categories: [],
+    generated: [],
+  }
 }
-process.exit(results.some((r) => !r.ok) ? 1 : 0)
+
+function writeResult(deps, result) {
+  const resultPath = deps.resultPath || process.env.FACTORY_RESULT_PATH || path.join(os.tmpdir(), 'sovetydoma-factory-result.json')
+  try {
+    fs.mkdirSync(path.dirname(resultPath), { recursive: true })
+    fs.writeFileSync(resultPath, JSON.stringify(result, null, 2))
+    ;(deps.logger || console).log(`[factory] result JSON -> ${resultPath}`)
+  } catch (e) {
+    ;(deps.logger || console).error(`[factory] failed to write result JSON: ${e.message}`)
+  }
+}
+
+// CLI main — the ONLY path that reads .env.local / process.env and builds
+// real clients. Importing this module never does.
+async function main() {
+  // Local runs read .env.local; CI provides real env vars which take priority.
+  for (const [k, v] of Object.entries(helpers.loadEnv())) {
+    if (process.env[k] === undefined) process.env[k] = v
+  }
+  const result = await runFactory(process.argv.slice(2), { env: process.env })
+  if (result.exitCode === EXIT_PROVIDER_BALANCE) {
+    const provider = result.failure?.provider || 'unknown'
+    console.error(`PROVIDER_BALANCE_EXHAUSTED provider=${provider}`)
+  }
+  process.exit(result.exitCode)
+}
+
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+if (isMain) {
+  main().catch(() => {
+    const result = baseResult({ env: process.env, argv: parseArgs(process.argv.slice(2)), textProvider: null, dryRun: process.argv.includes('--dry-run') })
+    result.failure = { kind: 'unknown', provider: null, stage: 'setup', reason: 'startup_failed', action: 'Inspect factory startup configuration and runtime logs.' }
+    result.exitCode = 1
+    writeResult({ env: process.env }, result)
+    console.error(result.failure.action)
+    process.exit(1)
+  })
+}

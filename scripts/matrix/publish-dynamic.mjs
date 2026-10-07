@@ -14,6 +14,7 @@ import path from 'node:path'
 import { execFileSync } from 'node:child_process'
 import helpers from './lib.mjs'
 import { buildQualityContext, checkArticleQuality, fetchAllPublishedForContext } from './quality-gate.mjs'
+import { allSlugsPublished, assertAllSlugsReady, updateConfirmed, validateRequiredSlugs } from './publish-require-all.mjs'
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? process.argv[i + 1] : d }
 const has = (k) => process.argv.includes(k)
@@ -23,6 +24,7 @@ const category = arg('--category', '')
 const slugsArg = arg('--slugs', '')
 const dryRun = has('--dry-run')
 const force = has('--force') // bypass the quality gate (logs a loud warning)
+const requireAll = has('--require-all')
 const agent = 'publish-dynamic'
 
 const DOMAIN = '1001sovet.ru'
@@ -38,7 +40,14 @@ const sb = helpers.getServiceClient()
 const env = helpers.loadEnv()
 
 // Parse slugs filter if provided
-const slugFilter = slugsArg ? slugsArg.split(',').map((s) => s.trim()).filter(Boolean) : []
+const slugFilter = slugsArg ? slugsArg.split(',').map((s) => s.trim()) : []
+if (requireAll) {
+  try { validateRequiredSlugs(slugFilter) } catch (err) {
+    console.error(err.message)
+    process.exit(1)
+  }
+}
+if (!requireAll) slugFilter.splice(0, slugFilter.length, ...slugFilter.filter(Boolean))
 
 // Build query: select candidates like auto-publish does
 let query = sb.from('content_matrix')
@@ -117,9 +126,16 @@ for (const r of data || []) {
   picked.push(r)
 }
 
+if (requireAll) {
+  try { assertAllSlugsReady(slugFilter, picked) } catch (err) {
+    console.error(err.message)
+    process.exit(1)
+  }
+}
+
 if (picked.length === 0) {
   console.log('Nothing ready to publish.')
-  process.exit(0)
+  process.exit(requireAll ? 1 : 0)
 }
 
 console.log(`Publishing ${picked.length} article(s): ${picked.map((r) => r.slug).join(', ')}${dryRun ? ' [dry-run]' : ''}`)
@@ -246,7 +262,7 @@ for (const r of picked) {
   console.log(`  Updating database...`)
   const imageUrl = `${IMAGE_URL_PREFIX}/${r.image_filename}`
   const publishedAt = new Date().toISOString()
-  const { error: updErr } = await sb.from('content_matrix')
+  let updateQuery = sb.from('content_matrix')
     .update({
       text_status: 'published',
       published_at: publishedAt,
@@ -254,10 +270,18 @@ for (const r of picked) {
       frontmatter: fm
     })
     .eq('id', r.id)
+  if (requireAll) updateQuery = updateQuery.select('id')
+  const { data: updatedRows, error: updErr } = await updateQuery
 
   if (updErr) {
     console.error(`  Database update failed: ${updErr.message}`)
     skipReasons.push(`${r.slug}: database update failed`)
+    skipped++
+    continue
+  }
+  if (requireAll && !updateConfirmed(updatedRows, r.id)) {
+    console.error(`  Database update did not confirm exactly one row for ${r.slug}`)
+    skipReasons.push(`${r.slug}: database update was not confirmed`)
     skipped++
     continue
   }
@@ -358,4 +382,4 @@ if (degraded) {
 
 // Exit non-zero on any skip OR any degraded (index) outcome, so cron/GitHub
 // Actions see that the autopost index was not fully updated.
-process.exit((skipped > 0 || degraded) ? 1 : 0)
+process.exit((skipped > 0 || degraded || (requireAll && !allSlugsPublished(slugFilter, published))) ? 1 : 0)
