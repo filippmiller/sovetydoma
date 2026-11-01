@@ -36,6 +36,11 @@ export function dzenFeedCacheUrl(base: string): string {
   return `${base}/zen.xml?generator=v4`
 }
 
+/** One rendered Dzen <item>; updated_at in the key retires it on any edit. */
+export function dzenItemCacheUrl(base: string, slug: string, version: string): string {
+  return `${base}/zen.xml/item/${encodeURIComponent(slug)}?v=${encodeURIComponent(version)}&generator=v1`
+}
+
 /** Latest-published-articles JSON API — used by the homepage "Только что"
  * widget so it can see today's dynamically-published articles, not just the
  * static build's month-old corpus. */

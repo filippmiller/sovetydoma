@@ -10,6 +10,13 @@ export interface DzenRow {
   published_at: string
 }
 
+/** The light row the day selection runs on — no article body. */
+export interface DzenIndexRow {
+  slug: string
+  published_at: string
+  updated_at: string | null
+}
+
 const MOSCOW_OFFSET_MS = 3 * 60 * 60 * 1000
 
 function escapeXml(value: string): string {
@@ -32,8 +39,8 @@ export function moscowDay(timestamp: string): string {
 }
 
 /** Keep one stable article per Moscow day; the day's earliest publication wins. */
-export function selectDailyDzenRows(rows: DzenRow[], maxDays = 30): DzenRow[] {
-  const earliestByDay = new Map<string, DzenRow>()
+export function selectDailyDzenRows<T extends { published_at: string }>(rows: T[], maxDays = 30): T[] {
+  const earliestByDay = new Map<string, T>()
 
   for (const row of rows) {
     const day = moscowDay(row.published_at)
@@ -49,17 +56,16 @@ export function selectDailyDzenRows(rows: DzenRow[], maxDays = 30): DzenRow[] {
     .slice(0, maxDays)
 }
 
-export function buildDzenFeed(rows: DzenRow[], siteUrl: string, now = new Date()): string {
+export function renderDzenItem(row: DzenRow, siteUrl: string): string {
   const base = siteUrl.replace(/\/+$/, '')
-  const items = rows.map((row) => {
-    const articleUrl = `${base}/${encodeURIComponent(row.category)}/${encodeURIComponent(row.slug)}/`
-    const imageName = row.image_filename || `${row.slug}.jpg`
-    const imageUrl = `${base}/images/${encodeURIComponent(imageName)}`
-    const body = mdToHtml(row.body_md || '')
-    const image = `<figure><img src="${escapeXml(imageUrl)}" alt="${escapeXml(row.title)}" /><figcaption>${escapeXml(row.title)}</figcaption></figure>`
-    const fullHtml = `<h1>${escapeXml(row.title)}</h1>\n${image}\n${body}`
+  const articleUrl = `${base}/${encodeURIComponent(row.category)}/${encodeURIComponent(row.slug)}/`
+  const imageName = row.image_filename || `${row.slug}.jpg`
+  const imageUrl = `${base}/images/${encodeURIComponent(imageName)}`
+  const body = mdToHtml(row.body_md || '')
+  const image = `<figure><img src="${escapeXml(imageUrl)}" alt="${escapeXml(row.title)}" /><figcaption>${escapeXml(row.title)}</figcaption></figure>`
+  const fullHtml = `<h1>${escapeXml(row.title)}</h1>\n${image}\n${body}`
 
-    return `  <item>
+  return `  <item>
     <title>${escapeXml(row.title)}</title>
     <link>${escapeXml(articleUrl)}</link>
     <guid isPermaLink="true">${escapeXml(articleUrl)}</guid>
@@ -68,7 +74,25 @@ export function buildDzenFeed(rows: DzenRow[], siteUrl: string, now = new Date()
     <enclosure url="${escapeXml(imageUrl)}" type="image/jpeg" />
     <content:encoded><![CDATA[${cdata(fullHtml)}]]></content:encoded>
   </item>`
-  }).join('\n')
+}
+
+/**
+ * The free Workers plan allows 10 ms of CPU per request and rendering one
+ * article's Markdown costs ~1 ms, so a cold feed of 30 days can never be built
+ * in one request. Each request renders at most `budget` uncached days, newest
+ * first; the rest arrive on the next requests while the partial feed is served.
+ */
+export function nextDzenRenderBatch<T extends { slug: string }>(selected: T[], cachedSlugs: Set<string>, budget: number): T[] {
+  return selected.filter((row) => !cachedSlugs.has(row.slug)).slice(0, budget)
+}
+
+export function buildDzenFeed(rows: DzenRow[], siteUrl: string, now = new Date()): string {
+  return wrapDzenFeed(rows.map((row) => renderDzenItem(row, siteUrl)), siteUrl, now)
+}
+
+export function wrapDzenFeed(itemsXml: string[], siteUrl: string, now = new Date()): string {
+  const base = siteUrl.replace(/\/+$/, '')
+  const items = itemsXml.join('\n')
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
