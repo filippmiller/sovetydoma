@@ -36,13 +36,13 @@ concurrency:
 
 jobs:
   factory:
-    runs-on: [self-hosted, lan-ci-linux]
+    # GitHub-hosted: free for this public repo, and its US egress reaches
+    # api.anthropic.com directly. The home-LAN runner needed a relay on the
+    # laptop server, and the factory died whenever that tunnel was down.
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      # Egress relay (Anthropic geo-blocks some IPs). Host is non-secret; token is.
-      ANTHROPIC_BASE_URL: ${{ vars.ANTHROPIC_BASE_URL || 'https://anthropic.vsedomatut.com' }}
-      ANTHROPIC_RELAY_TOKEN: ${{ secrets.ANTHROPIC_RELAY_TOKEN }}
       FAL_KEY: ${{ secrets.FAL_KEY }}
       SUPABASE_URL: ${{ secrets.MATRIX_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.MATRIX_SUPABASE_SERVICE_ROLE_KEY }}
