@@ -56,7 +56,7 @@ import {
   categoryLatestCacheUrl,
   categoryRowsCacheUrl,
   dzenFeedCacheUrl,
-  dzenItemCacheUrl,
+  dzenItemKey,
   hubCacheUrl,
   latestArticlesCacheUrl,
   siteBaseUrl,
@@ -78,6 +78,7 @@ interface Env {
   R2_UPLOAD_SECRET?: string     // shared secret for the authenticated PUT /__r2/ upload
   RENDERER_PURGE_SECRET?: string // shared secret for POST /__purge (wrangler secret bulk)
   DZEN_FEED_START_DATE?: string // YYYY-MM-DD; prevents an initial historical import flood
+  DZEN_ITEMS: KVNamespace       // rendered Dzen <item> XML (see wrangler.toml)
 }
 
 // ---------------------------------------------------------------------------
@@ -1453,7 +1454,8 @@ async function handleSitemap(env: Env): Promise<Response> {
 const DZEN_FEED_CACHE_TTL = 900
 // A partial feed (cold item cache) is re-assembled soon so it fills in a few requests.
 const DZEN_PARTIAL_FEED_CACHE_TTL = 60
-const DZEN_ITEM_CACHE_TTL = 7 * 24 * 60 * 60
+// Long enough to outlive the 30-day window; stale versions of edited items expire on their own.
+const DZEN_ITEM_TTL = 45 * 24 * 60 * 60
 const DZEN_RENDER_BUDGET = 3
 
 async function fetchDzenRows<T>(env: Env, params: URLSearchParams): Promise<T[] | null> {
@@ -1516,11 +1518,11 @@ async function handleDzenFeed(env: Env): Promise<Response> {
   }
 
   const selected = selectDailyDzenRows(index)
-  const itemKey = (row: DzenIndexRow) => new Request(dzenItemCacheUrl(siteUrl, row.slug, row.updated_at ?? row.published_at))
+  const itemKey = (row: DzenIndexRow) => dzenItemKey(row.slug, row.updated_at ?? row.published_at)
   const itemXml = new Map<string, string>()
   await Promise.all(selected.map(async (row) => {
-    const hit = await cache.match(itemKey(row))
-    if (hit) itemXml.set(row.slug, await hit.text())
+    const hit = await env.DZEN_ITEMS.get(itemKey(row))
+    if (hit !== null) itemXml.set(row.slug, hit)
   }))
 
   const batch = nextDzenRenderBatch(selected, new Set(itemXml.keys()), DZEN_RENDER_BUDGET)
@@ -1530,15 +1532,16 @@ async function handleDzenFeed(env: Env): Promise<Response> {
       domain: 'eq.1001sovet.ru',
       select: 'slug,category,title,description,body_md,image_filename,published_at',
     }))
+    const writes: Promise<void>[] = []
     for (const row of rows ?? []) {
       const indexed = batch.find((item) => item.slug === row.slug)
       if (!indexed) continue
       const xml = renderDzenItem(row, siteUrl)
       itemXml.set(row.slug, xml)
-      cache.put(itemKey(indexed), new Response(xml, {
-        headers: { 'Cache-Control': `public, max-age=${DZEN_ITEM_CACHE_TTL}` },
-      })).catch(() => {/* ignore */})
+      writes.push(env.DZEN_ITEMS.put(itemKey(indexed), xml, { expirationTtl: DZEN_ITEM_TTL }))
     }
+    // A failed write only means the item is rendered again next request.
+    await Promise.allSettled(writes)
   }
 
   const items = selected.flatMap((row) => itemXml.get(row.slug) ?? [])
