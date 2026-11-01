@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { buildDzenFeed, dzenIndexSince, moscowDay, nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, wrapDzenFeed, type DzenRow } from './dzen'
+import { buildDzenFeed, completeDzenIndexDays, moscowDay, nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, wrapDzenFeed, type DzenRow } from './dzen'
 
 function row(slug: string, publishedAt: string, overrides: Partial<DzenRow> = {}): DzenRow {
   return {
@@ -39,9 +39,16 @@ describe('Dzen daily feed', () => {
     assert.deepEqual(selected.map((item) => item.slug), ['b', 'a'])
   })
 
-  it('queries only the recent window, never before the configured start date', () => {
-    assert.equal(dzenIndexSince('2026-07-19', new Date('2026-11-01T09:00:00Z')), '2026-09-27')
-    assert.equal(dzenIndexSince('2026-07-19', new Date('2026-08-01T09:00:00Z')), '2026-07-19')
+  it('keeps a short index whole and drops only the possibly cut oldest day at the limit', () => {
+    const rows = [
+      { slug: 'c', published_at: '2026-09-19T09:00:00Z' },
+      { slug: 'b2', published_at: '2026-09-18T15:00:00Z' },
+      { slug: 'b1', published_at: '2026-09-18T06:00:00Z' },
+      { slug: 'a', published_at: '2026-09-10T06:00:00Z' },
+    ]
+    assert.deepEqual(completeDzenIndexDays(rows, 5).map((row) => row.slug), ['c', 'b2', 'b1', 'a'])
+    assert.deepEqual(completeDzenIndexDays(rows, 4).map((row) => row.slug), ['c', 'b2', 'b1'])
+    assert.deepEqual(completeDzenIndexDays(rows.slice(0, 2), 2).map((row) => row.slug), ['c'])
   })
 
   it('renders at most the budget of uncached days, newest first', () => {

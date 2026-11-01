@@ -62,7 +62,7 @@ import {
   sitemapCacheUrl,
 } from './cacheKeys'
 import { handlePurge } from './purge'
-import { DZEN_FEED_TAIL, dzenFeedHead, dzenIndexSince, nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, type DzenIndexRow, type DzenRow } from './dzen'
+import { DZEN_FEED_TAIL, completeDzenIndexDays, dzenFeedHead, nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, type DzenIndexRow, type DzenRow } from './dzen'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -1456,6 +1456,8 @@ const DZEN_PARTIAL_FEED_CACHE_TTL = 60
 // Long enough to outlive the 30-day window; stale versions of edited items expire on their own.
 const DZEN_ITEM_TTL = 45 * 24 * 60 * 60
 const DZEN_RENDER_BUDGET = 1
+// ~10 days at the factory's peak rate of several articles a day, ample for 30 days at the usual pace.
+const DZEN_INDEX_LIMIT = 300
 
 async function fetchDzenRows<T>(env: Env, params: URLSearchParams): Promise<T[] | null> {
   const base = env.SUPABASE_URL.replace(/\/+$/, '')
@@ -1516,10 +1518,10 @@ async function handleDzenFeed(env: Env): Promise<Response> {
     text_status: 'eq.published',
     disposition: 'eq.active',
     domain: 'eq.1001sovet.ru',
-    published_at: `gte.${dzenIndexSince(startDate, new Date())}T00:00:00+03:00`,
+    published_at: `gte.${startDate}T00:00:00+03:00`,
     select: 'slug,published_at,updated_at',
-    order: 'published_at.asc,slug.asc',
-    limit: '1000',
+    order: 'published_at.desc,slug.asc',
+    limit: String(DZEN_INDEX_LIMIT),
   })
   let index = await fetchDzenRows<DzenIndexRow>(env, indexParams)
   if (!index) {
@@ -1537,7 +1539,7 @@ async function handleDzenFeed(env: Env): Promise<Response> {
     index = await fetchDzenRows<DzenIndexRow>(env, fallbackParams) ?? []
   }
 
-  const selected = selectDailyDzenRows(index)
+  const selected = selectDailyDzenRows(completeDzenIndexDays(index, DZEN_INDEX_LIMIT))
   const itemKey = (row: DzenIndexRow) => dzenItemKey(row.slug, row.updated_at ?? row.published_at)
   // Stored items stay as byte streams end to end: decoding ~30 large XML strings
   // in JS alone would blow the 10 ms CPU budget.
