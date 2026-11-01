@@ -81,6 +81,7 @@ export function renderDzenItem(row: DzenRow, siteUrl: string): string {
  * article's Markdown costs ~1 ms, so a cold feed of 30 days can never be built
  * in one request. Each request renders at most `budget` uncached days, newest
  * first; the rest arrive on the next requests while the partial feed is served.
+ * Already rendered items are streamed from KV as bytes, so they cost no CPU.
  */
 export function nextDzenRenderBatch<T extends { slug: string }>(selected: T[], cachedSlugs: Set<string>, budget: number): T[] {
   return selected.filter((row) => !cachedSlugs.has(row.slug)).slice(0, budget)
@@ -91,8 +92,14 @@ export function buildDzenFeed(rows: DzenRow[], siteUrl: string, now = new Date()
 }
 
 export function wrapDzenFeed(itemsXml: string[], siteUrl: string, now = new Date()): string {
+  return dzenFeedHead(siteUrl, now) + itemsXml.join('\n') + DZEN_FEED_TAIL
+}
+
+export const DZEN_FEED_TAIL = '\n  </channel>\n</rss>'
+
+/** Everything before the first <item>; the feed is head + items joined by '\n' + tail. */
+export function dzenFeedHead(siteUrl: string, now = new Date()): string {
   const base = siteUrl.replace(/\/+$/, '')
-  const items = itemsXml.join('\n')
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
@@ -105,7 +112,5 @@ export function wrapDzenFeed(itemsXml: string[], siteUrl: string, now = new Date
     <language>ru</language>
     <atom:link href="${escapeXml(base)}/zen.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>${now.toUTCString()}</lastBuildDate>
-${items}
-  </channel>
-</rss>`
+`
 }

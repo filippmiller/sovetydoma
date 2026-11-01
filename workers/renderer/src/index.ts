@@ -63,7 +63,7 @@ import {
   sitemapCacheUrl,
 } from './cacheKeys'
 import { handlePurge } from './purge'
-import { nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, wrapDzenFeed, type DzenIndexRow, type DzenRow } from './dzen'
+import { DZEN_FEED_TAIL, dzenFeedHead, nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, type DzenIndexRow, type DzenRow } from './dzen'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -1456,7 +1456,7 @@ const DZEN_FEED_CACHE_TTL = 900
 const DZEN_PARTIAL_FEED_CACHE_TTL = 60
 // Long enough to outlive the 30-day window; stale versions of edited items expire on their own.
 const DZEN_ITEM_TTL = 45 * 24 * 60 * 60
-const DZEN_RENDER_BUDGET = 3
+const DZEN_RENDER_BUDGET = 1
 
 async function fetchDzenRows<T>(env: Env, params: URLSearchParams): Promise<T[] | null> {
   const base = env.SUPABASE_URL.replace(/\/+$/, '')
@@ -1477,6 +1477,30 @@ async function fetchDzenRows<T>(env: Env, params: URLSearchParams): Promise<T[] 
     return null
   } finally {
     clearTimeout(timer)
+  }
+}
+
+async function streamDzenFeed(writable: WritableStream, siteUrl: string, items: (ReadableStream | string)[]): Promise<void> {
+  const encoder = new TextEncoder()
+  const writeText = async (text: string) => {
+    const writer = writable.getWriter()
+    try {
+      await writer.write(encoder.encode(text))
+    } finally {
+      writer.releaseLock()
+    }
+  }
+  try {
+    await writeText(dzenFeedHead(siteUrl))
+    for (const [position, item] of items.entries()) {
+      if (position > 0) await writeText('\n')
+      if (typeof item === 'string') await writeText(item)
+      else await item.pipeTo(writable, { preventClose: true })
+    }
+    await writeText(DZEN_FEED_TAIL)
+    await writable.close()
+  } catch (error) {
+    await writable.abort(error).catch(() => {/* already errored */})
   }
 }
 
@@ -1519,9 +1543,11 @@ async function handleDzenFeed(env: Env): Promise<Response> {
 
   const selected = selectDailyDzenRows(index)
   const itemKey = (row: DzenIndexRow) => dzenItemKey(row.slug, row.updated_at ?? row.published_at)
-  const itemXml = new Map<string, string>()
+  // Stored items stay as byte streams end to end: decoding ~30 large XML strings
+  // in JS alone would blow the 10 ms CPU budget.
+  const itemXml = new Map<string, ReadableStream | string>()
   await Promise.all(selected.map(async (row) => {
-    const hit = await env.DZEN_ITEMS.get(itemKey(row))
+    const hit = await env.DZEN_ITEMS.get(itemKey(row), 'stream')
     if (hit !== null) itemXml.set(row.slug, hit)
   }))
 
@@ -1546,7 +1572,9 @@ async function handleDzenFeed(env: Env): Promise<Response> {
 
   const items = selected.flatMap((row) => itemXml.get(row.slug) ?? [])
   const ttl = items.length === selected.length ? DZEN_FEED_CACHE_TTL : DZEN_PARTIAL_FEED_CACHE_TTL
-  const response = new Response(wrapDzenFeed(items, siteUrl), {
+  const { readable, writable } = new IdentityTransformStream()
+  void streamDzenFeed(writable, siteUrl, items)
+  const response = new Response(readable, {
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',
       'Cache-Control': `public, max-age=${ttl}, s-maxage=${ttl}`,

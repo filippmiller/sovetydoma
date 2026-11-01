@@ -105,16 +105,11 @@ function parseBlocks(lines: string[]): Block[] {
       continue
     }
 
-    // Headings
-    const h2 = line.match(/^## (.+)/)
-    if (h2) {
-      blocks.push({ type: 'heading2', raw: [line] })
-      i++
-      continue
-    }
-    const h3 = line.match(/^### (.+)/)
-    if (h3) {
-      blocks.push({ type: 'heading3', raw: [line] })
+    // Headings. The page and the Dzen item already own the <h1> (the article
+    // title), so a body `#` heading is demoted to <h2>; `####`+ collapse to <h3>.
+    const heading = line.match(/^(#{1,6}) (.+)/)
+    if (heading) {
+      blocks.push({ type: heading[1].length <= 2 ? 'heading2' : 'heading3', raw: [line] })
       i++
       continue
     }
@@ -178,7 +173,13 @@ function parseBlocks(lines: string[]): Block[] {
       raw.push(lines[i])
       i++
     }
-    if (raw.length) blocks.push({ type: 'paragraph', raw })
+    // A line no rule above consumes (e.g. a bare `#`) must still advance the
+    // cursor; otherwise this loop spins forever and the worker dies on CPU.
+    if (raw.length === 0) {
+      raw.push(lines[i])
+      i++
+    }
+    blocks.push({ type: 'paragraph', raw })
   }
 
   return blocks
@@ -187,12 +188,12 @@ function parseBlocks(lines: string[]): Block[] {
 function renderBlock(block: Block): string {
   switch (block.type) {
     case 'heading2': {
-      const text = block.raw[0].replace(/^## /, '')
+      const text = block.raw[0].replace(/^#{1,6} /, '')
       const id = slugify(text)
       return id ? `<h2 id="${escHtml(id)}">${inlineHtml(text)}</h2>\n` : `<h2>${inlineHtml(text)}</h2>\n`
     }
     case 'heading3': {
-      const text = block.raw[0].replace(/^### /, '')
+      const text = block.raw[0].replace(/^#{1,6} /, '')
       const id = slugify(text)
       return id ? `<h3 id="${escHtml(id)}">${inlineHtml(text)}</h3>\n` : `<h3>${inlineHtml(text)}</h3>\n`
     }
