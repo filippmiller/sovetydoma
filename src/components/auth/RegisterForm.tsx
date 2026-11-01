@@ -20,6 +20,7 @@ export interface RegisterFormProps {
   onPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onConfirmPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onTermsChange: () => void
+  onPrivacyConsentChange: () => void
 }
 
 export default function RegisterForm({
@@ -38,6 +39,7 @@ export default function RegisterForm({
   onPasswordChange,
   onConfirmPasswordChange,
   onTermsChange,
+  onPrivacyConsentChange,
 }: RegisterFormProps) {
   return (
     <form onSubmit={onSubmit} noValidate className={styles.form}>
@@ -105,6 +107,9 @@ export default function RegisterForm({
           required
         />
       </div>
+      {/* 152-FZ: consent to the terms of use and consent to PD processing are
+          separate purposes and must not be bundled into one checkbox (canon
+          §1.1) — each is recorded as its own consent_events row on submit. */}
       <div className={styles.termsRow}>
         <input
           type="checkbox"
@@ -115,7 +120,20 @@ export default function RegisterForm({
           onChange={onTermsChange}
         />
         <label htmlFor="terms" style={{ lineHeight: 1.3 }}>
-          Я согласен(а) с <a href="/terms" target="_blank">Условиями использования</a> и <a href="/privacy" target="_blank">Политикой конфиденциальности</a>.
+          Я согласен(а) с <a href="/terms" target="_blank">Условиями использования</a>.
+        </label>
+      </div>
+      <div className={styles.termsRow}>
+        <input
+          type="checkbox"
+          id="privacyConsent"
+          name="privacyConsent"
+          value="accepted"
+          required
+          onChange={onPrivacyConsentChange}
+        />
+        <label htmlFor="privacyConsent" style={{ lineHeight: 1.3 }}>
+          Согласен(а) на обработку персональных данных в соответствии с <a href="/privacy" target="_blank">Политикой конфиденциальности</a>.
         </label>
       </div>
       {error && <p className={styles.error} role="alert">{error}</p>}

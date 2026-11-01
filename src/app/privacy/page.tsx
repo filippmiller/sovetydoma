@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { canonicalPath } from '@/lib/seo'
+import { PRIVACY_POLICY_VERSION } from '@/lib/legal/document-versions'
 
 export const metadata: Metadata = {
   title: 'Политика конфиденциальности',
@@ -9,7 +10,6 @@ export const metadata: Metadata = {
 }
 
 export default function PrivacyPage() {
-  const year = new Date().getFullYear()
   return (
     <div style={{ maxWidth: '780px', margin: '2rem auto', padding: '0 1rem 4rem', lineHeight: 1.65 }}>
       <nav aria-label="Хлебные крошки" style={{ fontSize: '0.85rem', marginBottom: '1rem' }}>
@@ -19,7 +19,7 @@ export default function PrivacyPage() {
       </nav>
 
       <h1 style={{ fontSize: '1.7rem', fontWeight: 800, marginBottom: '0.5rem' }}>Политика конфиденциальности</h1>
-      <p style={{ color: '#666', marginBottom: '1.25rem' }}>Последнее обновление: {year}. Мы уважаем ваше право на приватность.</p>
+      <p style={{ color: '#666', marginBottom: '1.25rem' }}>Версия документа: {PRIVACY_POLICY_VERSION}. Мы уважаем ваше право на приватность.</p>
 
       <p style={{ color: '#444' }}>
         Сайт 1001sovet.ru — информационный ресурс. Мы не собираем избыточные персональные данные. Обработка ведётся в соответствии с принципами минимизации и только для работы функций сайта (авторизация, избранное, комментарии, подписки, модерация, аналитика).
@@ -51,7 +51,7 @@ export default function PrivacyPage() {
 
       <h2 style={{ fontSize: '1.15rem', margin: '1.5rem 0 0.5rem' }}>Ваши права</h2>
       <p style={{ color: '#444' }}>
-        Вы можете запросить удаление аккаунта и связанных данных (комментарии, сохранённые, подписки) через форму <Link href="/contact/" style={{ color: '#c0392b' }}>Контакты</Link> (тема «Другое» или «Ошибка в материале»). Уканите email аккаунта. Мы обработаем в разумные сроки (обычно до 30 дней). Локальные данные в браузере удаляете сами.
+        Вы можете самостоятельно запросить удаление аккаунта в <Link href="/moy-kabinet/" style={{ color: '#c0392b' }}>личном кабинете</Link> (раздел «Приватность»). Запрос выполняется в течение 30 дней (льготный период — вы можете отменить запрос в этот срок), после чего имя, фото и текст комментариев обезличиваются. Если доступ в кабинет невозможен — напишите через форму <Link href="/contact/" style={{ color: '#c0392b' }}>Контакты</Link>, указав email аккаунта. Локальные данные в браузере удаляете сами.
       </p>
 
       <p style={{ marginTop: '2rem', fontSize: '0.9rem', color: '#888' }}>

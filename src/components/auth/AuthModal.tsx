@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { supabase } from '@/lib/supabase'
 import { migrateLocalFavoritesToServer, processPendingFavoriteIntent } from '@/lib/favorites'
 import { mapAuthError } from '@/lib/auth/error-messages'
+import { submitSignupConsent } from '@/lib/privacy/privacy-worker-client'
 import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
 import ForgotPasswordForm from './ForgotPasswordForm'
@@ -285,7 +286,11 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     const submittedEmail = String(form.get('email') || '').trim()
     const submittedPassword = String(form.get('password') || '')
     const submittedConfirmPassword = String(form.get('confirmPassword') || '')
+    // 152-FZ: terms-of-use consent and PD-processing consent are separate
+    // purposes/checkboxes (canon §1.1) — both required to register, but
+    // recorded as two distinct consent_events rows below, not bundled.
     const termsAccepted = form.get('terms') === 'accepted'
+    const privacyConsentAccepted = form.get('privacyConsent') === 'accepted'
     setDisplayName(submittedDisplayName)
     setRegisterEmail(submittedEmail)
     setRegisterPassword(submittedPassword)
@@ -295,11 +300,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     if (!isValidEmail(submittedEmail)) { setEmailError('Введите корректный email адрес.'); return }
     if (submittedPassword.length < 8) { setError('Пароль должен быть не короче 8 символов'); return }
     if (submittedPassword !== submittedConfirmPassword) { setError('Пароли не совпадают'); return }
-    if (!termsAccepted) { setError('Подтвердите согласие с условиями и политикой конфиденциальности'); return }
+    if (!termsAccepted) { setError('Подтвердите согласие с условиями использования'); return }
+    if (!privacyConsentAccepted) { setError('Подтвердите согласие на обработку персональных данных'); return }
 
     const emailRedirectTo = getAuthRedirectTo()
     setLoading(true)
-    const { error: err } = await supabase.auth.signUp({
+    const { data: signUpData, error: err } = await supabase.auth.signUp({
       email: submittedEmail,
       password: submittedPassword,
       options: {
@@ -311,6 +317,14 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
     if (err) {
       setError(mapAuthError(err.message))
       return
+    }
+    // Best-effort evidence write (never blocks the success UX — see
+    // submitSignupConsent's doc comment). The new user's id is available on
+    // the signUp response even before email confirmation.
+    const newUserId = signUpData.user?.id
+    if (newUserId) {
+      void submitSignupConsent(newUserId, 'terms')
+      void submitSignupConsent(newUserId, 'privacy_policy')
     }
     setSuccess('verify')
     setRegisterPassword('')
@@ -700,6 +714,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = 'login', reaso
               onPasswordChange={(e) => setRegisterPassword(e.target.value)}
               onConfirmPasswordChange={(e) => setConfirmRegisterPassword(e.target.value)}
               onTermsChange={() => { if (error) setError('') }}
+              onPrivacyConsentChange={() => { if (error) setError('') }}
             />
           </>
         )}
