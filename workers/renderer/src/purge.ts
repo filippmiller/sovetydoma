@@ -9,7 +9,6 @@ import { HUB_PAGE_SIZE } from './links'
 import {
   articleCacheUrl,
   categoryRowsCacheUrl,
-  dzenFeedCacheUrl,
   hubCacheUrl,
   siteBaseUrl,
   sitemapCacheUrl,
@@ -116,7 +115,6 @@ export async function handlePurge(
   }
 
   keys.push(sitemapCacheUrl(base))
-  keys.push(dzenFeedCacheUrl(base))
 
   const cache = caches.default
   await Promise.all(keys.map((key) => cache.delete(new Request(key)).catch(() => false)))

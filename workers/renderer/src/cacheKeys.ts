@@ -31,11 +31,6 @@ export function sitemapCacheUrl(base: string): string {
   return `${base}/sitemap-dynamic.xml?generator=v3`
 }
 
-/** Dzen RSS feed: one stable article per Moscow day. */
-export function dzenFeedCacheUrl(base: string): string {
-  return `${base}/zen.xml?generator=v4`
-}
-
 /** KV key of one rendered Dzen <item>; updated_at in the key retires it on any edit. */
 export function dzenItemKey(slug: string, version: string): string {
   return `dzen-item:v1:${slug}:${version}`

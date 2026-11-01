@@ -55,7 +55,6 @@ import {
   articleCacheUrl,
   categoryLatestCacheUrl,
   categoryRowsCacheUrl,
-  dzenFeedCacheUrl,
   dzenItemKey,
   hubCacheUrl,
   latestArticlesCacheUrl,
@@ -63,7 +62,7 @@ import {
   sitemapCacheUrl,
 } from './cacheKeys'
 import { handlePurge } from './purge'
-import { DZEN_FEED_TAIL, dzenFeedHead, nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, type DzenIndexRow, type DzenRow } from './dzen'
+import { DZEN_FEED_TAIL, dzenFeedHead, dzenIndexSince, nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, type DzenIndexRow, type DzenRow } from './dzen'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -1452,7 +1451,7 @@ async function handleSitemap(env: Env): Promise<Response> {
 // Moscow-time publication of each day keeps the cadence at one stable item/day
 // even though the content factory publishes several articles daily.
 const DZEN_FEED_CACHE_TTL = 900
-// A partial feed (cold item cache) is re-assembled soon so it fills in a few requests.
+// A partial feed (cold item cache) tells clients to come back soon so it fills in a few requests.
 const DZEN_PARTIAL_FEED_CACHE_TTL = 60
 // Long enough to outlive the 30-day window; stale versions of edited items expire on their own.
 const DZEN_ITEM_TTL = 45 * 24 * 60 * 60
@@ -1505,12 +1504,9 @@ async function streamDzenFeed(writable: WritableStream, siteUrl: string, items: 
 }
 
 async function handleDzenFeed(env: Env): Promise<Response> {
+  // No caches.default here: the renderer is reached via *.workers.dev, where the
+  // Cache API is a no-op, and response.clone() would only buffer the stream.
   const siteUrl = siteBaseUrl(env)
-  const cacheKey = new Request(dzenFeedCacheUrl(siteUrl))
-  const cache = caches.default
-  const cached = await cache.match(cacheKey)
-  if (cached) return cached
-
   const startDate = /^\d{4}-\d{2}-\d{2}$/.test(env.DZEN_FEED_START_DATE || '')
     ? env.DZEN_FEED_START_DATE as string
     : '2026-07-19'
@@ -1520,7 +1516,7 @@ async function handleDzenFeed(env: Env): Promise<Response> {
     text_status: 'eq.published',
     disposition: 'eq.active',
     domain: 'eq.1001sovet.ru',
-    published_at: `gte.${startDate}T00:00:00+03:00`,
+    published_at: `gte.${dzenIndexSince(startDate, new Date())}T00:00:00+03:00`,
     select: 'slug,published_at,updated_at',
     order: 'published_at.asc,slug.asc',
     limit: '1000',
@@ -1581,7 +1577,6 @@ async function handleDzenFeed(env: Env): Promise<Response> {
       'X-Content-Type-Options': 'nosniff',
     },
   })
-  cache.put(cacheKey, response.clone()).catch(() => {/* ignore */})
   return response
 }
 
