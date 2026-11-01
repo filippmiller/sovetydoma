@@ -38,6 +38,16 @@ export function moscowDay(timestamp: string): string {
   return new Date(time + MOSCOW_OFFSET_MS).toISOString().slice(0, 10)
 }
 
+/**
+ * Earliest Moscow day the index query needs: the feed shows at most 30 days, so
+ * reading the whole history since the start date only burns CPU on JSON parsing.
+ * Five spare days cover a factory pause without shrinking the feed much.
+ */
+export function dzenIndexSince(startDate: string, now: Date, windowDays = 35): string {
+  const windowStart = moscowDay(new Date(now.getTime() - windowDays * 24 * 60 * 60 * 1000).toISOString())
+  return windowStart > startDate ? windowStart : startDate
+}
+
 /** Keep one stable article per Moscow day; the day's earliest publication wins. */
 export function selectDailyDzenRows<T extends { published_at: string }>(rows: T[], maxDays = 30): T[] {
   const earliestByDay = new Map<string, T>()

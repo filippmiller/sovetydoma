@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { buildDzenFeed, moscowDay, nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, wrapDzenFeed, type DzenRow } from './dzen'
+import { buildDzenFeed, dzenIndexSince, moscowDay, nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, wrapDzenFeed, type DzenRow } from './dzen'
 
 function row(slug: string, publishedAt: string, overrides: Partial<DzenRow> = {}): DzenRow {
   return {
@@ -37,6 +37,11 @@ describe('Dzen daily feed', () => {
       { slug: 'b', published_at: '2026-07-20T04:00:00Z', updated_at: '2026-07-21T00:00:00Z' },
     ])
     assert.deepEqual(selected.map((item) => item.slug), ['b', 'a'])
+  })
+
+  it('queries only the recent window, never before the configured start date', () => {
+    assert.equal(dzenIndexSince('2026-07-19', new Date('2026-11-01T09:00:00Z')), '2026-09-27')
+    assert.equal(dzenIndexSince('2026-07-19', new Date('2026-08-01T09:00:00Z')), '2026-07-19')
   })
 
   it('renders at most the budget of uncached days, newest first', () => {
