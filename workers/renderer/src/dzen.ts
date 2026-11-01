@@ -39,13 +39,16 @@ export function moscowDay(timestamp: string): string {
 }
 
 /**
- * Earliest Moscow day the index query needs: the feed shows at most 30 days, so
- * reading the whole history since the start date only burns CPU on JSON parsing.
- * Five spare days cover a factory pause without shrinking the feed much.
+ * The index query reads only the newest `limit` rows (newest first) instead of
+ * the whole history: parsing it is most of the feed's CPU. Time windows do not
+ * work here because the content factory can pause for weeks. When the limit is
+ * hit, the oldest day in the slice may be cut short and would pick the wrong
+ * "earliest of the day" article, so that day is dropped.
  */
-export function dzenIndexSince(startDate: string, now: Date, windowDays = 35): string {
-  const windowStart = moscowDay(new Date(now.getTime() - windowDays * 24 * 60 * 60 * 1000).toISOString())
-  return windowStart > startDate ? windowStart : startDate
+export function completeDzenIndexDays<T extends { published_at: string }>(rowsNewestFirst: T[], limit: number): T[] {
+  if (rowsNewestFirst.length < limit) return rowsNewestFirst
+  const oldestDay = moscowDay(rowsNewestFirst[rowsNewestFirst.length - 1].published_at)
+  return rowsNewestFirst.filter((row) => moscowDay(row.published_at) !== oldestDay)
 }
 
 /** Keep one stable article per Moscow day; the day's earliest publication wins. */
