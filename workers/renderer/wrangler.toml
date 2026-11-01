@@ -18,3 +18,9 @@ DZEN_FEED_START_DATE = "2026-07-19"
 #     after a dynamic publish). Must match the x-purge-secret header sent by the
 #     publishing pipeline (scripts/factory/publish-dynamic). If unset, /__purge
 #     fails closed with 503 purge_not_configured.
+
+# Rendered Dzen <item> XML, keyed by slug + updated_at. KV, not the Cache API:
+# the renderer is reached via *.workers.dev, where cache.put is a no-op.
+[[kv_namespaces]]
+binding = "DZEN_ITEMS"
+id = "e11a195e92c04ae4928dae1497958f8d"

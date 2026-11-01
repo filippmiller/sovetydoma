@@ -36,9 +36,9 @@ export function dzenFeedCacheUrl(base: string): string {
   return `${base}/zen.xml?generator=v4`
 }
 
-/** One rendered Dzen <item>; updated_at in the key retires it on any edit. */
-export function dzenItemCacheUrl(base: string, slug: string, version: string): string {
-  return `${base}/zen.xml/item/${encodeURIComponent(slug)}?v=${encodeURIComponent(version)}&generator=v1`
+/** KV key of one rendered Dzen <item>; updated_at in the key retires it on any edit. */
+export function dzenItemKey(slug: string, version: string): string {
+  return `dzen-item:v1:${slug}:${version}`
 }
 
 /** Latest-published-articles JSON API — used by the homepage "Только что"
