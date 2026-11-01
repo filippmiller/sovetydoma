@@ -56,13 +56,14 @@ import {
   categoryLatestCacheUrl,
   categoryRowsCacheUrl,
   dzenFeedCacheUrl,
+  dzenItemCacheUrl,
   hubCacheUrl,
   latestArticlesCacheUrl,
   siteBaseUrl,
   sitemapCacheUrl,
 } from './cacheKeys'
 import { handlePurge } from './purge'
-import { buildDzenFeed, selectDailyDzenRows, type DzenRow } from './dzen'
+import { nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, wrapDzenFeed, type DzenIndexRow, type DzenRow } from './dzen'
 
 // ---------------------------------------------------------------------------
 // Environment
@@ -1450,6 +1451,32 @@ async function handleSitemap(env: Env): Promise<Response> {
 // Moscow-time publication of each day keeps the cadence at one stable item/day
 // even though the content factory publishes several articles daily.
 const DZEN_FEED_CACHE_TTL = 900
+// A partial feed (cold item cache) is re-assembled soon so it fills in a few requests.
+const DZEN_PARTIAL_FEED_CACHE_TTL = 60
+const DZEN_ITEM_CACHE_TTL = 7 * 24 * 60 * 60
+const DZEN_RENDER_BUDGET = 3
+
+async function fetchDzenRows<T>(env: Env, params: URLSearchParams): Promise<T[] | null> {
+  const base = env.SUPABASE_URL.replace(/\/+$/, '')
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
+  try {
+    const resp = await fetch(`${base}/rest/v1/content_matrix?${params.toString()}`, {
+      signal: controller.signal,
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        Accept: 'application/json',
+      },
+    })
+    if (!resp.ok) return null
+    return await resp.json() as T[]
+  } catch {
+    return null
+  } finally {
+    clearTimeout(timer)
+  }
+}
 
 async function handleDzenFeed(env: Env): Promise<Response> {
   const siteUrl = siteBaseUrl(env)
@@ -1461,73 +1488,65 @@ async function handleDzenFeed(env: Env): Promise<Response> {
   const startDate = /^\d{4}-\d{2}-\d{2}$/.test(env.DZEN_FEED_START_DATE || '')
     ? env.DZEN_FEED_START_DATE as string
     : '2026-07-19'
-  const base = env.SUPABASE_URL.replace(/\/+$/, '')
-  const params = new URLSearchParams({
+  // Day selection runs on slugs and timestamps only; bodies are fetched later
+  // for the few items that still need rendering.
+  const indexParams = new URLSearchParams({
     text_status: 'eq.published',
     disposition: 'eq.active',
     domain: 'eq.1001sovet.ru',
     published_at: `gte.${startDate}T00:00:00+03:00`,
-    select: 'slug,category,title,description,body_md,image_filename,published_at',
+    select: 'slug,published_at,updated_at',
     order: 'published_at.asc,slug.asc',
     limit: '1000',
   })
-
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), DB_TIMEOUT_MS)
-  let upstream: Response
-  try {
-    upstream = await fetch(`${base}/rest/v1/content_matrix?${params.toString()}`, {
-      signal: controller.signal,
-      headers: {
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        Accept: 'application/json',
-      },
-    })
-  } catch {
-    clearTimeout(timer)
+  let index = await fetchDzenRows<DzenIndexRow>(env, indexParams)
+  if (!index) {
     return new Response('Dzen feed unavailable', { status: 503, headers: { 'Retry-After': '30' } })
   }
-  clearTimeout(timer)
-
-  if (!upstream.ok) {
-    return new Response('Dzen feed DB error', { status: 503, headers: { 'Retry-After': '30' } })
-  }
-
-  let rows = await upstream.json() as DzenRow[]
 
   // Keep the feed connectable while the content factory is temporarily idle:
   // bootstrap it with the latest published article, but do not expose a backlog.
-  if (rows.length === 0) {
-    const fallbackParams = new URLSearchParams(params)
+  // A failed bootstrap lookup leaves an empty but valid feed rather than a 503.
+  if (index.length === 0) {
+    const fallbackParams = new URLSearchParams(indexParams)
     fallbackParams.delete('published_at')
     fallbackParams.set('order', 'published_at.desc,slug.asc')
     fallbackParams.set('limit', '1')
-    const fallbackController = new AbortController()
-    const fallbackTimer = setTimeout(() => fallbackController.abort(), DB_TIMEOUT_MS)
-    try {
-      const fallback = await fetch(`${base}/rest/v1/content_matrix?${fallbackParams.toString()}`, {
-        signal: fallbackController.signal,
-        headers: {
-          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-          Accept: 'application/json',
-        },
-      })
-      if (fallback.ok) rows = await fallback.json() as DzenRow[]
-    } catch {
-      // The primary query succeeded, so an empty but valid feed is safer than
-      // turning a transient bootstrap lookup failure into a 503.
-    } finally {
-      clearTimeout(fallbackTimer)
+    index = await fetchDzenRows<DzenIndexRow>(env, fallbackParams) ?? []
+  }
+
+  const selected = selectDailyDzenRows(index)
+  const itemKey = (row: DzenIndexRow) => new Request(dzenItemCacheUrl(siteUrl, row.slug, row.updated_at ?? row.published_at))
+  const itemXml = new Map<string, string>()
+  await Promise.all(selected.map(async (row) => {
+    const hit = await cache.match(itemKey(row))
+    if (hit) itemXml.set(row.slug, await hit.text())
+  }))
+
+  const batch = nextDzenRenderBatch(selected, new Set(itemXml.keys()), DZEN_RENDER_BUDGET)
+  if (batch.length > 0) {
+    const rows = await fetchDzenRows<DzenRow>(env, new URLSearchParams({
+      slug: `in.(${batch.map((row) => `"${row.slug}"`).join(',')})`,
+      domain: 'eq.1001sovet.ru',
+      select: 'slug,category,title,description,body_md,image_filename,published_at',
+    }))
+    for (const row of rows ?? []) {
+      const indexed = batch.find((item) => item.slug === row.slug)
+      if (!indexed) continue
+      const xml = renderDzenItem(row, siteUrl)
+      itemXml.set(row.slug, xml)
+      cache.put(itemKey(indexed), new Response(xml, {
+        headers: { 'Cache-Control': `public, max-age=${DZEN_ITEM_CACHE_TTL}` },
+      })).catch(() => {/* ignore */})
     }
   }
 
-  const xml = buildDzenFeed(selectDailyDzenRows(rows), siteUrl)
-  const response = new Response(xml, {
+  const items = selected.flatMap((row) => itemXml.get(row.slug) ?? [])
+  const ttl = items.length === selected.length ? DZEN_FEED_CACHE_TTL : DZEN_PARTIAL_FEED_CACHE_TTL
+  const response = new Response(wrapDzenFeed(items, siteUrl), {
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',
-      'Cache-Control': `public, max-age=${DZEN_FEED_CACHE_TTL}, s-maxage=${DZEN_FEED_CACHE_TTL}`,
+      'Cache-Control': `public, max-age=${ttl}, s-maxage=${ttl}`,
       'X-Content-Type-Options': 'nosniff',
     },
   })

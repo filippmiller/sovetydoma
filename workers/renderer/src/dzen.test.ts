@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { buildDzenFeed, moscowDay, selectDailyDzenRows, type DzenRow } from './dzen'
+import { buildDzenFeed, moscowDay, nextDzenRenderBatch, renderDzenItem, selectDailyDzenRows, wrapDzenFeed, type DzenRow } from './dzen'
 
 function row(slug: string, publishedAt: string, overrides: Partial<DzenRow> = {}): DzenRow {
   return {
@@ -29,6 +29,28 @@ describe('Dzen daily feed', () => {
       row('day-2-first', '2026-07-18T22:00:00Z'),
     ])
     assert.deepEqual(selected.map((item) => item.slug), ['day-2-first', 'day-1'])
+  })
+
+  it('selects days from light index rows that carry no body', () => {
+    const selected = selectDailyDzenRows([
+      { slug: 'a', published_at: '2026-07-19T04:00:00Z', updated_at: null },
+      { slug: 'b', published_at: '2026-07-20T04:00:00Z', updated_at: '2026-07-21T00:00:00Z' },
+    ])
+    assert.deepEqual(selected.map((item) => item.slug), ['b', 'a'])
+  })
+
+  it('renders at most the budget of uncached days, newest first', () => {
+    const selected = ['d5', 'd4', 'd3', 'd2', 'd1'].map((slug) => ({ slug }))
+    assert.deepEqual(nextDzenRenderBatch(selected, new Set(), 3).map((row) => row.slug), ['d5', 'd4', 'd3'])
+    assert.deepEqual(nextDzenRenderBatch(selected, new Set(['d5', 'd3']), 3).map((row) => row.slug), ['d4', 'd2', 'd1'])
+    assert.deepEqual(nextDzenRenderBatch(selected, new Set(['d5', 'd4', 'd3', 'd2', 'd1']), 3), [])
+  })
+
+  it('assembles the same feed from cached items as from rows', () => {
+    const rows = [row('a', '2026-07-20T04:00:00Z'), row('b', '2026-07-19T04:00:00Z')]
+    const now = new Date('2026-07-21T00:00:00Z')
+    const fromItems = wrapDzenFeed(rows.map((item) => renderDzenItem(item, 'https://1001sovet.ru')), 'https://1001sovet.ru', now)
+    assert.equal(fromItems, buildDzenFeed(rows, 'https://1001sovet.ru', now))
   })
 
   it('builds canonical UTF-8 RSS with full content and an image', () => {
